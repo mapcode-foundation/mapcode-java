@@ -20,11 +20,11 @@ of the Mapcode library by Rijn Buve and Matthew Lowden.
 
 This Java project contains a library to encode latitude/longitude pairs to Mapcodes
 and to decode Mapcodes back to latitude/longitude pairs.
-
-For more information, see: http://www.mapcode.com.
-
--------------------------------------------------------------------------------
-RELEASE NOTES
 -------------------------------------------------------------------------------
 
-See file: src/site/apt/ReleaseNotes.apt.vm
+Online documentation can be found at: http://rijnb.github.io/mapcode-java/
+
+Release notes can be found at: http://rijnb.github.io/mapcode-java/ReleaseNotes.html
+
+This website was automatically generated with Maven (using 'mvn site:site'). 
+You can find the site page sources at 'src/site/apt/...'.
