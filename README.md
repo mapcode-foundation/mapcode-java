@@ -1,5 +1,4 @@
-Mapcode Library for Java
-====
+# Mapcode Library for Java
 
 Copyright (C) 2014 Stichting Mapcode Foundation (http://www.mapcode.com)
 
@@ -12,8 +11,7 @@ and to decode Mapcodes back to latitude/longitude pairs.
 
 **Release notes can be found at: http://rijnb.github.io/mapcode-java/ReleaseNotes.html**
 
-License
-====
+# License
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
