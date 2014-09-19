@@ -77,18 +77,18 @@ class DataAccess {
         return u;
     }
 
-    public static int dataFlags(final int i) {
+    static int dataFlags(final int i) {
         return asUnsignedByte((i * 20) + 16) + asUnsignedByte((i * 20) + 17) * 256;
     }
 
-    public static int asLong(final int i) {
+    static int asLong(final int i) {
         return asUnsignedByte(i) +
             (asUnsignedByte(i + 1) << 8) +
             (asUnsignedByte(i + 2) << 16) +
             (asUnsignedByte(i + 3) << 24);
     }
 
-    public static int smartDiv(final int i) {
+    static int smartDiv(final int i) {
         return asUnsignedByte((i * 20) + 18) + (asUnsignedByte((i * 20) + 19) * 256);
     }
 
@@ -127,15 +127,15 @@ class DataAccess {
         16105, 16112, 16114, 16115, 16117, 16118, 16120, 16122, 16124, 16126, 16128, 16129, 16130, 16162};
 
     // / low-level routines for data access
-    public static int dataFirstRecord(final int ccode) {
+    static int dataFirstRecord(final int ccode) {
         return DATA_START[ccode];
     }
 
-    public static int dataLastRecord(final int ccode) {
+    static int dataLastRecord(final int ccode) {
         return DATA_START[ccode + 1] - 1;
     }
 
-    public static int numberOfSubAreas() {
+    static int numberOfSubAreas() {
         return DATA_START[DATA_START.length - 1];
     }
 }

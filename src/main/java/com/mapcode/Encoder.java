@@ -24,7 +24,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mapcode.Common.GSON;
 import static com.mapcode.Common.countCityCoordinatesForCountry;
 import static com.mapcode.Common.getFirstNamelessRecord;
 import static com.mapcode.Common.nc;
@@ -40,7 +39,7 @@ class Encoder {
     // ----------------------------------------------------------------------
 
     @Nonnull
-    public static List<MapcodeInfo> encode(
+    static List<Mapcode> encode(
         final double latDeg,
         final double lonDeg,
         @Nullable final Territory territory,
@@ -59,11 +58,16 @@ class Encoder {
         'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
 
     @Nonnull
-    private static List<MapcodeInfo> encode(double latDeg, double lonDeg, @Nullable final Territory territory,
-        final boolean isRecursive, final boolean limitToOneResult, final boolean allowWorld,
-        @Nullable Territory stateOverride) {
+    private static List<Mapcode> encode(final double argLatDeg, final double argLonDeg,
+        @Nullable final Territory territory, final boolean isRecursive, final boolean limitToOneResult, final boolean allowWorld,
+        @Nullable final Territory argStateOverride) {
         LOG.trace("encode: latDeg={}, lonDeg={}, territory={}, isRecursive={}, limitToOneResult={}, allowWorld={}",
-            latDeg, lonDeg, (territory == null) ? null : territory.name(), isRecursive, limitToOneResult, allowWorld);
+            argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), isRecursive, limitToOneResult,
+            allowWorld);
+
+        double latDeg = argLatDeg;
+        double lonDeg = argLonDeg;
+        Territory stateOverride = argStateOverride;
 
         if (latDeg > 90) {
             latDeg -= 180;
@@ -80,7 +84,7 @@ class Encoder {
 
         final Point pointToEncode = Point.fromDeg(latDeg, lonDeg);
         final List<SubArea> areas = SubArea.getAreasForPoint(pointToEncode);
-        final List<MapcodeInfo> results = new ArrayList<MapcodeInfo>();
+        final List<Mapcode> results = new ArrayList<Mapcode>();
 
         int lastbasesubareaID = -1;
 
@@ -144,7 +148,7 @@ class Encoder {
                     }
 
                     // Create new result.
-                    final MapcodeInfo newResult = new MapcodeInfo(mapcode, encodeTerritory);
+                    final Mapcode newResult = new Mapcode(mapcode, encodeTerritory);
 
                     // The result should not be stored yet.
                     if (!results.contains(newResult)) {
@@ -152,8 +156,8 @@ class Encoder {
                     }
                     else {
                         // TODO: This should probably be simply an assertion instead.
-                        LOG.error("encode: Duplicate results found, newResult={}, results={}",
-                            GSON.toJson(newResult), GSON.toJson(results));
+                        LOG.error("encode: Duplicate results found, newResult={}, results={} items",
+                            newResult.asInternationalISO(), results.size());
                     }
 
                     lastbasesubareaID = from;
@@ -161,14 +165,27 @@ class Encoder {
                         return results;
                     }
                 }
-            } // in rect
+            }
         }
-        LOG.trace("encode: isRecursive={}, results={}", isRecursive, GSON.toJson(results));
+        LOG.trace("encode: isRecursive={}, results={} items", isRecursive, results.size());
         LOG.trace("");
         return results;
     }
 
-    private static String encodeGrid(final int m, Point pointToEncode, final Data mapcoderData) {
+    private static String addPostfix(final int extrax4, final int extray, final int dividerx4, final int dividery) {
+        final int gx = ((30 * extrax4) / dividerx4);
+        final int gy = ((30 * extray) / dividery);
+        final int x1 = (gx / 6);
+        final int y1 = (gy / 5);
+        String s = "-" + encode_chars[y1 * 5 + x1];
+        final int x2 = (gx % 6);
+        final int y2 = (gy % 5);
+        s += encode_chars[y2 * 6 + x2];
+        return s;
+    }
+
+    private static String encodeGrid(final int m, final Point point, final Data mapcoderData) {
+        Point pointToEncode = point;
         int codex = mapcoderData.getCodex();
         final int orgcodex = codex;
         if (codex == 14) {
@@ -200,9 +217,10 @@ class Encoder {
             pointToEncode =
                 Point.fromMicroDeg(pointToEncode.getLatMicroDeg(), pointToEncode.getLonMicroDeg() + 360000000);
             relx += 360000000;
-        } else if (relx > 360000000) {
+        }
+        else if (relx >= 360000000) {
             pointToEncode =
-                    Point.fromMicroDeg(pointToEncode.getLatMicroDeg(), pointToEncode.getLonMicroDeg() - 360000000);
+                Point.fromMicroDeg(pointToEncode.getLatMicroDeg(), pointToEncode.getLonMicroDeg() - 360000000);
             relx -= 360000000;
         }
         if (relx < 0) {
@@ -242,6 +260,10 @@ class Encoder {
 
         int difx = pointToEncode.getLonMicroDeg() - relx;
         int dify = pointToEncode.getLatMicroDeg() - rely;
+
+        final int extrax = difx % dividerx;
+        final int extray = dify % dividery;
+
         difx = difx / dividerx;
         dify = dify / dividery;
 
@@ -262,6 +284,8 @@ class Encoder {
         if (orgcodex == 14) {
             result = result.charAt(0) + "." + result.charAt(1) + result.substring(3);
         }
+
+        result += addPostfix(extrax << 2, extray, dividerx << 2, dividery); // for encodeGrid
 
         return mapcoderData.getPipeLetter() + result;
     }
@@ -308,8 +332,10 @@ class Encoder {
                 if (i == thisindex && mapcoderData.getMapcoderRect().containsPoint(pointToEncode)) {
                     final int dividerx = (maxx - minx + w - 1) / w;
                     int vx = (pointToEncode.getLonMicroDeg() - minx) / dividerx;
+                    final int extrax = (pointToEncode.getLonMicroDeg() - minx) % dividerx;
                     final int dividery = (maxy - miny + h - 1) / h;
                     int vy = (maxy - pointToEncode.getLatMicroDeg()) / dividery;
+                    final int extray = (maxy - pointToEncode.getLatMicroDeg()) % dividery;
                     final int spx = vx % 168;
                     final int spy = vy % 176;
 
@@ -324,13 +350,15 @@ class Encoder {
                     starpipe_result.append('.');
                     starpipe_result.append(encodeTriple(spx, spy));
 
+                    starpipe_result.append(
+                        addPostfix(extrax << 2, extray, dividerx << 2, dividery)); // for encodeStarpipe
                     done = true; // will be returned soon, but look for end
                     // of pipes
                 }
                 storageStart += product;
 
-            } // !done
-        } // for i
+            }
+        }
     }
 
     // mid-level encode/decode
@@ -396,8 +424,11 @@ class Encoder {
             final int dx = (4 * (x - minx)) / dividerx4;
             // div with floating point value
 
+            final int extrax4 = (x - minx) * 4 - (dx * dividerx4); // like modulus, but with floating point value
+
             final int dividery = 90;
             final int dy = (maxy - y) / dividery;
+            final int extray = (maxy - y) % dividery;
             int v = storage_offset;
             if (mapcoderData.isSpecialShape()) {
                 v += encode6(dx, side - 1 - dy, xSide, side);
@@ -422,31 +453,33 @@ class Encoder {
                     result = result.substring(0, 3) + '.' + result.substring(3);
                 }
             }
+            result += addPostfix(extrax4, extray, dividerx4, dividery); // for encodeNameless
 
             return result;
         }
         return "";
     }
 
-    private static String aeuPack(String r) {
+    private static String aeuPack(final String argStr) {
+        String str = argStr;
         int dotpos = -9;
-        int rlen = r.length();
+        int rlen = str.length();
         int d;
         String rest = "";
         for (d = 0; d < rlen; d++) {
-            if (r.charAt(d) < '0' || r.charAt(d) > '9') // not digit?
+            if (str.charAt(d) < '0' || str.charAt(d) > '9') // not digit?
             {
-                if (r.charAt(d) == '.' && dotpos < 0) // first dot?
+                if (str.charAt(d) == '.' && dotpos < 0) // first dot?
                 {
                     dotpos = d;
                 }
-                else if (r.charAt(d) == '-') {
-                    rest = r.substring(d);
-                    r = r.substring(0, d);
+                else if (str.charAt(d) == '-') {
+                    rest = str.substring(d);
+                    str = str.substring(0, d);
                     rlen = d;
                 }
                 else {
-                    return r; // not alldigit (or multiple dots)
+                    return str; // not alldigit (or multiple dots)
                 }
             }
         }
@@ -454,18 +487,21 @@ class Encoder {
         if (rlen - 2 > dotpos) {
             // does r have a dot, AND at least 2 chars
             // after the dot?
-            final int v = (((int) r.charAt(rlen - 2)) - 48) * 10 + ((int) r.charAt(rlen - 1)) - 48;
+            final int v = (((int) str.charAt(rlen - 2)) - 48) * 10 + ((int) str.charAt(rlen - 1)) - 48;
             final int last = v % 34;
             final char[] vowels = {'A', 'E', 'U'};
-            r = r.substring(0, rlen - 2) + vowels[v / 34] + (last < 31 ? encode_chars[last] : vowels[last - 31]);
+            str =
+                str.substring(0, rlen - 2) + vowels[v / 34] + (last < 31 ? encode_chars[last] : vowels[last - 31]);
         }
-        return r + rest;
+        return str + rest;
     }
 
-    private static String fastEncode(int value, int nrchars) {
-        StringBuffer result = new StringBuffer();
-        while (nrchars > 0) {
-            nrchars--;
+    private static String fastEncode(final int argValue, final int argNrChars) {
+        int value = argValue;
+        int nrChars = argNrChars;
+        final StringBuilder result = new StringBuilder();
+        while (nrChars > 0) {
+            nrChars--;
             result.insert(0, encode_chars[value % 31]);
             value = value / 31;
         }

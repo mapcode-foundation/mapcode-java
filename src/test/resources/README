@@ -7,20 +7,48 @@ For terms of use refer to http://www.mapcode.com/downloads.html
 CREATING MAPCODE TEST SETS
 -------------------------------------------------------------------------------
 
-These test files have been created with the following commands:
+These test files have been created with the commands below.
+
+Note: The syntax of the 'mapcode' command is:
+      mapcode --random nrOfPoints [extraDigits] [seed]
+      mapcode --grid   nrOfPoints [extraDigits]
+      mapcode --boundaries        [extraDigits]
 
 +----
-mapcode --random 1000    12345678 > random_1k.txt
-mapcode --random 10000   12345678 > random_10k.txt
-mapcode --random 100000  12345678 > random_100k.txt
-mapcode --random 1000000 12345678 > random_1m.txt
+mapcode --random 1000    0 12 > random_1k.txt
+mapcode --random 10000   0 12 > random_10k.txt
+mapcode --random 100000  0 12 > random_100k.txt
 
-mapcode --grid 1000    > grid_1k.txt
-mapcode --grid 10000   > grid_10k.txt
-mapcode --grid 100000  > grid_100k.txt
-mapcode --grid 1000000 > grid_1m.txt
+mapcode --grid   1000    0    > grid_1k.txt
+mapcode --grid   10000   0    > grid_10k.txt
+mapcode --grid   100000  0    > grid_100k.txt
 
-mapcode --boundaries > boundaries.txt
+mapcode --boundaries        > boundaries.txt
++----
+
+And for the high-precision codes:
+
++----
+mapcode --random 1000    3 12 > random_hp_1k.txt
+mapcode --random 10000   3 12 > random_hp_10k.txt
+mapcode --random 100000  3 12 > random_hp_100k.txt
+
+mapcode --grid   1000    3    > grid_hp_1k.txt
+mapcode --grid   10000   3    > grid_hp_10k.txt
+mapcode --grid   100000  3    > grid_hp_100k.txt
+
+mapcode --boundaries     3    > boundaries_hp.txt
++----
+
+IMPORTANT: Please note that an explicit seed (12) is used for the generation of
+random data sets, so they can be compared across different version of the software.
+
+After generating the files, they must be split into smaller pieces (in this case
+5Mb chunks) to allow uploading to Github or other source code control systems,
+by executing:
+
++----
+for f in *.txt; do split -l 200000 -a 1 $f $f.; rm $f; done
 +----
 
 -------------------------------------------------------------------------------

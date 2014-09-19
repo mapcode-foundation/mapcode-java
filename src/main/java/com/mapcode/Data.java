@@ -27,7 +27,7 @@ import javax.annotation.Nullable;
  * This class the data class for Mapcode codex items.
  */
 class Data {
-    public static final char[] ENCODE_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
+    static final char[] ENCODE_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
         'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
 
     private           int     flags;
@@ -44,77 +44,79 @@ class Data {
     @Nullable private SubArea mapcoderRect;
     private           boolean initialized;
 
-    public int getFlags() {
+    int getFlags() {
         assert initialized;
         return flags;
     }
 
-    public int getCodex() {
+    int getCodex() {
         assert initialized;
         return codex;
     }
 
-    public int getCodexLo() {
+    int getCodexLo() {
         assert initialized;
         return codexLo;
     }
 
-    public int getCodexHi() {
+    int getCodexHi() {
         assert initialized;
         return codexHi;
     }
 
-    public int getCodexLen() {
+    int getCodexLen() {
         assert initialized;
         return codexLen;
     }
 
-    public boolean isNameless() {
+    boolean isNameless() {
         assert initialized;
         return nameless;
     }
 
-    public boolean isUseless() {
+    boolean isUseless() {
         assert initialized;
         return useless;
     }
 
-    public boolean isSpecialShape() {
+    boolean isSpecialShape() {
         assert initialized;
         return specialShape;
     }
 
-    public int getPipeType() {
+    int getPipeType() {
         assert initialized;
         return pipeType;
     }
 
     @Nonnull
-    public String getPipeLetter() {
+    String getPipeLetter() {
         assert initialized;
+        assert pipeLetter != null;
         return pipeLetter;
     }
 
-    public boolean isStarPipe() {
+    boolean isStarPipe() {
         assert initialized;
         return starPipe;
     }
 
     @Nonnull
-    public SubArea getMapcoderRect() {
+    SubArea getMapcoderRect() {
         assert initialized;
+        assert mapcoderRect != null;
         return mapcoderRect;
     }
 
-    public Data(final int i) {
+    Data(final int i) {
         dataSetup(i);
     }
 
-    public Data() {
+    Data() {
         initialized = false;
     }
 
-    public void dataSetup(final int i) {
+    void dataSetup(final int i) {
         flags = DataAccess.dataFlags(i);
         codexHi = calcCodexHi(flags);
         codexLo = calcCodexLo(flags);
@@ -140,25 +142,25 @@ class Data {
         initialized = true;
     }
 
-    public static boolean isNameless(final int i) {
+    static boolean isNameless(final int i) {
         return (DataAccess.dataFlags(i) & 64) != 0;
     }
 
-    public static boolean isSpecialShape(final int i) {
+    static boolean isSpecialShape(final int i) {
         return (DataAccess.dataFlags(i) & 1024) != 0;
     }
 
-    public static int calcCodex(final int i) {
+    static int calcCodex(final int i) {
         final int flags = DataAccess.dataFlags(i);
         return calcCodex(calcCodexHi(flags), calcCodexLo(flags));
     }
 
-    public static int calcCodexLen(final int i) {
+    static int calcCodexLen(final int i) {
         final int flags = DataAccess.dataFlags(i);
         return calcCodexLen(calcCodexHi(flags), calcCodexLo(flags));
     }
 
-    public static boolean calcStarPipe(final int i) {
+    static boolean calcStarPipe(final int i) {
         return (DataAccess.dataFlags(i) & (8 << 5)) != 0;
     }
 

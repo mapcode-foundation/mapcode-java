@@ -21,8 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 
-import static com.mapcode.Common.GSON;
-
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
 
@@ -31,8 +29,11 @@ class Decoder {
     // ----------------------------------------------------------------------
 
     @Nonnull
-    public static Point decode(@Nonnull String mapcode, @Nonnull Territory territory) {
-        LOG.trace("decode: mapcode={}, territory={}", mapcode, territory.name());
+    static Point decode(@Nonnull final String argMapcode, @Nonnull final Territory argTerritory) {
+        LOG.trace("decode: mapcode={}, territory={}", argMapcode, argTerritory.name());
+
+        String mapcode = argMapcode;
+        Territory territory = argTerritory;
 
         // in case of error, result.isDefined() is false
         Point result = Point.undefined();
@@ -135,7 +136,8 @@ class Decoder {
         if (result.isDefined()) {
             if (result.getLonMicroDeg() > 180000000) {
                 result = Point.fromMicroDeg(result.getLatMicroDeg(), result.getLonMicroDeg() - 360000000);
-            } else if (result.getLonMicroDeg() < -180000000) {
+            }
+            else if (result.getLonMicroDeg() < -180000000) {
                 result = Point.fromMicroDeg(result.getLatMicroDeg(), result.getLonMicroDeg() + 360000000);
             }
 
@@ -146,17 +148,19 @@ class Decoder {
                 // rect
                 final int xdiv8 = Common.xDivider(mapcoderRect.getMinY(), mapcoderRect.getMaxY()) / 4;
                 // should be /8 but there's some extra margin
-                if (!mapcoderRect.extendBounds(xdiv8, 45).containsPoint(result)) {
+                if (!mapcoderRect.extendBounds(xdiv8, 60).containsPoint(result)) {
                     result.setUndefined(); // decodes outside the official territory
                     // limit
                 }
             }
         }
 
-        LOG.trace("encode: result={}", GSON.toJson(result));
+        LOG.trace("decode: result=({}, {})",
+            result.isDefined() ? result.getLatDeg() : Double.NaN,
+            result.isDefined() ? result.getLonDeg() : Double.NaN);
         result = Point.restrictLatLon(result);
         return result;
-    } // master_decode
+    }
 
     // ----------------------------------------------------------------------
     // Private methods.
@@ -175,9 +179,71 @@ class Decoder {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
+    private static class Unicode2Ascii {
+
+        public final int    min;
+        public final int    max;
+        public final String convert;
+
+        public Unicode2Ascii(final int min, final int max, final String convert) {
+            this.min = min;
+            this.max = max;
+            this.convert = convert;
+        }
+    }
+
+    private final static Unicode2Ascii[] UNICODE2ASCII = {
+        new Unicode2Ascii(0x0041, 0x005a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), // Roman
+        new Unicode2Ascii(0x0391, 0x03a9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
+        new Unicode2Ascii(0x0410, 0x042f,
+            "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"), // Cyrillic
+        new Unicode2Ascii(0x05d0, 0x05ea, "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"), // Hebrew
+        new Unicode2Ascii(0x0905, 0x0939,
+            "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Hindi
+        new Unicode2Ascii(0x0d07, 0x0d39,
+            "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"), // Malai
+        new Unicode2Ascii(0x10a0, 0x10bf,
+            "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch
+        new Unicode2Ascii(
+            0x30a2,
+            0x30f2,
+            "A?I?O?U?EB?C?D?F?G?H???J???????K??????L?M?N?????P??Q??R??S?????TV?????WX???Y????Z"), // Katakana
+        new Unicode2Ascii(0x0e01, 0x0e32,
+            "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"), // Thai
+        new Unicode2Ascii(0x0e81, 0x0ec6,
+            "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"), // Lao
+        new Unicode2Ascii(0x0532, 0x0556,
+            "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
+        new Unicode2Ascii(0x0985, 0x09b9,
+            "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"), // Bengali
+        new Unicode2Ascii(0x0a05, 0x0a39,
+            "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Gurmukhi
+        new Unicode2Ascii(0x0f40, 0x0f66,
+            "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"), // Tibetan
+
+        new Unicode2Ascii(0x0966, 0x096f, ""), // Hindi
+        new Unicode2Ascii(0x0d66, 0x0d6f, ""), // Malai
+        new Unicode2Ascii(0x0e50, 0x0e59, ""), // Thai
+        new Unicode2Ascii(0x09e6, 0x09ef, ""), // Bengali
+        new Unicode2Ascii(0x0a66, 0x0a6f, ""), // Gurmukhi
+        new Unicode2Ascii(0x0f20, 0x0f29, ""), // Tibetan
+
+        // lowercase variants: greek, georgisch
+        new Unicode2Ascii(0x03B1, 0x03c9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
+        // lowercase
+        new Unicode2Ascii(0x10d0, 0x10ef,
+            "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch lowercase
+        new Unicode2Ascii(0x0562, 0x0586,
+            "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
+        // lowercase
+        new Unicode2Ascii(0, 0, null)
+    };
+
     @Nonnull
-    private static Point decodeGrid(String result, final int minx, final int miny, final int maxx, final int maxy, final int m, final String extrapostfix) {
+    private static Point decodeGrid(final String str, final int minx, final int miny, final int maxx, final int maxy,
+        final int m, final String extrapostfix) {
         // for a well-formed result, and integer variables
+        String result = str;
         int relx, rely;
         final int codexlen = result.length() - 1; // length ex dot
         int dc = result.indexOf('.'); // dotposition
@@ -256,7 +322,9 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeNameless(String result, final int firstrec, final String extrapostfix, final Data mapcoderData) {
+    private static Point decodeNameless(final String str, final int firstrec, final String extrapostfix,
+        final Data mapcoderData) {
+        String result = str;
         if (mapcoderData.getCodex() == 22) {
             result = result.substring(0, 3) + result.substring(4);
         }
@@ -371,7 +439,7 @@ class Decoder {
         // divide!
         final int cornery = maxy - dy * dividery;
         return add2res(cornery, cornerx, dividerx4, dividery, -1, extrapostfix);
-    } // decode_nameless
+    }
 
     @Nonnull
     private static Point decodeStarpipe(final String input, final int firstindex, final String extrapostfix,
@@ -447,12 +515,13 @@ class Decoder {
             }
             storageStart += product;
         }
-    } // decode_starpipe
+    }
 
     @Nonnull
-    private static String aeuUnpack(String str) {
+    private static String aeuUnpack(final String argStr) {
         // unpack encoded into all-digit
         // (assume str already uppercase!), returns "" in case of error
+        String str = decodeUTF16(argStr);
         boolean voweled = false;
         final int lastpos = str.length() - 1;
         int dotpos = str.indexOf('.');
@@ -525,8 +594,43 @@ class Decoder {
         return str;
     }
 
+    private static String decodeUTF16(final String str) {
+        final StringBuilder asciibuf = new StringBuilder();
+        for (int index = 0; index < str.length(); index++) {
+            if (str.charAt(index) == '.') {
+                asciibuf.append(str.charAt(index));
+            }
+            else if (str.charAt(index) >= 1 && str.charAt(index) <= 'z') {
+                // normal ascii
+                asciibuf.append(str.charAt(index));
+            }
+            else {
+                boolean found = false;
+                for (int i = 0; UNICODE2ASCII[i].min != 0; i++) {
+                    if (str.charAt(index) >= UNICODE2ASCII[i].min
+                        && str.charAt(index) <= UNICODE2ASCII[i].max) {
+                        String convert = UNICODE2ASCII[i].convert;
+                        if (convert == null) {
+                            convert = "0123456789";
+                        }
+                        asciibuf.append(convert.charAt(((int) str.charAt(index)) - UNICODE2ASCII[i].min));
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    asciibuf.append('?');
+                    break;
+                }
+            }
+        }
+
+        return asciibuf.toString();
+    }
+
     @Nonnull
     private static Point decodeTriple(final String str) {
+        //noinspection NumericCastThatLosesPrecision
         final byte c1 = (byte) decode_chars[(int) str.charAt(0)];
         final int x = fastDecode(str.substring(1));
         if (c1 < 24) {
@@ -601,5 +705,4 @@ class Decoder {
         }
         return Point.fromMicroDeg(y + (dividery / 2) * ydirection, x + dividerx4 / 8);
     }
-
 }

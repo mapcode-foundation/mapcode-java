@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import static org.junit.Assert.assertEquals;
 
 public class PointTest {
-    private static final Logger LOG = LoggerFactory.getLogger(PointTest.class);
+    private static final Logger LOG   = LoggerFactory.getLogger(PointTest.class);
     private static final double DELTA = 0.000001;
 
     @Test

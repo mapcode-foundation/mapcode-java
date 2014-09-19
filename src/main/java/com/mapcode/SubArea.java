@@ -110,14 +110,14 @@ class SubArea {
             Point.microDegToDeg(lonMap.firstKey()), Point.microDegToDeg(lonMap.lastKey()));
     }
 
-    public static SubArea getArea(final int i) {
+    static SubArea getArea(final int i) {
         return subAreas.get(i);
     }
 
 
     @SuppressWarnings("unchecked")
     @Nonnull
-    public static List<SubArea> getAreasForPoint(@Nonnull final Point point) {
+    static List<SubArea> getAreasForPoint(@Nonnull final Point point) {
         final ArrayList<ArrayList<SubArea>> areaLists = new ArrayList<ArrayList<SubArea>>();
         ArrayList<SubArea> list;
         list = latMap.get(point.getLatMicroDeg());
@@ -184,27 +184,27 @@ mainLoop:
     private final Territory parentTerritory;
     private final Integer   subAreaID;
 
-    public int getMinX() {
+    int getMinX() {
         return lonRange.getMin();
     }
 
-    public int getMinY() {
+    int getMinY() {
         return latRange.getMin();
     }
 
-    public int getMaxX() {
+    int getMaxX() {
         return lonRange.getMax();
     }
 
-    public int getMaxY() {
+    int getMaxY() {
         return latRange.getMax();
     }
 
-    public Territory getParentTerritory() {
+    Territory getParentTerritory() {
         return parentTerritory;
     }
 
-    public Integer getSubAreaID() {
+    Integer getSubAreaID() {
         return subAreaID;
     }
 
@@ -217,7 +217,7 @@ mainLoop:
 
         // Mapcode areas are inclusive for the minimum bounds and exclusive for the maximum bounds
         // Trim max by 1, to address boundary cases.
-        Range<Integer> trimmedLonRange = trimRange(lonRange);
+        final Range<Integer> trimmedLonRange = trimRange(lonRange);
         Range<Integer> trimmedLatRange = latRange;
         // Special handling for latitude +90.0 which should not be trimmed, in order to produce
         // mapcode AAA Z0000.010G for lat: 90.0 lon:180.0.
@@ -288,21 +288,23 @@ mainLoop:
         subAreaID = null;
     }
 
-    public boolean containsPoint(@Nonnull final Point point) {
+    boolean containsPoint(@Nonnull final Point point) {
         if (latRange.contains(point.getLatMicroDeg()) && containsLongitude(point.getLonMicroDeg())) {
             return true;
         }
         return false;
     }
 
-    public SubArea extendBounds(final int xExtension, final int yExtension) {
+    @Nonnull
+    SubArea extendBounds(final int xExtension, final int yExtension) {
         final SubArea result = new SubArea();
         result.latRange = new Range<Integer>(this.getMinY() - yExtension, getMaxY() + yExtension);
         result.lonRange = new Range<Integer>(this.getMinX() - xExtension, getMaxX() + xExtension);
         return result;
     }
 
-    public boolean containsLongitude(int lonMicroDeg) {
+    boolean containsLongitude(final int argLonMicroDeg) {
+        int lonMicroDeg = argLonMicroDeg;
         if (this.lonRange.contains(lonMicroDeg)) {
             return true;
         }
@@ -335,7 +337,7 @@ mainLoop:
         lonRange = new Range<Integer>(minX, maxX);
     }
 
-    private Range<Integer> trimRange(Range<Integer> range) {
+    private static Range<Integer> trimRange(final Range<Integer> range) {
         return new Range<Integer>(range.getMin(), range.getMax() - 1);
     }
 

@@ -126,6 +126,7 @@ public class Point {
     }
 
     public static int degToMicroDeg(final double deg) {
+        //noinspection NumericCastThatLosesPrecision
         return (int) Math.round(deg * MICRODEG_TO_DEG_FACTOR);
     }
 
@@ -178,8 +179,8 @@ public class Point {
      * Calculate the distance between two points. This algorithm does not take the curvature of the Earth into
      * account, so it only works for small distance up to, say 200 km, and not too close to the poles.
      *
-     * @param from Point 1.
-     * @param to   Point 2.
+     * @param p1 Point 1.
+     * @param p2 Point 2.
      * @return Straight distance between p1 and p2. Only accurate for small distances up to 200 km.
      */
     public static double distanceInMeters(@Nonnull final Point p1, @Nonnull final Point p2) {

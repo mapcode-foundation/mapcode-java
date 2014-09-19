@@ -1,4 +1,7 @@
 This directory contains the source code for a small Processing
-applicatio that can read the generated Mapcode rererence files.
+application that can read the generated Mapcode rererence files.
 
 You can download Processing from: http://processing.org
+
+Make sure the test files are generated with (x, y, z) coordinate
+information (e.g. "mapcode -gXYZ 1000", rather than "mapcode -g 1000").

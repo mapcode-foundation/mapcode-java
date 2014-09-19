@@ -1,0 +1,251 @@
+    -----------
+    Mapcode Library for Java
+    -----------
+
+    Welcome to the Java library to handle mapcodes. The original C library was created by Pieter Geelen. Work
+    on the Java version of the Mapcode library was done by Rijn Buve and Matthew Lowden.
+
+Release Notes
+
+    You can find the release notes for this library at: <<{{{./ReleaseNotes.html}Release Notes}}>>
+
+How To Build The Mapcode Library JAR File
+
+    The sources for the Mapcode Library for Java contain everything to build the Mapcode JAR file as well
+    as a significant number of unit tests to verify the correctness of the implementation against the
+    reference C implementation.
+
+    The library requires a minimum Java language revision level 6, but has been tested and verified to work
+    with JDK 1.6, JDK 1.7 and JDK 1.8.
+
+    To build the library:
+
+----
+cd <MAPCODE-HOME>
+mvn clean install
+----
+
+    This produces a JAR file in your local Maven repository at <<<~/.m2/repository/com/mapcode/mapcode/x.y/>>>.
+    You can include this JAR in your project, or store it in your local Nexus repository, for example.
+
+    If you creating a Maven project, you can see how to include the JAR in your project in the menu
+    item <<Dependency Information>> in the menu on this page.
+
+How To Use This Library In Your Application
+
+    There are two classes you interact with as a client of the Mapcode library. These are:
+
+    * <<<MapcodeCodec.java>>>
+
+    * <<<Mapcode.java>>>
+
+    * <<<Point.java>>>
+
+    []
+
+Class <<<MapcodeCodec.java>>>
+
+    This class contains the <<encoder>> and <<decoder>> for mapcodes. The class exposes two methods (with some
+    variants): <<<encode>>> and <<<decode>>>.
+
+    The <<encoder>> encodes a (latitude, longitude) pair into a result set of mapcodes. A single (latitude,
+    longitude) pair may produce multiple mapcodes, some of which are known as <local> mapcodes
+    (which are only unique within a given territory) and one which is globally unique in the entire world.
+
+    The <<decoder>> decodes a local or world-wide mapcode string into a (latitude, longitude) pair. For
+    local mapcodes a territory may be specified which is used to disambiguate the mapcode resolution.
+
+    Note that encoding a (latitude, longitude) pair to a mapcode and then decoding it may result in a
+    slightly offset position, as the mapcodes have a limited precision. The library offers "high-precision"
+    mapcodes as well, but you van never assume the resulting latitudes and longitudes to exactly match the
+    original input.
+
+    * <<<List\<Mapcode\>>>> encode(double latitude, double longitude)>>> encodes a (latitude, longitude) pair.
+    Example:
+
++---
+final double lat = 52.376514;
+final double lon = 4.908542;
+final List<Mapcode> results = MapcodeCodec.encode(lat, lon);
+// Returns a non-empty list of results.
++---
+
+        This produces a non-empty list of resulting mapcodes. The shortest (potentially local) mapcodes is always
+        the first mapcodes in the list. The last mapcode in the list is always the
+        globally unique international mapcode.
+
+    * <<<List\<Mapcode\>>>> encode(double latitude, double longitude, Territory territory)>>> encodes a (latitude,
+    longitude) pair, where encoding is restricted to a specific territory. Example:
+
++---
+final List<Mapcode> results = MapcodeCodec.encode(lat, lon, Territory.NLD);
+// Returns an empty list of results if the location is not within the territory.
++---
+
+        This resticts encoding to a specific territory and produces a potentially empty list of results.
+        Again, if encoding succeeded, the first mapcode is the shortest one and the last mapcode in the list is the
+        globally unique international mapcode.
+
+    * Both <<<encode()>>> methods are also offered as a <<<encodeToShortest()>>> method, which essentially
+    returns only the first result of the previous methods (if there are any results).
+
++---
+final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon);
+// Always returns a mapcode.
++---
+
++---
+try {
+    final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
+}
+catch (final UnknownMapcodeException e) {
+    // If the location is not within the territory, this exception is thrown.
+}
++---
+
+    * It's important to note that for the encoding methods:
+
+        * <<latitudes>> are always between <<<-90>>> and <<<90>>>, and
+
+        * <<longitudes>> are always between <<<-180>>> and <<<180>>>.
+
+        An runtime exception <<<IllegalArgumentException>>> exception is thrown for values outside these ranges.
+
+        []
+
+    * <<<Point decode(String mapcode)>>> decodes a mapcode to a <<<Point>>> which contains a location. Example:
+
++----
+final Point p = MapcodeCodec.decode("NLD 49.4V");
++----
+
+    * <<<Point decode(String mapcode, Territory territory)>>> decodes a mapcode to a <<<Point>>> which contains a
+    location, where the mapcode must be located within a specific territory.
+
+    Examples of usage:
+
++----
+final Point p = MapcodeCodec.decode("49.4V", Territory.NLD);
++----
+
+    []
+
+Class <<<Mapcode.java>>>
+
+    This class represents mapcodes, which consist of a string of characters, digits and a decimal point and
+    a territory specification. The territory specification is required for national (local) mapcodes, which
+    are not globally unique.
+
+    The class also exposes methods to convert mapcodes to proper mapcode strings, usable for printing and
+    it allows string-formatted mapcodes to be converted to <<<Mapcode>>> objects, where territory information
+    is properly parsed and converted to a <<<Territory>>> enumeration value.
+
+    * <<<String getMapcode()>>> returns the mapcode string which does not include territory information. You can also
+    use <<<getMapcodeHighPrecision()>>> and <<<getMapcodeMediumPrecision()>>> for more precision, but longer
+    mapcodes.
+
+    * <<<Territory getTerritory()>>> returns the territory information.
+
+    * <<<StringasInternationFullname()>>> returns mapcodes string with territory information, specified as a full
+    country name.
+
+    * <<<String asInternationISO()>>> returns mapcodes string with territory information, specified as an ISO code
+    name. Importanmt: This is returns the same result as <<<toString()>>>.
+
+    []
+
+Class <<<Point.java>>>
+
+    This class represents (latitude, longitude) locations. It offers methods to create locations using
+    degrees or micro-degrees (which are degrees times 1.000.000).
+
+    * <<<Point fromDeg(double latitude, double longitude)>>> returns a <<<Point>>> for a given (latitude, longitude)
+    pair. Note that:
+
+        * <<latitudes>> are always between <<<-90>>> and <<<90>>>, and
+
+        * <<longitudes>> are always between <<<-180>>> and <<<180>>>.
+
+        []
+
+    * <<<Point fromMicroDeg(int latitude, int longitude)>>> is the same as <<<fromDeg>>> except the values are
+    integers and are degerees times 1.000.000, so the ranges are:
+
+        * <<latitudes>> are always between <<<-90000000>>> and <<<90000000>>>, and
+
+        * <<longitudes>> are always between <<<-180000000>>> and <<<180000000>>>.
+
+        []
+
+    * <<<double getLat()>>> and <<<getLon()>>> return the latitude and longitude respectively, in degrees.
+
+    * <<<int getLatMicroDegrees()>>> and <<<getLonMicroDegrees()>>> return the latitude and longitude respectively,
+    in micro-degrees.
+
+
+What Is A Mapcode?
+
+    A mapcode represents a location. Every location on Earth can be represented by a mapcode. Mapcodes
+    were designed to be short, easy to recognise, remember and communicate. They are precise to a few
+    meters, which is good enough for every-day use.
+
+Mapcodes Are Free!
+
+    Mapcodes are free. They can be used by anyone, and may be supported, provided or generated by anyone,
+    as long as this is done free of charge, conditions or restrictions. Technical details and sources are
+    available on our developers page.
+
+what Does A Mapcode Look Like?
+
+    A mapcode consists of two groups of letters and digits, separated by a dot. An example of a mapcode is
+
++----
+49.4V
++----
+
+    This is sufficient as long as it is clear what country or state the mapcode belongs in. On a business card,
+    it is therefore a good idea to put it after the country or state name:
+
++----
+John Smith
+Oosterdoksstraat 114
+Amsterdam
+Netherlands 49.4V
++----
+
+    When storing mapcodes in a database, it is recommended to explicitly specify the country:
+
++----
+Netherlands 49.4V
++----
+
+    or via the standard 3-letter abbreviation:
+
++----
+NLD 49.4V
++----
+
+    In eight very large countries (The USA, Canada, Mexico, Brazil, India, Australia, Russia, and China),
+    an address has little meaning without knowing the state (just like elsewhere, an address has little meaning
+    without knowing the country). For example, there are 27 cities called Washington in the USA. If you want to
+    refer to a location in the capital city, you would always refer to "Washington DC".
+
++----
+DC 18.JQZ
++----
+
+    or (in an international database):
+
++----
+US-DC 18.JQZ
++----
+
+    More information on mapcodes and their underlying concepts can be found in our reference material.
+
+Where Did Mapcodes Come From?
+
+    Mapcodes were developed in 2001 by Pieter Geelen and Harold Goddijn, soon after the GPS satellite signals
+    were opened up for civilian use. It was decided to donate the mapcode system to the public domain in 2008.
+    The algorithms and data tables are maintained by the Stichting Mapcode Foundation.
+
+    The mapcode system is being filed as a standard at the International Organisation for Standardisation.

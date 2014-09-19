@@ -808,7 +808,7 @@ public enum Territory {
     /**
      * Get a territory from a name, specifying a parent territory for disambiguation.
      *
-     * @param nameTrimmed            Territory name.
+     * @param name            Territory name.
      * @param parentTerritory Parent territory.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if the territory is not found.

@@ -1,0 +1,46 @@
+Release Notes (Version ${project.version})
+
+    These are the release notes for the Java library for mapcodes.
+
+#set( $str = "${project.version}" )
+#if( $str.contains('SNAPSHOT') )
+    <<IMPORTANT: This is a SNAPSHOT version of the repository which may change at any time.
+    Needless to say, never depend on <<<SNAPSHOT>>> versions if you can avoid it.
+    In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
+#end
+
+* 1.40
+
+    * Renamed class <<<Mapcode>>> to <<<MapcodeCodec>>>.
+
+    * Renamed class <<<MapcodeInfo>>> to <<<Mapcode>>>.
+
+    * Added high precision Mapcodes, with methods <<<getMapcodeHighPrecision>>>
+
+    * Seriously reduced test set size.
+
+    * Replaced Unicode characters in source code to escapes.
+
+    * Added explicit character encoding to <<<pom.xml>>>.
+
+    * Fixed issues with decoder at some boundaries.
+
+    []
+
+* 1.33.2
+
+    * Clean-up of release 1.33.2.
+
+    * Added release notes.
+
+    * Removed GSON dependency from production (now scope 'test' only).
+
+    * Added robustness with respect to Unicode characters.
+
+    []
+
+* 1.33.1
+
+    * First release of Java library for MapCodes. Includes extensive test suite.
+
+    []

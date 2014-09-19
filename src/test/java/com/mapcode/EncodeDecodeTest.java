@@ -66,8 +66,8 @@ public class EncodeDecodeTest {
                 final double latDeg = encode.getLatDeg();
                 final double lonDeg = encode.getLonDeg();
 
-                final List<MapcodeInfo> results = Mapcode.encode(latDeg, lonDeg, territory);
-                for (final MapcodeInfo result : results) {
+                final List<Mapcode> results = MapcodeCodec.encode(latDeg, lonDeg, territory);
+                for (final Mapcode result : results) {
                     found = true;
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, encode={}, {} {} --> results={}",
@@ -80,7 +80,7 @@ public class EncodeDecodeTest {
                     // Check if the territory matches.
                     assertEquals(territory, result.getTerritory());
 
-                    final Point decodeLocation = Mapcode.decode(mapcode, territory);
+                    final Point decodeLocation = MapcodeCodec.decode(mapcode, territory);
                     final double distanceMeters = Point.distanceInMeters(encode, decodeLocation);
 
                     if (showLogLine) {
