@@ -1,0 +1,54 @@
+-------------------------------------------------------------------------------
+Copyright (C) 2014 Stichting Mapcode Foundation
+For terms of use refer to http://www.mapcode.com/downloads.html
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+CREATING MAPCODE TEST SETS
+-------------------------------------------------------------------------------
+
+These test files have been created with the following commands:
+
++----
+mapcode --random 1000    12345678 > random_1k.txt
+mapcode --random 10000   12345678 > random_10k.txt
+mapcode --random 100000  12345678 > random_100k.txt
+mapcode --random 1000000 12345678 > random_1m.txt
+
+mapcode --grid 1000    > grid_1k.txt
+mapcode --grid 10000   > grid_10k.txt
+mapcode --grid 100000  > grid_100k.txt
+mapcode --grid 1000000 > grid_1m.txt
+
+mapcode --boundaries > boundaries.txt
++----
+
+-------------------------------------------------------------------------------
+COMPILING THE MAPCODE UTILITY
+-------------------------------------------------------------------------------
+
+The application "mapcode" is found in project "mapcode-cpp", which is the
+original reference CPP implementation for Mapcode.
+
+The reference files are the following format:
+
++----
+<number-of-mapcode-aliases> <lat-deg> <lon-deg> <x> <y> <z>
+<territory-code> <mapcode>      (repeated for every alias)
+
+                                (repeated for every record)
++----
+
+Example:
+
++----
+1 -14.103223 -133.860523 -0.672020 -0.699296 -0.243670
+AAA D3ZFY.3HP5
+
+2 40.203512 26.190811 0.685341 0.337093 0.645505
+TUR 0W6P.PVC
+AAA SKR23.PH6G
++----
+
+You can use the tool Processing (http://processing.org) with the application
+in "show3d" to visualize the generated data.
