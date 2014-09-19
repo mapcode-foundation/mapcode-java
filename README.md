@@ -1,6 +1,12 @@
--------------------------------------------------------------------------------
-MAPCODE LIBRARY FOR JAVA
--------------------------------------------------------------------------------
+Mapcode Library for Java
+====
+
+Online documentation can be found at: http://rijnb.github.io/mapcode-java/
+
+Release notes can be found at: http://rijnb.github.io/mapcode-java/ReleaseNotes.html
+
+----
+
 Copyright (C) 2014 Stichting Mapcode Foundation (http://www.mapcode.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,13 +24,7 @@ limitations under the License.
 Original C library created by Pieter Geelen. Work on Java version
 of the Mapcode library by Rijn Buve and Matthew Lowden.
 
+----
+
 This Java project contains a library to encode latitude/longitude pairs to Mapcodes
 and to decode Mapcodes back to latitude/longitude pairs.
--------------------------------------------------------------------------------
-
-Online documentation can be found at: http://rijnb.github.io/mapcode-java/
-
-Release notes can be found at: http://rijnb.github.io/mapcode-java/ReleaseNotes.html
-
-This website was automatically generated with Maven (using 'mvn site:site'). 
-You can find the site page sources at 'src/site/apt/...'.
