@@ -11,6 +11,8 @@ and to decode Mapcodes back to latitude/longitude pairs.
 
 **Release notes can be found at: http://mapcode-foundation.github.io/mapcode-java/ReleaseNotes.html**
 
+**An example of how to use this library can be found at: https://github.com/mapcode-foundation/mapcode-java-example**
+
 # License
 
 Licensed under the Apache License, Version 2.0 (the "License");
