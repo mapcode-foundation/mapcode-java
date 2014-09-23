@@ -8,7 +8,7 @@
     <artifactId>mapcode</artifactId>
 
     <packaging>jar</packaging>
-    <version>1.40</version>
+    <version>1.40-SNAPSHOT</version>
 
     <name>Mapcode Java Library</name>
     <description>
@@ -25,7 +25,6 @@
         <developer>
             <id>pieter</id>
             <name>Pieter Geelen</name>
-            <email>pieter.geelen@mapcode.com</email>
             <organization>Mapcode</organization>
             <roles>
                 <role>Founder</role>
@@ -35,7 +34,6 @@
         <developer>
             <id>rijn</id>
             <name>Rijn Buve</name>
-            <email>rijn@buve.nl</email>
             <organization>Mapcode</organization>
             <roles>
                 <role>Developer</role>
@@ -45,7 +43,6 @@
         <developer>
             <id>matthew</id>
             <name>Matthew Lowden</name>
-            <email>matthew.lowden@tomtom.com</email>
             <organization>Mapcode</organization>
             <roles>
                 <role>Developer</role>
@@ -74,18 +71,30 @@
         <junit.version>4.11</junit.version>
         <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.7.2</slf4j.version>
+        <nexus-staging-maven-plugin.version>1.6.4</nexus-staging-maven-plugin.version>
+        <maven-source-plugin.version>2.3</maven-source-plugin.version>
+        <maven-javadoc-plugin.version>2.10</maven-javadoc-plugin.version>
+        <maven-gpg-plugin.version>1.5</maven-gpg-plugin.version>
     </properties>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
                         <goals>
-                            <goal>jar</goal>
+                            <goal>jar-no-fork</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -94,11 +103,39 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
                         <goals>
                             <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>${nexus-staging-maven-plugin.version}</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>${maven-gpg-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
                         </goals>
                     </execution>
                 </executions>
