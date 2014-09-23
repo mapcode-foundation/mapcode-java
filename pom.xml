@@ -8,7 +8,7 @@
     <artifactId>mapcode</artifactId>
 
     <packaging>jar</packaging>
-    <version>1.4</version>
+    <version>1.40</version>
 
     <name>Mapcode Java Library</name>
     <description>
@@ -60,6 +60,9 @@
     </licenses>
 
     <url>http://mapcode.com</url>
+    <scm>
+        <url>http://github.com/mapcode-foundation/mapcode-java</url>
+    </scm>
 
     <!-- Dependencies on other packages. -->
     <properties>
