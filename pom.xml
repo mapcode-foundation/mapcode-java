@@ -8,7 +8,7 @@
     <artifactId>mapcode</artifactId>
 
     <packaging>jar</packaging>
-    <version>1.40</version>
+    <version>1.41-SNAPSHOT</version>
 
     <name>Mapcode Java Library</name>
     <description>
