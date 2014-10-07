@@ -24,7 +24,7 @@ import java.util.Arrays;
  * territory definition.
  */
 public final class Mapcode {
-    @Nonnull private final String    mapcode;
+    @Nonnull private final String    mapcodePrecision0;
     @Nonnull private final String    mapcodePrecision1;
     @Nonnull private final String    mapcodePrecision2;
     @Nonnull private final Territory territory;
@@ -34,11 +34,11 @@ public final class Mapcode {
         @Nonnull final Territory territory) {
         this.mapcodePrecision2 = mapcode;
         if (mapcode.contains("-")) {
-            this.mapcode = mapcode.substring(0, mapcode.length() - 3);
+            this.mapcodePrecision0 = mapcode.substring(0, mapcode.length() - 3);
             this.mapcodePrecision1 = mapcode.substring(0, mapcode.length() - 1);
         }
         else {
-            this.mapcode = mapcode;
+            this.mapcodePrecision0 = mapcode;
             this.mapcodePrecision1 = mapcode;
         }
         this.territory = territory;
@@ -56,7 +56,7 @@ public final class Mapcode {
      */
     @Nonnull
     public String getMapcode() {
-        return mapcode;
+        return mapcodePrecision0;
     }
 
     /**
@@ -66,7 +66,7 @@ public final class Mapcode {
      */
     @Nonnull
     public String getMapcodePrecision0() {
-        return mapcode;
+        return mapcodePrecision0;
     }
 
     /**
@@ -131,7 +131,7 @@ public final class Mapcode {
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(new Object[]{mapcode, territory});
+        return Arrays.deepHashCode(new Object[]{mapcodePrecision0, territory});
     }
 
     /**
@@ -144,7 +144,7 @@ public final class Mapcode {
      */
     @Nonnull
     public String asLocal() {
-        return mapcode;
+        return mapcodePrecision0;
     }
 
     /**
@@ -160,7 +160,7 @@ public final class Mapcode {
      */
     @Nonnull
     public String asInternationalFullName() {
-        return territory.getFullName() + ' ' + mapcode;
+        return territory.getFullName() + ' ' + mapcodePrecision0;
     }
 
     /**
@@ -177,7 +177,7 @@ public final class Mapcode {
      */
     @Nonnull
     public String asInternationalISO() {
-        return territory.toString() + ' ' + mapcode;
+        return territory.toString() + ' ' + mapcodePrecision0;
     }
 
     @Nonnull
@@ -195,6 +195,6 @@ public final class Mapcode {
             return false;
         }
         final Mapcode that = (Mapcode) obj;
-        return mapcode.equals(that.mapcode) && (this.territory.equals(that.territory));
+        return mapcodePrecision0.equals(that.mapcodePrecision0) && (this.territory.equals(that.territory));
     }
 }
