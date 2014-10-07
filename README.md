@@ -4,8 +4,8 @@ Copyright (C) 2014 Stichting Mapcode Foundation (http://www.mapcode.com)
 
 ----
 
-This Java project contains a library to encode latitude/longitude pairs to Mapcodes
-and to decode Mapcodes back to latitude/longitude pairs.
+This Java project contains a library to encode latitude/longitude pairs to mapcodes
+and to decode mapcodes back to latitude/longitude pairs.
 
 **Online documentation can be found at: http://mapcode-foundation.github.io/mapcode-java/**
 
@@ -28,5 +28,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Original C library created by Pieter Geelen. Work on Java version
-of the Mapcode library by Rijn Buve and Matthew Lowden.
+of the mapcode library by Rijn Buve and Matthew Lowden.
 

@@ -9,6 +9,15 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 1.40.1
+
+    * Deprecated names <<<getMapcodeHighPrecision>>> and <<<getMapcodeMediumPrecision>>>.
+      Replaced those with <<<getMapcodePrecision1>>> and <<<getMapcodePrecision2>>>.
+
+    * Fixed all occurences of incorrectly cased Mapcode vs. mapcode.
+
+    []
+
 * 1.40
 
     * Renamed class <<<Mapcode>>> to <<<MapcodeCodec>>>.

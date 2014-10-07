@@ -23,7 +23,7 @@ import static com.mapcode.CheckArgs.checkNonnull;
 
 /**
  * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the Mapcode implementation only.
+ * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
  *
  * This class defines a class for lat/lon points.
@@ -233,7 +233,7 @@ public class Point {
     private double lonDeg;     // Longitude, normal range -180..180, but not enforced.
 
     /**
-     * Points can be "undefined" within the Mapcode implementation, but never outside of that.
+     * Points can be "undefined" within the mapcode implementation, but never outside of that.
      * Any methods creating or setting undefined points must be package private and external
      * interfaces must never pass undefined points to callers.
      */
@@ -258,12 +258,12 @@ public class Point {
     }
 
     /**
-     * Package private methods. Only used in the Mapcode implementation modules.
+     * Package private methods. Only used in the mapcode implementation modules.
      */
 
     /**
      * Create an undefined points. No latitude or longitude can be obtained from it.
-     * Only within the Mapcode implementation points can be undefined, so this methods is package private.
+     * Only within the mapcode implementation points can be undefined, so this methods is package private.
      *
      * @return Undefined points.
      */
@@ -274,7 +274,7 @@ public class Point {
 
     /**
      * Set a point to be undefined, invalidating the latitude and longitude.
-     * Only within the Mapcode implementation points can be undefined, so this methods is package private.
+     * Only within the mapcode implementation points can be undefined, so this methods is package private.
      */
     void setUndefined() {
         latDeg = Double.NaN;
@@ -284,7 +284,7 @@ public class Point {
 
     /**
      * Return whether the point is defined or not.
-     * Only within the Mapcode implementation points can be undefined, so this methods is package private.
+     * Only within the mapcode implementation points can be undefined, so this methods is package private.
      *
      * @return True if defined. If false, no lat/lon is available.
      */

@@ -33,7 +33,7 @@ mvn clean install
 
 How To Use This Library In Your Application
 
-    There are two classes you interact with as a client of the Mapcode library. These are:
+    There are two classes you interact with as a client of the Mapcode Library. These are:
 
     * <<<MapcodeCodec.java>>>
 
@@ -141,8 +141,18 @@ Class <<<Mapcode.java>>>
     is properly parsed and converted to a <<<Territory>>> enumeration value.
 
     * <<<String getMapcode()>>> returns the mapcode string which does not include territory information. You can also
-    use <<<getMapcodeHighPrecision()>>> and <<<getMapcodeMediumPrecision()>>> for more precision, but longer
+    use <<<getMapcodePrecision1()>>> and <<<getMapcodePrecision2()>>> for more precision, but longer
     mapcodes.
+
+        * The default precision offered by <<<getMapcode()>>> is approximately 5m (maximum distance to latitude,
+        longitude the mapcode decodes to). This corresponds to an area of 10m x 10m (100m2). These mapcodes include
+        no additional precision digits.
+
+        * The precision offered by <<<getMapcodePrecision1()>>> is approximately 1m.
+        This corresponds to an area of 2m x 2m (4m2). These mapcodes include 1 additional precision digit.
+
+        * The precision offered by <<<getMapcodePrecision2()>>> is approximately 0.16m. This corresponds to an area
+        of 0.32m x 0.32m (0.1m2). These mapcodes include 2 additional precision digits.
 
     * <<<Territory getTerritory()>>> returns the territory information.
 

@@ -88,8 +88,8 @@ public class ReferenceFileTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    public void checkRandomReferenceRecordsHighPrecision() throws Exception {
-        LOG.info("checkRandomReferenceRecordsHighPrecision");
+    public void checkRandomReferenceRecordsPrecision2() throws Exception {
+        LOG.info("checkRandomReferenceRecordsPrecision2");
         checkFile(RANDOM_REFERENCE_FILE_1_HP);
         checkFile(RANDOM_REFERENCE_FILE_2_HP);
         checkFile(RANDOM_REFERENCE_FILE_3_HP);
@@ -97,8 +97,8 @@ public class ReferenceFileTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    public void checkGridReferenceRecordsHighPrecision() throws Exception {
-        LOG.info("checkGridReferenceRecordsHighPrecision");
+    public void checkGridReferenceRecordsPrecision2() throws Exception {
+        LOG.info("checkGridReferenceRecordsPrecision2");
         checkFile(GRID_REFERENCE_FILE_1_HP);
         checkFile(GRID_REFERENCE_FILE_2_HP);
         checkFile(GRID_REFERENCE_FILE_3_HP);
@@ -106,8 +106,8 @@ public class ReferenceFileTest {
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    public void checkBoundariesReferenceRecordsHighPrecision() throws Exception {
-        LOG.info("checkBoundariesReferenceRecordsHighPrecision");
+    public void checkBoundariesReferenceRecordsPrecision2() throws Exception {
+        LOG.info("checkBoundariesReferenceRecordsPrecision2");
         checkFile(BOUNDARIES_REFERENCE_FILE_HP);
     }
 
@@ -138,18 +138,18 @@ public class ReferenceFileTest {
                  * Check encode.
                  */
 
-                // Encode lat/lon to series of Mapcodes and check the resulting Mapcodes.
+                // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
                 final List<Mapcode> results = MapcodeCodec.encode(
                     reference.point.getLatDeg(), reference.point.getLonDeg());
                 if (showLogLine) {
                     LOG.info("checkFile: actual   = {}", GSON.toJson(results));
                 }
 
-                // Check the number of Mapcodes.
+                // Check the number of mapcodes.
 
                 // TODO: This check can only be enabled when the reference implementation and the
                 // Java version produce exactly the same number of code. For now, we will only
-                // log the offending Mapcodes as errors in the log file, but not fail the test.
+                // log the offending mapcodes as errors in the log file, but not fail the test.
                 //
                 // Check the size and order of the results with a single assertion.
                 //
@@ -160,13 +160,13 @@ public class ReferenceFileTest {
                 //         "\n  actual   = " + results.size() + " results, " + GSON.toJson(results),
                 //     reference.mapcodes.size(), results.size());
 
-                // For every Mapcode in the result set, check if it is contained in the reference set.
+                // For every mapcode in the result set, check if it is contained in the reference set.
                 for (final Mapcode result : results) {
                     boolean found = false;
                     for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
                         if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
                             if (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodeHighPrecision())) {
+                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodePrecision2())) {
                                     found = true;
                                     break;
                                 }
@@ -196,7 +196,7 @@ public class ReferenceFileTest {
                     for (final Mapcode result : results) {
                         if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
                             if (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodeHighPrecision())) {
+                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodePrecision2())) {
                                     found = true;
                                     break;
                                 }
@@ -295,7 +295,7 @@ public class ReferenceFileTest {
         assertTrue("Latitude must be in [-90, 90]", (-90 <= point.getLatDeg()) && (point.getLatDeg() <= 90));
         assertTrue("Longitude must be in [-180, 180]", (-180 <= point.getLonDeg()) && (point.getLonDeg() <= 180));
 
-        // Read Mapcodes: <territory> <mapcode>
+        // Read mapcodes: <territory> <mapcode>
         final ArrayList<MapcodeRec> mapcodeRecs = new ArrayList<MapcodeRec>();
         for (int i = 0; i < count; ++i) {
             final String line = chunkedFile.readNonEmptyLine();

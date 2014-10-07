@@ -30,10 +30,10 @@ import java.util.TreeMap;
 
 /**
  * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the Mapcode implementation only.
+ * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
  *
- * This class contains a class that defines an area for local Mapcodes.
+ * This class contains a class that defines an area for local mapcodes.
  */
 class SubArea {
     private static final Logger LOG = LoggerFactory.getLogger(SubArea.class);

@@ -56,7 +56,7 @@ COMPILING THE MAPCODE UTILITY
 -------------------------------------------------------------------------------
 
 The application "mapcode" is found in project "mapcode-cpp", which is the
-original reference CPP implementation for Mapcode.
+original reference CPP implementation for mapcode.
 
 The reference files are the following format:
 

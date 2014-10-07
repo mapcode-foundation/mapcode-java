@@ -31,7 +31,7 @@ import static com.mapcode.CheckArgs.checkRange;
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
  *
- * This class defines the available territory codes as used by Mapcode.
+ * This class defines the available territory codes as used by mapcode.
  */
 public enum Territory {
     USA(409, "USA", null, new String[]{"US"}, new String[]{"United States of America", "America"}),
@@ -692,7 +692,7 @@ public enum Territory {
     }
 
     /**
-     * Enumeration that specifies the format for Mapcodes.
+     * Enumeration that specifies the format for mapcodes.
      */
     public enum NameFormat {
         INTERNATIONAL,          // Same as name() with underscores replaces with dashes.
