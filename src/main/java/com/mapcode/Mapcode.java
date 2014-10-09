@@ -187,7 +187,7 @@ public final class Mapcode {
     public static MapcodeFormatType getMapcodeFormatType(@Nonnull final String mapcode) {
 
         // First, decode to ASCII.
-        final String decodedMapcode = Decoder.decodeUTF16(mapcode);
+        final String decodedMapcode = convertToAscii(mapcode);
 
         // Syntax needs to be OK.
         if (!PATTERN_MAPCODE_FORMAT.matcher(decodedMapcode).matches()) {
@@ -216,6 +216,17 @@ public final class Mapcode {
      */
     public static boolean isValidMapcodeFormat(@Nonnull final String mapcode) {
         return getMapcodeFormatType(mapcode) != MapcodeFormatType.MAPCODE_TYPE_INVALID;
+    }
+
+    /**
+     * Convert a mapcode which potentially contains Unicode characters, to an ASCII veriant.
+     *
+     * @param mapcode Mapcode, with optional Unicode characters.
+     * @return ASCII, non-Unicode string.
+     */
+    @Nonnull
+    public static String convertToAscii(@Nonnull final String mapcode) {
+        return Decoder.decodeUTF16(mapcode);
     }
 
     /**

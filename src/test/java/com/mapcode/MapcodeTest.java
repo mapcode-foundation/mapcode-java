@@ -90,4 +90,11 @@ public class MapcodeTest {
         assertEquals(Mapcode.MapcodeFormatType.MAPCODE_TYPE_PRECISION_1, Mapcode.getMapcodeFormatType("AA.BB-1"));
         assertEquals(Mapcode.MapcodeFormatType.MAPCODE_TYPE_PRECISION_2, Mapcode.getMapcodeFormatType("AA.BB-12"));
     }
+
+    @Test
+    public void checkConvertToAscii() {
+        LOG.info("checkConvertToAscii");
+        assertEquals("KM.8K", Mapcode.convertToAscii("\u30c1\u30ca.8\u30c1"));
+        assertEquals("HJ.Q2-Z", Mapcode.convertToAscii("\u0397\u03a0.\u03982-\u0411"));
+    }
 }

@@ -20,6 +20,9 @@ Release Notes (Version ${project.version})
     if the character 'Z' or equivalent Unicode character is contained in the high precision part according to
     the Mapcode documenation.
 
+    * Added method <<<convertToAscii>>> which produces the ASCII, non-Unicode variant of a mapcode which contains
+    Unicode characters§.
+
     []
 
 * 1.40.1
