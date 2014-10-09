@@ -16,10 +16,10 @@
 
 package com.mapcode;
 
+import javax.annotation.Nonnull;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
 
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
@@ -29,7 +29,9 @@ class Decoder {
     // ----------------------------------------------------------------------
 
     @Nonnull
-    static Point decode(@Nonnull final String argMapcode, @Nonnull final Territory argTerritory) {
+    static Point decode(@Nonnull final String argMapcode,
+	    @Nonnull final Territory argTerritory)
+	    throws UnknownMapcodeException {
         LOG.trace("decode: mapcode={}, territory={}", argMapcode, argTerritory.name());
 
         String mapcode = argMapcode;
@@ -41,7 +43,10 @@ class Decoder {
 
         final int minpos = mapcode.indexOf('-');
         if (minpos > 0) {
-            extrapostfix = mapcode.substring(minpos + 1).trim();
+	    extrapostfix = decodeUTF16(mapcode.substring(minpos + 1).trim());
+	    if (extrapostfix.contains("Z")) {
+		throw new UnknownMapcodeException("Invalid character Z");
+	    }
             mapcode = mapcode.substring(0, minpos);
         }
 
