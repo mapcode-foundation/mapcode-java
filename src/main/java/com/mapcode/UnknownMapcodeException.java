@@ -24,6 +24,9 @@ import javax.annotation.Nonnull;
  * ----------------------------------------------------------------------------------------------
  *
  * This exception is thrown for invalid mapcodes (which have the right syntax, are correctly formatted).
+ *
+ * Note that for syntactically incorrect mapcodes, normally {@link java.lang.IllegalArgumentException}s are thrown,
+ * not {@link com.mapcode.UnknownMapcodeException}.
  */
 public final class UnknownMapcodeException extends Exception {
     private static final long serialVersionUID = 1L;
