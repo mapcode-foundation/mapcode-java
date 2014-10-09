@@ -16,6 +16,10 @@ Release Notes (Version ${project.version})
 
     * Constructor of <<<Mapcode>>> now checks for validity of mapcode string.
 
+    * Added Unicode handling of high precision mapcodes and added check to throw an <<<IllegalArgumentException>>>
+    if the character 'Z' or equivalent Unicode character is contained in the high precision part according to
+    the Mapcode documenation.
+
     []
 
 * 1.40.1

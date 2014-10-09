@@ -16,11 +16,11 @@
 
 package com.mapcode;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
 public class DecoderTest {
@@ -60,126 +60,126 @@ public class DecoderTest {
 
     @Test
     public void highPrecisionUnicodeAthensAcropolis1() throws Exception {
-	LOG.info("highPrecisionUnicodeAthensAcropolis1");
-	final Point point = MapcodeCodec.decode("ΗΠ.Θ2-Φ2", Territory.GRC);
-	assertEquals("decodeUnicode latitude", 37971844, point.getLatMicroDeg());
-	assertEquals("decodeUnicode longitude", 23726223,
-		point.getLonMicroDeg());
+        LOG.info("highPrecisionUnicodeAthensAcropolis1");
+        final Point point = MapcodeCodec.decode("\u0397\u03a0.\u03982-\u03a62", Territory.GRC);
+        assertEquals("decodeUnicode latitude", 37971844, point.getLatMicroDeg());
+        assertEquals("decodeUnicode longitude", 23726223,
+            point.getLonMicroDeg());
     }
 
     @Test
     public void highPrecisionUnicodeAthensAcropolis2() throws Exception {
-	LOG.info("highPrecisionUnicodeAthensAcropolis2");
-	final Point point = MapcodeCodec.decode("GRC ΗΠ.Θ2-Φ2");
-	assertEquals("decodeUnicode latitude", 37971844, point.getLatMicroDeg());
-	assertEquals("decodeUnicode longitude", 23726223,
-		point.getLonMicroDeg());
+        LOG.info("highPrecisionUnicodeAthensAcropolis2");
+        final Point point = MapcodeCodec.decode("GRC \u0397\u03a0.\u03982-\u03a62");
+        assertEquals("decodeUnicode latitude", 37971844, point.getLatMicroDeg());
+        assertEquals("decodeUnicode longitude", 23726223,
+            point.getLonMicroDeg());
     }
 
     @Test
     public void unicodeMapcodeAthensAcropolis1() throws Exception {
-	LOG.info("unicodeMapcodeAthensAcropolis1");
-	final Point point = MapcodeCodec.decode("ΗΠ.Θ2", Territory.GRC);
-	assertEquals("decodeUnicode latitude", 37971812, point.getLatMicroDeg());
-	assertEquals("decodeUnicode longitude", 23726247,
-		point.getLonMicroDeg());
+        LOG.info("unicodeMapcodeAthensAcropolis1");
+        final Point point = MapcodeCodec.decode("\u0397\u03a0.\u03982", Territory.GRC);
+        assertEquals("decodeUnicode latitude", 37971812, point.getLatMicroDeg());
+        assertEquals("decodeUnicode longitude", 23726247,
+            point.getLonMicroDeg());
     }
 
     @Test
     public void unicodeMapcodeAthensAcropolis2() throws Exception {
-	LOG.info("unicodeMapcodeAthensAcropolis2");
-	final Point point = MapcodeCodec.decode("GRC ΗΠ.Θ2");
-	assertEquals("decodeUnicode latitude", 37971812, point.getLatMicroDeg());
-	assertEquals("decodeUnicode longitude", 23726247,
-		point.getLonMicroDeg());
+        LOG.info("unicodeMapcodeAthensAcropolis2");
+        final Point point = MapcodeCodec.decode("GRC \u0397\u03a0.\u03982");
+        assertEquals("decodeUnicode latitude", 37971812, point.getLatMicroDeg());
+        assertEquals("decodeUnicode longitude", 23726247,
+            point.getLonMicroDeg());
     }
 
     @Test
     public void unicodeMapcodeTokyoTower1() throws Exception {
-	LOG.info("unicodeMapcodeTokyoTower1");
-	final Point point = MapcodeCodec.decode("\u30c1\u30ca.8\u30c1",
-		Territory.JPN);
-	assertEquals("decodeUnicode latitude", 35658660, point.getLatMicroDeg());
-	assertEquals("decodeUnicode longitude", 139745394,
-		point.getLonMicroDeg());
+        LOG.info("unicodeMapcodeTokyoTower1");
+        final Point point = MapcodeCodec.decode("\u30c1\u30ca.8\u30c1",
+            Territory.JPN);
+        assertEquals("decodeUnicode latitude", 35658660, point.getLatMicroDeg());
+        assertEquals("decodeUnicode longitude", 139745394,
+            point.getLonMicroDeg());
     }
 
     @Test
     public void unicodeMapcodeTokyoTower2() throws Exception {
-	LOG.info("unicodeMapcodeTokyoTower2");
-	final Point point = MapcodeCodec.decode("JPN \u30c1\u30ca.8\u30c1");
-	assertEquals("decodeUnicode latitude", 35658660, point.getLatMicroDeg());
-	assertEquals("decodeUnicode longitude", 139745394,
-		point.getLonMicroDeg());
+        LOG.info("unicodeMapcodeTokyoTower2");
+        final Point point = MapcodeCodec.decode("JPN \u30c1\u30ca.8\u30c1");
+        assertEquals("decodeUnicode latitude", 35658660, point.getLatMicroDeg());
+        assertEquals("decodeUnicode longitude", 139745394,
+            point.getLonMicroDeg());
     }
 
     @Test
     public void mapCodeWithZeroGroitzsch() throws Exception {
-	LOG.info("mapCodeWithZeroGroitzsch");
-	final Point point = MapcodeCodec.decode("HMVM.3Q0", Territory.DEU);
-	assertEquals("decodeUnicode latitude", 51154852, point.getLatMicroDeg());
-	assertEquals("decodeUnicode longitude", 12278574,
-		point.getLonMicroDeg());
+        LOG.info("mapCodeWithZeroGroitzsch");
+        final Point point = MapcodeCodec.decode("HMVM.3Q0", Territory.DEU);
+        assertEquals("decodeUnicode latitude", 51154852, point.getLatMicroDeg());
+        assertEquals("decodeUnicode longitude", 12278574,
+            point.getLonMicroDeg());
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidTerritory() throws Exception {
         LOG.info("invalidTerritory");
         MapcodeCodec.decode("NLD 49.4V", Territory.NLD);
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidNoDot() throws Exception {
         LOG.info("invalidNoDot");
         MapcodeCodec.decode("494V", Territory.NLD);
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidDotLocation1() throws Exception {
         LOG.info("invalidDotLocation1");
         MapcodeCodec.decode("4.94V", Territory.NLD);
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidDotLocation2() throws Exception {
         LOG.info("invalidDotLocation2");
         MapcodeCodec.decode("494.V", Territory.NLD);
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidDotLocation3() throws Exception {
         LOG.info("invalidDotLocation3");
         MapcodeCodec.decode("494V49.4V", Territory.NLD);
     }
 
     @Test(expected = UnknownMapcodeException.class)
-    public void invalidDotLocation4() throws Exception {
-        LOG.info("invalidDotLocation4");
+    public void invalidMapcode1() throws Exception {
+        LOG.info("invalidMapcode1");
         MapcodeCodec.decode("494.V494V", Territory.NLD);
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidHighPrecisionCharacter() throws Exception {
-	LOG.info("invalidHighPrecisionCharacter");
-	MapcodeCodec.decode("49.4V-Z", Territory.NLD);
+        LOG.info("invalidHighPrecisionCharacter");
+        MapcodeCodec.decode("49.4V-Z", Territory.NLD);
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidHighPrecisionCharacter2() throws Exception {
-	LOG.info("invalidHighPrecisionCharacter2");
-	MapcodeCodec.decode("49.4V-HZ", Territory.NLD);
+        LOG.info("invalidHighPrecisionCharacter2");
+        MapcodeCodec.decode("49.4V-HZ", Territory.NLD);
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidHighPrecisionCharacter3() throws Exception {
-	LOG.info("invalidHighPrecisionCharacter3");
-	MapcodeCodec.decode("ΗΠ.Θ2-Б", Territory.GRC);
+        LOG.info("invalidHighPrecisionCharacter3");
+        MapcodeCodec.decode("\u0397\u03a0.\u03982-\u0411", Territory.GRC);
     }
 
-    @Test(expected = UnknownMapcodeException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void invalidHighPrecisionCharacter4() throws Exception {
-	LOG.info("invalidHighPrecisionCharacter4");
-	MapcodeCodec.decode("ΗΠ.Θ2-ББ", Territory.GRC);
+        LOG.info("invalidHighPrecisionCharacter4");
+        MapcodeCodec.decode("\u0397\u03a0.\u03982-\u0411\u0411", Territory.GRC);
     }
 
     @SuppressWarnings("ConstantConditions")

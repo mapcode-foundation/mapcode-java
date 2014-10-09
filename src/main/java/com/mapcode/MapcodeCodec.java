@@ -194,8 +194,9 @@ public final class MapcodeCodec {
      *
      * @param mapcode Mapcode.
      * @return Point corresponding to mapcode.
-     * @throws UnknownMapcodeException  Thrown if the mapcode cannot be decoded into a point.
-     * @throws IllegalArgumentException Thrown if arguments are null.
+     * @throws UnknownMapcodeException  Thrown if the mapcode has the correct synaxt,
+     *                                  but cannot be decoded into a point.
+     * @throws IllegalArgumentException Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
      */
     @Nonnull
     public static Point decode(
@@ -219,6 +220,10 @@ public final class MapcodeCodec {
         else {
             territory = Territory.AAA;
         }
+        if (!Mapcode.isValidMapcodeFormat(mapcodeTrimmed)) {
+            throw new IllegalArgumentException(mapcode + " is not a correctly formatted mapcode; " +
+                "the regular expression for the mapcode syntax is: " + Mapcode.REGEX_MAPCODE_FORMAT);
+        }
         return decode(mapcodeTrimmed, territory);
     }
 
@@ -231,8 +236,8 @@ public final class MapcodeCodec {
      * @param mapcode          Mapcode.
      * @param territoryContext Territory for disambiguation purposes.
      * @return Point corresponding to mapcode. Latitude range: -90..90, longitude range: -180..180.
-     * @throws UnknownMapcodeException  Thrown if the mapcode cannot be decoded into a point.
-     * @throws IllegalArgumentException Thrown if arguments are null.
+     * @throws UnknownMapcodeException  Thrown if the mapcode has the right syntax, but cannot be decoded into a point.
+     * @throws IllegalArgumentException Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
      */
     @Nonnull
     public static Point decode(
@@ -241,6 +246,11 @@ public final class MapcodeCodec {
         checkNonnull("mapcode", mapcode);
         checkNonnull("territoryConext", territoryContext);
         final String mapcodeTrimmed = mapcode.trim();
+        if (!Mapcode.isValidMapcodeFormat(mapcodeTrimmed)) {
+            throw new IllegalArgumentException(mapcode + " is not a correctly formatted mapcode; " +
+                "the regular expression for the mapcode syntax is: " + Mapcode.REGEX_MAPCODE_FORMAT);
+        }
+
         @Nonnull final Point point = Decoder.decode(mapcodeTrimmed, territoryContext);
         assert point != null;
 

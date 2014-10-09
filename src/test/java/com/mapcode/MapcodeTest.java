@@ -42,6 +42,10 @@ public class MapcodeTest {
         assertTrue(Mapcode.isValidMapcodeFormat("AAAAA.BBBBB"));
         assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-0"));
         assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-01"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-A"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-AA"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-Y"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-1Y"));
     }
 
     @Test
@@ -67,6 +71,14 @@ public class MapcodeTest {
         assertFalse(Mapcode.isValidMapcodeFormat("AAAAAA.BBBBB"));
         assertFalse(Mapcode.isValidMapcodeFormat("AAAAA.BBBBBB"));
         assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-012"));
+        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-1Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA"));
+        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A"));
+        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA-1"));
+        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A-1"));
+        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA-12"));
+        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A-12"));
     }
 
     @Test

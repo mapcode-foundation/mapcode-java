@@ -23,7 +23,7 @@ import javax.annotation.Nonnull;
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
  *
- * This exception is thrown for unknown mapcodes.
+ * This exception is thrown for invalid mapcodes (which have the right syntax, are correctly formatted).
  */
 public final class UnknownMapcodeException extends Exception {
     private static final long serialVersionUID = 1L;

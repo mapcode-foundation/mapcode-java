@@ -24,6 +24,10 @@ import java.util.regex.Pattern;
 /**
  * This class defines a single mapcode encoding result, including the mapcode itself and the
  * territory definition.
+ *
+ * Note that the constructor will throw an {@link IllegalArgumentException} if the syntax of the mapcode
+ * is not correct. It does not throw an {@link com.mapcode.UnknownMapcodeException}, because the mapcode
+ * is not checked for validity, other than its syntax.
  */
 public final class Mapcode {
     @Nonnull private final String    mapcodePrecision0;
@@ -149,15 +153,24 @@ public final class Mapcode {
     }
 
     /**
-     * These patterns and regular expressions are used for checking mapcode format strings.
+     * These patterns and matchers are used internally in this module to match mapcodes. They are
+     * provided as statics to only compile these patterns once.
+     */
+    @Nonnull static final String REGEX_MAPCODE_FORMAT1   = "^[\\p{Alpha}\\p{Digit}]{2,5}+";
+    @Nonnull static final String REGEX_MAPCODE_FORMAT2   = "[.][\\p{Alpha}\\p{Digit}]{2,5}+";
+    @Nonnull static final String REGEX_MAPCODE_PRECISION = "[-][\\p{Alpha}\\p{Digit}&&[^zZ]]{1,2}+";
+
+    /**
+     * This patterns/regular expressions is used for checking mapcode format strings.
      * They've been made pulkic to allow others to use the correct regular expressions as well.
      */
-    @Nonnull public static final String REGEX_MAPCODE_FORMAT    =
-        "^[a-zA-Z0-9]{2,5}?[.][a-zA-Z0-9]{2,5}?([-][a-zA-Z0-9]{1,2}?)?$";
-    @Nonnull public static final String REGEX_MAPCODE_PRECISION = "[-][a-zA-Z0-9]{1,2}?$";
+    @Nonnull public static final String REGEX_MAPCODE_FORMAT =
+        REGEX_MAPCODE_FORMAT1 + REGEX_MAPCODE_FORMAT2 + '(' + REGEX_MAPCODE_PRECISION + ")?$";
 
-    @Nonnull public static final Pattern PATTERN_MAPCODE_FORMAT    = Pattern.compile(REGEX_MAPCODE_FORMAT);
-    @Nonnull public static final Pattern PATTERN_MAPCODE_PRECISION = Pattern.compile(REGEX_MAPCODE_PRECISION);
+    @Nonnull private static final Pattern PATTERN_MAPCODE_FORMAT    =
+        Pattern.compile(REGEX_MAPCODE_FORMAT, Pattern.UNICODE_CHARACTER_CLASS);
+    @Nonnull private static final Pattern PATTERN_MAPCODE_PRECISION =
+        Pattern.compile(REGEX_MAPCODE_PRECISION, Pattern.UNICODE_CHARACTER_CLASS);
 
     /**
      * This method return the mapcode type, given a mapcode string. If the mapcode string has an invalid
@@ -172,15 +185,21 @@ public final class Mapcode {
      */
     @Nonnull
     public static MapcodeFormatType getMapcodeFormatType(@Nonnull final String mapcode) {
-        final Matcher matcherMapcodeFormat = PATTERN_MAPCODE_FORMAT.matcher(mapcode);
-        if (!matcherMapcodeFormat.matches()) {
+
+        // First, decode to ASCII.
+        final String decodedMapcode = Decoder.decodeUTF16(mapcode);
+
+        // Syntax needs to be OK.
+        if (!PATTERN_MAPCODE_FORMAT.matcher(decodedMapcode).matches()) {
             return MapcodeFormatType.MAPCODE_TYPE_INVALID;
         }
-        final Matcher matcherMapcodePrecision = PATTERN_MAPCODE_PRECISION.matcher(mapcode);
+
+        // Precision part should be OK.
+        final Matcher matcherMapcodePrecision = PATTERN_MAPCODE_PRECISION.matcher(decodedMapcode);
         if (!matcherMapcodePrecision.find()) {
             return MapcodeFormatType.MAPCODE_TYPE_PRECISION_0;
         }
-        final int length = matcherMapcodePrecision.group().length();
+        final int length = matcherMapcodePrecision.end() - matcherMapcodePrecision.start();
         assert (2 <= length) && (length <= 3);
         if (length == 2) {
             return MapcodeFormatType.MAPCODE_TYPE_PRECISION_1;

@@ -16,10 +16,10 @@
 
 package com.mapcode;
 
-import javax.annotation.Nonnull;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
 
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
@@ -30,23 +30,23 @@ class Decoder {
 
     @Nonnull
     static Point decode(@Nonnull final String argMapcode,
-	    @Nonnull final Territory argTerritory)
-	    throws UnknownMapcodeException {
+        @Nonnull final Territory argTerritory)
+        throws UnknownMapcodeException {
         LOG.trace("decode: mapcode={}, territory={}", argMapcode, argTerritory.name());
 
         String mapcode = argMapcode;
         Territory territory = argTerritory;
 
-        // in case of error, result.isDefined() is false
+        // In case of error, result.isDefined() is false.
         Point result = Point.undefined();
         String extrapostfix = "";
 
         final int minpos = mapcode.indexOf('-');
         if (minpos > 0) {
-	    extrapostfix = decodeUTF16(mapcode.substring(minpos + 1).trim());
-	    if (extrapostfix.contains("Z")) {
-		throw new UnknownMapcodeException("Invalid character Z");
-	    }
+            extrapostfix = decodeUTF16(mapcode.substring(minpos + 1).trim());
+            if (extrapostfix.contains("Z")) {
+                throw new UnknownMapcodeException("Invalid character Z");
+            }
             mapcode = mapcode.substring(0, minpos);
         }
 
@@ -599,7 +599,13 @@ class Decoder {
         return str;
     }
 
-    private static String decodeUTF16(final String str) {
+    /**
+     * This method decodes a Unicode string to ASCII. Package private for access by other modules.
+     *
+     * @param str Unicode string.
+     * @return ASCII string.
+     */
+    static String decodeUTF16(final String str) {
         final StringBuilder asciibuf = new StringBuilder();
         for (int index = 0; index < str.length(); index++) {
             if (str.charAt(index) == '.') {
