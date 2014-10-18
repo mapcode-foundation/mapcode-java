@@ -63,8 +63,7 @@ class Common {
         while (Data.calcCodex(e) == sameCodex) {
             e++;
         }
-        e--;
-        return e - i + 1;
+        return e - i;
     }
 
     static int getFirstNamelessRecord(final int sameCodex, final int index, final int firstCode) {
