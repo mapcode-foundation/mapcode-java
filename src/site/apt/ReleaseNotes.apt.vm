@@ -11,10 +11,10 @@ Release Notes (Version ${project.version})
 
 * 1.40.3
 
-    * To be done.
+    * Minor code cleam-up with no functional effect.
 
     []
-    
+
 * 1.40.2
 
     * Added <<<getMapcodeFormatType>>> and <<<isValidMapcodeFormat>>> to check validity of mapcode strings. Added
