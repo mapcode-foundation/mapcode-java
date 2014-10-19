@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 Stichting Mapcode Foundation (http://www.mapcode.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,5 +47,14 @@ public class TerritoryTest {
     public void disambiguateMNTest2() throws Exception {
         LOG.info("disambiguateMNTest2");
         Territory.fromString("MN", ParentTerritory.RUS);
+    }
+
+    @Test
+    public void territoryFromStringTest() throws Exception {
+        LOG.info("territoryFromStringTest");
+        assertEquals(Territory.NLD, Territory.fromString("NLD"));
+        assertEquals(Territory.ARG, Territory.fromString("ARG"));
+        assertEquals(Territory.ASM, Territory.fromString("US-AS"));
+        assertEquals(Territory.ASM, Territory.fromString("USA-AS"));
     }
 }
