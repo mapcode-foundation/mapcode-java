@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 Stichting Mapcode Foundation (http://www.mapcode.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -170,8 +170,10 @@ public class Point {
         final double lonRad = Math.atan2(y, x);
 
         // Convert radians to degrees.
-        final double lat = Double.isNaN(latRad) ? 90.0 : (latRad * (180.0 / Math.PI));
-        final double lon = Double.isNaN(lonRad) ? 180.0 : (lonRad * (180.0 / Math.PI));
+        assert !Double.isNaN(latRad);
+        assert !Double.isNaN(lonRad);
+        final double lat = latRad * (180.0 / Math.PI);
+        final double lon = lonRad * (180.0 / Math.PI);
         return fromMicroDeg(degToMicroDeg(lat), degToMicroDeg(lon));
     }
 
