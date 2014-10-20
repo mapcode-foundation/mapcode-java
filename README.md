@@ -34,20 +34,24 @@ of the mapcode library by Rijn Buve and Matthew Lowden.
 
 It's good practice to set up a personal global .gitignore file on your machine which filters a number of files
 on your file systems that you do not wish to submit to the Git repository. You can set up your own global
-.gitignore file by executing:
+`~/.gitignore` file by executing:
 `git config --global core.excludesfile ~/.gitignore`
 
-In general, filter these file types in `~/.gitignore` (each entry should be on a separate line):
-`*.com *.class *.dll *.exe *.o *.so *.log *.sql *.sqlite *.tlog *.epoch *.swp *.hprof *.hprof.index *~`
+In general, add the following file types to `~/.gitignore` (each entry should be on a separate line):
+`*.com *.class *.dll *.exe *.o *.so *.log *.sql *.sqlite *.tlog *.epoch *.swp *.hprof *.hprof.index *.releaseBackup *~`
 
 If you're using a Mac, filter:
 `.DS_Store* Thumbs.db`
 
 If you're using IntelliJ IDEA, filter:
-`*.iml *.iws *.releaseBackup .idea/`
+`*.iml *.iws .idea/`
 
 If you're using Eclips, filter:
 `.classpath .project .settings .cache`
 
 If you're using NetBeans, filter: 
 `nb-configuration.xml *.orig`
+
+The local `.gitignore` file in the Git repository itself to reflect those file only that are produced by executing
+regular compile, build or release commands, such as:
+`target/ out/`
