@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2014 Stichting Mapcode Foundation (http://www.mapcode.com)
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,7 @@ import java.io.InputStream;
 class DataAccess {
 
     private static final byte[] FILE_DATA;
-    private static final String FILE_NAME = "/mminfo.dat";
+    private static final String FILE_NAME = "/com/mapcode/mminfo.dat";
 
     // Read data only once in static initializer.
     static {
