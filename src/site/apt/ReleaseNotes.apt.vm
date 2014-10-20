@@ -11,7 +11,10 @@ Release Notes (Version ${project.version})
 
 * 1.40.3
 
-    * Minor code cleam-up with no functional effect.
+    * Minor code clean-up with no functional effect.
+
+    * (Issue #6) Removed non-project specific unwanted files out of <<<.gitignore>>>. These should be listed in the
+    developer's own global <<<~/.gitignore>>> file instead.
 
     []
 
