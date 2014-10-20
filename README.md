@@ -30,7 +30,7 @@ limitations under the License.
 Original C library created by Pieter Geelen. Work on Java version
 of the mapcode library by Rijn Buve and Matthew Lowden.
 
-# Using Git and .gitignore
+# Using Git and `.gitignore`
 
 It's good practice to set up a personal global .gitignore file on your machine which filters a number of files
 on your file systems that you do not wish to submit to the Git repository. You can set up your own global
