@@ -648,7 +648,17 @@ public enum Territory {
     }
 
     /**
-     * Get a territory from a name.
+     * Get a territory from a mapcode territory abbreviatiobn code. Note that this is NOT strictly an ISO code.
+     * This method has been optimized to prefer to return local states, rather than countries, if the
+     * local territory code for a state is the same as a country code.
+     *
+     * For example, fromString("AS") returns {@link Territory#IN_AS} rather than {@link Territory#ASM} and
+     * fromString("BR") returns {@link Territory#IN_BR} rather than {@link Territory#BRA}.
+     *
+     * This behavior is intentional as local mapcodes are designed to be as short as possible. A mapcode within
+     * the Indian state Bihar should therefore be able to specified as "BR 49.46M3" rather "IN-BR 49.46M3".
+     *
+     * Brazilian mapcodes, on the other hand, would be specified as "BRA BDHP.JK39-1D", using the ISO 3 letter code.
      *
      * @param name Territory name.
      * @return Territory.
@@ -663,7 +673,8 @@ public enum Territory {
     /**
      * Get a territory from a name, specifying a parent territory for disambiguation.
      *
-     * @param name            Territory name.
+     * @param name            Territory name. See {@link #fromString(String)} for an explanation of the format for
+     *                        this name. (This is NOT strictly an ISO code!)
      * @param parentTerritory Parent territory.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if the territory is not found given the parentTerritory.

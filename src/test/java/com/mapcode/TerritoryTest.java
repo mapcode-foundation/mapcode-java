@@ -56,5 +56,11 @@ public class TerritoryTest {
         assertEquals(Territory.ARG, Territory.fromString("ARG"));
         assertEquals(Territory.ASM, Territory.fromString("US-AS"));
         assertEquals(Territory.ASM, Territory.fromString("USA-AS"));
+        assertEquals(Territory.RUS, Territory.fromString("RU"));
+        assertEquals(Territory.CHN, Territory.fromString("CN"));
+        assertEquals(Territory.AUS, Territory.fromString("AU"));
+        assertEquals(Territory.US_IN, Territory.fromString("IN"));
+        assertEquals(Territory.IN_BR, Territory.fromString("BR"));
+        assertEquals(Territory.IN_AS, Territory.fromString("AS"));
     }
 }
