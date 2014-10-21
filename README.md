@@ -55,3 +55,8 @@ If you're using NetBeans, filter:
 The local `.gitignore` file in the Git repository itself to reflect those file only that are produced by executing
 regular compile, build or release commands, such as:
 `target/ out/`
+
+# Bug Reports and New Feature Requests
+
+If you encounter any problems with this library, don't hesitate to use the `Issues` session to file your issues.
+Normally, one of our developers should be able to comment on them and fix. 
