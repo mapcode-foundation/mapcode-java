@@ -648,9 +648,9 @@ public enum Territory {
     }
 
     /**
-     * Get a territory from a mapcode territory abbreviatiobn code. Note that this is NOT strictly an ISO code.
-     * This method has been optimized to prefer to return local states, rather than countries, if the
-     * local territory code for a state is the same as a country code.
+     * Get a territory from a mapcode territory abbreviation. Note that the provided abbreviation is NOT an
+     * ISO code: it's a mapcode prefix. As local mapcodes for states have been optimized to prefer to use 2-character
+     * state codes in local codes, states are preferred over countries in this case.
      *
      * For example, fromString("AS") returns {@link Territory#IN_AS} rather than {@link Territory#ASM} and
      * fromString("BR") returns {@link Territory#IN_BR} rather than {@link Territory#BRA}.
