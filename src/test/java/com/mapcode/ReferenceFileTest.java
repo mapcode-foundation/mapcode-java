@@ -363,9 +363,6 @@ public class ReferenceFileTest {
 
                     // Move to next file.
                     nextChunk();
-
-                    // Retry and add remainder of line.
-//                    line = line + bufferedReader.readLine();
                 }
             }
             while (line.isEmpty());
