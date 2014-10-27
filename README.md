@@ -32,7 +32,7 @@ of the mapcode library by Rijn Buve and Matthew Lowden.
 
 # Using Git and `.gitignore`
 
-It's good practice to set up a personal global .gitignore file on your machine which filters a number of files
+It's good practice to set up a personal global `.gitignore` file on your machine which filters a number of files
 on your file systems that you do not wish to submit to the Git repository. You can set up your own global
 `~/.gitignore` file by executing:
 `git config --global core.excludesfile ~/.gitignore`
@@ -63,7 +63,7 @@ Normally, one of our developers should be able to comment on them and fix.
 
 # Code Style Settings in IntelliJ IDEA
 
-In order to get consistent code layout for Scala files, source files should be reformatted in your IDE according to the 
+In order to get consistent code layout for Java files, source files should be reformatted in your IDE according to the 
 settings below. These settings are describes as IntelliJ IDEA "Code Style" settings (and they can be copied directly 
 into your `.idea/codeStyleSetting.xml` file, if you use IDEA):
 
