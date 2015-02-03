@@ -356,7 +356,6 @@ class Encoder {
                     // of pipes
                 }
                 storageStart += product;
-
             }
         }
     }

@@ -39,5 +39,4 @@ class CheckArgs {
             throw new IllegalArgumentException("Parameter " + param + " should not be null");
         }
     }
-
 }

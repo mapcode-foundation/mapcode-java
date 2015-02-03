@@ -103,7 +103,6 @@ class SubArea {
                     areaList.add(subArea);
                 }
             }
-
         }
         LOG.debug("SubArea (init): lat=[{}, {}], lon=[{}, {}]",
             Point.microDegToDeg(latMap.firstKey()), Point.microDegToDeg(latMap.lastKey()),
@@ -340,5 +339,4 @@ mainLoop:
     private static Range<Integer> trimRange(final Range<Integer> range) {
         return new Range<Integer>(range.getMin(), range.getMax() - 1);
     }
-
 }

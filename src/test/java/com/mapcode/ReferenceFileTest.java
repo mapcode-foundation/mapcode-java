@@ -186,7 +186,6 @@ public class ReferenceFileTest {
                         LOG.error("checkFile: Mapcode '{}' at {} is not in the reference file!",
                             result, reference.point);
                         ++error;
-
                     }
                 }
 
