@@ -9,6 +9,12 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 1.41
+
+    * Added the India state Telangana (IN-TG), until 2014 a region in Adhra Pradesh.
+
+    * Updated POM dependencies to latest library versions of standard components.
+
 * 1.40.3
 
     * Minor code clean-up with no functional effect.

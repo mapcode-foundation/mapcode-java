@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2014 Stichting Mapcode Foundation (http://www.mapcode.com)
- * 
+ * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -91,8 +91,9 @@ public class EncodeDecodeTest {
                         LOG.info("");
                     }
 
-                    // CHeck if the distance is not too great.
-                    assertTrue(distanceMeters < ALLOWED_DISTANCE_DELTA_METERS);
+                    // Check if the distance is not too great.
+                    assertTrue("distanceMeters=" + distanceMeters + " >= " + ALLOWED_DISTANCE_DELTA_METERS,
+                        distanceMeters < ALLOWED_DISTANCE_DELTA_METERS);
                     showLogLine = false;
                 }
             }
