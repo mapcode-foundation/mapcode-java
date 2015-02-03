@@ -9,6 +9,10 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 1.41.1
+    
+    To be done.
+
 * 1.41
 
     * Added the India state Telangana (IN-TG), until 2014 a region in Adhra Pradesh.
