@@ -155,7 +155,6 @@ class Encoder {
                         results.add(newResult);
                     }
                     else {
-                        // TODO: This should probably be simply an assertion instead.
                         LOG.error("encode: Duplicate results found, newResult={}, results={} items",
                             newResult.asInternationalISO(), results.size());
                     }

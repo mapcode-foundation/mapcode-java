@@ -147,18 +147,14 @@ public class ReferenceFileTest {
 
                 // Check the number of mapcodes.
 
-                // TODO: This check can only be enabled when the reference implementation and the
-                // Java version produce exactly the same number of code. For now, we will only
-                // log the offending mapcodes as errors in the log file, but not fail the test.
-                //
                 // Check the size and order of the results with a single assertion.
                 //
-                // assertEquals("Encode #" + i + " incorrect number of results:" +
-                //         "\n  lat/lon  = " + reference.point +
-                //         "\n  expected = " + reference.mapcodes.size() + " results, " +
-                //         GSON.toJson(reference.mapcodes) +
-                //         "\n  actual   = " + results.size() + " results, " + GSON.toJson(results),
-                //     reference.mapcodes.size(), results.size());
+                assertEquals("Encode #" + i + " incorrect number of results:" +
+                        "\n  lat/lon  = " + reference.point +
+                        "\n  expected = " + reference.mapcodes.size() + " results, " +
+                        GSON.toJson(reference.mapcodes) +
+                        "\n  actual   = " + results.size() + " results, " + GSON.toJson(results),
+                    reference.mapcodes.size(), results.size());
 
                 // For every mapcode in the result set, check if it is contained in the reference set.
                 for (final Mapcode result : results) {
