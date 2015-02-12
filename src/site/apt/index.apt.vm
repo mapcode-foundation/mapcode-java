@@ -9,6 +9,11 @@ Release Notes
 
     You can find the release notes for this library at: <<{{{./ReleaseNotes.html}Release Notes}}>>
 
+Code Style Settings for IntelliJ IDEA
+
+    The Java code uses the IntelliJ IDEA code style settings as specified in:
+    <<{{{./IntelliJ.html}IntelliJ IDEA Code Style Settings}}>>.
+
 How To Build The Mapcode Library JAR File
 
     The sources for the Mapcode Library for Java contain everything to build the Mapcode JAR file as well

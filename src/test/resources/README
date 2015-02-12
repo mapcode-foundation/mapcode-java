@@ -4,6 +4,16 @@ For terms of use refer to http://www.mapcode.com/downloads.html
 -------------------------------------------------------------------------------
 
 -------------------------------------------------------------------------------
+CREATING THE MAPCODE UTILITY
+-------------------------------------------------------------------------------
+
+To create the test files, you will first need to build the 'mapcode' utility
+from the "Mapcode C++" library on Githgub.
+You find the tool in the "example" directory and compile it with:
+
+    gcc mapcode.cpp -o -mapcode
+
+-------------------------------------------------------------------------------
 CREATING MAPCODE TEST SETS
 -------------------------------------------------------------------------------
 
@@ -14,7 +24,7 @@ Note: The syntax of the 'mapcode' command is:
       mapcode --grid   nrOfPoints [extraDigits]
       mapcode --boundaries        [extraDigits]
 
-The parameters extraDigits is 0 for normal precision and 1 or 2 for higher and 
+The parameters extraDigits is 0 for normal precision and 1 or 2 for higher and
 highest precision codes.
 
 +----
