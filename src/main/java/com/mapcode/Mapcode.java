@@ -75,6 +75,26 @@ public final class Mapcode {
     /**
      * Alias for {@link #getMapcode}.
      *
+     * @param precision Precision. Range: 0..2.
+     * @return Mapcode string.
+     */
+    @Nonnull
+    public String getMapcodePrecision(final int precision) {
+        switch (precision) {
+            case 0:
+                return mapcodePrecision0;
+            case 1:
+                return mapcodePrecision1;
+            case 2:
+                return mapcodePrecision2;
+            default:
+                throw new IllegalArgumentException("getMapcodePrecision: precision must be in [0..2]");
+        }
+    }
+
+    /**
+     * Alias for {@link #getMapcode}.
+     *
      * @return Mapcode string.
      */
     @Nonnull
@@ -123,9 +143,7 @@ public final class Mapcode {
         return mapcodePrecision2;
     }
 
-    /**
-     * Deprecated alias for {@see #getMapcodePrecision2}.
-     */
+    // Deprecated alias for {@see #getMapcodePrecision2}.
     @Deprecated
     @Nonnull
     public String getMapcodeHighPrecision() {
@@ -162,7 +180,7 @@ public final class Mapcode {
 
     /**
      * This patterns/regular expressions is used for checking mapcode format strings.
-     * They've been made pulkic to allow others to use the correct regular expressions as well.
+     * They've been made public to allow others to use the correct regular expressions as well.
      */
     @Nonnull public static final String REGEX_MAPCODE_FORMAT =
         REGEX_MAPCODE_FORMAT1 + REGEX_MAPCODE_FORMAT2 + '(' + REGEX_MAPCODE_PRECISION + ")?$";

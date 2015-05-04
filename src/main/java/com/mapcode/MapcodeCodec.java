@@ -189,12 +189,12 @@ public final class MapcodeCodec {
      * because no territory context is supplied (world-wide).
      *
      * The accepted format is:
-     * <mapcode>
-     * <territory-code> <mapcode>
+     * {mapcode}
+     * {territory-code} {mapcode}
      *
      * @param mapcode Mapcode.
      * @return Point corresponding to mapcode.
-     * @throws UnknownMapcodeException  Thrown if the mapcode has the correct synaxt,
+     * @throws UnknownMapcodeException  Thrown if the mapcode has the correct syntax,
      *                                  but cannot be decoded into a point.
      * @throws IllegalArgumentException Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
      */
@@ -231,7 +231,7 @@ public final class MapcodeCodec {
      * Decode a mapcode to a Point. A reference territory is supplied for disambiguation (only used if applicable).
      *
      * The accepted format is:
-     * <mapcode>        (note that a territory code is not allowed here)
+     * {mapcode}        (note that a territory code is not allowed here)
      *
      * @param mapcode          Mapcode.
      * @param territoryContext Territory for disambiguation purposes.
@@ -244,7 +244,7 @@ public final class MapcodeCodec {
         @Nonnull final String mapcode,
         @Nonnull final Territory territoryContext) throws UnknownMapcodeException, IllegalArgumentException {
         checkNonnull("mapcode", mapcode);
-        checkNonnull("territoryConext", territoryContext);
+        checkNonnull("territoryContext", territoryContext);
         final String mapcodeTrimmed = mapcode.trim();
         if (!Mapcode.isValidMapcodeFormat(mapcodeTrimmed)) {
             throw new IllegalArgumentException(mapcode + " is not a correctly formatted mapcode; " +
