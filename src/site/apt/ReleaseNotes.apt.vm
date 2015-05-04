@@ -11,13 +11,17 @@ Release Notes (Version ${project.version})
 
 * 1.41.1
     
-    To be done.
+    * Added convenience method to Mapcode.
+
+    []
 
 * 1.41
 
     * Added the India state Telangana (IN-TG), until 2014 a region in Adhra Pradesh.
 
     * Updated POM dependencies to latest library versions of standard components.
+
+    []
 
 * 1.40.3
 
