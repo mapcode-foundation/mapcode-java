@@ -152,7 +152,13 @@ class Encoder {
 
                     // The result should not be stored yet.
                     if (!results.contains(newResult)) {
-                        results.add(newResult);
+                        if (limitToOneResult) {
+                            results.clear();
+                            results.add(newResult);
+                        }
+                        else {
+                            results.add(newResult);
+                        }
                     }
                     else {
                         LOG.error("encode: Duplicate results found, newResult={}, results={} items",

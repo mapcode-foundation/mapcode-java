@@ -9,14 +9,18 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
-* 1.41.2
-    
-    * To be done.
+* 1.42
+
+    * Fixed a bug in <<<MapcodeCodec.encodeToShortest>>> which would not always return the shortest code (see
+      next bullet). Reproducible with <<<curl -X GET http://localhost:8080/mapcode/to/47.1243/-111.28564/local>>>.
+
+    * Fixed a bug where <<<Encoder.encode>>> would sometime retrieve more than one result even if result set
+      was limited to 1 result.
 
     []
 
 * 1.41.1
-    
+
     * Added convenience method to Mapcode.
 
     []
