@@ -9,6 +9,12 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 1.42.1
+
+    * To be done.
+
+    []
+
 * 1.42
 
     * Fixed a bug in <<<MapcodeCodec.encodeToShortest>>> which would not always return the shortest code (see
