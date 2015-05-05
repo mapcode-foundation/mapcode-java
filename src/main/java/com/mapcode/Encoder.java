@@ -154,11 +154,8 @@ class Encoder {
                     if (!results.contains(newResult)) {
                         if (limitToOneResult) {
                             results.clear();
-                            results.add(newResult);
                         }
-                        else {
-                            results.add(newResult);
-                        }
+                        results.add(newResult);
                     }
                     else {
                         LOG.error("encode: Duplicate results found, newResult={}, results={} items",
