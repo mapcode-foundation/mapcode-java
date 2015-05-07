@@ -11,7 +11,10 @@ Release Notes (Version ${project.version})
 
 * 1.42.1
 
-    * To be done.
+    * Cleaned up source. Removed all pending IntelliJ IDEA inspection warnings and reformatted code
+      using default IDEA code style to maintain consistent layout.
+
+    * Add minor additional unit tests to check for correct handling of international mapcode handling.
 
     []
 
