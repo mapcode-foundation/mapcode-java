@@ -32,7 +32,7 @@ import java.util.TreeMap;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- * <p/>
+ *
  * This class contains a class that defines an area for local mapcodes.
  */
 class SubArea {
