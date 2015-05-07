@@ -24,33 +24,36 @@ import java.util.regex.Pattern;
 /**
  * This class defines a single mapcode encoding result, including the mapcode itself and the
  * territory definition.
- *
+ * <p/>
  * Note that the constructor will throw an {@link IllegalArgumentException} if the syntax of the mapcode
  * is not correct. It does not throw an {@link UnknownMapcodeException}, because the mapcode
  * is not checked for validity, other than its syntax.
  */
 public final class Mapcode {
-    @Nonnull private final String    mapcodePrecision0;
-    @Nonnull private final String    mapcodePrecision1;
-    @Nonnull private final String    mapcodePrecision2;
-    @Nonnull private final Territory territory;
+    @Nonnull
+    private final String mapcodePrecision0;
+    @Nonnull
+    private final String mapcodePrecision1;
+    @Nonnull
+    private final String mapcodePrecision2;
+    @Nonnull
+    private final Territory territory;
 
     public Mapcode(
-        @Nonnull final String mapcode,
-        @Nonnull final Territory territory) throws IllegalArgumentException {
+            @Nonnull final String mapcode,
+            @Nonnull final Territory territory) throws IllegalArgumentException {
 
         // Check mapcode format.
         if (!isValidMapcodeFormat(mapcode)) {
             throw new IllegalArgumentException(mapcode + " is not a correctly formatted mapcode; " +
-                "the regular expression for the mapcode syntax is: " + REGEX_MAPCODE_FORMAT);
+                    "the regular expression for the mapcode syntax is: " + REGEX_MAPCODE_FORMAT);
         }
 
         this.mapcodePrecision2 = mapcode;
         if (mapcode.contains("-")) {
             this.mapcodePrecision0 = mapcode.substring(0, mapcode.length() - 3);
             this.mapcodePrecision1 = mapcode.substring(0, mapcode.length() - 1);
-        }
-        else {
+        } else {
             this.mapcodePrecision0 = mapcode;
             this.mapcodePrecision1 = mapcode;
         }
@@ -60,7 +63,7 @@ public final class Mapcode {
     /**
      * Get the Mapcode string (without territory information) with standard precision.
      * The returned mapcode does not include the '-' separator and additional digits.
-     *
+     * <p/>
      * The returned precision is approximately 5 meters. The precision is defined as the maximum distance to the
      * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
      * approximately 10 x 10 meters (100 m2).
@@ -106,7 +109,7 @@ public final class Mapcode {
      * Get the medium-precision mapcode string (without territory information).
      * The returned mapcode includes the '-' separator and 1 additional digit, if available.
      * If a medium precision code is not available, the regular mapcode is returned.
-     *
+     * <p/>
      * The returned precision is approximately 1 meter. The precision is defined as the maximum distance to the
      * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
      * approximately 2 x 2 meters (4 m2).
@@ -131,7 +134,7 @@ public final class Mapcode {
      * Get the high-precision mapcode string (without territory information).
      * The returned mapcode includes the '-' separator and 2 additional digit2, if available.
      * If a high precision code is not available, the regular mapcode is returned.
-     *
+     * <p/>
      * The returned precision is approximately 16 centimeters. The precision is defined as the maximum distance to the
      * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
      * approximately 32 x 32 centimeters (0.1 m2).
@@ -174,27 +177,33 @@ public final class Mapcode {
      * These patterns and matchers are used internally in this module to match mapcodes. They are
      * provided as statics to only compile these patterns once.
      */
-    @Nonnull static final String REGEX_MAPCODE_FORMAT1   = "^[\\p{Alpha}\\p{Digit}]{2,5}+";
-    @Nonnull static final String REGEX_MAPCODE_FORMAT2   = "[.][\\p{Alpha}\\p{Digit}]{2,5}+";
-    @Nonnull static final String REGEX_MAPCODE_PRECISION = "[-][\\p{Alpha}\\p{Digit}&&[^zZ]]{1,2}+";
+    @Nonnull
+    static final String REGEX_MAPCODE_FORMAT1 = "^[\\p{Alpha}\\p{Digit}]{2,5}+";
+    @Nonnull
+    static final String REGEX_MAPCODE_FORMAT2 = "[.][\\p{Alpha}\\p{Digit}]{2,5}+";
+    @Nonnull
+    static final String REGEX_MAPCODE_PRECISION = "[-][\\p{Alpha}\\p{Digit}&&[^zZ]]{1,2}+";
 
     /**
      * This patterns/regular expressions is used for checking mapcode format strings.
      * They've been made public to allow others to use the correct regular expressions as well.
      */
-    @Nonnull public static final String REGEX_MAPCODE_FORMAT =
-        REGEX_MAPCODE_FORMAT1 + REGEX_MAPCODE_FORMAT2 + '(' + REGEX_MAPCODE_PRECISION + ")?$";
+    @Nonnull
+    public static final String REGEX_MAPCODE_FORMAT =
+            REGEX_MAPCODE_FORMAT1 + REGEX_MAPCODE_FORMAT2 + '(' + REGEX_MAPCODE_PRECISION + ")?$";
 
-    @Nonnull private static final Pattern PATTERN_MAPCODE_FORMAT    =
-        Pattern.compile(REGEX_MAPCODE_FORMAT, Pattern.UNICODE_CHARACTER_CLASS);
-    @Nonnull private static final Pattern PATTERN_MAPCODE_PRECISION =
-        Pattern.compile(REGEX_MAPCODE_PRECISION, Pattern.UNICODE_CHARACTER_CLASS);
+    @Nonnull
+    private static final Pattern PATTERN_MAPCODE_FORMAT =
+            Pattern.compile(REGEX_MAPCODE_FORMAT, Pattern.UNICODE_CHARACTER_CLASS);
+    @Nonnull
+    private static final Pattern PATTERN_MAPCODE_PRECISION =
+            Pattern.compile(REGEX_MAPCODE_PRECISION, Pattern.UNICODE_CHARACTER_CLASS);
 
     /**
      * This method return the mapcode type, given a mapcode string. If the mapcode string has an invalid
      * format, {@link MapcodeFormatType#MAPCODE_TYPE_INVALID} is returned. If another value is returned,
      * the precision of the mapcode is given.
-     *
+     * <p/>
      * Note that this method only checks the syntactic validity of the mapcode, the string format. It does not
      * check if the mapcode is really a valid mapcode representing a position on Earth.
      *
@@ -249,7 +258,7 @@ public final class Mapcode {
 
     /**
      * Return the local mapcode string, potentially ambiguous.
-     *
+     * <p/>
      * Example:
      * 49.4V
      *
@@ -264,7 +273,7 @@ public final class Mapcode {
      * Return the full international mapcode, including the full name of the territory and the Mapcode itself.
      * The format of the code is:
      * full-territory-name mapcode
-     *
+     * <p/>
      * Example:
      * Netherlands 49.4V           (regular code)
      * Netherlands 49.4V-K2        (high precision code)
@@ -281,7 +290,7 @@ public final class Mapcode {
      * International codes use a territory code "AAA".
      * The format of the code is:
      * short-territory-name mapcode
-     *
+     * <p/>
      * Example:
      * NLD 49.4V                   (regular code)
      * NLD 49.4V-K2                (high-precision code)

@@ -29,15 +29,15 @@ class CheckArgs {
     }
 
     static void checkRange(@Nonnull final String param, final double value,
-        final double min, final double max) throws IllegalArgumentException {
+                           final double min, final double max) throws IllegalArgumentException {
         if ((value < min) || (value > max)) {
             throw new IllegalArgumentException("Parameter " + param +
-                " should be in range [" + min + ", " + max + "], but is: " + value);
+                    " should be in range [" + min + ", " + max + "], but is: " + value);
         }
     }
 
     static void checkNonnull(@Nonnull final String param, @Nullable final Object obj)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
         if (obj == null) {
             throw new IllegalArgumentException("Parameter " + param + " should not be null");
         }

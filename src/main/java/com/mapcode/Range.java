@@ -24,12 +24,14 @@ import java.util.ArrayList;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class contains a class for dealing with ranges of comparable items.
  */
 class Range<T extends Comparable<T>> {
-    @Nonnull private final T min;
-    @Nonnull private final T max;
+    @Nonnull
+    private final T min;
+    @Nonnull
+    private final T max;
 
     Range(@Nonnull final T min, @Nonnull final T max) {
         this.min = min;

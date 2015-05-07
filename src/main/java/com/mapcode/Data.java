@@ -23,26 +23,28 @@ import javax.annotation.Nullable;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class the data class for Mapcode codex items.
  */
 class Data {
     static final char[] ENCODE_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
-        'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
+            'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
 
-    private           int     flags;
-    private           int     codex;
-    private           int     codexLo;
-    private           int     codexHi;
-    private           int     codexLen;
-    private           boolean nameless;
-    private           boolean useless;
-    private           boolean specialShape;
-    private           int     pipeType;
-    @Nullable private String  pipeLetter;
-    private           boolean starPipe;
-    @Nullable private SubArea mapcoderRect;
-    private           boolean initialized;
+    private int flags;
+    private int codex;
+    private int codexLo;
+    private int codexHi;
+    private int codexLen;
+    private boolean nameless;
+    private boolean useless;
+    private boolean specialShape;
+    private int pipeType;
+    @Nullable
+    private String pipeLetter;
+    private boolean starPipe;
+    @Nullable
+    private SubArea mapcoderRect;
+    private boolean initialized;
 
     int getFlags() {
         assert initialized;
@@ -128,8 +130,7 @@ class Data {
         pipeType = (flags >> 5) & 12; // 4=pipe 8=plus 12=star
         if (pipeType == 4) {
             pipeLetter = Character.toString(ENCODE_CHARS[(flags >> 11) & 31]);
-        }
-        else {
+        } else {
             pipeLetter = "";
         }
         if ((codex == 21) && !nameless) {

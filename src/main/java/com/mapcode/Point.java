@@ -25,7 +25,7 @@ import static com.mapcode.CheckArgs.checkNonnull;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class defines a class for lat/lon points.
  */
 public class Point {
@@ -52,7 +52,7 @@ public class Point {
     public static final double EARTH_CIRCUMFERENCE_Y = EARTH_RADIUS_Y_METERS * 2.0 * Math.PI;
 
     // Meters per degree latitude is fixed. For longitude: use factor * cos(midpoint of two degree latitudes).
-    public static final double METERS_PER_DEGREE_LAT         = EARTH_CIRCUMFERENCE_Y / 360.0;
+    public static final double METERS_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE_Y / 360.0;
     public static final double METERS_PER_DEGREE_LON_EQUATOR = EARTH_CIRCUMFERENCE_X / 360.0; // * cos(deg(lat)).
 
     /**
@@ -194,8 +194,7 @@ public class Point {
         if (p1.lonDeg <= p2.lonDeg) {
             from = p1;
             to = p2;
-        }
-        else {
+        } else {
             from = p2;
             to = p1;
         }

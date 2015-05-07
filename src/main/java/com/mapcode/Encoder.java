@@ -44,12 +44,12 @@ class Encoder {
 
     @Nonnull
     static List<Mapcode> encode(
-        final double latDeg,
-        final double lonDeg,
-        @Nullable final Territory territory,
-        final boolean isRecursive,
-        final boolean stopWithOneResult,
-        final boolean allowWorld) {
+            final double latDeg,
+            final double lonDeg,
+            @Nullable final Territory territory,
+            final boolean isRecursive,
+            final boolean stopWithOneResult,
+            final boolean allowWorld) {
 
         return encode(latDeg, lonDeg, territory, isRecursive, stopWithOneResult, allowWorld, null);
     }
@@ -59,15 +59,15 @@ class Encoder {
     // ----------------------------------------------------------------------
 
     private final static char[] encode_chars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
-        'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
+            'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
 
     @Nonnull
     private static List<Mapcode> encode(final double argLatDeg, final double argLonDeg,
-        @Nullable final Territory territory, final boolean isRecursive, final boolean limitToOneResult, final boolean allowWorld,
-        @Nullable final Territory argStateOverride) {
+                                        @Nullable final Territory territory, final boolean isRecursive, final boolean limitToOneResult, final boolean allowWorld,
+                                        @Nullable final Territory argStateOverride) {
         LOG.trace("encode: latDeg={}, lonDeg={}, territory={}, isRecursive={}, limitToOneResult={}, allowWorld={}",
-            argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), isRecursive, limitToOneResult,
-            allowWorld);
+                argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), isRecursive, limitToOneResult,
+                allowWorld);
 
         double latDeg = argLatDeg;
         double lonDeg = argLonDeg;
@@ -75,14 +75,12 @@ class Encoder {
 
         if (latDeg > 90) {
             latDeg -= 180;
-        }
-        else if (latDeg < -90) {
+        } else if (latDeg < -90) {
             latDeg += 180;
         }
         if (lonDeg > 179.999999) {
             lonDeg -= 360;
-        }
-        else if (lonDeg < -180) {
+        } else if (lonDeg < -180) {
             lonDeg += 180;
         }
 
@@ -100,7 +98,7 @@ class Encoder {
             final Territory currentEncodeTerritory = subArea.getParentTerritory();
 
             if ((currentEncodeTerritory == Territory.AAA) && !allowWorld &&
-                (territory != Territory.AAA)) {
+                    (territory != Territory.AAA)) {
                 continue;
             }
 
@@ -122,7 +120,7 @@ class Encoder {
                     if (!isRecursive) {
                         stateOverride = currentEncodeTerritory;
                         results.addAll(encode(latDeg, lonDeg, territoryParent, true, limitToOneResult,
-                            allowWorld, stateOverride));
+                                allowWorld, stateOverride));
                         stateOverride = null;
                     }
 
@@ -132,14 +130,11 @@ class Encoder {
                     if (!mapcoderData.isUseless() || (lastbasesubareaID == from)) {
                         mapcode = encodeGrid(i, pointToEncode, mapcoderData);
                     }
-                }
-                else if (mapcoderData.getPipeType() == 4) {
+                } else if (mapcoderData.getPipeType() == 4) {
                     mapcode = encodeGrid(i, pointToEncode, mapcoderData);
-                }
-                else if (mapcoderData.isNameless()) { // auto-pipe 21/22
+                } else if (mapcoderData.isNameless()) { // auto-pipe 21/22
                     mapcode = encodeNameless(pointToEncode, mapcoderData, i, from);
-                }
-                else { // pipe star, pipe plus
+                } else { // pipe star, pipe plus
                     mapcode = encodeStarpipe(pointToEncode, mapcoderData, i);
                 }
 
@@ -160,10 +155,9 @@ class Encoder {
                             results.clear();
                         }
                         results.add(newResult);
-                    }
-                    else {
+                    } else {
                         LOG.error("encode: Duplicate results found, newResult={}, results={} items",
-                            newResult.asInternationalISO(), results.size());
+                                newResult.asInternationalISO(), results.size());
                     }
 
                     lastbasesubareaID = from;
@@ -204,29 +198,27 @@ class Encoder {
         if (divy == 1) {
             divx = xSide[dc];
             divy = ySide[dc];
-        }
-        else {
+        } else {
             divx = nc[dc] / divy;
         }
 
         final int ygridsize =
-            (((mapcoderData.getMapcoderRect().getMaxY() - mapcoderData.getMapcoderRect().getMinY()) + divy) - 1)
-                / divy;
+                (((mapcoderData.getMapcoderRect().getMaxY() - mapcoderData.getMapcoderRect().getMinY()) + divy) - 1)
+                        / divy;
         int rely = pointToEncode.getLatMicroDeg() - mapcoderData.getMapcoderRect().getMinY();
         rely = rely / ygridsize;
         final int xgridsize =
-            (((mapcoderData.getMapcoderRect().getMaxX() - mapcoderData.getMapcoderRect().getMinX()) + divx) - 1)
-                / divx;
+                (((mapcoderData.getMapcoderRect().getMaxX() - mapcoderData.getMapcoderRect().getMinX()) + divx) - 1)
+                        / divx;
 
         int relx = pointToEncode.getLonMicroDeg() - mapcoderData.getMapcoderRect().getMinX();
         if (relx < 0) {
             pointToEncode =
-                Point.fromMicroDeg(pointToEncode.getLatMicroDeg(), pointToEncode.getLonMicroDeg() + 360000000);
+                    Point.fromMicroDeg(pointToEncode.getLatMicroDeg(), pointToEncode.getLonMicroDeg() + 360000000);
             relx += 360000000;
-        }
-        else if (relx >= 360000000) {
+        } else if (relx >= 360000000) {
             pointToEncode =
-                Point.fromMicroDeg(pointToEncode.getLatMicroDeg(), pointToEncode.getLonMicroDeg() - 360000000);
+                    Point.fromMicroDeg(pointToEncode.getLatMicroDeg(), pointToEncode.getLonMicroDeg() - 360000000);
             relx -= 360000000;
         }
         if (relx < 0) {
@@ -241,8 +233,7 @@ class Encoder {
         if ((divx != divy) && (codex > 24)) // D==6
         {
             v = encode6(relx, rely, divx, divy);
-        }
-        else {
+        } else {
             v = ((relx * divy) + divy) - 1 - rely;
         }
 
@@ -276,8 +267,7 @@ class Encoder {
         dify = ySide[nrchars] - 1 - dify;
         if (nrchars == 3) {
             result += encodeTriple(difx, dify);
-        }
-        else {
+        } else {
 
             String postfix = fastEncode(((difx) * ySide[nrchars]) + dify, nrchars);
             if (nrchars == 4) {
@@ -334,7 +324,7 @@ class Encoder {
                 if (mapcoderData.getPipeType() == 8) // *+
                 {
                     product =
-                        ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
+                            ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
                 }
 
                 if ((i == thisindex) && mapcoderData.getMapcoderRect().containsPoint(pointToEncode)) {
@@ -354,12 +344,12 @@ class Encoder {
                     final int value = (vx * (h / 176)) + vy;
 
                     starpipe_result.append(fastEncode((storageStart / (961 * 31)) + value,
-                        mapcoderData.getCodexLen() - 2));
+                            mapcoderData.getCodexLen() - 2));
                     starpipe_result.append('.');
                     starpipe_result.append(encodeTriple(spx, spy));
 
                     starpipe_result.append(
-                        addPostfix(extrax << 2, extray, dividerx << 2, dividery)); // for encodeStarpipe
+                            addPostfix(extrax << 2, extray, dividerx << 2, dividery)); // for encodeStarpipe
                     done = true; // will be returned soon, but look for end
                     // of pipes
                 }
@@ -374,7 +364,7 @@ class Encoder {
     // returns "" in case of (argument) error
     {
         final int first_nameless_record =
-            getFirstNamelessRecord(mapcoderData.getCodex(), index, firstcode);
+                getFirstNamelessRecord(mapcoderData.getCodex(), index, firstcode);
         final int a = countCityCoordinatesForCountry(mapcoderData.getCodex(), index, firstcode);
         final int p = 31 / a;
         final int r = 31 % a;
@@ -392,25 +382,21 @@ class Encoder {
 
             if ((mapcoderData.getCodex() != 21) && (a <= 31)) {
                 storage_offset = ((nrX * p) + ((nrX < r) ? nrX : r)) * (961 * 961);
-            }
-            else if ((mapcoderData.getCodex() != 21) && (a < 62)) {
+            } else if ((mapcoderData.getCodex() != 21) && (a < 62)) {
                 if (nrX < (62 - a)) {
                     storage_offset = nrX * 961 * 961;
-                }
-                else {
+                } else {
                     storage_offset = ((62 - a) + (((nrX - 62) + a) / 2)) * 961 * 961;
                     if (((nrX + a) & 1) != 0) {
                         storage_offset += 16 * 961 * 31;
                     }
                 }
-            }
-            else {
+            } else {
                 final int basePower = (mapcoderData.getCodex() == 21) ? (961 * 961) : (961 * 961 * 31);
                 int basePowerA = basePower / a;
                 if (a == 62) {
                     basePowerA++;
-                }
-                else {
+                } else {
                     basePowerA = 961 * (basePowerA / 961);
                 }
 
@@ -440,8 +426,7 @@ class Encoder {
             int v = storage_offset;
             if (mapcoderData.isSpecialShape()) {
                 v += encode6(dx, side - 1 - dy, xSide, side);
-            }
-            else {
+            } else {
                 v += (dx * side) + dy;
             }
 
@@ -449,15 +434,13 @@ class Encoder {
 
             if (mapcoderData.getCodexLen() == 3) {
                 result = result.substring(0, 2) + '.' + result.substring(2);
-            }
-            else if (mapcoderData.getCodexLen() == 4) {
+            } else if (mapcoderData.getCodexLen() == 4) {
                 if ((mapcoderData.getCodex() == 22) && (a < 62) && (orgSide == 961) && !mapcoderData.isSpecialShape()) {
                     result = result.substring(0, 2) + result.charAt(3) + result.charAt(2) + result.charAt(4);
                 }
                 if (mapcoderData.getCodex() == 13) {
                     result = result.substring(0, 2) + '.' + result.substring(2);
-                }
-                else {
+                } else {
                     result = result.substring(0, 3) + '.' + result.substring(3);
                 }
             }
@@ -480,13 +463,11 @@ class Encoder {
                 if ((str.charAt(d) == '.') && (dotpos < 0)) // first dot?
                 {
                     dotpos = d;
-                }
-                else if (str.charAt(d) == '-') {
+                } else if (str.charAt(d) == '-') {
                     rest = str.substring(d);
                     str = str.substring(0, d);
                     rlen = d;
-                }
-                else {
+                } else {
                     return str; // not alldigit (or multiple dots)
                 }
             }
@@ -499,7 +480,7 @@ class Encoder {
             final int last = v % 34;
             final char[] vowels = {'A', 'E', 'U'};
             str =
-                str.substring(0, rlen - 2) + vowels[v / 34] + (last < 31 ? encode_chars[last] : vowels[last - 31]);
+                    str.substring(0, rlen - 2) + vowels[v / 34] + (last < 31 ? encode_chars[last] : vowels[last - 31]);
         }
         return str + rest;
     }
@@ -530,8 +511,7 @@ class Encoder {
     private static String encodeTriple(final int difx, final int dify) {
         if (dify < (4 * 34)) {
             return encode_chars[((difx / 28) + (6 * (dify / 34)))] + fastEncode(((difx % 28) * 34) + (dify % 34), 2);
-        }
-        else {
+        } else {
             return encode_chars[((difx / 24) + 24)] + fastEncode((((difx % 24) * 40) + dify) - 136, 2);
         }
     }

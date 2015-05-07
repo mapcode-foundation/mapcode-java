@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  * ----------------------------------------------------------------------------------------------
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class defines "parent territories" for territories that have multiple territory codes.
  */
 public enum ParentTerritory {
@@ -41,7 +41,8 @@ public enum ParentTerritory {
         return territory;
     }
 
-    @Nonnull private final Territory territory;
+    @Nonnull
+    private final Territory territory;
 
     private ParentTerritory(@Nonnull final Territory territory) {
         this.territory = territory;

@@ -32,20 +32,20 @@ import java.util.TreeMap;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class contains a class that defines an area for local mapcodes.
  */
 class SubArea {
     private static final Logger LOG = LoggerFactory.getLogger(SubArea.class);
 
-    private static final ArrayList<SubArea>                   subAreas = new ArrayList<>();
-    private static final TreeMap<Integer, ArrayList<SubArea>> lonMap   = new TreeMap<>();
-    private static final TreeMap<Integer, ArrayList<SubArea>> latMap   = new TreeMap<>();
+    private static final ArrayList<SubArea> subAreas = new ArrayList<>();
+    private static final TreeMap<Integer, ArrayList<SubArea>> lonMap = new TreeMap<>();
+    private static final TreeMap<Integer, ArrayList<SubArea>> latMap = new TreeMap<>();
 
     private static final Range<Integer> latBoundingRange =
-        new Range<>(Point.LAT_MICRODEG_MIN, Point.LAT_MICRODEG_MAX);
+            new Range<>(Point.LAT_MICRODEG_MIN, Point.LAT_MICRODEG_MAX);
     private static final Range<Integer> lonBoundingRange =
-        new Range<>(Point.LON_MICRODEG_MIN, Point.LON_MICRODEG_MAX);
+            new Range<>(Point.LON_MICRODEG_MIN, Point.LON_MICRODEG_MAX);
 
     static {
         for (final Territory territory : Territory.values()) {
@@ -105,8 +105,8 @@ class SubArea {
             }
         }
         LOG.debug("SubArea (init): lat=[{}, {}], lon=[{}, {}]",
-            Point.microDegToDeg(latMap.firstKey()), Point.microDegToDeg(latMap.lastKey()),
-            Point.microDegToDeg(lonMap.firstKey()), Point.microDegToDeg(lonMap.lastKey()));
+                Point.microDegToDeg(latMap.firstKey()), Point.microDegToDeg(latMap.lastKey()),
+                Point.microDegToDeg(lonMap.firstKey()), Point.microDegToDeg(lonMap.lastKey()));
     }
 
     static SubArea getArea(final int i) {
@@ -123,8 +123,7 @@ class SubArea {
 
         if (list != null) {
             areaLists.add(list);
-        }
-        else {
+        } else {
             Entry<Integer, ArrayList<SubArea>> entry = latMap.lowerEntry(point.getLatMicroDeg());
             if (entry == null) {
                 return Collections.EMPTY_LIST;
@@ -144,8 +143,7 @@ class SubArea {
         list = lonMap.get(point.getLonMicroDeg());
         if (list != null) {
             areaLists.add(list);
-        }
-        else {
+        } else {
             Entry<Integer, ArrayList<SubArea>> entry = lonMap.lowerEntry(point.getLonMicroDeg());
             if (entry == null) {
                 return Collections.EMPTY_LIST;
@@ -165,7 +163,7 @@ class SubArea {
         final ArrayList<SubArea> result = new ArrayList<>();
         list = areaLists.get(0);
 
-mainLoop:
+        mainLoop:
         for (final SubArea subArea : list) {
             for (int i = 1; i < areaLists.size(); i++) {
                 if (!areaLists.get(i).contains(subArea)) {
@@ -178,12 +176,12 @@ mainLoop:
         return result;
     }
 
-    private Range<Integer>            latRange;
-    private Range<Integer>            lonRange;
+    private Range<Integer> latRange;
+    private Range<Integer> lonRange;
     private ArrayList<Range<Integer>> boundedLatRange;
     private ArrayList<Range<Integer>> boundedLonRange;
     private final Territory parentTerritory;
-    private final Integer   subAreaID;
+    private final Integer subAreaID;
 
     int getMinX() {
         return lonRange.getMin();
@@ -230,18 +228,17 @@ mainLoop:
         if (territoryBounds == null) {
             boundedLonRange = normalisedLonRange;
             boundedLatRange = normalisedLatRange;
-        }
-        else {
+        } else {
             for (final Range<Integer> normalisedRange : normalisedLonRange) {
                 final ArrayList<Range<Integer>> boundedRange =
-                    normalisedRange.constrain(territoryBounds.boundedLonRange);
+                        normalisedRange.constrain(territoryBounds.boundedLonRange);
                 if (boundedRange != null) {
                     boundedLonRange.addAll(boundedRange);
                 }
             }
             for (final Range<Integer> normalisedRange : normalisedLatRange) {
                 final ArrayList<Range<Integer>> boundedRange =
-                    normalisedRange.constrain(territoryBounds.boundedLatRange);
+                        normalisedRange.constrain(territoryBounds.boundedLatRange);
                 if (boundedRange != null) {
                     boundedLatRange.addAll(boundedRange);
                 }
@@ -251,7 +248,7 @@ mainLoop:
 
     @Nonnull
     private static ArrayList<Range<Integer>> normaliseRange(
-        @Nonnull final Range<Integer> range, @Nonnull final Range<Integer> boundingRange) {
+            @Nonnull final Range<Integer> range, @Nonnull final Range<Integer> boundingRange) {
         final ArrayList<Range<Integer>> ranges = new ArrayList<>();
 
         Range<Integer> tempRange = range.constrain(boundingRange);
@@ -262,8 +259,8 @@ mainLoop:
         Range<Integer> normalisingRange = range;
         while (normalisingRange.getMin() < boundingRange.getMin()) {
             normalisingRange = new Range<>((normalisingRange.getMin() + boundingRange.getMax())
-                - boundingRange.getMin(), (normalisingRange.getMax() + boundingRange.getMax())
-                - boundingRange.getMin());
+                    - boundingRange.getMin(), (normalisingRange.getMax() + boundingRange.getMax())
+                    - boundingRange.getMin());
             tempRange = normalisingRange.constrain(boundingRange);
             if (tempRange != null) {
                 ranges.add(tempRange);
@@ -273,8 +270,8 @@ mainLoop:
         normalisingRange = range;
         while (normalisingRange.getMax() > boundingRange.getMax()) {
             normalisingRange = new Range<>((normalisingRange.getMin() - boundingRange.getMax())
-                + boundingRange.getMin(), (normalisingRange.getMax() - boundingRange.getMax())
-                + boundingRange.getMin());
+                    + boundingRange.getMin(), (normalisingRange.getMax() - boundingRange.getMax())
+                    + boundingRange.getMin());
             tempRange = normalisingRange.constrain(boundingRange);
             if (tempRange != null) {
                 ranges.add(tempRange);
@@ -311,8 +308,7 @@ mainLoop:
         }
         if (lonMicroDeg < lonRange.getMin()) {
             lonMicroDeg += 360000000;
-        }
-        else {
+        } else {
             lonMicroDeg -= 360000000;
         }
         if (this.lonRange.contains(lonMicroDeg)) {
