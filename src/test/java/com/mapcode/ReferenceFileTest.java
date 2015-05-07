@@ -36,8 +36,8 @@ import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({"ProhibitedExceptionDeclared", "OverlyBroadThrowsClause"})
 public class ReferenceFileTest {
-    private static final Logger LOG  = LoggerFactory.getLogger(ReferenceFileTest.class);
-    public static final  Gson   GSON = new GsonBuilder().serializeSpecialFloatingPointValues().create();
+    private static final Logger LOG = LoggerFactory.getLogger(ReferenceFileTest.class);
+    public static final Gson GSON = new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
     private static final String RANDOM_REFERENCE_FILE_1 = "/random_1k.txt";
     private static final String RANDOM_REFERENCE_FILE_2 = "/random_10k.txt";
@@ -55,11 +55,11 @@ public class ReferenceFileTest {
     private static final String GRID_REFERENCE_FILE_2_HP = "/grid_hp_10k.txt";
     private static final String GRID_REFERENCE_FILE_3_HP = "/grid_hp_100k.txt";
 
-    private static final String BOUNDARIES_REFERENCE_FILE    = "/boundaries.txt";
+    private static final String BOUNDARIES_REFERENCE_FILE = "/boundaries.txt";
     private static final String BOUNDARIES_REFERENCE_FILE_HP = "/boundaries_hp.txt";
 
-    private static final int    LOG_LINE_EVERY = 25000;
-    private static final double METERS_DELTA   = 10.0;
+    private static final int LOG_LINE_EVERY = 25000;
+    private static final double METERS_DELTA = 10.0;
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
@@ -140,7 +140,7 @@ public class ReferenceFileTest {
 
                 // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
                 final List<Mapcode> results = MapcodeCodec.encode(
-                    reference.point.getLatDeg(), reference.point.getLonDeg());
+                        reference.point.getLatDeg(), reference.point.getLonDeg());
                 if (showLogLine) {
                     LOG.info("checkFile: actual   = {}", GSON.toJson(results));
                 }
@@ -150,11 +150,11 @@ public class ReferenceFileTest {
                 // Check the size and order of the results with a single assertion.
                 //
                 assertEquals("Encode #" + i + " incorrect number of results:" +
-                        "\n  lat/lon  = " + reference.point +
-                        "\n  expected = " + reference.mapcodes.size() + " results, " +
-                        GSON.toJson(reference.mapcodes) +
-                        "\n  actual   = " + results.size() + " results, " + GSON.toJson(results),
-                    reference.mapcodes.size(), results.size());
+                                "\n  lat/lon  = " + reference.point +
+                                "\n  expected = " + reference.mapcodes.size() + " results, " +
+                                GSON.toJson(reference.mapcodes) +
+                                "\n  actual   = " + results.size() + " results, " + GSON.toJson(results),
+                        reference.mapcodes.size(), results.size());
 
                 // For every mapcode in the result set, check if it is contained in the reference set.
                 for (final Mapcode result : results) {
@@ -166,8 +166,7 @@ public class ReferenceFileTest {
                                     found = true;
                                     break;
                                 }
-                            }
-                            else {
+                            } else {
                                 if (referenceMapcodeRec.mapcode.equals(result.getMapcode())) {
                                     found = true;
                                     break;
@@ -180,7 +179,7 @@ public class ReferenceFileTest {
                         // This does not fail the test, but rather produces an ERROR in the log file.
                         // It indicates a discrepancy in the C and Java implementations.
                         LOG.error("checkFile: Mapcode '{}' at {} is not in the reference file!",
-                            result, reference.point);
+                                result, reference.point);
                         ++error;
                     }
                 }
@@ -195,8 +194,7 @@ public class ReferenceFileTest {
                                     found = true;
                                     break;
                                 }
-                            }
-                            else {
+                            } else {
                                 if (referenceMapcodeRec.mapcode.equals(result.getMapcode())) {
                                     found = true;
                                     break;
@@ -206,7 +204,7 @@ public class ReferenceFileTest {
                     }
                     if (!found) {
                         LOG.error("checkFile: Mapcode '{} {}' at {} is not produced by the decoder!",
-                            referenceMapcodeRec.territory, referenceMapcodeRec.mapcode, reference.point);
+                                referenceMapcodeRec.territory, referenceMapcodeRec.mapcode, reference.point);
                         ++error;
                     }
                 }
@@ -222,14 +220,13 @@ public class ReferenceFileTest {
                         maxdelta = Math.max(maxdelta, distanceMeters);
                         if (distanceMeters > METERS_DELTA) {
                             LOG.error(
-                                "Mapcode {} {} was generated for point {}, but decodes to point {} which is {} meters from the original point.",
-                                mapcodeRec.territory, mapcodeRec.mapcode, reference.point, result, distanceMeters);
+                                    "Mapcode {} {} was generated for point {}, but decodes to point {} which is {} meters from the original point.",
+                                    mapcodeRec.territory, mapcodeRec.mapcode, reference.point, result, distanceMeters);
                             ++error;
                         }
-                    }
-                    catch (final UnknownMapcodeException unknownMapcodeException) {
+                    } catch (final UnknownMapcodeException unknownMapcodeException) {
                         LOG.error("Mapcode {} {} was generated for point {}, but cannot be decoded.",
-                            mapcodeRec.territory, mapcodeRec.mapcode, reference.point);
+                                mapcodeRec.territory, mapcodeRec.mapcode, reference.point);
                         ++error;
                     }
                 }
@@ -239,11 +236,9 @@ public class ReferenceFileTest {
                 }
                 ++i;
             }
-        }
-        catch (final EOFException e) {
+        } catch (final EOFException e) {
             // OK.
-        }
-        finally {
+        } finally {
             chunkedFile.close();
         }
         LOG.info("checkFile: Maximum delta for this testset = {}", maxdelta);
@@ -251,8 +246,10 @@ public class ReferenceFileTest {
     }
 
     private static class MapcodeRec {
-        @Nonnull private final String    mapcode;
-        @Nonnull private final Territory territory;
+        @Nonnull
+        private final String mapcode;
+        @Nonnull
+        private final Territory territory;
 
         public MapcodeRec(@Nonnull final String mapcode, @Nonnull final Territory territory) {
             this.mapcode = mapcode;
@@ -261,8 +258,10 @@ public class ReferenceFileTest {
     }
 
     private static class ReferenceRec {
-        @Nonnull private final Point                 point;
-        @Nonnull private final ArrayList<MapcodeRec> mapcodes;
+        @Nonnull
+        private final Point point;
+        @Nonnull
+        private final ArrayList<MapcodeRec> mapcodes;
 
         public ReferenceRec(@Nonnull final Point point, @Nonnull final ArrayList<MapcodeRec> mapcodes) {
             this.point = point;
@@ -272,13 +271,13 @@ public class ReferenceFileTest {
 
     @Nonnull
     private static ReferenceRec getNextReferenceRecord(@Nonnull final ChunkedFile chunkedFile)
-        throws IOException, UnknownTerritoryException {
+            throws IOException, UnknownTerritoryException {
 
         // Read first line of data file: <nr> <lat> <lon> <x> <y> <z>
         final String firstLine = chunkedFile.readNonEmptyLine();
         final String[] args = firstLine.split(" ");
         assertTrue("Expecting 3 or 6 elements, not " + args.length + " in line: " + firstLine,
-            (args.length == 3) || (args.length == 6));
+                (args.length == 3) || (args.length == 6));
 
         final int count = Integer.parseInt(args[0]);
         assertTrue("Expecting between 1 and 21 mapcodes", (1 <= count) && (count <= 21));
@@ -315,11 +314,11 @@ public class ReferenceFileTest {
      * to next chunks when needed.
      */
     private static class ChunkedFile {
-        final private String         baseFileName;
-        private       String         fileName;
-        private       char           fileExt;
-        private       InputStream    inputStream;
-        private       BufferedReader bufferedReader;
+        final private String baseFileName;
+        private String fileName;
+        private char fileExt;
+        private InputStream inputStream;
+        private BufferedReader bufferedReader;
 
         private ChunkedFile(final String baseFileName) throws IOException {
             super();
@@ -330,8 +329,7 @@ public class ReferenceFileTest {
             if (inputStream != null) {
                 LOG.info("ChunkedFile: Reading {}...", fileName);
                 this.bufferedReader = new BufferedReader(new InputStreamReader(this.inputStream));
-            }
-            else {
+            } else {
                 throw new IOException();
             }
         }
@@ -346,8 +344,7 @@ public class ReferenceFileTest {
                 try {
                     line = bufferedReader.readLine();
                     tryNextChunk = !bufferedReader.ready() || (line == null);
-                }
-                catch (final EOFException ignored) {
+                } catch (final EOFException ignored) {
                     tryNextChunk = true;
                 }
                 if (line == null) {
@@ -372,8 +369,7 @@ public class ReferenceFileTest {
             if (inputStream != null) {
                 LOG.info("nextChunk: Reading {}...", fileName);
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            }
-            else {
+            } else {
                 LOG.debug("nextChunk: End of chunked file found (chunk {} not found)", fileName);
                 throw new EOFException();
             }
@@ -383,14 +379,12 @@ public class ReferenceFileTest {
             if (inputStream != null) {
                 try {
                     bufferedReader.close();
-                }
-                catch (final IOException ignored) {
+                } catch (final IOException ignored) {
                     LOG.error("close: Cannot close BufferedReader: {}", fileName);
                 }
                 try {
                     inputStream.close();
-                }
-                catch (final IOException e) {
+                } catch (final IOException e) {
                     LOG.error("close: Cannot close InputStream: {}", fileName);
                 }
             }

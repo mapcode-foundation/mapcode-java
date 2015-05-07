@@ -30,6 +30,11 @@ limitations under the License.
 Original C library created by Pieter Geelen. Work on Java version
 of the mapcode library by Rijn Buve and Matthew Lowden.
 
+# Coding Formatting Style
+
+The code formatting style used is the default code formatting style from IntelliJ IDEA (version 14).
+it is recommended to always use auto-format on any (Java) files before committing to maintain consistent layout.
+
 # Using Git and `.gitignore`
 
 It's good practice to set up a personal global `.gitignore` file on your machine which filters a number of files

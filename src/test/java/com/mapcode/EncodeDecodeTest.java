@@ -32,11 +32,11 @@ import static org.junit.Assert.assertTrue;
 public class EncodeDecodeTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncodeDecodeTest.class);
 
-    private static final int    NUMBER_OF_POINTS              = 1000;
-    private static final int    LOG_LINE_EVERY                = 500;
+    private static final int NUMBER_OF_POINTS = 1000;
+    private static final int LOG_LINE_EVERY = 500;
     private static final double ALLOWED_DISTANCE_DELTA_METERS = 10.0;
-    public static final  Gson   GSON                          =
-        new GsonBuilder().serializeSpecialFloatingPointValues().create();
+    public static final Gson GSON =
+            new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
     @Test
     public void encodeDecodeTestFixedSeed() throws Exception {
@@ -71,7 +71,7 @@ public class EncodeDecodeTest {
                     found = true;
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, encode={}, {} {} --> results={}",
-                            i, NUMBER_OF_POINTS, latDeg, lonDeg, territory, GSON.toJson(results));
+                                i, NUMBER_OF_POINTS, latDeg, lonDeg, territory, GSON.toJson(results));
                     }
 
                     // Decode location, up to '/'.
@@ -85,15 +85,15 @@ public class EncodeDecodeTest {
 
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, result={}, mapcode={}, territory={} --> " +
-                                "lat={}, lon={}; delta={}", i, NUMBER_OF_POINTS,
-                            result, mapcode, territory.getFullName(), decodeLocation.getLatDeg(),
-                            decodeLocation.getLonDeg(), distanceMeters);
+                                        "lat={}, lon={}; delta={}", i, NUMBER_OF_POINTS,
+                                result, mapcode, territory.getFullName(), decodeLocation.getLatDeg(),
+                                decodeLocation.getLonDeg(), distanceMeters);
                         LOG.info("");
                     }
 
                     // Check if the distance is not too great.
                     assertTrue("distanceMeters=" + distanceMeters + " >= " + ALLOWED_DISTANCE_DELTA_METERS,
-                        distanceMeters < ALLOWED_DISTANCE_DELTA_METERS);
+                            distanceMeters < ALLOWED_DISTANCE_DELTA_METERS);
                     showLogLine = false;
                 }
             }

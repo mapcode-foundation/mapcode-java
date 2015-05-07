@@ -80,7 +80,7 @@ public class DecoderTest {
         final Point point = MapcodeCodec.decode("\u0397\u03a0.\u03982-\u03a62", Territory.GRC);
         assertEquals("decodeUnicode latitude", 37971844, point.getLatMicroDeg());
         assertEquals("decodeUnicode longitude", 23726223,
-            point.getLonMicroDeg());
+                point.getLonMicroDeg());
     }
 
     @Test
@@ -89,7 +89,7 @@ public class DecoderTest {
         final Point point = MapcodeCodec.decode("GRC \u0397\u03a0.\u03982-\u03a62");
         assertEquals("decodeUnicode latitude", 37971844, point.getLatMicroDeg());
         assertEquals("decodeUnicode longitude", 23726223,
-            point.getLonMicroDeg());
+                point.getLonMicroDeg());
     }
 
     @Test
@@ -98,7 +98,7 @@ public class DecoderTest {
         final Point point = MapcodeCodec.decode("\u0397\u03a0.\u03982", Territory.GRC);
         assertEquals("decodeUnicode latitude", 37971812, point.getLatMicroDeg());
         assertEquals("decodeUnicode longitude", 23726247,
-            point.getLonMicroDeg());
+                point.getLonMicroDeg());
     }
 
     @Test
@@ -107,17 +107,17 @@ public class DecoderTest {
         final Point point = MapcodeCodec.decode("GRC \u0397\u03a0.\u03982");
         assertEquals("decodeUnicode latitude", 37971812, point.getLatMicroDeg());
         assertEquals("decodeUnicode longitude", 23726247,
-            point.getLonMicroDeg());
+                point.getLonMicroDeg());
     }
 
     @Test
     public void unicodeMapcodeTokyoTower1() throws Exception {
         LOG.info("unicodeMapcodeTokyoTower1");
         final Point point = MapcodeCodec.decode("\u30c1\u30ca.8\u30c1",
-            Territory.JPN);
+                Territory.JPN);
         assertEquals("decodeUnicode latitude", 35658660, point.getLatMicroDeg());
         assertEquals("decodeUnicode longitude", 139745394,
-            point.getLonMicroDeg());
+                point.getLonMicroDeg());
     }
 
     @Test
@@ -126,7 +126,7 @@ public class DecoderTest {
         final Point point = MapcodeCodec.decode("JPN \u30c1\u30ca.8\u30c1");
         assertEquals("decodeUnicode latitude", 35658660, point.getLatMicroDeg());
         assertEquals("decodeUnicode longitude", 139745394,
-            point.getLonMicroDeg());
+                point.getLonMicroDeg());
     }
 
     @Test
@@ -135,7 +135,7 @@ public class DecoderTest {
         final Point point = MapcodeCodec.decode("HMVM.3Q0", Territory.DEU);
         assertEquals("decodeUnicode latitude", 51154852, point.getLatMicroDeg());
         assertEquals("decodeUnicode longitude", 12278574,
-            point.getLonMicroDeg());
+                point.getLonMicroDeg());
     }
 
     @Test(expected = IllegalArgumentException.class)
