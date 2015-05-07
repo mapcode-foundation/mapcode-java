@@ -24,7 +24,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -38,14 +38,14 @@ import java.util.TreeMap;
 class SubArea {
     private static final Logger LOG = LoggerFactory.getLogger(SubArea.class);
 
-    private static final ArrayList<SubArea>                   subAreas = new ArrayList<SubArea>();
-    private static final TreeMap<Integer, ArrayList<SubArea>> lonMap   = new TreeMap<Integer, ArrayList<SubArea>>();
-    private static final TreeMap<Integer, ArrayList<SubArea>> latMap   = new TreeMap<Integer, ArrayList<SubArea>>();
+    private static final ArrayList<SubArea>                   subAreas = new ArrayList<>();
+    private static final TreeMap<Integer, ArrayList<SubArea>> lonMap   = new TreeMap<>();
+    private static final TreeMap<Integer, ArrayList<SubArea>> latMap   = new TreeMap<>();
 
     private static final Range<Integer> latBoundingRange =
-        new Range<Integer>(Point.LAT_MICRODEG_MIN, Point.LAT_MICRODEG_MAX);
+        new Range<>(Point.LAT_MICRODEG_MIN, Point.LAT_MICRODEG_MAX);
     private static final Range<Integer> lonBoundingRange =
-        new Range<Integer>(Point.LON_MICRODEG_MIN, Point.LON_MICRODEG_MAX);
+        new Range<>(Point.LON_MICRODEG_MIN, Point.LON_MICRODEG_MAX);
 
     static {
         for (final Territory territory : Territory.values()) {
@@ -117,7 +117,7 @@ class SubArea {
     @SuppressWarnings("unchecked")
     @Nonnull
     static List<SubArea> getAreasForPoint(@Nonnull final Point point) {
-        final ArrayList<ArrayList<SubArea>> areaLists = new ArrayList<ArrayList<SubArea>>();
+        final ArrayList<ArrayList<SubArea>> areaLists = new ArrayList<>();
         ArrayList<SubArea> list;
         list = latMap.get(point.getLatMicroDeg());
 
@@ -125,7 +125,7 @@ class SubArea {
             areaLists.add(list);
         }
         else {
-            Map.Entry<Integer, ArrayList<SubArea>> entry = latMap.lowerEntry(point.getLatMicroDeg());
+            Entry<Integer, ArrayList<SubArea>> entry = latMap.lowerEntry(point.getLatMicroDeg());
             if (entry == null) {
                 return Collections.EMPTY_LIST;
             }
@@ -146,7 +146,7 @@ class SubArea {
             areaLists.add(list);
         }
         else {
-            Map.Entry<Integer, ArrayList<SubArea>> entry = lonMap.lowerEntry(point.getLonMicroDeg());
+            Entry<Integer, ArrayList<SubArea>> entry = lonMap.lowerEntry(point.getLonMicroDeg());
             if (entry == null) {
                 return Collections.EMPTY_LIST;
             }
@@ -162,7 +162,7 @@ class SubArea {
             areaLists.add(list);
         }
 
-        final ArrayList<SubArea> result = new ArrayList<SubArea>();
+        final ArrayList<SubArea> result = new ArrayList<>();
         list = areaLists.get(0);
 
 mainLoop:
@@ -178,8 +178,10 @@ mainLoop:
         return result;
     }
 
-    private Range<Integer> latRange, lonRange;
-    private ArrayList<Range<Integer>> boundedLatRange, boundedLonRange;
+    private Range<Integer>            latRange;
+    private Range<Integer>            lonRange;
+    private ArrayList<Range<Integer>> boundedLatRange;
+    private ArrayList<Range<Integer>> boundedLonRange;
     private final Territory parentTerritory;
     private final Integer   subAreaID;
 
@@ -211,8 +213,8 @@ mainLoop:
         minMaxSetup(i);
         parentTerritory = territory;
         subAreaID = i;
-        boundedLonRange = new ArrayList<Range<Integer>>();
-        boundedLatRange = new ArrayList<Range<Integer>>();
+        boundedLonRange = new ArrayList<>();
+        boundedLatRange = new ArrayList<>();
 
         // Mapcode areas are inclusive for the minimum bounds and exclusive for the maximum bounds
         // Trim max by 1, to address boundary cases.
@@ -250,7 +252,7 @@ mainLoop:
     @Nonnull
     private static ArrayList<Range<Integer>> normaliseRange(
         @Nonnull final Range<Integer> range, @Nonnull final Range<Integer> boundingRange) {
-        final ArrayList<Range<Integer>> ranges = new ArrayList<Range<Integer>>();
+        final ArrayList<Range<Integer>> ranges = new ArrayList<>();
 
         Range<Integer> tempRange = range.constrain(boundingRange);
         if (tempRange != null) {
@@ -259,8 +261,8 @@ mainLoop:
 
         Range<Integer> normalisingRange = range;
         while (normalisingRange.getMin() < boundingRange.getMin()) {
-            normalisingRange = new Range<Integer>(normalisingRange.getMin() + boundingRange.getMax()
-                - boundingRange.getMin(), normalisingRange.getMax() + boundingRange.getMax()
+            normalisingRange = new Range<>((normalisingRange.getMin() + boundingRange.getMax())
+                - boundingRange.getMin(), (normalisingRange.getMax() + boundingRange.getMax())
                 - boundingRange.getMin());
             tempRange = normalisingRange.constrain(boundingRange);
             if (tempRange != null) {
@@ -270,8 +272,8 @@ mainLoop:
 
         normalisingRange = range;
         while (normalisingRange.getMax() > boundingRange.getMax()) {
-            normalisingRange = new Range<Integer>(normalisingRange.getMin() - boundingRange.getMax()
-                + boundingRange.getMin(), normalisingRange.getMax() - boundingRange.getMax()
+            normalisingRange = new Range<>((normalisingRange.getMin() - boundingRange.getMax())
+                + boundingRange.getMin(), (normalisingRange.getMax() - boundingRange.getMax())
                 + boundingRange.getMin());
             tempRange = normalisingRange.constrain(boundingRange);
             if (tempRange != null) {
@@ -297,8 +299,8 @@ mainLoop:
     @Nonnull
     SubArea extendBounds(final int xExtension, final int yExtension) {
         final SubArea result = new SubArea();
-        result.latRange = new Range<Integer>(this.getMinY() - yExtension, getMaxY() + yExtension);
-        result.lonRange = new Range<Integer>(this.getMinX() - xExtension, getMaxX() + xExtension);
+        result.latRange = new Range<>(this.getMinY() - yExtension, getMaxY() + yExtension);
+        result.lonRange = new Range<>(this.getMinX() - xExtension, getMaxX() + xExtension);
         return result;
     }
 
@@ -332,11 +334,11 @@ mainLoop:
         i += 4;
         final int maxY = DataAccess.asLong(i);
 
-        latRange = new Range<Integer>(minY, maxY);
-        lonRange = new Range<Integer>(minX, maxX);
+        latRange = new Range<>(minY, maxY);
+        lonRange = new Range<>(minX, maxX);
     }
 
     private static Range<Integer> trimRange(final Range<Integer> range) {
-        return new Range<Integer>(range.getMin(), range.getMax() - 1);
+        return new Range<>(range.getMin(), range.getMax() - 1);
     }
 }

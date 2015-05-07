@@ -111,7 +111,7 @@ public class ReferenceFileTest {
         checkFile(BOUNDARIES_REFERENCE_FILE_HP);
     }
 
-    private void checkFile(@Nonnull final String baseFileName) throws Exception {
+    private static void checkFile(@Nonnull final String baseFileName) throws Exception {
 
         int error = 0;
         double maxdelta = 0;
@@ -291,13 +291,13 @@ public class ReferenceFileTest {
         assertTrue("Longitude must be in [-180, 180]", (-180 <= point.getLonDeg()) && (point.getLonDeg() <= 180));
 
         // Read mapcodes: <territory> <mapcode>
-        final ArrayList<MapcodeRec> mapcodeRecs = new ArrayList<MapcodeRec>();
+        final ArrayList<MapcodeRec> mapcodeRecs = new ArrayList<>();
         for (int i = 0; i < count; ++i) {
             final String line = chunkedFile.readNonEmptyLine();
             assertTrue("Line should not be empty", !line.isEmpty());
 
             final String[] mapcodeLine = line.split(" ");
-            assertEquals("Expecting 2 elements, territory and mapcode, got: " + mapcodeLine, 2, mapcodeLine.length);
+            assertEquals("Expecting 2 elements, territory and mapcode, got: " + mapcodeLine.length, 2, mapcodeLine.length);
 
             @Nonnull final Territory territory = Territory.fromString(mapcodeLine[0]);
             @Nonnull final String mapcode = mapcodeLine[1];
@@ -314,7 +314,7 @@ public class ReferenceFileTest {
      * like '.a', '.b', etc. This class provides reading lines from such files and moving
      * to next chunks when needed.
      */
-    private class ChunkedFile {
+    private static class ChunkedFile {
         final private String         baseFileName;
         private       String         fileName;
         private       char           fileExt;

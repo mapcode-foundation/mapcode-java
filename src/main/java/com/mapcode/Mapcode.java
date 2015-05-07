@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * territory definition.
  *
  * Note that the constructor will throw an {@link IllegalArgumentException} if the syntax of the mapcode
- * is not correct. It does not throw an {@link com.mapcode.UnknownMapcodeException}, because the mapcode
+ * is not correct. It does not throw an {@link UnknownMapcodeException}, because the mapcode
  * is not checked for validity, other than its syntax.
  */
 public final class Mapcode {

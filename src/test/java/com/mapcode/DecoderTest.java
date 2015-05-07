@@ -27,35 +27,51 @@ public class DecoderTest {
     private static final Logger LOG = LoggerFactory.getLogger(DecoderTest.class);
 
     @Test
-    public void decodeTomTomOffice1() throws Exception {
-        LOG.info("decodeTomTomOffice1");
+    public void decodeMapcodeWithTerritory() throws Exception {
+        LOG.info("decodeMapcodeWithTerritory");
         final Point point = MapcodeCodec.decode("49.4V", Territory.NLD);
-        assertEquals("decodeTomTomOffice latitude", 52376514, point.getLatMicroDeg());
-        assertEquals("decodeTomTomOffice longitude", 4908542, point.getLonMicroDeg());
+        assertEquals("decode latitude", 52376514, point.getLatMicroDeg());
+        assertEquals("decode longitude", 4908542, point.getLonMicroDeg());
     }
 
     @Test
-    public void decodeTomTomOffice2() throws Exception {
-        LOG.info("decodeTomTomOffice2");
+    public void decodeFullMapcode() throws Exception {
+        LOG.info("decodeFullMapcode");
         final Point point = MapcodeCodec.decode("NLD 49.4V");
-        assertEquals("decodeTomTomOffice latitude", 52376514, point.getLatMicroDeg());
-        assertEquals("decodeTomTomOffice longitude", 4908542, point.getLonMicroDeg());
+        assertEquals("decode latitude", 52376514, point.getLatMicroDeg());
+        assertEquals("decode longitude", 4908542, point.getLonMicroDeg());
     }
 
     @Test
-    public void highPrecisionTomTomOffice1() throws Exception {
-        LOG.info("highPrecisionTomTomOffice1");
+    public void decodeInternationalMapcodeWithTerritory() throws Exception {
+        LOG.info("decodeInternationalMapcodeWithTerritory");
+        final Point point = MapcodeCodec.decode("VHXGB.1J9J", Territory.AAA);
+        assertEquals("decode latitude", 52376504, point.getLatMicroDeg());
+        assertEquals("decode longitude", 4908535, point.getLonMicroDeg());
+    }
+
+    @Test
+    public void decodeFullInternationalMapcode() throws Exception {
+        LOG.info("decodeFullInternationalMapcode");
+        final Point point = MapcodeCodec.decode("VHXGB.1J9J");
+        assertEquals("decode latitude", 52376504, point.getLatMicroDeg());
+        assertEquals("decode longitude", 4908535, point.getLonMicroDeg());
+    }
+
+    @Test
+    public void highPrecisionMapcodeWithTerritory() throws Exception {
+        LOG.info("highPrecisionMapcodeWithTerritory");
         final Point point = MapcodeCodec.decode("49.4V-K2", Territory.NLD);
-        assertEquals("decodeTomTomOffice hi-precision latitude", 52376512, point.getLatMicroDeg());
-        assertEquals("decodeTomTomOffice hi-precision longitude", 4908540, point.getLonMicroDeg());
+        assertEquals("decode hi-precision latitude", 52376512, point.getLatMicroDeg());
+        assertEquals("decode hi-precision longitude", 4908540, point.getLonMicroDeg());
     }
 
     @Test
-    public void highPrecisionTomTomOffice2() throws Exception {
-        LOG.info("highPrecisionTomTomOffice2");
+    public void highPrecisionFullMapcode() throws Exception {
+        LOG.info("highPrecisionFullMapcode");
         final Point point = MapcodeCodec.decode("NLD 49.4V-K2");
-        assertEquals("decodeTomTomOffice hi-precision latitude", 52376512, point.getLatMicroDeg());
-        assertEquals("decodeTomTomOffice hi-precision longitude", 4908540, point.getLonMicroDeg());
+        assertEquals("decode hi-precision latitude", 52376512, point.getLatMicroDeg());
+        assertEquals("decode hi-precision longitude", 4908540, point.getLonMicroDeg());
     }
 
     @Test

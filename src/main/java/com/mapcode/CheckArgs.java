@@ -19,11 +19,14 @@ package com.mapcode;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Package private helper methods.
+ */
 class CheckArgs {
 
-    /**
-     * Package private helper methods.
-     */
+    private CheckArgs() {
+        // Prevent instantiation.
+    }
 
     static void checkRange(@Nonnull final String param, final double value,
         final double min, final double max) throws IllegalArgumentException {

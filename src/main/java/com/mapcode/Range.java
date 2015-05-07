@@ -56,7 +56,7 @@ class Range<T extends Comparable<T>> {
     }
 
     boolean containsRange(@Nonnull final Range<T> range) {
-        return this.min.compareTo(range.getMin()) <= 0 && this.max.compareTo(range.getMax()) >= 0;
+        return (this.min.compareTo(range.getMin()) <= 0) && (this.max.compareTo(range.getMax()) >= 0);
     }
 
     boolean intersects(@Nonnull final Range<T> range) {
@@ -78,12 +78,12 @@ class Range<T extends Comparable<T>> {
             return null;
         }
 
-        return new Range<T>(newMin, newMax);
+        return new Range<>(newMin, newMax);
     }
 
     @Nullable
     ArrayList<Range<T>> constrain(@Nonnull final ArrayList<Range<T>> constrainingRanges) {
-        final ArrayList<Range<T>> resultRanges = new ArrayList<Range<T>>();
+        final ArrayList<Range<T>> resultRanges = new ArrayList<>();
         for (final Range<T> range : constrainingRanges) {
             final Range<T> constrainedRange = constrain(range);
             if (constrainedRange != null) {

@@ -16,6 +16,7 @@
 
 package com.mapcode;
 
+import com.mapcode.Mapcode.MapcodeFormatType;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,10 +86,10 @@ public class MapcodeTest {
     public void checkMapcodeFormatType() {
         LOG.info("checkMapcodeFormatType");
 
-        assertEquals(Mapcode.MapcodeFormatType.MAPCODE_TYPE_INVALID, Mapcode.getMapcodeFormatType("ABC"));
-        assertEquals(Mapcode.MapcodeFormatType.MAPCODE_TYPE_PRECISION_0, Mapcode.getMapcodeFormatType("AA.BB"));
-        assertEquals(Mapcode.MapcodeFormatType.MAPCODE_TYPE_PRECISION_1, Mapcode.getMapcodeFormatType("AA.BB-1"));
-        assertEquals(Mapcode.MapcodeFormatType.MAPCODE_TYPE_PRECISION_2, Mapcode.getMapcodeFormatType("AA.BB-12"));
+        assertEquals(MapcodeFormatType.MAPCODE_TYPE_INVALID, Mapcode.getMapcodeFormatType("ABC"));
+        assertEquals(MapcodeFormatType.MAPCODE_TYPE_PRECISION_0, Mapcode.getMapcodeFormatType("AA.BB"));
+        assertEquals(MapcodeFormatType.MAPCODE_TYPE_PRECISION_1, Mapcode.getMapcodeFormatType("AA.BB-1"));
+        assertEquals(MapcodeFormatType.MAPCODE_TYPE_PRECISION_2, Mapcode.getMapcodeFormatType("AA.BB-12"));
     }
 
     @Test

@@ -31,6 +31,10 @@ import static com.mapcode.CheckArgs.checkRange;
  */
 public final class MapcodeCodec {
 
+    private MapcodeCodec() {
+        // Prevent instantiation.
+    }
+
     /**
      * ------------------------------------------------------------------------------------------
      * Encoding latitude, longitude to mapcodes.
@@ -79,7 +83,7 @@ public final class MapcodeCodec {
      *
      * @param latDeg              Latitude, accepted range: -90..90.
      * @param lonDeg              Longitude, accepted range: -180..180.
-     * @param restrictToTerritory Try to encode only within this territory, see {@link com.mapcode.Territory}. Cannot
+     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. Cannot
      *                            be null.
      * @return List of mapcode information records, see {@link Mapcode}. This list is empty if no
      * Mapcode can be generated for this territory matching the lat/lon.
@@ -129,7 +133,7 @@ public final class MapcodeCodec {
      *
      * @param latDeg              Latitude, accepted range: -90..90.
      * @param lonDeg              Longitude, accepted range: -180..180.
-     * @param restrictToTerritory Try to encode only within this territory, see {@link com.mapcode.Territory}. Cannot
+     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. Cannot
      *                            be null.
      * @return Shortest mapcode, see {@link Mapcode}.
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.

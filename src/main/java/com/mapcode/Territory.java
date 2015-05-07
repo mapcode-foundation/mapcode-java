@@ -798,10 +798,10 @@ public enum Territory {
      * Static initialization of the static data structures.
      */
     static {
-        codeList = new ArrayList<Territory>();
-        nameMap = new HashMap<String, List<Territory>>();
-        parentList = new ArrayList<Territory>();
-        final ArrayList<Integer> territoryCodeList = new ArrayList<Integer>();
+        codeList = new ArrayList<>();
+        nameMap = new HashMap<>();
+        parentList = new ArrayList<>();
+        final ArrayList<Integer> territoryCodeList = new ArrayList<>();
 
         for (final Territory territory : Territory.values()) {
             final int territoryCode = territory.getTerritoryCode();
@@ -930,7 +930,7 @@ public enum Territory {
                 for (int i = 0; i < territories.size(); i++) {
 
                     final Territory existingTerritoryParent = territories.get(i).getParentTerritory();
-                    if (existingTerritoryParent == null && territories.get(i).toString().contentEquals(name)) {
+                    if ((existingTerritoryParent == null) && territories.get(i).toString().contentEquals(name)) {
                         // A primary identifier always takes priority.
                         return;
                     }
@@ -944,7 +944,7 @@ public enum Territory {
             territories.add(territory);
         }
         else {
-            final ArrayList<Territory> arrayList = new ArrayList<Territory>();
+            final ArrayList<Territory> arrayList = new ArrayList<>();
             arrayList.add(territory);
             nameMap.put(name, arrayList);
         }

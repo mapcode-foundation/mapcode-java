@@ -37,6 +37,10 @@ class Common {
         1260, 1300, 1343, 1389, 1438, 1490, 1547, 1609, 1676, 1749, 1828, 1916, 2012, 2118, 2237, 2370, 2521, 2691,
         2887, 3114, 3380, 3696, 4077, 4547, 5139, 5910, 6952, 8443, 10747, 14784, 23681, 59485};
 
+    private Common() {
+        // Prevent instantiation.
+    }
+
     /**
      * This method returns a divider for longitude (multiplied by 4), for a given latitude.
      *

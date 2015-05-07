@@ -78,7 +78,7 @@ class DataAccess {
     }
 
     static int dataFlags(final int i) {
-        return asUnsignedByte((i * 20) + 16) + asUnsignedByte((i * 20) + 17) * 256;
+        return asUnsignedByte((i * 20) + 16) + (asUnsignedByte((i * 20) + 17) * 256);
     }
 
     static int asLong(final int i) {

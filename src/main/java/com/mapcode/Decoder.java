@@ -24,14 +24,18 @@ import javax.annotation.Nonnull;
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
 
+    private Decoder() {
+        // Prevent instantiation.
+    }
+
     // ----------------------------------------------------------------------
     // Method called from public Java API.
     // ----------------------------------------------------------------------
 
     @Nonnull
     static Point decode(@Nonnull final String argMapcode,
-        @Nonnull final Territory argTerritory)
-        throws UnknownMapcodeException {
+                        @Nonnull final Territory argTerritory)
+            throws UnknownMapcodeException {
         LOG.trace("decode: mapcode={}, territory={}", argMapcode, argTerritory.name());
 
         String mapcode = argMapcode;
@@ -60,14 +64,13 @@ class Decoder {
         // *** long codes in states are handled by the country
         if (incodexlen >= 9) {
             territory = Territory.AAA;
-        }
-        else {
+        } else {
             final Territory parentTerritory = territory.getParentTerritory();
-            if (incodexlen >= 8 && (parentTerritory == Territory.USA || parentTerritory == Territory.CAN
-                || parentTerritory == Territory.AUS || parentTerritory == Territory.BRA
-                || parentTerritory == Territory.CHN || parentTerritory == Territory.RUS)
-                || incodexlen >= 7 &&
-                (parentTerritory == Territory.IND || parentTerritory == Territory.MEX)) {
+            if (((incodexlen >= 8) && ((parentTerritory == Territory.USA) || (parentTerritory == Territory.CAN)
+                    || (parentTerritory == Territory.AUS) || (parentTerritory == Territory.BRA)
+                    || (parentTerritory == Territory.CHN) || (parentTerritory == Territory.RUS)))
+                    || ((incodexlen >= 7) &&
+                    ((parentTerritory == Territory.IND) || (parentTerritory == Territory.MEX)))) {
 
                 territory = parentTerritory;
             }
@@ -87,12 +90,12 @@ class Decoder {
 
         for (int i = from; i <= upto; i++) {
             mapcoderData.dataSetup(i);
-            if (mapcoderData.getPipeType() == 0 && !mapcoderData.isNameless()
-                && mapcoderData.getCodexLen() == incodexlen && mapcoderData.getCodexHi() == incodexhi) {
+            if ((mapcoderData.getPipeType() == 0) && !mapcoderData.isNameless()
+                    && (mapcoderData.getCodexLen() == incodexlen) && (mapcoderData.getCodexHi() == incodexhi)) {
 
                 result = decodeGrid(mapcode, mapcoderData.getMapcoderRect().getMinX(), mapcoderData.getMapcoderRect()
-                        .getMinY(), mapcoderData.getMapcoderRect().getMaxX(), mapcoderData.getMapcoderRect().getMaxY(),
-                    i, extrapostfix);
+                                .getMinY(), mapcoderData.getMapcoderRect().getMaxX(), mapcoderData.getMapcoderRect().getMaxY(),
+                        i, extrapostfix);
                 // RESTRICTUSELESS
                 if (mapcoderData.isUseless() && result.isDefined()) {
                     boolean fitssomewhere = false;
@@ -104,7 +107,7 @@ class Decoder {
                             continue;
                         }
                         final int xdiv8 = Common.xDivider(mapcoderData.getMapcoderRect().getMinY(),
-                            mapcoderData.getMapcoderRect().getMaxY()) / 4;
+                                mapcoderData.getMapcoderRect().getMaxY()) / 4;
                         if (mapcoderData.getMapcoderRect().extendBounds(xdiv8, 60).containsPoint(result)) {
                             fitssomewhere = true;
                             break;
@@ -115,24 +118,21 @@ class Decoder {
                     }
                 }
                 break;
-            }
-            else if (mapcoderData.getPipeType() == 4 && mapcoderData.getCodexLen() + 1 == incodexlen
-                && mapcoderData.getCodexHi() + 1 == incodexhi
-                && mapcoderData.getPipeLetter().charAt(0) == mapcode.charAt(0)) {
+            } else if ((mapcoderData.getPipeType() == 4) && ((mapcoderData.getCodexLen() + 1) == incodexlen)
+                    && ((mapcoderData.getCodexHi() + 1) == incodexhi)
+                    && (mapcoderData.getPipeLetter().charAt(0) == mapcode.charAt(0))) {
                 result = decodeGrid(mapcode.substring(1), mapcoderData.getMapcoderRect().getMinX(), mapcoderData
-                    .getMapcoderRect().getMinY(), mapcoderData.getMapcoderRect().getMaxX(), mapcoderData
-                    .getMapcoderRect().getMaxY(), i, extrapostfix);
+                        .getMapcoderRect().getMinY(), mapcoderData.getMapcoderRect().getMaxX(), mapcoderData
+                        .getMapcoderRect().getMaxY(), i, extrapostfix);
                 break;
-            }
-            else if (mapcoderData.isNameless()
-                && (mapcoderData.getCodex() == 21 && incodexlen == 4 && incodexhi == 2
-                || mapcoderData.getCodex() == 22 && incodexlen == 5 && incodexhi == 3 || mapcoderData
-                .getCodex() == 13 && incodexlen == 5 && incodexhi == 2)) {
+            } else if (mapcoderData.isNameless()
+                    && (((mapcoderData.getCodex() == 21) && (incodexlen == 4) && (incodexhi == 2))
+                    || ((mapcoderData.getCodex() == 22) && (incodexlen == 5) && (incodexhi == 3)) || ((mapcoderData
+                    .getCodex() == 13) && (incodexlen == 5) && (incodexhi == 2)))) {
                 result = decodeNameless(mapcode, i, extrapostfix, mapcoderData);
                 break;
-            }
-            else if (mapcoderData.getPipeType() > 4 && incodexlen == incodexhi + 3
-                && mapcoderData.getCodexLen() + 1 == incodexlen) {
+            } else if ((mapcoderData.getPipeType() > 4) && (incodexlen == (incodexhi + 3))
+                    && ((mapcoderData.getCodexLen() + 1) == incodexlen)) {
                 result = decodeStarpipe(mapcode, i, extrapostfix, mapcoderData);
                 break;
             }
@@ -141,8 +141,7 @@ class Decoder {
         if (result.isDefined()) {
             if (result.getLonMicroDeg() > 180000000) {
                 result = Point.fromMicroDeg(result.getLatMicroDeg(), result.getLonMicroDeg() - 360000000);
-            }
-            else if (result.getLonMicroDeg() < -180000000) {
+            } else if (result.getLonMicroDeg() < -180000000) {
                 result = Point.fromMicroDeg(result.getLatMicroDeg(), result.getLonMicroDeg() + 360000000);
             }
 
@@ -161,8 +160,8 @@ class Decoder {
         }
 
         LOG.trace("decode: result=({}, {})",
-            result.isDefined() ? result.getLatDeg() : Double.NaN,
-            result.isDefined() ? result.getLonDeg() : Double.NaN);
+                result.isDefined() ? result.getLatDeg() : Double.NaN,
+                result.isDefined() ? result.getLonDeg() : Double.NaN);
         result = Point.restrictLatLon(result);
         return result;
     }
@@ -174,20 +173,20 @@ class Decoder {
     private static final int CCODE_EARTH = 540;
 
     private final static int[] decode_chars = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, -2, 10, 11, 12, -3, 13, 14, 15,
-        1, 16, 17, 18, 19, 20, 0, 21, 22, 23, 24, 25, -4, 26, 27, 28, 29, 30, -1, -1, -1, -1, -1, -1, -2, 10, 11,
-        12, -3, 13, 14, 15, 1, 16, 17, 18, 19, 20, 0, 21, 22, 23, 24, 25, -4, 26, 27, 28, 29, 30, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, -2, 10, 11, 12, -3, 13, 14, 15,
+            1, 16, 17, 18, 19, 20, 0, 21, 22, 23, 24, 25, -4, 26, 27, 28, 29, 30, -1, -1, -1, -1, -1, -1, -2, 10, 11,
+            12, -3, 13, 14, 15, 1, 16, 17, 18, 19, 20, 0, 21, 22, 23, 24, 25, -4, 26, 27, 28, 29, 30, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
     private static class Unicode2Ascii {
 
-        public final int    min;
-        public final int    max;
+        public final int min;
+        public final int max;
         public final String convert;
 
         public Unicode2Ascii(final int min, final int max, final String convert) {
@@ -198,67 +197,53 @@ class Decoder {
     }
 
     private final static Unicode2Ascii[] UNICODE2ASCII = {
-        new Unicode2Ascii(0x0041, 0x005a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), // Roman
-        new Unicode2Ascii(0x0391, 0x03a9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
-        new Unicode2Ascii(0x0410, 0x042f,
-            "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"), // Cyrillic
-        new Unicode2Ascii(0x05d0, 0x05ea, "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"), // Hebrew
-        new Unicode2Ascii(0x0905, 0x0939,
-            "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Hindi
-        new Unicode2Ascii(0x0d07, 0x0d39,
-            "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"), // Malai
-        new Unicode2Ascii(0x10a0, 0x10bf,
-            "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch
-        new Unicode2Ascii(
-            0x30a2,
-            0x30f2,
-            "A?I?O?U?EB?C?D?F?G?H???J???????K??????L?M?N?????P??Q??R??S?????TV?????WX???Y????Z"), // Katakana
-        new Unicode2Ascii(0x0e01, 0x0e32,
-            "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"), // Thai
-        new Unicode2Ascii(0x0e81, 0x0ec6,
-            "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"), // Lao
-        new Unicode2Ascii(0x0532, 0x0556,
-            "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
-        new Unicode2Ascii(0x0985, 0x09b9,
-            "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"), // Bengali
-        new Unicode2Ascii(0x0a05, 0x0a39,
-            "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Gurmukhi
-        new Unicode2Ascii(0x0f40, 0x0f66,
-            "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"), // Tibetan
+            new Unicode2Ascii(0x0041, 0x005a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), // Roman
+            new Unicode2Ascii(0x0391, 0x03a9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
+            new Unicode2Ascii(0x0410, 0x042f, "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"), // Cyrillic
+            new Unicode2Ascii(0x05d0, 0x05ea, "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"), // Hebrew
+            new Unicode2Ascii(0x0905, 0x0939, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Hindi
+            new Unicode2Ascii(0x0d07, 0x0d39, "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"), // Malai
+            new Unicode2Ascii(0x10a0, 0x10bf, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch
+            new Unicode2Ascii(0x30a2, 0x30f2, "A?I?O?U?EB?C?D?F?G?H???J???????K??????L?M?N?????P??Q??R??S?????TV?????WX???Y????Z"), // Katakana
+            new Unicode2Ascii(0x0e01, 0x0e32, "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"), // Thai
+            new Unicode2Ascii(0x0e81, 0x0ec6, "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"), // Lao
+            new Unicode2Ascii(0x0532, 0x0556, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
+            new Unicode2Ascii(0x0985, 0x09b9, "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"), // Bengali
+            new Unicode2Ascii(0x0a05, 0x0a39, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Gurmukhi
+            new Unicode2Ascii(0x0f40, 0x0f66, "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"), // Tibetan
 
-        new Unicode2Ascii(0x0966, 0x096f, ""), // Hindi
-        new Unicode2Ascii(0x0d66, 0x0d6f, ""), // Malai
-        new Unicode2Ascii(0x0e50, 0x0e59, ""), // Thai
-        new Unicode2Ascii(0x09e6, 0x09ef, ""), // Bengali
-        new Unicode2Ascii(0x0a66, 0x0a6f, ""), // Gurmukhi
-        new Unicode2Ascii(0x0f20, 0x0f29, ""), // Tibetan
+            new Unicode2Ascii(0x0966, 0x096f, ""), // Hindi
+            new Unicode2Ascii(0x0d66, 0x0d6f, ""), // Malai
+            new Unicode2Ascii(0x0e50, 0x0e59, ""), // Thai
+            new Unicode2Ascii(0x09e6, 0x09ef, ""), // Bengali
+            new Unicode2Ascii(0x0a66, 0x0a6f, ""), // Gurmukhi
+            new Unicode2Ascii(0x0f20, 0x0f29, ""), // Tibetan
 
-        // lowercase variants: greek, georgisch
-        new Unicode2Ascii(0x03B1, 0x03c9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
-        // lowercase
-        new Unicode2Ascii(0x10d0, 0x10ef,
-            "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch lowercase
-        new Unicode2Ascii(0x0562, 0x0586,
-            "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
-        // lowercase
-        new Unicode2Ascii(0, 0, null)
+            // lowercase variants: greek, georgisch
+            new Unicode2Ascii(0x03B1, 0x03c9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
+            // lowercase
+            new Unicode2Ascii(0x10d0, 0x10ef, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch lowercase
+            new Unicode2Ascii(0x0562, 0x0586, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
+            // lowercase
+            new Unicode2Ascii(0, 0, null)
     };
 
     @Nonnull
     private static Point decodeGrid(final String str, final int minx, final int miny, final int maxx, final int maxy,
-        final int m, final String extrapostfix) {
+                                    final int m, final String extrapostfix) {
         // for a well-formed result, and integer variables
         String result = str;
-        int relx, rely;
+        int relx;
+        int rely;
         final int codexlen = result.length() - 1; // length ex dot
         int dc = result.indexOf('.'); // dotposition
 
-        if (dc == 1 && codexlen == 5) {
+        if ((dc == 1) && (codexlen == 5)) {
             dc++;
             result = result.substring(0, 1) + result.charAt(2) + '.' + result.substring(3);
         }
         final int codexlow = codexlen - dc;
-        final int codex = 10 * dc + codexlow;
+        final int codex = (10 * dc) + codexlow;
 
         final int divx;
         int divy;
@@ -266,37 +251,35 @@ class Decoder {
         if (divy == 1) {
             divx = Common.xSide[dc];
             divy = Common.ySide[dc];
-        }
-        else {
+        } else {
             divx = Common.nc[dc] / divy;
         }
 
-        if (dc == 4 && divx == Common.xSide[4] && divy == Common.ySide[4]) {
+        if ((dc == 4) && (divx == Common.xSide[4]) && (divy == Common.ySide[4])) {
             result = result.substring(0, 1) + result.charAt(2) + result.charAt(1) + result.substring(3);
         }
 
         int v = fastDecode(result);
 
-        if (divx != divy && codex > 24) // D==6
+        if ((divx != divy) && (codex > 24)) // D==6
         {
             final Point d = decode6(v, divx, divy);
             relx = d.getLonMicroDeg();
             rely = d.getLatMicroDeg();
-        }
-        else {
+        } else {
             relx = v / divy;
             rely = v % divy;
             rely = divy - 1 - rely;
         }
 
-        final int ygridsize = (maxy - miny + divy - 1) / divy;
-        final int xgridsize = (maxx - minx + divx - 1) / divx;
+        final int ygridsize = (((maxy - miny) + divy) - 1) / divy;
+        final int xgridsize = (((maxx - minx) + divx) - 1) / divx;
 
-        rely = miny + rely * ygridsize;
-        relx = minx + relx * xgridsize;
+        rely = miny + (rely * ygridsize);
+        relx = minx + (relx * xgridsize);
 
-        final int dividery = (ygridsize + Common.ySide[codexlow] - 1) / Common.ySide[codexlow];
-        final int dividerx = (xgridsize + Common.xSide[codexlow] - 1) / Common.xSide[codexlow];
+        final int dividery = ((ygridsize + Common.ySide[codexlow]) - 1) / Common.ySide[codexlow];
+        final int dividerx = ((xgridsize + Common.xSide[codexlow]) - 1) / Common.xSide[codexlow];
 
         String rest = result.substring(dc + 1);
 
@@ -309,8 +292,7 @@ class Decoder {
             final Point d = decodeTriple(rest);
             difx = d.getLonMicroDeg();
             dify = d.getLatMicroDeg();
-        }
-        else {
+        } else {
             if (nrchars == 4) {
                 rest = String.valueOf(rest.charAt(0)) + rest.charAt(2) + rest.charAt(1) + rest.charAt(3);
             }
@@ -321,19 +303,18 @@ class Decoder {
 
         dify = Common.ySide[nrchars] - 1 - dify;
 
-        final int cornery = rely + dify * dividery;
-        final int cornerx = relx + difx * dividerx;
+        final int cornery = rely + (dify * dividery);
+        final int cornerx = relx + (difx * dividerx);
         return add2res(cornery, cornerx, dividerx << 2, dividery, 1, extrapostfix);
     }
 
     @Nonnull
     private static Point decodeNameless(final String str, final int firstrec, final String extrapostfix,
-        final Data mapcoderData) {
+                                        final Data mapcoderData) {
         String result = str;
         if (mapcoderData.getCodex() == 22) {
             result = result.substring(0, 3) + result.substring(4);
-        }
-        else {
+        } else {
             result = result.substring(0, 2) + result.substring(3);
         }
 
@@ -348,34 +329,29 @@ class Decoder {
         int nrX;
         boolean swapletters = false;
 
-        if (mapcoderData.getCodex() != 21 && a <= 31) {
+        if ((mapcoderData.getCodex() != 21) && (a <= 31)) {
             final int offset = decode_chars[(int) result.charAt(0)];
 
-            if (offset < r * (p + 1)) {
+            if (offset < (r * (p + 1))) {
                 nrX = offset / (p + 1);
+            } else {
+                swapletters = (p == 1) && (mapcoderData.getCodex() == 22);
+                nrX = r + ((offset - (r * (p + 1))) / p);
             }
-            else {
-                swapletters = p == 1 && mapcoderData.getCodex() == 22;
-                nrX = r + (offset - r * (p + 1)) / p;
-            }
-        }
-        else if (mapcoderData.getCodex() != 21 && a < 62) {
+        } else if ((mapcoderData.getCodex() != 21) && (a < 62)) {
             nrX = decode_chars[(int) result.charAt(0)];
             if (nrX < (62 - a)) {
                 swapletters = mapcoderData.getCodex() == 22;
+            } else {
+                nrX = ((nrX + nrX) - 62) + a;
             }
-            else {
-                nrX = nrX + nrX - 62 + a;
-            }
-        }
-        else {
+        } else {
             // codex==21 || A>=62
-            final int basePower = (mapcoderData.getCodex() == 21) ? 961 * 961 : 961 * 961 * 31;
+            final int basePower = (mapcoderData.getCodex() == 21) ? (961 * 961) : (961 * 961 * 31);
             int basePowerA = basePower / a;
             if (a == 62) {
                 basePowerA++;
-            }
-            else {
+            } else {
                 basePowerA = 961 * (basePowerA / 961);
             }
 
@@ -389,15 +365,14 @@ class Decoder {
             result = result.substring(0, 2) + result.charAt(3) + result.charAt(2) + result.charAt(4);
         }
 
-        if (mapcoderData.getCodex() != 21 && a <= 31) {
+        if ((mapcoderData.getCodex() != 21) && (a <= 31)) {
             v = fastDecode(result);
             if (nrX > 0) {
-                v -= (nrX * p + (nrX < r ? nrX : r)) * 961 * 961;
+                v -= ((nrX * p) + ((nrX < r) ? nrX : r)) * 961 * 961;
             }
-        }
-        else if (mapcoderData.getCodex() != 21 && a < 62) {
+        } else if ((mapcoderData.getCodex() != 21) && (a < 62)) {
             v = fastDecode(result.substring(1));
-            if (nrX >= (62 - a) && v >= (16 * 961 * 31)) {
+            if ((nrX >= (62 - a)) && (v >= (16 * 961 * 31))) {
                 v -= 16 * 961 * 31;
                 nrX++;
             }
@@ -420,14 +395,13 @@ class Decoder {
 
         if (mapcoderData.isSpecialShape()) {
             xSIDE *= side;
-            side = 1 + (maxy - miny) / 90;
+            side = 1 + ((maxy - miny) / 90);
             xSIDE = xSIDE / side;
 
             final Point d = decode6(v, xSIDE, side);
             dx = d.getLonMicroDeg();
             dy = side - 1 - d.getLatMicroDeg();
-        }
-        else {
+        } else {
             dy = v % side;
             dx = v / side;
         }
@@ -440,15 +414,15 @@ class Decoder {
         final int dividerx4 = Common.xDivider(miny, maxy); // 4 times too large!
         final int dividery = 90;
 
-        final int cornerx = minx + (dx * dividerx4) / 4; // FIRST multiply, THEN
+        final int cornerx = minx + ((dx * dividerx4) / 4); // FIRST multiply, THEN
         // divide!
-        final int cornery = maxy - dy * dividery;
+        final int cornery = maxy - (dy * dividery);
         return add2res(cornery, cornerx, dividerx4, dividery, -1, extrapostfix);
     }
 
     @Nonnull
     private static Point decodeStarpipe(final String input, final int firstindex, final String extrapostfix,
-        @Nonnull final Data mapcoderData) {
+                                        @Nonnull final Data mapcoderData) {
         // returns Point.isUndefined() in case or error
         int storageStart = 0;
         final int thiscodexlen = mapcoderData.getCodexLen();
@@ -459,7 +433,8 @@ class Decoder {
         // decode bottom 3 chars
 
         int i;
-        for (i = firstindex; ; i++) {
+        i = firstindex;
+        while (true) {
             if (Data.calcCodexLen(i) != thiscodexlen) {
                 return Point.undefined(); // return undefined
             }
@@ -472,35 +447,35 @@ class Decoder {
             final int minx = mapcoderData.getMapcoderRect().getMinX();
             final int miny = mapcoderData.getMapcoderRect().getMinY();
 
-            int h = (maxy - miny + 89) / 90;
+            int h = ((maxy - miny) + 89) / 90;
             final int xdiv = Common.xDivider(miny, maxy);
-            int w = ((maxx - minx) * 4 + xdiv - 1) / xdiv;
+            int w = ((((maxx - minx) * 4) + xdiv) - 1) / xdiv;
 
-            h = 176 * ((h + 176 - 1) / 176);
-            w = 168 * ((w + 168 - 1) / 168);
+            h = 176 * (((h + 176) - 1) / 176);
+            w = 168 * (((w + 168) - 1) / 168);
 
             int product = (w / 168) * (h / 176) * 961 * 31;
 
-            final int goodRounder = mapcoderData.getCodex() >= 23 ? 961 * 961 * 31 : 961 * 961;
+            final int goodRounder = (mapcoderData.getCodex() >= 23) ? (961 * 961 * 31) : (961 * 961);
             if (mapcoderData.getPipeType() == 8) {
                 // *+
-                product = ((storageStart + product + goodRounder - 1) / goodRounder) * goodRounder - storageStart;
+                product = ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
             }
 
-            if (value >= storageStart && value < storageStart + product) {
+            if ((value >= storageStart) && (value < (storageStart + product))) {
                 // code belongs here?
-                final int dividerx = (maxx - minx + w - 1) / w;
-                final int dividery = (maxy - miny + h - 1) / h;
+                final int dividerx = (((maxx - minx) + w) - 1) / w;
+                final int dividery = (((maxy - miny) + h) - 1) / h;
 
                 value -= storageStart;
                 value = value / (961 * 31);
                 // PIPELETTER DECODE
                 int vx = value / (h / 176);
-                vx = vx * 168 + triple.getLonMicroDeg();
-                final int vy = (value % (h / 176)) * 176 + triple.getLatMicroDeg();
+                vx = (vx * 168) + triple.getLonMicroDeg();
+                final int vy = ((value % (h / 176)) * 176) + triple.getLatMicroDeg();
 
-                final int cornery = maxy - vy * dividery;
-                final int cornerx = minx + vx * dividerx;
+                final int cornery = maxy - (vy * dividery);
+                final int cornerx = minx + (vx * dividerx);
 
                 /*
                  * Sri Lanka Defect (v1.1)
@@ -519,6 +494,7 @@ class Decoder {
                 return retval;
             }
             storageStart += product;
+            i++;
         }
     }
 
@@ -530,7 +506,7 @@ class Decoder {
         boolean voweled = false;
         final int lastpos = str.length() - 1;
         int dotpos = str.indexOf('.');
-        if (dotpos < 2 || lastpos < dotpos + 2) {
+        if ((dotpos < 2) || (lastpos < (dotpos + 2))) {
             return ""; // Error: no dot, or less than 2 letters before dot, or
         }
         // less than 2 letters after dot
@@ -539,33 +515,26 @@ class Decoder {
             voweled = true;
             str = str.substring(1);
             dotpos--;
-        }
-        else {
+        } else {
             int v = str.charAt(lastpos - 1);
             if (v == 'A') {
                 v = 0;
-            }
-            else if (v == 'E') {
+            } else if (v == 'E') {
                 v = 34;
-            }
-            else if (v == 'U') {
+            } else if (v == 'U') {
                 v = 68;
-            }
-            else {
+            } else {
                 v = -1;
             }
             if (v >= 0) {
                 final char e = str.charAt(lastpos);
                 if (e == 'A') {
                     v += 31;
-                }
-                else if (e == 'E') {
+                } else if (e == 'E') {
                     v += 32;
-                }
-                else if (e == 'U') {
+                } else if (e == 'U') {
                     v += 33;
-                }
-                else {
+                } else {
                     final int ve = decode_chars[(int) str.charAt(lastpos)];
                     if (ve < 0) {
                         return "";
@@ -577,11 +546,11 @@ class Decoder {
                 }
                 voweled = true;
                 str = str.substring(0, lastpos - 1) + Data.ENCODE_CHARS[v / 10]
-                    + Data.ENCODE_CHARS[v % 10];
+                        + Data.ENCODE_CHARS[v % 10];
             }
         }
 
-        if (dotpos < 2 || dotpos > 5) {
+        if ((dotpos < 2) || (dotpos > 5)) {
             return "";
         }
 
@@ -589,8 +558,7 @@ class Decoder {
             if (v != dotpos) {
                 if (decode_chars[(int) str.charAt(v)] < 0) {
                     return ""; // bad char!
-                }
-                else if (voweled && decode_chars[(int) str.charAt(v)] > 9) {
+                } else if (voweled && (decode_chars[(int) str.charAt(v)] > 9)) {
                     return ""; // nonodigit!
                 }
             }
@@ -610,16 +578,14 @@ class Decoder {
         for (int index = 0; index < str.length(); index++) {
             if (str.charAt(index) == '.') {
                 asciibuf.append(str.charAt(index));
-            }
-            else if (str.charAt(index) >= 1 && str.charAt(index) <= 'z') {
+            } else if ((str.charAt(index) >= 1) && (str.charAt(index) <= 'z')) {
                 // normal ascii
                 asciibuf.append(str.charAt(index));
-            }
-            else {
+            } else {
                 boolean found = false;
                 for (int i = 0; UNICODE2ASCII[i].min != 0; i++) {
-                    if (str.charAt(index) >= UNICODE2ASCII[i].min
-                        && str.charAt(index) <= UNICODE2ASCII[i].max) {
+                    if ((str.charAt(index) >= UNICODE2ASCII[i].min)
+                            && (str.charAt(index) <= UNICODE2ASCII[i].max)) {
                         String convert = UNICODE2ASCII[i].convert;
                         if (convert == null) {
                             convert = "0123456789";
@@ -645,9 +611,9 @@ class Decoder {
         final byte c1 = (byte) decode_chars[(int) str.charAt(0)];
         final int x = fastDecode(str.substring(1));
         if (c1 < 24) {
-            return Point.fromMicroDeg(c1 / 6 * 34 + x % 34, (c1 % 6) * 28 + x / 34);
+            return Point.fromMicroDeg(((c1 / 6) * 34) + (x % 34), ((c1 % 6) * 28) + (x / 34));
         }
-        return Point.fromMicroDeg(x % 40 + 136, x / 40 + 24 * (c1 - 24));
+        return Point.fromMicroDeg((x % 40) + 136, (x / 40) + (24 * (c1 - 24)));
     }
 
     @Nonnull
@@ -657,10 +623,10 @@ class Decoder {
         final int maxcol = (width - 4) / 6;
         if (col >= maxcol) {
             col = maxcol;
-            d = width - maxcol * 6;
+            d = width - (maxcol * 6);
         }
-        final int w = v - col * height * 6;
-        return Point.fromMicroDeg(height - 1 - w / d, col * 6 + w % d);
+        final int w = v - (col * height * 6);
+        return Point.fromMicroDeg(height - 1 - (w / d), (col * 6) + (w % d));
     }
 
     // / lowest level encode/decode routines
@@ -679,7 +645,7 @@ class Decoder {
             if (decode_chars[c] < 0) {
                 return -1;
             }
-            value = value * 31 + decode_chars[c];
+            value = (value * 31) + decode_chars[c];
         }
         return value;
     }
@@ -691,8 +657,7 @@ class Decoder {
             c1 = decode_chars[c1];
             if (c1 < 0) {
                 c1 = 0;
-            }
-            else if (c1 > 29) {
+            } else if (c1 > 29) {
                 c1 = 29;
             }
             final int y1 = c1 / 5;
@@ -702,18 +667,17 @@ class Decoder {
             c2 = decode_chars[c2];
             if (c2 < 0) {
                 c2 = 0;
-            }
-            else if (c2 > 29) {
+            } else if (c2 > 29) {
                 c2 = 29;
             }
             final int y2 = c2 / 6;
             final int x2 = c2 % 6;
 
-            final int extrax = ((x1 * 12 + 2 * x2 + 1) * dividerx4 + 120) / 240;
-            final int extray = ((y1 * 10 + 2 * y2 + 1) * dividery + 30) / 60;
+            final int extrax = ((((x1 * 12) + (2 * x2) + 1) * dividerx4) + 120) / 240;
+            final int extray = ((((y1 * 10) + (2 * y2) + 1) * dividery) + 30) / 60;
 
-            return Point.fromMicroDeg(y + extray * ydirection, x + extrax);
+            return Point.fromMicroDeg(y + (extray * ydirection), x + extrax);
         }
-        return Point.fromMicroDeg(y + (dividery / 2) * ydirection, x + dividerx4 / 8);
+        return Point.fromMicroDeg(y + ((dividery / 2) * ydirection), x + (dividerx4 / 8));
     }
 }
