@@ -26,7 +26,7 @@ import static com.mapcode.CheckArgs.checkNonnull;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- * <p/>
+ *
  * This class defines a class for lat/lon points.
  */
 public class Point {

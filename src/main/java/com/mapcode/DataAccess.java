@@ -24,7 +24,7 @@ import java.io.InputStream;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- * <p/>
+ *
  * This class contains the module that reads the Mapcode areas into memory and processes them.
  */
 class DataAccess {

@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  * ----------------------------------------------------------------------------------------------
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
- * <p/>
+ *
  * This exception is thrown for unknown territory codes.
  */
 public final class UnknownTerritoryException extends Exception {
