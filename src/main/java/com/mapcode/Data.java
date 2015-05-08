@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class the data class for Mapcode codex items.
  */
 class Data {

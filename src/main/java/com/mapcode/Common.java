@@ -20,7 +20,7 @@ package com.mapcode;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class contains common data structures and methods used by the Mapcode implementation.
  */
 class Common {

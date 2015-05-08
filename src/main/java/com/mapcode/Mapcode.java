@@ -24,9 +24,9 @@ import java.util.regex.Pattern;
 /**
  * This class defines a single mapcode encoding result, including the mapcode itself and the
  * territory definition.
- *
+ * <p/>
  * Note that the constructor will throw an {@link IllegalArgumentException} if the syntax of the mapcode
- * is not correct. It does not throw an {@link UnknownMapcodeException}, because the mapcode
+ * is not correct. It does not throw an {@link com.mapcode.UnknownMapcodeException}, because the mapcode
  * is not checked for validity, other than its syntax.
  */
 public final class Mapcode {
@@ -63,7 +63,7 @@ public final class Mapcode {
     /**
      * Get the Mapcode string (without territory information) with standard precision.
      * The returned mapcode does not include the '-' separator and additional digits.
-     *
+     * <p/>
      * The returned precision is approximately 5 meters. The precision is defined as the maximum distance to the
      * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
      * approximately 10 x 10 meters (100 m2).
@@ -75,6 +75,24 @@ public final class Mapcode {
         return mapcodePrecision0;
     }
 
+    /**
+     * Get the Mapcode string (without territory information) with a specified precision.
+     * The returned mapcode includes a '-' separator and additional digits for precisions 1 and 2.
+     *
+     * The precision defines the size of a geographical area a single mapcode covers. This means It also defines
+     * the maximum distance to the location, a (latitude, longitude) pair, that encoded to this mapcode.
+     *
+     * Precision 0 uses an area of approx 10 x 10 meters, which means the original location and the location
+     * as obtained by decoding the encoded mapcode are no further than 5 meters apart.
+     *
+     * Precision 1 uses an area of approx 10 x 10 meters, which means the original location and the location
+     * as obtained by decoding the encoded mapcode are no further than 5 meters apart.
+     *
+     * Precision 2 uses an area of approx 10 x 10 meters, which means the original location and the location
+     * as obtained by decoding the encoded mapcode are no further than 5 meters apart.
+     *
+     * @return Mapcode string.
+     */
     /**
      * Alias for {@link #getMapcode}.
      *
@@ -100,6 +118,7 @@ public final class Mapcode {
      *
      * @return Mapcode string.
      */
+    @Deprecated
     @Nonnull
     public String getMapcodePrecision0() {
         return mapcodePrecision0;
@@ -109,7 +128,7 @@ public final class Mapcode {
      * Get the medium-precision mapcode string (without territory information).
      * The returned mapcode includes the '-' separator and 1 additional digit, if available.
      * If a medium precision code is not available, the regular mapcode is returned.
-     *
+     * <p/>
      * The returned precision is approximately 1 meter. The precision is defined as the maximum distance to the
      * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
      * approximately 2 x 2 meters (4 m2).
@@ -134,7 +153,7 @@ public final class Mapcode {
      * Get the high-precision mapcode string (without territory information).
      * The returned mapcode includes the '-' separator and 2 additional digit2, if available.
      * If a high precision code is not available, the regular mapcode is returned.
-     *
+     * <p/>
      * The returned precision is approximately 16 centimeters. The precision is defined as the maximum distance to the
      * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
      * approximately 32 x 32 centimeters (0.1 m2).
@@ -203,7 +222,7 @@ public final class Mapcode {
      * This method return the mapcode type, given a mapcode string. If the mapcode string has an invalid
      * format, {@link MapcodeFormatType#MAPCODE_TYPE_INVALID} is returned. If another value is returned,
      * the precision of the mapcode is given.
-     *
+     * <p/>
      * Note that this method only checks the syntactic validity of the mapcode, the string format. It does not
      * check if the mapcode is really a valid mapcode representing a position on Earth.
      *
@@ -258,7 +277,7 @@ public final class Mapcode {
 
     /**
      * Return the local mapcode string, potentially ambiguous.
-     *
+     * <p/>
      * Example:
      * 49.4V
      *
@@ -273,13 +292,19 @@ public final class Mapcode {
      * Return the full international mapcode, including the full name of the territory and the Mapcode itself.
      * The format of the code is:
      * full-territory-name mapcode
-     *
+     * <p/>
      * Example:
      * Netherlands 49.4V           (regular code)
      * Netherlands 49.4V-K2        (high precision code)
      *
+     * @param precision Precision specifier. Range: [0, 2].
      * @return Full international mapcode.
      */
+    @Nonnull
+    public String asInternationalFullName(final int precision) {
+        return territory.getFullName() + ' ' + getMapcodePrecision(precision);
+    }
+
     @Nonnull
     public String asInternationalFullName() {
         return territory.getFullName() + ' ' + mapcodePrecision0;
@@ -290,17 +315,24 @@ public final class Mapcode {
      * International codes use a territory code "AAA".
      * The format of the code is:
      * short-territory-name mapcode
-     *
+     * <p/>
      * Example:
      * NLD 49.4V                   (regular code)
      * NLD 49.4V-K2                (high-precision code)
      *
+     * @param precision Precision specifier. Range: [0, 2].
      * @return Short-hand international mapcode.
      */
+    @Nonnull
+    public String asInternationalISO(final int precision) {
+        return territory.toString() + ' ' + getMapcodePrecision(precision);
+    }
+
     @Nonnull
     public String asInternationalISO() {
         return territory.toString() + ' ' + mapcodePrecision0;
     }
+
 
     @Nonnull
     @Override
@@ -310,7 +342,7 @@ public final class Mapcode {
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(new Object[]{mapcodePrecision0, territory});
+        return Arrays.deepHashCode(new Object[]{mapcodePrecision0, mapcodePrecision1, mapcodePrecision2, territory});
     }
 
     @Override
@@ -322,6 +354,9 @@ public final class Mapcode {
             return false;
         }
         final Mapcode that = (Mapcode) obj;
-        return mapcodePrecision0.equals(that.mapcodePrecision0) && (this.territory.equals(that.territory));
+        return mapcodePrecision0.equals(that.mapcodePrecision0) &&
+                mapcodePrecision1.equals(that.mapcodePrecision1) &&
+                mapcodePrecision2.equals(that.mapcodePrecision2) &&
+                (this.territory.equals(that.territory));
     }
 }

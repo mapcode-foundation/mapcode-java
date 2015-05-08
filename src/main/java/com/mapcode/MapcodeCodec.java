@@ -26,7 +26,7 @@ import static com.mapcode.CheckArgs.checkRange;
  * ----------------------------------------------------------------------------------------------
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class is the external Java interface for encoding and decoding mapcodes.
  */
 public final class MapcodeCodec {
@@ -44,13 +44,13 @@ public final class MapcodeCodec {
     /**
      * Encode a lat/lon pair to a mapcode with territory information. This produces a non-empty list of mapcode,
      * with at the very least 1 mapcodes for the lat/lon, which is the "International" mapcode.
-     *
+     * <p/>
      * The returned result list will always contain at least 1 mapcode, because every lat/lon pair can be encoded.
-     *
+     * <p/>
      * The list is ordered in such a way that the first result contains the shortest mapcode (which is usually a
      * local mapcode). The last result contains the "International" or world-wide mapcode, which is always
      * unambiguous, even when used without a territory specification.
-     *
+     * <p/>
      * The international code can be obtained from the list by using: "results.get(results.size() - 1)".
      *
      * @param latDeg Latitude, accepted range: -90..90.
@@ -75,9 +75,9 @@ public final class MapcodeCodec {
     /**
      * Encode a lat/lon pair to a mapcode with territory information, for a specific territory. This produces a
      * potentially empty list of mapcodes (empty if the lat/lon does not fall within the territory for mapcodes).
-     *
+     * <p/>
      * The returned result list will always contain at least 1 mapcode, because every lat/lon pair can be encoded.
-     *
+     * <p/>
      * The list is ordered in such a way that the first result contains the shortest mapcode (which is usually a
      * local mapcode).
      *
@@ -191,7 +191,7 @@ public final class MapcodeCodec {
     /**
      * Decode a mapcode to a Point. The decoding process may fail for local mapcodes,
      * because no territory context is supplied (world-wide).
-     *
+     * <p/>
      * The accepted format is:
      * {mapcode}
      * {territory-code} {mapcode}
@@ -231,7 +231,7 @@ public final class MapcodeCodec {
 
     /**
      * Decode a mapcode to a Point. A reference territory is supplied for disambiguation (only used if applicable).
-     *
+     * <p/>
      * The accepted format is:
      * {mapcode}        (note that a territory code is not allowed here)
      *

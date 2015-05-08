@@ -37,9 +37,17 @@ public class DecoderTest {
     @Test
     public void decodeFullMapcode() throws Exception {
         LOG.info("decodeFullMapcode");
-        final Point point = MapcodeCodec.decode("NLD 49.4V");
-        assertEquals("decode latitude", 52376514, point.getLatMicroDeg());
-        assertEquals("decode longitude", 4908542, point.getLonMicroDeg());
+        final Point point1 = MapcodeCodec.decode("NLD 49.4V");
+        assertEquals("decode latitude", 52376514, point1.getLatMicroDeg());
+        assertEquals("decode longitude", 4908542, point1.getLonMicroDeg());
+
+        final Point point2 = MapcodeCodec.decode("US-ID LQJT.N94S");
+        assertEquals("decode latitude", 45011346, point2.getLatMicroDeg());
+        assertEquals("decode longitude", -113232731, point2.getLonMicroDeg());
+
+        final Point point3 = MapcodeCodec.decode("US_ID LQJT.N94S");
+        assertEquals("decode latitude", 45011346, point3.getLatMicroDeg());
+        assertEquals("decode longitude", -113232731, point3.getLonMicroDeg());
     }
 
     @Test

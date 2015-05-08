@@ -24,12 +24,7 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mapcode.Common.countCityCoordinatesForCountry;
-import static com.mapcode.Common.getFirstNamelessRecord;
-import static com.mapcode.Common.nc;
-import static com.mapcode.Common.xDivider;
-import static com.mapcode.Common.xSide;
-import static com.mapcode.Common.ySide;
+import static com.mapcode.Common.*;
 
 class Encoder {
     private static final Logger LOG = LoggerFactory.getLogger(Encoder.class);

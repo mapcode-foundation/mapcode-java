@@ -21,18 +21,14 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class contains a class that defines an area for local mapcodes.
  */
 class SubArea {

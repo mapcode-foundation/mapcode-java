@@ -30,7 +30,7 @@ import static com.mapcode.CheckArgs.checkRange;
  * ----------------------------------------------------------------------------------------------
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class defines the available territory codes as used by mapcode.
  */
 public enum Territory {
@@ -657,13 +657,13 @@ public enum Territory {
      * Get a territory from a mapcode territory abbreviation. Note that the provided abbreviation is NOT an
      * ISO code: it's a mapcode prefix. As local mapcodes for states have been optimized to prefer to use 2-character
      * state codes in local codes, states are preferred over countries in this case.
-     *
+     * <p/>
      * For example, fromString("AS") returns {@link Territory#IN_AS} rather than {@link Territory#ASM} and
      * fromString("BR") returns {@link Territory#IN_BR} rather than {@link Territory#BRA}.
-     *
+     * <p/>
      * This behavior is intentional as local mapcodes are designed to be as short as possible. A mapcode within
      * the Indian state Bihar should therefore be able to specified as "BR 49.46M3" rather "IN-BR 49.46M3".
-     *
+     * <p/>
      * Brazilian mapcodes, on the other hand, would be specified as "BRA BDHP.JK39-1D", using the ISO 3 letter code.
      *
      * @param name Territory name.
@@ -695,16 +695,13 @@ public enum Territory {
     }
 
     /**
-     * Return the territory name.
+     * Return the territory name, with dashes rather than underscores.
      *
-     * @return Territory name. Same as toNameFormat(NameFormat.INTERNATIONAL).
+     * @return Territory name. Underscores have been replaced with dashes.
      */
     @Override
     @Nonnull
     public String toString() {
-
-        // Territory names contain "-". Enum constants must have this
-        // substituted to "_"
         return name().replace('_', '-');
     }
 
@@ -844,7 +841,7 @@ public enum Territory {
     private static Territory createFromString(
             @Nonnull final String name,
             @Nullable final ParentTerritory parentTerritory) throws UnknownTerritoryException {
-        final String nameTrimmed = name.trim();
+        final String nameTrimmed = name.trim().replace('_', '-');
         final List<Territory> territories = nameMap.get(nameTrimmed);
         if (territories != null) {
             if (parentTerritory == null) {
@@ -907,7 +904,6 @@ public enum Territory {
     }
 
     private static void addNameWithSeperatorVariants(@Nonnull final String name, @Nonnull final Territory territory) {
-
         addName(name, territory);
 
         // Tolerate a space character in place of a hyphen.
@@ -918,7 +914,6 @@ public enum Territory {
     }
 
     private static void addName(@Nonnull final String name, @Nonnull final Territory territory) {
-
         if (nameMap.containsKey(name)) {
             final List<Territory> territories = nameMap.get(name);
 
@@ -937,7 +932,7 @@ public enum Territory {
                 for (int i = 0; i < territories.size(); i++) {
 
                     final Territory existingTerritoryParent = territories.get(i).getParentTerritory();
-                    if ((existingTerritoryParent == null) && territories.get(i).toString().contentEquals(name)) {
+                    if (existingTerritoryParent == null && territories.get(i).toString().contentEquals(name)) {
                         // A primary identifier always takes priority.
                         return;
                     }

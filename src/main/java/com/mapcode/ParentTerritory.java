@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  * ----------------------------------------------------------------------------------------------
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class defines "parent territories" for territories that have multiple territory codes.
  */
 public enum ParentTerritory {

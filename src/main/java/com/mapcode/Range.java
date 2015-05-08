@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class contains a class for dealing with ranges of comparable items.
  */
 class Range<T extends Comparable<T>> {

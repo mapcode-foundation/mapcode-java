@@ -17,6 +17,7 @@
 package com.mapcode;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Random;
 
 import static com.mapcode.CheckArgs.checkNonnull;
@@ -25,7 +26,7 @@ import static com.mapcode.CheckArgs.checkNonnull;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class defines a class for lat/lon points.
  */
 public class Point {
@@ -117,12 +118,6 @@ public class Point {
     public double getLonDeg() {
         assert defined;
         return lonDeg;
-    }
-
-    @Override
-    @Nonnull
-    public String toString() {
-        return "(" + latDeg + ", " + lonDeg + ')';
     }
 
     public static int degToMicroDeg(final double deg) {
@@ -291,5 +286,32 @@ public class Point {
      */
     boolean isDefined() {
         return defined;
+    }
+
+    @Nonnull
+    @Override
+    public String toString() {
+        return defined ? ("(" + latDeg + ", " + lonDeg + ')') : "undefined";
+    }
+
+    @SuppressWarnings("NonFinalFieldReferencedInHashCode")
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new Object[]{latDeg, lonDeg, defined});
+    }
+
+    @SuppressWarnings("NonFinalFieldReferenceInEquals")
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Point)) {
+            return false;
+        }
+        final Point that = (Point) obj;
+        return (Double.compare(this.latDeg, that.latDeg) == 0) &&
+                (Double.compare(this.lonDeg, that.lonDeg) == 0) &&
+                (this.defined == that.defined);
     }
 }
