@@ -43,6 +43,13 @@ public final class Mapcode {
     @Nonnull
     private final Territory territory;
 
+    /**
+     * These constants define a safe maximum for the distance between a decoded mapcode and its original
+     * location used for encoding the mapcode.
+     *
+     * The actual accuracy (resolution) of mapcodes are actually slightly better than this, but these are
+     * safe values to use under normal circumstances.
+     */
     public static final double PRECISION_0_MAX_DELTA_METERS = 10.0;
     public static final double PRECISION_1_MAX_DELTA_METERS = 2.0;
     public static final double PRECISION_2_MAX_DELTA_METERS = 0.4;

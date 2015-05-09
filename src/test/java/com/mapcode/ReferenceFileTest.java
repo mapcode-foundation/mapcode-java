@@ -129,10 +129,6 @@ public class ReferenceFileTest {
                     LOG.info("checkFile: expected = {}", GSON.toJson(reference.mapcodes));
                 }
 
-                /**
-                 * Check encode.
-                 */
-
                 // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
                 final List<Mapcode> results = MapcodeCodec.encode(
                         reference.point.getLatDeg(), reference.point.getLonDeg());
@@ -146,10 +142,9 @@ public class ReferenceFileTest {
                     ++error;
                 }
 
-                /**
-                 * Check encodeToInternational.
-                 */
-                final Mapcode resultInternational = MapcodeCodec.encodeToInternational(reference.point.getLatDeg(), reference.point.getLonDeg());
+                // Check encodeToInternational.
+                final Mapcode resultInternational = MapcodeCodec.encodeToInternational(
+                        reference.point.getLatDeg(), reference.point.getLonDeg());
                 final Mapcode expectedInternational = results.get(results.size() - 1);
                 if (!resultInternational.equals(expectedInternational)) {
                     LOG.error("checkFile: encodeToInternational fails, expected={}, got={} for reference",
@@ -157,14 +152,19 @@ public class ReferenceFileTest {
                     ++error;
                 }
 
-                // Check the size and order of the results with a single assertion.
-                //
-                assertEquals("Encode #" + i + " incorrect number of results:" +
-                                "\n  lat/lon  = " + reference.point +
-                                "\n  expected = " + reference.mapcodes.size() + " results, " +
-                                GSON.toJson(reference.mapcodes) +
-                                "\n  actual   = " + results.size() + " results, " + GSON.toJson(results),
-                        reference.mapcodes.size(), results.size());
+                // Check the size of the results.
+                if (reference.mapcodes.size() != results.size()) {
+                    LOG.error("checkFile: Encode #{} incorrect number of results:" +
+                                    "\n  lat/lon  = {}" +
+                                    "\n  expected = {} results," +
+                                    "\n  actual   = {} results",
+                            i,
+                            reference.point,
+                            reference.mapcodes.size(),
+                            GSON.toJson(reference.mapcodes),
+                            GSON.toJson(results));
+                    ++error;
+                }
 
                 // For every mapcode in the result set, check if it is contained in the reference set.
                 for (final Mapcode result : results) {
@@ -172,7 +172,7 @@ public class ReferenceFileTest {
                     for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
                         if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
                             if (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodePrecision2())) {
+                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodePrecision(2))) {
                                     found = true;
                                     break;
                                 }
@@ -200,7 +200,7 @@ public class ReferenceFileTest {
                     for (final Mapcode result : results) {
                         if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
                             if (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodePrecision2())) {
+                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodePrecision(2))) {
                                     found = true;
                                     break;
                                 }
@@ -219,19 +219,20 @@ public class ReferenceFileTest {
                     }
                 }
 
-                /**
-                 * Check distance of decoded point to reference point.
-                 */
+                // Check distance of decoded point to reference point.
                 for (final MapcodeRec mapcodeRec : reference.mapcodes) {
                     //noinspection NestedTryStatement
                     try {
                         final Point result = MapcodeCodec.decode(mapcodeRec.mapcode, mapcodeRec.territory);
                         final double distanceMeters = Point.distanceInMeters(reference.point, result);
                         maxdelta = Math.max(maxdelta, distanceMeters);
-                        if (distanceMeters > Mapcode.PRECISION_0_MAX_DELTA_METERS) {
-                            LOG.error(
-                                    "Mapcode {} {} was generated for point {}, but decodes to point {} which is {} meters from the original point.",
-                                    mapcodeRec.territory, mapcodeRec.mapcode, reference.point, result, distanceMeters);
+
+                        final double maxDeltaMeters = (mapcodeRec.mapcode.lastIndexOf('-') > 4) ?
+                                Mapcode.PRECISION_2_MAX_DELTA_METERS : Mapcode.PRECISION_0_MAX_DELTA_METERS;
+                        if (distanceMeters > maxDeltaMeters) {
+                            LOG.error("Mapcode {} {} was generated for point {}, but decodes to point {} " +
+                                            "which is {} meters from the original point (max is {} meters).",
+                                    mapcodeRec.territory, mapcodeRec.mapcode, reference.point, result, distanceMeters, maxDeltaMeters);
                             ++error;
                         }
                     } catch (final UnknownMapcodeException unknownMapcodeException) {
