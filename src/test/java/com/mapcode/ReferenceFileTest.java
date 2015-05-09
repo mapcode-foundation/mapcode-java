@@ -55,7 +55,6 @@ public class ReferenceFileTest {
     private static final String BOUNDARIES_REFERENCE_FILE_HP = "/boundaries_hp.txt";
 
     private static final int LOG_LINE_EVERY = 25000;
-    private static final double METERS_DELTA = 10.0;
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
@@ -148,17 +147,6 @@ public class ReferenceFileTest {
                 }
 
                 /**
-                 * Check encodeToShortest.
-                 */
-                final Mapcode resultShortest = MapcodeCodec.encodeToShortest(reference.point.getLatDeg(), reference.point.getLonDeg());
-                final Mapcode expectedShortest = results.get(0);
-                if (!resultShortest.asLocal().equals(expectedShortest.asLocal())) {
-                    LOG.error("checkFile: encodeToShortest fails, expected={}, got={} for reference",
-                            expectedShortest, resultShortest, reference);
-                    ++error;
-                }
-
-                /**
                  * Check encodeToInternational.
                  */
                 final Mapcode resultInternational = MapcodeCodec.encodeToInternational(reference.point.getLatDeg(), reference.point.getLonDeg());
@@ -168,7 +156,6 @@ public class ReferenceFileTest {
                             expectedInternational, resultInternational, reference);
                     ++error;
                 }
-
 
                 // Check the size and order of the results with a single assertion.
                 //
@@ -241,7 +228,7 @@ public class ReferenceFileTest {
                         final Point result = MapcodeCodec.decode(mapcodeRec.mapcode, mapcodeRec.territory);
                         final double distanceMeters = Point.distanceInMeters(reference.point, result);
                         maxdelta = Math.max(maxdelta, distanceMeters);
-                        if (distanceMeters > METERS_DELTA) {
+                        if (distanceMeters > Mapcode.PRECISION_0_MAX_DELTA_METERS) {
                             LOG.error(
                                     "Mapcode {} {} was generated for point {}, but decodes to point {} which is {} meters from the original point.",
                                     mapcodeRec.territory, mapcodeRec.mapcode, reference.point, result, distanceMeters);

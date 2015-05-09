@@ -37,10 +37,6 @@ public class EncodeDecodeTest {
     private static final int NUMBER_OF_POINTS = 5000;
     private static final int LOG_LINE_EVERY = 100;
 
-    private static final double PRECISION_0_METERS = 10.0;
-    private static final double PRECISION_1_METERS = 2.0;
-    private static final double PRECISION_2_METERS = 0.4;
-
     @Test
     public void encodeDecodeTestFixedSeed() throws Exception {
         LOG.info("encodeDecodeTestFixedSeed");
@@ -91,15 +87,17 @@ public class EncodeDecodeTest {
                     }
 
                     // Check if the territory matches.
-                    final String mapcodePrecision0 = result.getMapcodePrecision(0);
-                    final String mapcodePrecision1 = result.getMapcodePrecision(1);
-                    final String mapcodePrecision2 = result.getMapcodePrecision(2);
                     assertEquals(territory, result.getTerritory());
 
                     // Check max distance.
+                    final String mapcodePrecision0 = result.getMapcodePrecision(0);
+                    final String mapcodePrecision1 = result.getMapcodePrecision(1);
+                    final String mapcodePrecision2 = result.getMapcodePrecision(2);
+
                     final Point decodeLocationPrecision0 = MapcodeCodec.decode(mapcodePrecision0, territory);
                     final Point decodeLocationPrecision1 = MapcodeCodec.decode(mapcodePrecision1, territory);
                     final Point decodeLocationPrecision2 = MapcodeCodec.decode(mapcodePrecision2, territory);
+
                     final double distancePrecision0Meters = Point.distanceInMeters(encode, decodeLocationPrecision0);
                     final double distancePrecision1Meters = Point.distanceInMeters(encode, decodeLocationPrecision1);
                     final double distancePrecision2Meters = Point.distanceInMeters(encode, decodeLocationPrecision2);
@@ -108,12 +106,12 @@ public class EncodeDecodeTest {
                     maxDistancePrecision1Meters = Math.max(maxDistancePrecision1Meters, distancePrecision1Meters);
                     maxDistancePrecision2Meters = Math.max(maxDistancePrecision2Meters, distancePrecision2Meters);
 
-                    assertTrue("distancePrecision0Meters=" + distancePrecision0Meters + " >= " + PRECISION_0_METERS,
-                            distancePrecision0Meters < PRECISION_0_METERS);
-                    assertTrue("distancePrecision1Meters=" + distancePrecision1Meters + " >= " + PRECISION_1_METERS,
-                            distancePrecision1Meters < PRECISION_1_METERS);
-                    assertTrue("distancePrecision2Meters=" + distancePrecision2Meters + " >= " + PRECISION_2_METERS,
-                            distancePrecision2Meters < PRECISION_2_METERS);
+                    assertTrue("distancePrecision0Meters=" + distancePrecision0Meters + " >= " + Mapcode.PRECISION_0_MAX_DELTA_METERS,
+                            distancePrecision0Meters < Mapcode.PRECISION_0_MAX_DELTA_METERS);
+                    assertTrue("distancePrecision1Meters=" + distancePrecision1Meters + " >= " + Mapcode.PRECISION_1_MAX_DELTA_METERS,
+                            distancePrecision1Meters < Mapcode.PRECISION_1_MAX_DELTA_METERS);
+                    assertTrue("distancePrecision2Meters=" + distancePrecision2Meters + " >= " + Mapcode.PRECISION_2_MAX_DELTA_METERS,
+                            distancePrecision2Meters < Mapcode.PRECISION_2_MAX_DELTA_METERS);
 
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, result={}, mapcode={}, territory={} --> " +

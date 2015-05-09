@@ -30,14 +30,22 @@ import java.util.regex.Pattern;
  * is not checked for validity, other than its syntax.
  */
 public final class Mapcode {
+
     @Nonnull
     private final String mapcodePrecision0;
+
     @Nonnull
     private final String mapcodePrecision1;
+
     @Nonnull
     private final String mapcodePrecision2;
+
     @Nonnull
     private final Territory territory;
+
+    public static final double PRECISION_0_MAX_DELTA_METERS = 10.0;
+    public static final double PRECISION_1_MAX_DELTA_METERS = 2.0;
+    public static final double PRECISION_2_MAX_DELTA_METERS = 0.4;
 
     public Mapcode(
             @Nonnull final String mapcode,
