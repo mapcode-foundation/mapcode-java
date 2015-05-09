@@ -82,14 +82,13 @@ public final class Mapcode {
      * The precision defines the size of a geographical area a single mapcode covers. This means It also defines
      * the maximum distance to the location, a (latitude, longitude) pair, that encoded to this mapcode.
      *
-     * Precision 0 uses an area of approx 10 x 10 meters, which means the original location and the location
-     * as obtained by decoding the encoded mapcode are no further than 5 meters apart.
+     * Precision 0: area is approx 20 x 20 meters; max. distance from original location less than 10 meters.
      *
-     * Precision 1 uses an area of approx 10 x 10 meters, which means the original location and the location
-     * as obtained by decoding the encoded mapcode are no further than 5 meters apart.
+     * Precision 1: area is approx 4 x 4 meters; max. distance from original location less than 2 meters.
      *
-     * Precision 2 uses an area of approx 10 x 10 meters, which means the original location and the location
-     * as obtained by decoding the encoded mapcode are no further than 5 meters apart.
+     * Precision 2: area is approx 0.8 x 0.8 meters; max. distance from original location less than 0.4 meters.
+     *
+     * The accuracy is slightly better than the figures above, but these figures are safe assumptions.
      *
      * @return Mapcode string.
      */
@@ -113,59 +112,35 @@ public final class Mapcode {
         }
     }
 
-    /**
-     * Alias for {@link #getMapcode}.
-     *
-     * @return Mapcode string.
-     */
+    // Deprecated alias for getMapcodePrecision().
     @Deprecated
     @Nonnull
     public String getMapcodePrecision0() {
         return mapcodePrecision0;
     }
 
-    /**
-     * Get the medium-precision mapcode string (without territory information).
-     * The returned mapcode includes the '-' separator and 1 additional digit, if available.
-     * If a medium precision code is not available, the regular mapcode is returned.
-     *
-     * The returned precision is approximately 1 meter. The precision is defined as the maximum distance to the
-     * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
-     * approximately 2 x 2 meters (4 m2).
-     *
-     * @return Medium precision mapcode string.
-     */
+    // Deprecated alias for getMapcodePrecision().
+    @Deprecated
     @Nonnull
     public String getMapcodePrecision1() {
         return mapcodePrecision1;
     }
 
-    /**
-     * Deprecated alias for {@link #getMapcodePrecision1}.
-     */
+    // Deprecated alias for getMapcodePrecision().
     @Deprecated
     @Nonnull
     public String getMapcodeMediumPrecision() {
         return mapcodePrecision1;
     }
 
-    /**
-     * Get the high-precision mapcode string (without territory information).
-     * The returned mapcode includes the '-' separator and 2 additional digit2, if available.
-     * If a high precision code is not available, the regular mapcode is returned.
-     *
-     * The returned precision is approximately 16 centimeters. The precision is defined as the maximum distance to the
-     * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
-     * approximately 32 x 32 centimeters (0.1 m2).
-     *
-     * @return High precision mapcode string.
-     */
+    // Deprecated alias for getMapcodePrecision().
+    @Deprecated
     @Nonnull
     public String getMapcodePrecision2() {
         return mapcodePrecision2;
     }
 
-    // Deprecated alias for {@see #getMapcodePrecision2}.
+    // Deprecated alias for getMapcodePrecision().
     @Deprecated
     @Nonnull
     public String getMapcodeHighPrecision() {

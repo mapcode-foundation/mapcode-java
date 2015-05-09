@@ -33,7 +33,7 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings({"ProhibitedExceptionDeclared", "OverlyBroadThrowsClause"})
 public class ReferenceFileTest {
     private static final Logger LOG = LoggerFactory.getLogger(ReferenceFileTest.class);
-    public static final Gson GSON = new GsonBuilder().serializeSpecialFloatingPointValues().create();
+    private static final Gson GSON = new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
     private static final String RANDOM_REFERENCE_FILE_1 = "/random_1k.txt";
     private static final String RANDOM_REFERENCE_FILE_2 = "/random_10k.txt";
@@ -142,6 +142,33 @@ public class ReferenceFileTest {
                 }
 
                 // Check the number of mapcodes.
+                if (results.isEmpty()) {
+                    LOG.error("checkFile: encode fails, no results found for reference={}", reference);
+                    ++error;
+                }
+
+                /**
+                 * Check encodeToShortest.
+                 */
+                final Mapcode resultShortest = MapcodeCodec.encodeToShortest(reference.point.getLatDeg(), reference.point.getLonDeg());
+                final Mapcode expectedShortest = results.get(0);
+                if (!resultShortest.asLocal().equals(expectedShortest.asLocal())) {
+                    LOG.error("checkFile: encodeToShortest fails, expected={}, got={} for reference",
+                            expectedShortest, resultShortest, reference);
+                    ++error;
+                }
+
+                /**
+                 * Check encodeToInternational.
+                 */
+                final Mapcode resultInternational = MapcodeCodec.encodeToInternational(reference.point.getLatDeg(), reference.point.getLonDeg());
+                final Mapcode expectedInternational = results.get(results.size() - 1);
+                if (!resultInternational.equals(expectedInternational)) {
+                    LOG.error("checkFile: encodeToInternational fails, expected={}, got={} for reference",
+                            expectedInternational, resultInternational, reference);
+                    ++error;
+                }
+
 
                 // Check the size and order of the results with a single assertion.
                 //

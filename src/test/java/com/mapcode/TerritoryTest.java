@@ -37,8 +37,8 @@ public class TerritoryTest {
     public void checkDash() throws Exception {
         LOG.info("checkDash");
         assertEquals(Territory.IN_MN, Territory.fromString("IND-MN"));
-        assertEquals(Territory.US_MN, Territory.fromString("USA-MN"));
         assertEquals(Territory.IN_MN, Territory.fromString("IND_MN"));
+        assertEquals(Territory.US_MN, Territory.fromString("USA-MN"));
         assertEquals(Territory.US_MN, Territory.fromString("USA_MN"));
     }
 

@@ -31,73 +31,103 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings({"JUnitTestMethodWithNoAssertions", "OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
 public class EncodeDecodeTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncodeDecodeTest.class);
-
-    private static final int NUMBER_OF_POINTS = 1000;
-    private static final int LOG_LINE_EVERY = 500;
-    private static final double ALLOWED_DISTANCE_DELTA_METERS = 10.0;
-    public static final Gson GSON =
+    private static final Gson GSON =
             new GsonBuilder().serializeSpecialFloatingPointValues().create();
+
+    private static final int NUMBER_OF_POINTS = 5000;
+    private static final int LOG_LINE_EVERY = 100;
+
+    private static final double PRECISION_0_METERS = 10.0;
+    private static final double PRECISION_1_METERS = 2.0;
+    private static final double PRECISION_2_METERS = 0.4;
 
     @Test
     public void encodeDecodeTestFixedSeed() throws Exception {
         LOG.info("encodeDecodeTestFixedSeed");
-        doEncodeDecode(12345678);
+        doEncodeDecode(123212321);
     }
 
     @Test
     public void encodeDecodeTestRandomSeed() throws Exception {
         LOG.info("encodeDecodeTestRandomSeed");
-        doEncodeDecode(System.currentTimeMillis());
+        final long seed = System.currentTimeMillis();
+        LOG.info("encodeDecodeTestRandomSeed: seed={}", seed);
+        doEncodeDecode(seed);
     }
 
     private static void doEncodeDecode(final long seed) throws UnknownMapcodeException {
         final Random randomGenerator = new Random(seed);
+        double maxDistancePrecision0Meters = 0.0;
+        double maxDistancePrecision1Meters = 0.0;
+        double maxDistancePrecision2Meters = 0.0;
         for (int i = 0; i < NUMBER_OF_POINTS; i++) {
             boolean showLogLine = ((i % LOG_LINE_EVERY) == 0);
 
+            // Encode location.
+            final Point encode = Point.fromUniformlyDistributedRandomPoints(randomGenerator);
+            final double latDeg = encode.getLatDeg();
+            final double lonDeg = encode.getLonDeg();
+
+            // Check local and international codes.
+            final Mapcode resultInternational = MapcodeCodec.encodeToInternational(latDeg, lonDeg);
+
+            // Check encodeToShortest and encodeToInternational.
+            final List<Mapcode> resultsAll = MapcodeCodec.encode(latDeg, lonDeg);
+            assertTrue(!resultsAll.isEmpty());
+            assertEquals("encodeToInternational failed, result=" + resultsAll,
+                    resultsAll.get(resultsAll.size() - 1), resultInternational);
+
             // Every point must have a Mapcode.
             boolean found = false;
-            final Point encode = Point.fromUniformlyDistributedRandomPoints(randomGenerator);
 
             // Walk through the list in reverse order to get International first.
             for (final Territory territory : Territory.values()) {
-
-                // Encode location.
-                final double latDeg = encode.getLatDeg();
-                final double lonDeg = encode.getLonDeg();
-
-                final List<Mapcode> results = MapcodeCodec.encode(latDeg, lonDeg, territory);
-                for (final Mapcode result : results) {
+                final List<Mapcode> resultsLimited = MapcodeCodec.encode(latDeg, lonDeg, territory);
+                for (final Mapcode result : resultsLimited) {
                     found = true;
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, encode={}, {} {} --> results={}",
-                                i, NUMBER_OF_POINTS, latDeg, lonDeg, territory, GSON.toJson(results));
+                                i, NUMBER_OF_POINTS, latDeg, lonDeg, territory, GSON.toJson(resultsLimited));
                     }
 
-                    // Decode location, up to '/'.
-                    final String mapcode = result.getMapcode();
-
                     // Check if the territory matches.
+                    final String mapcodePrecision0 = result.getMapcodePrecision(0);
+                    final String mapcodePrecision1 = result.getMapcodePrecision(1);
+                    final String mapcodePrecision2 = result.getMapcodePrecision(2);
                     assertEquals(territory, result.getTerritory());
 
-                    final Point decodeLocation = MapcodeCodec.decode(mapcode, territory);
-                    final double distanceMeters = Point.distanceInMeters(encode, decodeLocation);
+                    // Check max distance.
+                    final Point decodeLocationPrecision0 = MapcodeCodec.decode(mapcodePrecision0, territory);
+                    final Point decodeLocationPrecision1 = MapcodeCodec.decode(mapcodePrecision1, territory);
+                    final Point decodeLocationPrecision2 = MapcodeCodec.decode(mapcodePrecision2, territory);
+                    final double distancePrecision0Meters = Point.distanceInMeters(encode, decodeLocationPrecision0);
+                    final double distancePrecision1Meters = Point.distanceInMeters(encode, decodeLocationPrecision1);
+                    final double distancePrecision2Meters = Point.distanceInMeters(encode, decodeLocationPrecision2);
+
+                    maxDistancePrecision0Meters = Math.max(maxDistancePrecision0Meters, distancePrecision0Meters);
+                    maxDistancePrecision1Meters = Math.max(maxDistancePrecision1Meters, distancePrecision1Meters);
+                    maxDistancePrecision2Meters = Math.max(maxDistancePrecision2Meters, distancePrecision2Meters);
+
+                    assertTrue("distancePrecision0Meters=" + distancePrecision0Meters + " >= " + PRECISION_0_METERS,
+                            distancePrecision0Meters < PRECISION_0_METERS);
+                    assertTrue("distancePrecision1Meters=" + distancePrecision1Meters + " >= " + PRECISION_1_METERS,
+                            distancePrecision1Meters < PRECISION_1_METERS);
+                    assertTrue("distancePrecision2Meters=" + distancePrecision2Meters + " >= " + PRECISION_2_METERS,
+                            distancePrecision2Meters < PRECISION_2_METERS);
 
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, result={}, mapcode={}, territory={} --> " +
                                         "lat={}, lon={}; delta={}", i, NUMBER_OF_POINTS,
-                                result, mapcode, territory.getFullName(), decodeLocation.getLatDeg(),
-                                decodeLocation.getLonDeg(), distanceMeters);
+                                result, mapcodePrecision0, territory.getFullName(), decodeLocationPrecision0.getLatDeg(),
+                                decodeLocationPrecision0.getLonDeg(), distancePrecision0Meters);
                         LOG.info("");
                     }
-
-                    // Check if the distance is not too great.
-                    assertTrue("distanceMeters=" + distanceMeters + " >= " + ALLOWED_DISTANCE_DELTA_METERS,
-                            distanceMeters < ALLOWED_DISTANCE_DELTA_METERS);
                     showLogLine = false;
                 }
             }
             assertTrue(found);
         }
+        LOG.info("encodeDecodeTest: maximum distances, precision 0, 1, 2: {}, {}, {} meters, ",
+                maxDistancePrecision0Meters, maxDistancePrecision1Meters, maxDistancePrecision2Meters);
     }
 }

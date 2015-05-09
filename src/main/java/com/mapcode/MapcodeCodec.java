@@ -47,11 +47,12 @@ public final class MapcodeCodec {
      *
      * The returned result list will always contain at least 1 mapcode, because every lat/lon pair can be encoded.
      *
-     * The list is ordered in such a way that the first result contains the shortest mapcode (which is usually a
-     * local mapcode). The last result contains the "International" or world-wide mapcode, which is always
-     * unambiguous, even when used without a territory specification.
+     * The list is ordered in such a way that the last result is the international code. However, you cannot assume
+     * that the first result is the shortest mapcode. If you want to use the shortest mapcode, use
+     * {@link #encodeToShortest(double, double)}.
      *
-     * The international code can be obtained from the list by using: "results.get(results.size() - 1)".
+     * The international code can be obtained from the list by using: "results.get(results.size() - 1)", or
+     * you can use {@link #encodeToInternational(double, double)}, which is faster.
      *
      * @param latDeg Latitude, accepted range: -90..90.
      * @param lonDeg Longitude, accepted range: -180..180.
@@ -78,8 +79,9 @@ public final class MapcodeCodec {
      *
      * The returned result list will always contain at least 1 mapcode, because every lat/lon pair can be encoded.
      *
-     * The list is ordered in such a way that the first result contains the shortest mapcode (which is usually a
-     * local mapcode).
+     * The list is ordered in such a way that the last result is the international code. However, you cannot assume
+     * that the first result is the shortest mapcode. If you want to use the shortest mapcode, use
+     * {@link #encodeToShortest(double, double, Territory)}.
      *
      * @param latDeg              Latitude, accepted range: -90..90.
      * @param lonDeg              Longitude, accepted range: -180..180.
@@ -106,8 +108,8 @@ public final class MapcodeCodec {
     }
 
     /**
-     * Encode a lat/lon pair to its shortest mapcode without territory information. For a valid lat/lon pair, this will
-     * always yield a mapcode.
+     * Encode a lat/lon pair to its shortest mapcode without specifying territory information. For a valid lat/lon pair,
+     * this will always yield a mapcode.
      *
      * @param latDeg Latitude, accepted range: -90..90.
      * @param lonDeg Longitude, accepted range: -180..180.
