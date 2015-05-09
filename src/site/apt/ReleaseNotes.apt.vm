@@ -14,7 +14,9 @@ Release Notes (Version ${project.version})
     * Cleaned up source. Removed all pending IntelliJ IDEA inspection warnings and reformatted code
       using default IDEA code style to maintain consistent layout.
 
-    * Add minor additional unit tests to check for correct handling of international mapcode handling.
+    * Add additional unit tests to check for correct handling of international mapcode handling.
+
+    * Added safe constants for the maximum delta distance in meters for mapcode accuracy.
 
     []
 
