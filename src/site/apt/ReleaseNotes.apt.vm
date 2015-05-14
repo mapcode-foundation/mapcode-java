@@ -9,6 +9,12 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 1.42.3
+
+    * To be done.
+
+    []
+
 * 1.42.2
 
     * Upper- and lowercase mapcodes always allowed.
