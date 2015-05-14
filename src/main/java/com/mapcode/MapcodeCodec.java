@@ -208,7 +208,7 @@ public final class MapcodeCodec {
     public static Point decode(
             @Nonnull final String mapcode) throws UnknownMapcodeException, IllegalArgumentException {
         checkNonnull("mapcode", mapcode);
-        String mapcodeTrimmed = mapcode.trim();
+        String mapcodeTrimmed = mapcode.trim().toUpperCase();
         final int space = mapcodeTrimmed.indexOf(' ');
         final Territory territory;
         if ((space > 0) && (mapcodeTrimmed.length() > space)) {
@@ -249,7 +249,7 @@ public final class MapcodeCodec {
             @Nonnull final Territory territoryContext) throws UnknownMapcodeException, IllegalArgumentException {
         checkNonnull("mapcode", mapcode);
         checkNonnull("territoryContext", territoryContext);
-        final String mapcodeTrimmed = mapcode.trim();
+        final String mapcodeTrimmed = mapcode.trim().toUpperCase();
         if (!Mapcode.isValidMapcodeFormat(mapcodeTrimmed)) {
             throw new IllegalArgumentException(mapcode + " is not a correctly formatted mapcode; " +
                     "the regular expression for the mapcode syntax is: " + Mapcode.REGEX_MAPCODE_FORMAT);

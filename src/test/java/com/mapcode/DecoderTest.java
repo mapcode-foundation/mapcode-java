@@ -35,6 +35,22 @@ public class DecoderTest {
     }
 
     @Test
+    public void decodeUpperLowercaseMapcode() throws Exception {
+        LOG.info("decodeUpperLowercaseMapcode");
+        final Point point1 = MapcodeCodec.decode("XXXXX.1234");
+        assertEquals("decode latitude", 59596312, point1.getLatMicroDeg());
+        assertEquals("decode longitude", 155931892, point1.getLonMicroDeg());
+
+        final Point point2 = MapcodeCodec.decode("Xxxxx.1234");
+        assertEquals("decode latitude", 59596312, point2.getLatMicroDeg());
+        assertEquals("decode longitude", 155931892, point2.getLonMicroDeg());
+
+        final Point point3 = MapcodeCodec.decode("xxxxx.1234");
+        assertEquals("decode latitude", 59596312, point3.getLatMicroDeg());
+        assertEquals("decode longitude", 155931892, point3.getLonMicroDeg());
+    }
+
+    @Test
     public void decodeFullMapcode() throws Exception {
         LOG.info("decodeFullMapcode");
         final Point point1 = MapcodeCodec.decode("NLD 49.4V");

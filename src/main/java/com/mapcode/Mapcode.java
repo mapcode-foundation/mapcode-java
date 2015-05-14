@@ -64,13 +64,14 @@ public final class Mapcode {
                     "the regular expression for the mapcode syntax is: " + REGEX_MAPCODE_FORMAT);
         }
 
-        this.mapcodePrecision2 = mapcode;
-        if (mapcode.contains("-")) {
-            this.mapcodePrecision0 = mapcode.substring(0, mapcode.length() - 3);
-            this.mapcodePrecision1 = mapcode.substring(0, mapcode.length() - 1);
+        final String mapcodeUppercase = mapcode.toUpperCase();
+        this.mapcodePrecision2 = mapcodeUppercase;
+        if (mapcodeUppercase.contains("-")) {
+            this.mapcodePrecision0 = mapcodeUppercase.substring(0, mapcodeUppercase.length() - 3);
+            this.mapcodePrecision1 = mapcodeUppercase.substring(0, mapcodeUppercase.length() - 1);
         } else {
-            this.mapcodePrecision0 = mapcode;
-            this.mapcodePrecision1 = mapcode;
+            this.mapcodePrecision0 = mapcodeUppercase;
+            this.mapcodePrecision1 = mapcodeUppercase;
         }
         this.territory = territory;
     }
@@ -223,7 +224,7 @@ public final class Mapcode {
     public static MapcodeFormatType getMapcodeFormatType(@Nonnull final String mapcode) {
 
         // First, decode to ASCII.
-        final String decodedMapcode = convertToAscii(mapcode);
+        final String decodedMapcode = convertToAscii(mapcode.toUpperCase());
 
         // Syntax needs to be OK.
         if (!PATTERN_MAPCODE_FORMAT.matcher(decodedMapcode).matches()) {
@@ -251,7 +252,7 @@ public final class Mapcode {
      * mapcode representing a location on Earth.
      */
     public static boolean isValidMapcodeFormat(@Nonnull final String mapcode) {
-        return getMapcodeFormatType(mapcode) != MapcodeFormatType.MAPCODE_TYPE_INVALID;
+        return getMapcodeFormatType(mapcode.toUpperCase()) != MapcodeFormatType.MAPCODE_TYPE_INVALID;
     }
 
     /**
@@ -262,7 +263,7 @@ public final class Mapcode {
      */
     @Nonnull
     public static String convertToAscii(@Nonnull final String mapcode) {
-        return Decoder.decodeUTF16(mapcode);
+        return Decoder.decodeUTF16(mapcode.toUpperCase());
     }
 
     /**
