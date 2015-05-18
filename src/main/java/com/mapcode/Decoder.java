@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
@@ -189,7 +190,7 @@ class Decoder {
         public final int max;
         public final String convert;
 
-        public Unicode2Ascii(final int min, final int max, final String convert) {
+        public Unicode2Ascii(final int min, final int max, @Nullable final String convert) {
             this.min = min;
             this.max = max;
             this.convert = convert;
@@ -511,7 +512,19 @@ class Decoder {
         }
         // less than 2 letters after dot
 
-        if (str.charAt(0) == 'A') {
+        if (str.charAt(0) == 'A') { // v1.50
+            int v1 = decode_chars[(int) str.charAt(lastpos)];
+            if (v1 < 0) {
+                v1 = 31;
+            }
+            int v2 = decode_chars[(int) str.charAt(lastpos - 1)];
+            if (v2 < 0) {
+                v2 = 31;
+            }
+            String s = String.valueOf(1000 + v1 + (32 * v2));
+            str = s.charAt(1) + str.substring(1, lastpos - 1) + s.charAt(2) + s.charAt(3);
+            voweled = true;
+        } else if (str.charAt(0) == 'U') { // v.1.50 debug decoding of U+alldigitmapcode
             voweled = true;
             str = str.substring(1);
             dotpos--;

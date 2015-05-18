@@ -33,8 +33,7 @@ public enum ParentTerritory {
     MEX(Territory.MEX),
     CAN(Territory.CAN),
     RUS(Territory.RUS),
-    CHN(Territory.CHN),
-    ATA(Territory.ATA);
+    CHN(Territory.CHN);
 
     @Nonnull
     public Territory getTerritory() {

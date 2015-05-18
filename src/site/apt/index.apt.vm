@@ -11,8 +11,7 @@ Release Notes
 
 Code Style Settings for IntelliJ IDEA
 
-    The Java code uses the IntelliJ IDEA code style settings as specified in:
-    <<{{{./IntelliJ.html}IntelliJ IDEA Code Style Settings}}>>.
+    The Java code uses the default IntelliJ IDEA code style settings for Java.
 
 How To Build The Mapcode Library JAR File
 

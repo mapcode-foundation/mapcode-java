@@ -54,7 +54,7 @@ class Encoder {
     // ----------------------------------------------------------------------
 
     private final static char[] encode_chars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
-            'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
+            'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z', 'A', 'E', 'U'};
 
     @Nonnull
     private static List<Mapcode> encode(final double argLatDeg, final double argLonDeg,
@@ -134,7 +134,7 @@ class Encoder {
                 }
 
                 if (mapcode.length() > 4) {
-                    mapcode = aeuPack(mapcode);
+                    mapcode = aeuPack(mapcode, false);
 
                     Territory encodeTerritory = currentEncodeTerritory;
                     if (stateOverride != null) {
@@ -446,7 +446,7 @@ class Encoder {
         return "";
     }
 
-    private static String aeuPack(final String argStr) {
+    private static String aeuPack(final String argStr, final boolean argShort) {
         String str = argStr;
         int dotpos = -9;
         int rlen = str.length();
@@ -471,11 +471,13 @@ class Encoder {
         if ((rlen - 2) > dotpos) {
             // does r have a dot, AND at least 2 chars
             // after the dot?
-            final int v = (((((int) str.charAt(rlen - 2)) - 48) * 10) + ((int) str.charAt(rlen - 1))) - 48;
-            final int last = v % 34;
-            final char[] vowels = {'A', 'E', 'U'};
-            str =
-                    str.substring(0, rlen - 2) + vowels[v / 34] + (last < 31 ? encode_chars[last] : vowels[last - 31]);
+            if (argShort) {
+                final int v = ((((int) str.charAt(0)) - 48) * 100) + ((((int) str.charAt(rlen - 2)) - 48) * 10) + (((int) str.charAt(rlen - 1)) - 48);
+                return 'A' + str.substring(1, rlen - 2) + encode_chars[v / 32] + encode_chars[v % 32] + rest;
+            } else {
+                final int v = (((((int) str.charAt(rlen - 2)) - 48) * 10) + ((int) str.charAt(rlen - 1))) - 48;
+                str = str.substring(0, rlen - 2) + encode_chars[31 + (v / 34)] + encode_chars[v % 34];
+            }
         }
         return str + rest;
     }

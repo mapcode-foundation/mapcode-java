@@ -18,10 +18,7 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.mapcode.CheckArgs.checkNonnull;
 import static com.mapcode.CheckArgs.checkRange;
@@ -42,7 +39,7 @@ public enum Territory {
     BRA(409, "Brazil", null, new String[]{"BR"}),
     RUS(496, "Russia", null, new String[]{"RU"}),
     CHN(528, "China", null, new String[]{"CN"}),
-    ATA(540, "Antarctica"),
+    ATA(531, "Antarctica"),
 
     VAT(0, "Vatican City", null, null, new String[]{"Holy See)"}),
     MCO(1, "Monaco"),
@@ -52,10 +49,10 @@ public enum Territory {
     BLM(5, "Saint-Barthelemy"),
     NRU(6, "Nauru"),
     TUV(7, "Tuvalu"),
-    MAC(8, "Macau", null, new String[]{"CN-92", "CHN-92", "CN-MC", "CHN-MC"}),
+    MAC(8, "Macau", null, new String[]{"CN-92", "CHN-92", "CN-MC", "CHN-MC"}, new String[]{"Aomen"}),
     SXM(9, "Sint Maarten"),
     MAF(10, "Saint-Martin"),
-    NFK(11, "Norfolk and Philip Island", null, new String[]{"AU-NI", "AUS-NI", "AU-NF", "AUS-NF"},
+    NFK(11, "Norfolk and Philip Island", null, new String[]{"AU-NF", "AUS-NF"},
             new String[]{"Philip Island"}),
     PCN(12, "Pitcairn Islands"),
     BVT(13, "Bouvet Island"),
@@ -86,7 +83,7 @@ public enum Territory {
     GRD(37, "Grenada"),
     VIR(38, "US Virgin Islands", null, new String[]{"US-VI", "USA-VI"}, new String[]{"Virgin Islands, US"}),
     MYT(39, "Mayotte"),
-    SJM(40, "Svalbard and Jan Mayen", null, null, new String[]{"Jan Mayen"}),
+    SJM(40, "Svalbard and Jan Mayen", null, null, new String[]{"Jan Mayen", "Spitsbergen"}),
     VCT(41, "Saint Vincent and the Grenadines", null, null, new String[]{"Grenadines"}),
     HMD(42, "Heard Island and McDonald Islands", null, new String[]{"AU-HM", "AUS-HM"},
             new String[]{"McDonald Islands"}),
@@ -108,7 +105,7 @@ public enum Territory {
     KIR(58, "Kiribati"),
     TCA(59, "Turks and Caicos Islands", null, null, new String[]{"Caicos Islands"}),
     STP(60, "Sao Tome and Principe", null, null, new String[]{"Principe"}),
-    HKG(61, "Hong Kong", null, new String[]{"CN-91", "CHN-91", "CN-HK", "CHN-HK"}),
+    HKG(61, "Hong Kong", null, new String[]{"CN-91", "CHN-91", "CN-HK", "CHN-HK"}, new String[]{"Xianggang"}),
     MTQ(62, "Martinique"),
     FRO(63, "Faroe Islands"),
     GLP(64, "Guadeloupe"),
@@ -264,7 +261,7 @@ public enum Territory {
     NAM(213, "Namibia"),
     VEN(214, "Venezuela"),
     NGA(215, "Nigeria"),
-    TZA(216, "Tanzania", null, new String[]{"EAZ"}),
+    TZA(216, "Tanzania"),
     EGY(217, "Egypt"),
     MRT(218, "Mauritania"),
     BOL(219, "Bolivia"),
@@ -330,7 +327,7 @@ public enum Territory {
     IN_MN(279, "Manipur", ParentTerritory.IND),
     IN_TR(280, "Tripura", ParentTerritory.IND),
     IN_MZ(281, "Mizoram", ParentTerritory.IND),
-    IN_SK(282, "Sikkim", ParentTerritory.IND, new String[]{"IN-SKM"}),
+    IN_SK(282, "Sikkim", ParentTerritory.IND),
     IN_PB(283, "Punjab", ParentTerritory.IND),
     IN_HR(284, "Haryana", ParentTerritory.IND),
     IN_AR(285, "Arunachal Pradesh", ParentTerritory.IND),
@@ -339,7 +336,7 @@ public enum Territory {
     IN_UT(288, "Uttarakhand", ParentTerritory.IND, new String[]{"IN-UK"}),
     IN_GA(289, "Goa", ParentTerritory.IND),
     IN_KL(290, "Kerala", ParentTerritory.IND),
-    IN_TN(291, "Tamil Nuda", ParentTerritory.IND),
+    IN_TN(291, "Tamil Nadu", ParentTerritory.IND),
     IN_HP(292, "Himachal Pradesh", ParentTerritory.IND),
     IN_JK(293, "Jammu and Kashmir", ParentTerritory.IND),
     IN_CT(294, "Chhattisgarh", ParentTerritory.IND, new String[]{"IN-CG"}),
@@ -357,13 +354,13 @@ public enum Territory {
     IN_PY(306, "Puducherry", ParentTerritory.IND),
     AU_NSW(307, "New South Wales", ParentTerritory.AUS),
     AU_ACT(308, "Australian Capital Territory", ParentTerritory.AUS),
-    AU_JBT(309, "Jervis Bay Territory", ParentTerritory.AUS, new String[]{"AU-JB"}),
+    AU_JBT(309, "Jervis Bay Territory", ParentTerritory.AUS),
     AU_NT(310, "Northern Territory", ParentTerritory.AUS),
     AU_SA(311, "South Australia", ParentTerritory.AUS),
-    AU_TAS(312, "Tasmania", ParentTerritory.AUS, new String[]{"AU-TS"}),
+    AU_TAS(312, "Tasmania", ParentTerritory.AUS),
     AU_VIC(313, "Victoria", ParentTerritory.AUS),
     AU_WA(314, "Western Australia", ParentTerritory.AUS),
-    AU_QLD(315, "Queensland", ParentTerritory.AUS, new String[]{"AU-QL"}),
+    AU_QLD(315, "Queensland", ParentTerritory.AUS),
     BR_DF(316, "Distrito Federal", ParentTerritory.BRA),
     BR_SE(317, "Sergipe", ParentTerritory.BRA),
     BR_AL(318, "Alagoas", ParentTerritory.BRA),
@@ -571,16 +568,7 @@ public enum Territory {
     CN_XJ(527, "Xinjiang Uyghur", ParentTerritory.CHN, new String[]{"CN-65"}),
     UMI(529, "United States Minor Outlying Islands", null, new String[]{"US-UM", "USA-UM", "JTN"}),
     CPT(530, "Clipperton Island"),
-    AT0(531, "Macquarie Island", ParentTerritory.ATA),
-    AT1(532, "Ross Dependency", ParentTerritory.ATA),
-    AT2(533, "Adelie Land", ParentTerritory.ATA),
-    AT3(534, "Australian Antarctic Territory", ParentTerritory.ATA),
-    AT4(535, "Queen Maud Land", ParentTerritory.ATA),
-    AT5(536, "British Antarctic Territory", ParentTerritory.ATA),
-    AT6(537, "Chile Antartica", ParentTerritory.ATA),
-    AT7(538, "Argentine Antarctica", ParentTerritory.ATA),
-    AT8(539, "Peter 1 Island", ParentTerritory.ATA),
-    AAA(541, "International", null, null, new String[]{"Worldwide", "Earth"});
+    AAA(532, "International", null, null, new String[]{"Worldwide", "Earth"});
 
     private final int territoryCode;
     @Nonnull
@@ -802,15 +790,22 @@ public enum Territory {
      * Static initialization of the static data structures.
      */
     static {
+        final String errorPrefix = "Initializing error: ";
         codeList = new ArrayList<>();
         nameMap = new HashMap<>();
         parentList = new ArrayList<>();
         final ArrayList<Integer> territoryCodeList = new ArrayList<>();
+        final Set<String> aliasesSet = new HashSet<>();
 
         for (final Territory territory : Territory.values()) {
             final int territoryCode = territory.getTerritoryCode();
-            assert (0 <= territoryCode) && (territoryCode < Territory.values().length) : territoryCode;
-            assert !territoryCodeList.contains(territoryCode) : territoryCode;
+            if ((territoryCode < 0) || (territoryCode >= Territory.values().length)) {
+                throw new ExceptionInInitializerError(errorPrefix + "territory code out of range: " + territoryCode);
+
+            }
+            if (territoryCodeList.contains(territoryCode)) {
+                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory code: " + territoryCode);
+            }
             territoryCodeList.add(territory.getTerritoryCode());
 
             final int initialCodeListSize = codeList.size();
@@ -823,6 +818,10 @@ public enum Territory {
             }
             addNameWithParentVariants(territory.toString(), territory);
             for (final String alias : territory.aliases) {
+                if (aliasesSet.contains(alias)) {
+                    throw new ExceptionInInitializerError(errorPrefix + "non-unique alias: " + alias);
+                }
+                aliasesSet.add(alias);
                 addNameWithParentVariants(alias, territory);
             }
         }
@@ -932,7 +931,7 @@ public enum Territory {
                 for (int i = 0; i < territories.size(); i++) {
 
                     final Territory existingTerritoryParent = territories.get(i).getParentTerritory();
-                    if (existingTerritoryParent == null && territories.get(i).toString().contentEquals(name)) {
+                    if ((existingTerritoryParent == null) && territories.get(i).toString().contentEquals(name)) {
                         // A primary identifier always takes priority.
                         return;
                     }
