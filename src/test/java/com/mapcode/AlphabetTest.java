@@ -67,17 +67,26 @@ public class AlphabetTest {
         final Point p1 = MapcodeCodec.decode(a1);
         final String y1 = MapcodeCodec.encodeToShortest(p1).getMapcodePrecision(0);
         final String b1 = Mapcode.convertToAlphabet(y1, Alphabet.GREEK);
-        final String d1 = Mapcode.convertToAlphabet(y1, Alphabet.ROMAN);
-        LOG.info("a1 = {}, b1 = {}, c1 = {}, d1 = {}, y1 = {}, p1 = {}", a1, b1, d1, y1, p1);
+        final String c1 = Mapcode.convertToAscii(b1);
+        final String d1 = Mapcode.convertToAlphabet(b1, Alphabet.ROMAN);
+        LOG.info("a1 = {}, b1 = {}, c1 = {}, d1 = {}, y1 = {}, p1 = {}", a1, b1, c1, d1, y1, p1);
         assertEquals(a1, y1);
+        assertEquals(a1, c1);
         assertEquals(a1, d1);
+    }
 
+    @Test
+    public void convertGreek3() throws Exception {
+        LOG.info("convertGreek3");
         final String a2 = "36228.92UW-TK";
         final Point p2 = MapcodeCodec.decode(a2);
         final String y2 = MapcodeCodec.encodeToShortest(p2).getMapcodePrecision(2);
         final String b2 = Mapcode.convertToAlphabet(y2, Alphabet.GREEK);
-        final String c2 = Mapcode.convertToAlphabet(b2, Alphabet.ROMAN);
-        LOG.info("a2 = {}, b2 = {}, c2 = {}, y2 = {}, p2 = {}", a2, b2, c2, y2, p2);
+        final String c2 = Mapcode.convertToAscii(b2);
+        final String d2 = Mapcode.convertToAlphabet(b2, Alphabet.ROMAN);
+        LOG.info("a2 = {}, b2 = {}, c2 = {}, d2 = {}, y2 = {}, p2 = {}", a2, b2, c2, d2, y2, p2);
+        assertEquals(a2, y2);
         assertEquals(a2, c2);
+        assertEquals(a2, d2);
     }
 }
