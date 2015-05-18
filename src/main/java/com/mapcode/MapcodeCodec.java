@@ -73,6 +73,13 @@ public final class MapcodeCodec {
         return results;
     }
 
+    // Convenience method.
+    @Nonnull
+    public static List<Mapcode> encode(@Nonnull final Point point) throws IllegalArgumentException {
+        checkNonnull("point", point);
+        return encode(point.getLatDeg(), point.getLonDeg());
+    }
+
     /**
      * Encode a lat/lon pair to a mapcode with territory information, for a specific territory. This produces a
      * potentially empty list of mapcodes (empty if the lat/lon does not fall within the territory for mapcodes).
@@ -107,6 +114,15 @@ public final class MapcodeCodec {
         return results;
     }
 
+    // Convenience method.
+    @Nonnull
+    public static List<Mapcode> encode(
+            @Nonnull final Point point,
+            @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException {
+        checkNonnull("point", point);
+        return encode(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
+    }
+
     /**
      * Encode a lat/lon pair to its shortest mapcode without specifying territory information. For a valid lat/lon pair,
      * this will always yield a mapcode.
@@ -128,6 +144,13 @@ public final class MapcodeCodec {
         assert results != null;
         assert results.size() == 1;
         return results.get(0);
+    }
+
+    // Convenience method.
+    @Nonnull
+    public static Mapcode encodeToShortest(@Nonnull final Point point) throws IllegalArgumentException {
+        checkNonnull("point", point);
+        return encodeToShortest(point.getLatDeg(), point.getLonDeg());
     }
 
     /**
@@ -162,6 +185,15 @@ public final class MapcodeCodec {
         return results.get(0);
     }
 
+    // Convenience method.
+    @Nonnull
+    public static Mapcode encodeToShortest(
+            @Nonnull final Point point,
+            @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
+        checkNonnull("point", point);
+        return encodeToShortest(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
+    }
+
     /**
      * Encode a lat/lon pair to its unambiguous, international mapcode.
      *
@@ -182,6 +214,13 @@ public final class MapcodeCodec {
         assert results != null;
         assert results.size() >= 1;
         return results.get(results.size() - 1);
+    }
+
+    // Convenience method.
+    @Nonnull
+    public static Mapcode encodeToInternational(@Nonnull final Point point) throws IllegalArgumentException {
+        checkNonnull("point", point);
+        return encodeToInternational(point.getLatDeg(), point.getLonDeg());
     }
 
     /**

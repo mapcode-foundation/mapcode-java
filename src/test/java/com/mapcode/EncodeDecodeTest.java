@@ -40,7 +40,7 @@ public class EncodeDecodeTest {
     @Test
     public void encodeDecodeTestFixedSeed() throws Exception {
         LOG.info("encodeDecodeTestFixedSeed");
-        doEncodeDecode(123212321);
+        doEncodeDecode(1431977987367L);
     }
 
     @Test
@@ -112,6 +112,14 @@ public class EncodeDecodeTest {
                             distancePrecision1Meters < Mapcode.PRECISION_1_MAX_DELTA_METERS);
                     assertTrue("distancePrecision2Meters=" + distancePrecision2Meters + " >= " + Mapcode.PRECISION_2_MAX_DELTA_METERS,
                             distancePrecision2Meters < Mapcode.PRECISION_2_MAX_DELTA_METERS);
+
+                    // Check conversion from/to alphabets.
+                    for (final Alphabet alphabet : Alphabet.values()) {
+                        final String converted = Mapcode.convertToAlphabet(mapcodePrecision2, alphabet);
+                        final String reverted = Mapcode.convertToAscii(converted);
+                        assertEquals("alphabet=" + alphabet + ", original=" + mapcodePrecision2 +
+                                ", converted=" + converted + ", reverted=" + reverted, mapcodePrecision2, reverted);
+                    }
 
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, result={}, mapcode={}, territory={} --> " +

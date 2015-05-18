@@ -20,6 +20,11 @@ Release Notes (Version ${project.version})
 
     * Retired legacy Antarctica claims AT0 through AT8.
 
+    * Added convencience methods for <<<MapcodeCodec>>> to accept <<<Point>>> for all encode functions
+      as well (not just <<<latDeg>>>, <<<lonDeg>>>).
+
+    * Added alphabet support to convert mapcodes between <<<Alphabet>>>s.
+
     []
 
 

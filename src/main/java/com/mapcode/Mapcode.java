@@ -21,6 +21,9 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.mapcode.CheckArgs.checkMapcode;
+import static com.mapcode.CheckArgs.checkNonnull;
+
 /**
  * This class defines a single mapcode encoding result, including the mapcode itself and the
  * territory definition.
@@ -58,12 +61,7 @@ public final class Mapcode {
             @Nonnull final String mapcode,
             @Nonnull final Territory territory) throws IllegalArgumentException {
 
-        // Check mapcode format.
-        if (!isValidMapcodeFormat(mapcode)) {
-            throw new IllegalArgumentException(mapcode + " is not a correctly formatted mapcode; " +
-                    "the regular expression for the mapcode syntax is: " + REGEX_MAPCODE_FORMAT);
-        }
-
+        checkMapcode("mapcode", mapcode);
         final String mapcodeUppercase = mapcode.toUpperCase();
         this.mapcodePrecision2 = mapcodeUppercase;
         if (mapcodeUppercase.contains("-")) {
@@ -252,18 +250,33 @@ public final class Mapcode {
      * mapcode representing a location on Earth.
      */
     public static boolean isValidMapcodeFormat(@Nonnull final String mapcode) {
+        checkNonnull("mapcode", mapcode);
         return getMapcodeFormatType(mapcode.toUpperCase()) != MapcodeFormatType.MAPCODE_TYPE_INVALID;
     }
 
     /**
-     * Convert a mapcode which potentially contains Unicode characters, to an ASCII veriant.
+     * Convert a mapcode which potentially contains Unicode characters, to an ASCII variant.
      *
      * @param mapcode Mapcode, with optional Unicode characters.
      * @return ASCII, non-Unicode string.
      */
     @Nonnull
     public static String convertToAscii(@Nonnull final String mapcode) {
+        // Cannot call: checkMapcode() - recursive.
         return Decoder.decodeUTF16(mapcode.toUpperCase());
+    }
+
+    /**
+     * Convert a mapcode into the same mapcode using a different (or the same) alphabet.
+     *
+     * @param mapcode  Mapcode to be converted.
+     * @param alphabet Alphabet to convert to, may contain Unicode characters.
+     * @return Converted mapcode.
+     */
+    @Nonnull
+    public static String convertToAlphabet(@Nonnull final String mapcode, @Nonnull final Alphabet alphabet) {
+        checkMapcode("mapcode", mapcode);
+        return Decoder.encodeToAlphabetCode(mapcode.toUpperCase(), alphabet.code);
     }
 
     /**
