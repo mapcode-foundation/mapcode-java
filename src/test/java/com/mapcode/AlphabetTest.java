@@ -29,7 +29,6 @@ import static org.junit.Assert.assertEquals;
 public class AlphabetTest {
     private static final Logger LOG = LoggerFactory.getLogger(AlphabetTest.class);
 
-    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void testConvertToAlphabet() throws Exception {
         LOG.info("testConvertToAlphabet");
@@ -37,14 +36,11 @@ public class AlphabetTest {
         convertCodeInAlphabet("\u0397\u03a0.\u03982-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
         convertCodeInAlphabet("GRC \u0397\u03a0.\u03982-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
 
-        convertCodeInAlphabet("XX.XX", Territory.NLD, Alphabet.GREEK, 0);
-        convertCodeInAlphabet("XX.XX-12", Territory.NLD, Alphabet.GREEK, 2);
-
-        convertCodeInAlphabet("NLD XX.XX", Territory.USA, Alphabet.GREEK, 0);
-        convertCodeInAlphabet("NLD XX.XX-12", Territory.USA, Alphabet.GREEK, 2);
-
-        convertCodeInAlphabet("36128.92UW", Territory.GRC, Alphabet.GREEK, 0);
-        convertCodeInAlphabet("36228.92UW-TK", Territory.GRC, Alphabet.GREEK, 2);
+        final String code = "26.53UK";
+        final String codeGreek = Mapcode.convertMapcodeToAlphabet(code, Alphabet.GREEK);
+        final String codeAscii = Mapcode.convertMapcodeToPlainAscii(codeGreek);
+        LOG.info("code = {}, codeGreek = {}, codeAscii = {}", code, codeGreek, codeAscii);
+        assertEquals(code, codeAscii);
     }
 
     private static void convertCodeInAlphabet(

@@ -25,6 +25,8 @@ import javax.annotation.Nullable;
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
 
+    private static final char GREEK_CAPITAL_ALPHA = 'Α';
+
     private Decoder() {
         // Prevent instantiation.
     }
@@ -216,33 +218,33 @@ class Decoder {
     };
 
     private final static Unicode2Ascii[] UNICODE2ASCII = {
-            new Unicode2Ascii(0x0041, 0x005a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), // Roman
-            new Unicode2Ascii(0x0391, 0x03a9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
-            new Unicode2Ascii(0x0410, 0x042f, "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"), // Cyrillic
-            new Unicode2Ascii(0x05d0, 0x05ea, "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"), // Hebrew
-            new Unicode2Ascii(0x0905, 0x0939, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Hindi
-            new Unicode2Ascii(0x0d07, 0x0d39, "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"), // Malai
-            new Unicode2Ascii(0x10a0, 0x10bf, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch
+            new Unicode2Ascii(0x0041, 0x005a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),                                                        // Roman
+            new Unicode2Ascii(0x0391, 0x03a9, "ABGDFZHQIKLMNCOJP?STYVXRW"),                                                         // Greek
+            new Unicode2Ascii(0x0410, 0x042f, "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"),                                                  // Cyrillic
+            new Unicode2Ascii(0x05d0, 0x05ea, "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"),                                                       // Hebrew
+            new Unicode2Ascii(0x0905, 0x0939, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Hindi
+            new Unicode2Ascii(0x0d07, 0x0d39, "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"),                               // Malai
+            new Unicode2Ascii(0x10a0, 0x10bf, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),                                                  // Georgian
             new Unicode2Ascii(0x30a2, 0x30f2, "A?I?O?U?EB?C?D?F?G?H???J???????K??????L?M?N?????P??Q??R??S?????TV?????WX???Y????Z"), // Katakana
-            new Unicode2Ascii(0x0e01, 0x0e32, "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"), // Thai
-            new Unicode2Ascii(0x0e81, 0x0ec6, "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"), // Lao
-            new Unicode2Ascii(0x0532, 0x0556, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
-            new Unicode2Ascii(0x0985, 0x09b9, "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"), // Bengali
-            new Unicode2Ascii(0x0a05, 0x0a39, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Gurmukhi
-            new Unicode2Ascii(0x0f40, 0x0f66, "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"), // Tibetan
+            new Unicode2Ascii(0x0e01, 0x0e32, "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"),                                // Thai
+            new Unicode2Ascii(0x0e81, 0x0ec6, "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"),            // Lao
+            new Unicode2Ascii(0x0532, 0x0556, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"),                                             // Armenian
+            new Unicode2Ascii(0x0985, 0x09b9, "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"),                             // Bengali
+            new Unicode2Ascii(0x0a05, 0x0a39, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Gurmukhi
+            new Unicode2Ascii(0x0f40, 0x0f66, "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"),                                           // Tibetan
 
-            new Unicode2Ascii(0x0966, 0x096f, ""), // Hindi
-            new Unicode2Ascii(0x0d66, 0x0d6f, ""), // Malai
-            new Unicode2Ascii(0x0e50, 0x0e59, ""), // Thai
-            new Unicode2Ascii(0x09e6, 0x09ef, ""), // Bengali
-            new Unicode2Ascii(0x0a66, 0x0a6f, ""), // Gurmukhi
-            new Unicode2Ascii(0x0f20, 0x0f29, ""), // Tibetan
+            new Unicode2Ascii(0x0966, 0x096f, ""),  // Hindi
+            new Unicode2Ascii(0x0d66, 0x0d6f, ""),  // Malai
+            new Unicode2Ascii(0x0e50, 0x0e59, ""),  // Thai
+            new Unicode2Ascii(0x09e6, 0x09ef, ""),  // Bengali
+            new Unicode2Ascii(0x0a66, 0x0a6f, ""),  // Gurmukhi
+            new Unicode2Ascii(0x0f20, 0x0f29, ""),  // Tibetan
 
-            // lowercase variants: greek, georgisch
-            new Unicode2Ascii(0x03B1, 0x03c9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
+            // lowercase variants: greek, georgian
+            new Unicode2Ascii(0x03B1, 0x03c9, "ABGDFZHQIKLMNCOJP?STYVXRW"),                                                         // Greek
             // lowercase
-            new Unicode2Ascii(0x10d0, 0x10ef, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch lowercase
-            new Unicode2Ascii(0x0562, 0x0586, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
+            new Unicode2Ascii(0x10d0, 0x10ef, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),                                                  // Georgisch lowercase
+            new Unicode2Ascii(0x0562, 0x0586, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"),                                             // Armenian
             // lowercase
             new Unicode2Ascii(0, 0, null)
     };
@@ -508,9 +510,7 @@ class Decoder {
                  * }
                  */
 
-                final Point retval = add2res(cornery, cornerx, dividerx << 2, dividery, -1, extrapostfix);
-
-                return retval;
+                return add2res(cornery, cornerx, dividerx << 2, dividery, -1, extrapostfix);
             }
             storageStart += product;
             i++;
@@ -602,39 +602,47 @@ class Decoder {
     /**
      * This method decodes a Unicode string to ASCII. Package private for access by other modules.
      *
-     * @param str Unicode string.
+     * @param mapcode Unicode string.
      * @return ASCII string.
      */
-    static String decodeUTF16(final String str) {
-        final StringBuilder asciibuf = new StringBuilder();
-        for (int index = 0; index < str.length(); index++) {
-            if (str.charAt(index) == '.') {
-                asciibuf.append(str.charAt(index));
-            } else if ((str.charAt(index) >= 1) && (str.charAt(index) <= 'z')) {
+    static String decodeUTF16(final String mapcode) {
+        String result;
+        final StringBuilder asciiBuf = new StringBuilder();
+        for (int index = 0; index < mapcode.length(); index++) {
+            final char ch = mapcode.charAt(index);
+            if (ch == '.') {
+                asciiBuf.append(ch);
+            } else if ((ch >= 1) && (ch <= 'z')) {
                 // normal ascii
-                asciibuf.append(str.charAt(index));
+                asciiBuf.append(ch);
             } else {
                 boolean found = false;
                 for (int i = 0; UNICODE2ASCII[i].min != 0; i++) {
-                    if ((str.charAt(index) >= UNICODE2ASCII[i].min)
-                            && (str.charAt(index) <= UNICODE2ASCII[i].max)) {
-                        String convert = UNICODE2ASCII[i].convert;
-                        if (convert == null) {
-                            convert = "0123456789";
-                        }
-                        asciibuf.append(convert.charAt(((int) str.charAt(index)) - UNICODE2ASCII[i].min));
+                    if ((ch >= UNICODE2ASCII[i].min) && (ch <= UNICODE2ASCII[i].max)) {
+                        final String convert = (UNICODE2ASCII[i].convert != null) ? UNICODE2ASCII[i].convert : "0123456789";
+                        final int pos = ((int) ch) - UNICODE2ASCII[i].min;
+                        asciiBuf.append(convert.charAt(pos));
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    asciibuf.append('?');
+                    asciiBuf.append('?');
                     break;
                 }
             }
         }
+        result = asciiBuf.toString();
 
-        return asciibuf.toString();
+        // Repack if this was a Greek 'alpha' code. This will have been converted to a regular 'A' after one iteration.
+        if (mapcode.startsWith(String.valueOf(GREEK_CAPITAL_ALPHA))) {
+            final String unpacked = aeuUnpack(result);
+            if (unpacked.isEmpty()) {
+                throw new AssertionError("decodeUTF16: cannot decode " + mapcode);
+            }
+            result = Encoder.aeuPack(unpacked, false);
+        }
+        return result;
     }
 
     static String encodeUTF16(final String string, final int alphabet) {
@@ -657,7 +665,9 @@ class Decoder {
 
     static String encodeToAlphabetCode(final String mapcode, int alphabetCode) {
         if (ASCII2LANGUAGE[alphabetCode][4] == 0x003f) {
-            if (mapcode.matches("^.*[EUeu].*")) {
+
+            // Alphabet does not contain 'E'.
+            if (mapcode.matches("^.*[EU].*")) {
                 final String unpacked = aeuUnpack(mapcode);
                 if (unpacked.isEmpty()) {
                     throw new AssertionError("encodeToAlphabetCode: cannot encode '" + mapcode +

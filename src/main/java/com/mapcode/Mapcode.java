@@ -392,7 +392,7 @@ public final class Mapcode {
      * @throws IllegalArgumentException If mapcode has incorrect syntax.
      */
     @Nonnull
-    private static String convertMapcodeToAlphabet(@Nonnull final String mapcode, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
+    static String convertMapcodeToAlphabet(@Nonnull final String mapcode, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
         checkMapcodeCode("mapcode", mapcode);
         return (alphabet != null) ? Decoder.encodeToAlphabetCode(mapcode.toUpperCase(), alphabet.code) : mapcode.toUpperCase();
     }
