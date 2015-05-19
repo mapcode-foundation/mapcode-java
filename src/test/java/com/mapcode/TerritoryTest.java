@@ -45,9 +45,11 @@ public class TerritoryTest {
     @Test
     public void disambiguateMNTest1() throws Exception {
         LOG.info("disambiguateMNTest2");
-        final Territory territory1 = Territory.fromString("IND-MN");
+        final Territory territory0 = Territory.fromString("IND-MN");
+        final Territory territory1 = Territory.fromString("IN-MN");
         final Territory territory2 = Territory.fromString("MN", ParentTerritory.IND);
         final Territory territory3 = Territory.fromString("MN", ParentTerritory.USA);
+        assertEquals(territory0, territory1);
         assertEquals(territory1, territory2);
         assertNotEquals(territory2, territory3);
     }
@@ -69,6 +71,9 @@ public class TerritoryTest {
         assertEquals(Territory.CHN, Territory.fromString("CN"));
         assertEquals(Territory.AUS, Territory.fromString("AU"));
         assertEquals(Territory.US_IN, Territory.fromString("IN"));
+        assertEquals(Territory.US_IN, Territory.fromString("US-IN"));
+        assertEquals(Territory.US_IN, Territory.fromString("USA-IN"));
+        assertEquals(Territory.RU_IN, Territory.fromString("RUS-IN"));
         assertEquals(Territory.IN_BR, Territory.fromString("BR"));
         assertEquals(Territory.IN_AS, Territory.fromString("AS"));
     }

@@ -65,13 +65,13 @@ public class EncodeDecodeTest {
             final double lonDeg = encode.getLonDeg();
 
             // Check local and international codes.
-            final Mapcode resultInternational = MapcodeCodec.encodeToInternational(latDeg, lonDeg);
+            final Mapcode mapcodeInternational = MapcodeCodec.encodeToInternational(latDeg, lonDeg);
 
             // Check encodeToShortest and encodeToInternational.
             final List<Mapcode> resultsAll = MapcodeCodec.encode(latDeg, lonDeg);
             assertTrue(!resultsAll.isEmpty());
             assertEquals("encodeToInternational failed, result=" + resultsAll,
-                    resultsAll.get(resultsAll.size() - 1), resultInternational);
+                    resultsAll.get(resultsAll.size() - 1), mapcodeInternational);
 
             // Every point must have a Mapcode.
             boolean found = false;
@@ -79,7 +79,7 @@ public class EncodeDecodeTest {
             // Walk through the list in reverse order to get International first.
             for (final Territory territory : Territory.values()) {
                 final List<Mapcode> resultsLimited = MapcodeCodec.encode(latDeg, lonDeg, territory);
-                for (final Mapcode result : resultsLimited) {
+                for (final Mapcode mapcode : resultsLimited) {
                     found = true;
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, encode={}, {} {} --> results={}",
@@ -87,16 +87,16 @@ public class EncodeDecodeTest {
                     }
 
                     // Check if the territory matches.
-                    assertEquals(territory, result.getTerritory());
+                    assertEquals(territory, mapcode.getTerritory());
 
                     // Check max distance.
-                    final String mapcodePrecision0 = result.getMapcodePrecision(0);
-                    final String mapcodePrecision1 = result.getMapcodePrecision(1);
-                    final String mapcodePrecision2 = result.getMapcodePrecision(2);
+                    final String codePrecision0 = mapcode.getCode(0);
+                    final String codePrecision1 = mapcode.getCode(1);
+                    final String codePrecision2 = mapcode.getCode(2);
 
-                    final Point decodeLocationPrecision0 = MapcodeCodec.decode(mapcodePrecision0, territory);
-                    final Point decodeLocationPrecision1 = MapcodeCodec.decode(mapcodePrecision1, territory);
-                    final Point decodeLocationPrecision2 = MapcodeCodec.decode(mapcodePrecision2, territory);
+                    final Point decodeLocationPrecision0 = MapcodeCodec.decode(codePrecision0, territory);
+                    final Point decodeLocationPrecision1 = MapcodeCodec.decode(codePrecision1, territory);
+                    final Point decodeLocationPrecision2 = MapcodeCodec.decode(codePrecision2, territory);
 
                     final double distancePrecision0Meters = Point.distanceInMeters(encode, decodeLocationPrecision0);
                     final double distancePrecision1Meters = Point.distanceInMeters(encode, decodeLocationPrecision1);
@@ -106,25 +106,26 @@ public class EncodeDecodeTest {
                     maxDistancePrecision1Meters = Math.max(maxDistancePrecision1Meters, distancePrecision1Meters);
                     maxDistancePrecision2Meters = Math.max(maxDistancePrecision2Meters, distancePrecision2Meters);
 
-                    assertTrue("distancePrecision0Meters=" + distancePrecision0Meters + " >= " + Mapcode.PRECISION_0_MAX_DELTA_METERS,
-                            distancePrecision0Meters < Mapcode.PRECISION_0_MAX_DELTA_METERS);
-                    assertTrue("distancePrecision1Meters=" + distancePrecision1Meters + " >= " + Mapcode.PRECISION_1_MAX_DELTA_METERS,
-                            distancePrecision1Meters < Mapcode.PRECISION_1_MAX_DELTA_METERS);
-                    assertTrue("distancePrecision2Meters=" + distancePrecision2Meters + " >= " + Mapcode.PRECISION_2_MAX_DELTA_METERS,
-                            distancePrecision2Meters < Mapcode.PRECISION_2_MAX_DELTA_METERS);
+                    assertTrue("distancePrecision0Meters=" + distancePrecision0Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(0),
+                            distancePrecision0Meters < Mapcode.getSafeMaxOffsetInMeters(0));
+                    assertTrue("distancePrecision1Meters=" + distancePrecision1Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(1),
+                            distancePrecision1Meters < Mapcode.getSafeMaxOffsetInMeters(1));
+                    assertTrue("distancePrecision2Meters=" + distancePrecision2Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(2),
+                            distancePrecision2Meters < Mapcode.getSafeMaxOffsetInMeters(2));
 
                     // Check conversion from/to alphabets.
                     for (final Alphabet alphabet : Alphabet.values()) {
-                        final String converted = Mapcode.convertToAlphabet(mapcodePrecision2, alphabet);
-                        final String reverted = Mapcode.convertToAscii(converted);
-                        assertEquals("alphabet=" + alphabet + ", original=" + mapcodePrecision2 +
-                                ", converted=" + converted + ", reverted=" + reverted, mapcodePrecision2, reverted);
+                        final String mapcodeAlphabet = mapcode.getCode(alphabet);
+                        final String mapcodeAscii = Mapcode.convertMapcodeToPlainAscii(mapcodeAlphabet);
+                        assertEquals("alphabet=" + alphabet + ", original=" + codePrecision0 +
+                                        ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii,
+                                codePrecision0, mapcodeAscii);
                     }
 
                     if (showLogLine) {
                         LOG.info("encodeDecodeTest: #{}/{}, result={}, mapcode={}, territory={} --> " +
                                         "lat={}, lon={}; delta={}", i, NUMBER_OF_POINTS,
-                                result, mapcodePrecision0, territory.getFullName(), decodeLocationPrecision0.getLatDeg(),
+                                mapcode, codePrecision0, territory.getFullName(), decodeLocationPrecision0.getLatDeg(),
                                 decodeLocationPrecision0.getLonDeg(), distancePrecision0Meters);
                         LOG.info("");
                     }

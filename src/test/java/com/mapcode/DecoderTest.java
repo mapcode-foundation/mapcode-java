@@ -162,10 +162,20 @@ public class DecoderTest {
                 point.getLonMicroDeg());
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void invalidTerritory() throws Exception {
-        LOG.info("invalidTerritory");
-        MapcodeCodec.decode("NLD 49.4V", Territory.NLD);
+    @Test
+    public void validTerritory() throws Exception {
+        LOG.info("validTerritory");
+        final Point point1 = MapcodeCodec.decode("NLD 49.4V", Territory.NLD);
+        assertEquals("decode latitude", 52376514, point1.getLatMicroDeg());
+        assertEquals("decode longitude", 4908542, point1.getLonMicroDeg());
+
+        final Point point2 = MapcodeCodec.decode("NLD 49.4V", Territory.USA);
+        assertEquals("decode latitude", 52376514, point2.getLatMicroDeg());
+        assertEquals("decode longitude", 4908542, point2.getLonMicroDeg());
+
+        final Point point3 = MapcodeCodec.decode("NLD 49.4V");
+        assertEquals("decode latitude", 52376514, point3.getLatMicroDeg());
+        assertEquals("decode longitude", 4908542, point3.getLonMicroDeg());
     }
 
     @Test(expected = IllegalArgumentException.class)

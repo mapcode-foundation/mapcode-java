@@ -152,7 +152,7 @@ class Encoder {
                         results.add(newResult);
                     } else {
                         LOG.error("encode: Duplicate results found, newResult={}, results={} items",
-                                newResult.asInternationalISO(), results.size());
+                                newResult.getCodeWithTerritory(), results.size());
                     }
 
                     lastbasesubareaID = from;

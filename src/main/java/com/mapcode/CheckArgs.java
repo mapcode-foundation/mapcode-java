@@ -45,12 +45,12 @@ class CheckArgs {
         }
     }
 
-    static void checkMapcode(@Nonnull final String param, @Nullable final String mapcode)
+    static void checkMapcodeCode(@Nonnull final String param, @Nullable final String code)
             throws IllegalArgumentException {
-        checkNonnull(param, mapcode);
-        if (!isValidMapcodeFormat(mapcode)) {
-            throw new IllegalArgumentException(mapcode + " is not a correctly formatted mapcode; " +
-                    "the regular expression for the mapcode syntax is: " + Mapcode.REGEX_MAPCODE_FORMAT);
+        checkNonnull(param, code);
+        if (!isValidMapcodeFormat(code)) {
+            throw new IllegalArgumentException(code + " is not a correctly formatted mapcode code; " +
+                    "the regular expression for the mapcode code syntax is: " + Mapcode.REGEX_MAPCODE);
         }
     }
 }
