@@ -17,6 +17,7 @@
 package com.mapcode;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -82,11 +83,18 @@ public final class Mapcode {
      * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
      * approximately 10 x 10 meters (100 m2).
      *
+     * @param alphabet Alphabet.
      * @return Mapcode string.
      */
     @Nonnull
+    public String getMapcode(@Nullable final Alphabet alphabet) {
+        return convertToAlphabet(mapcodePrecision0, alphabet);
+    }
+
+    // Convencience method.
+    @Nonnull
     public String getMapcode() {
-        return mapcodePrecision0;
+        return convertToAlphabet(mapcodePrecision0, null);
     }
 
     /**
@@ -104,26 +112,27 @@ public final class Mapcode {
      *
      * The accuracy is slightly better than the figures above, but these figures are safe assumptions.
      *
-     * @return Mapcode string.
-     */
-    /**
-     * Alias for {@link #getMapcode}.
-     *
      * @param precision Precision. Range: 0..2.
      * @return Mapcode string.
      */
     @Nonnull
-    public String getMapcodePrecision(final int precision) {
+    public String getMapcodePrecision(final int precision, @Nullable final Alphabet alphabet) {
         switch (precision) {
             case 0:
-                return mapcodePrecision0;
+                return convertToAlphabet(mapcodePrecision0, alphabet);
             case 1:
-                return mapcodePrecision1;
+                return convertToAlphabet(mapcodePrecision1, alphabet);
             case 2:
-                return mapcodePrecision2;
+                return convertToAlphabet(mapcodePrecision2, alphabet);
             default:
                 throw new IllegalArgumentException("getMapcodePrecision: precision must be in [0..2]");
         }
+    }
+
+    // Convencience method.
+    @Nonnull
+    public String getMapcodePrecision(final int precision) {
+        return getMapcodePrecision(precision, null);
     }
 
     // Deprecated alias for getMapcodePrecision().
@@ -255,41 +264,23 @@ public final class Mapcode {
     }
 
     /**
-     * Convert a mapcode which potentially contains Unicode characters, to an ASCII variant.
-     *
-     * @param mapcode Mapcode, with optional Unicode characters.
-     * @return ASCII, non-Unicode string.
-     */
-    @Nonnull
-    public static String convertToAscii(@Nonnull final String mapcode) {
-        // Cannot call: checkMapcode() - recursive.
-        return Decoder.decodeUTF16(mapcode.toUpperCase());
-    }
-
-    /**
-     * Convert a mapcode into the same mapcode using a different (or the same) alphabet.
-     *
-     * @param mapcode  Mapcode to be converted.
-     * @param alphabet Alphabet to convert to, may contain Unicode characters.
-     * @return Converted mapcode.
-     */
-    @Nonnull
-    public static String convertToAlphabet(@Nonnull final String mapcode, @Nonnull final Alphabet alphabet) {
-        checkMapcode("mapcode", mapcode);
-        return Decoder.encodeToAlphabetCode(mapcode.toUpperCase(), alphabet.code);
-    }
-
-    /**
      * Return the local mapcode string, potentially ambiguous.
      *
      * Example:
      * 49.4V
      *
+     * @param alphabet Alphabet.
      * @return Local mapcode.
      */
     @Nonnull
+    public String asLocal(@Nullable final Alphabet alphabet) {
+        return getMapcode(alphabet);
+    }
+
+    // Convenience method.
+    @Nonnull
     public String asLocal() {
-        return mapcodePrecision0;
+        return asLocal(null);
     }
 
     /**
@@ -302,16 +293,30 @@ public final class Mapcode {
      * Netherlands 49.4V-K2        (high precision code)
      *
      * @param precision Precision specifier. Range: [0, 2].
+     * @param alphabet  Alphabet.
      * @return Full international mapcode.
      */
     @Nonnull
-    public String asInternationalFullName(final int precision) {
-        return territory.getFullName() + ' ' + getMapcodePrecision(precision);
+    public String asInternationalFullName(final int precision, @Nullable final Alphabet alphabet) {
+        return territory.getFullName() + ' ' + getMapcodePrecision(precision, alphabet);
     }
 
+    // Convenience method.
+    @Nonnull
+    public String asInternationalFullName(final int precision) {
+        return asInternationalFullName(precision, null);
+    }
+
+    // Convenience method.
+    @Nonnull
+    public String asInternationalFullName(@Nonnull final Alphabet alphabet) {
+        return asInternationalFullName(0, alphabet);
+    }
+
+    // Convenience method.
     @Nonnull
     public String asInternationalFullName() {
-        return territory.getFullName() + ' ' + mapcodePrecision0;
+        return asInternationalFullName(0, null);
     }
 
     /**
@@ -325,18 +330,58 @@ public final class Mapcode {
      * NLD 49.4V-K2                (high-precision code)
      *
      * @param precision Precision specifier. Range: [0, 2].
+     * @param alphabet  Alphabet.
      * @return Short-hand international mapcode.
      */
     @Nonnull
-    public String asInternationalISO(final int precision) {
-        return territory.toString() + ' ' + getMapcodePrecision(precision);
+    public String asInternationalISO(final int precision, @Nullable final Alphabet alphabet) {
+        return territory.toString() + ' ' + getMapcodePrecision(precision, alphabet);
     }
 
+    // Convenience method.
+    @Nonnull
+    public String asInternationalISO(final int precision) {
+        return asInternationalISO(precision, null);
+    }
+
+    // Convenience method.
+    @Nonnull
+    public String asInternationalISO(@Nonnull final Alphabet alphabet) {
+        return asInternationalISO(0, alphabet);
+    }
+
+    // Convenience method.
     @Nonnull
     public String asInternationalISO() {
-        return territory.toString() + ' ' + mapcodePrecision0;
+        return asInternationalISO(0, null);
     }
 
+    // TODO !! Is this still needed?
+
+    /**
+     * Convert a mapcode which potentially contains Unicode characters, to an ASCII variant.
+     *
+     * @param mapcode Mapcode, with optional Unicode characters.
+     * @return ASCII, non-Unicode string.
+     */
+    @Nonnull
+    private static String convertToAscii(@Nonnull final String mapcode) {
+        // Cannot call: checkMapcode() - recursive.
+        return Decoder.decodeUTF16(mapcode.toUpperCase());
+    }
+
+    /**
+     * Convert a mapcode into the same mapcode using a different (or the same) alphabet.
+     *
+     * @param mapcode  Mapcode to be converted.
+     * @param alphabet Alphabet to convert to, may contain Unicode characters.
+     * @return Converted mapcode.
+     */
+    @Nonnull
+    private static String convertToAlphabet(@Nonnull final String mapcode, @Nullable final Alphabet alphabet) {
+        checkMapcode("mapcode", mapcode);
+        return (alphabet != null) ? Decoder.encodeToAlphabetCode(mapcode.toUpperCase(), alphabet.code) : mapcode.toUpperCase();
+    }
 
     @Nonnull
     @Override
