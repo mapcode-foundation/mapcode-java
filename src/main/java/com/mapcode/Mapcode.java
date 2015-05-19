@@ -394,7 +394,7 @@ public final class Mapcode {
     @Nonnull
     static String convertMapcodeToAlphabet(@Nonnull final String mapcode, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
         checkMapcodeCode("mapcode", mapcode);
-        return (alphabet != null) ? Decoder.encodeToAlphabetCode(mapcode.toUpperCase(), alphabet.code) : mapcode.toUpperCase();
+        return (alphabet != null) ? Decoder.encodeUTF16(mapcode.toUpperCase(), alphabet.code) : mapcode.toUpperCase();
     }
 
     /**

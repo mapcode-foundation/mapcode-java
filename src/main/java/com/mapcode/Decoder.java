@@ -645,25 +645,8 @@ class Decoder {
         return result;
     }
 
-    static String encodeUTF16(final String string, final int alphabet) {
-        final StringBuilder sb = new StringBuilder();
-        for (char ch : string.toCharArray()) {
-            ch = Character.toUpperCase(ch);
-            if (ch > 'Z') {
-                // Not in any valid range?
-                sb.append('?');
-            } else if (ch < 'A') {
-                // Valid but not a letter (e.g. a dot, a space...).
-                // Leave untranslated.
-                sb.append(ch);
-            } else {
-                sb.append((char) ASCII2LANGUAGE[alphabet][(int) ch - (int) 'A']);
-            }
-        }
-        return sb.toString();
-    }
-
-    static String encodeToAlphabetCode(final String mapcode, int alphabetCode) {
+    static String encodeUTF16(final String mapcode, int alphabetCode) {
+        final String mapcodeToEncode;
         if (ASCII2LANGUAGE[alphabetCode][4] == 0x003f) {
 
             // Alphabet does not contain 'E'.
@@ -673,11 +656,29 @@ class Decoder {
                     throw new AssertionError("encodeToAlphabetCode: cannot encode '" + mapcode +
                             "' to alphabet " + alphabetCode + ' ' + Alphabet.fromCode(alphabetCode));
                 }
-                final String packed = Encoder.aeuPack(unpacked, true);
-                return encodeUTF16(packed, alphabetCode);
+                mapcodeToEncode = Encoder.aeuPack(unpacked, true);
+            }
+            else {
+                mapcodeToEncode = mapcode;
             }
         }
-        return encodeUTF16(mapcode, alphabetCode);
+        else {
+            mapcodeToEncode = mapcode;
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (char ch : mapcodeToEncode.toCharArray()) {
+            ch = Character.toUpperCase(ch);
+            if (ch > 'Z') {
+                // Not in any valid range?
+                sb.append('?');
+            } else if (ch < 'A') {
+                // Valid but not a letter (e.g. a dot, a space...). Leave untranslated.
+                sb.append(ch);
+            } else {
+                sb.append((char) ASCII2LANGUAGE[alphabetCode][(int) ch - (int) 'A']);
+            }
+        }
+        return sb.toString();
     }
 
     @Nonnull
