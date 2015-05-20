@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -65,20 +66,10 @@ public final class MapcodeCodec {
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
      */
     @Nonnull
-    public static List<Mapcode> encode(
-            final double latDeg,
-            final double lonDeg) throws IllegalArgumentException {
-        checkRange("latDeg", latDeg, Point.LAT_DEG_MIN, Point.LAT_DEG_MAX);
-        checkRange("lonDeg", lonDeg, Point.LON_DEG_MIN, Point.LON_DEG_MAX);
-
-        // Call mapcode encoder.
-        @Nonnull final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, null, false, false, true);
-        assert results != null;
-        assert results.size() >= 1;
-        return results;
+    public static List<Mapcode> encode(final double latDeg, final double lonDeg) throws IllegalArgumentException {
+        return encode(latDeg, lonDeg, null);
     }
 
-    // Convenience method.
     @Nonnull
     public static List<Mapcode> encode(@Nonnull final Point point) throws IllegalArgumentException {
         checkNonnull("point", point);
@@ -97,33 +88,26 @@ public final class MapcodeCodec {
      *
      * @param latDeg              Latitude, accepted range: -90..90.
      * @param lonDeg              Longitude, accepted range: -180..180.
-     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. Cannot
-     *                            be null.
+     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. May be null.
      * @return List of mapcode information records, see {@link Mapcode}. This list is empty if no
      * Mapcode can be generated for this territory matching the lat/lon.
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
      */
     @Nonnull
-    public static List<Mapcode> encode(
-            final double latDeg,
-            final double lonDeg,
-            @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException {
+    public static List<Mapcode> encode(final double latDeg, final double lonDeg,
+                                       @Nullable final Territory restrictToTerritory) throws IllegalArgumentException {
         checkRange("latDeg", latDeg, Point.LAT_DEG_MIN, Point.LAT_DEG_MAX);
         checkRange("lonDeg", lonDeg, Point.LON_DEG_MIN, Point.LON_DEG_MAX);
-        checkNonnull("restrictToTerritory", restrictToTerritory);
 
         // Call Mapcode encoder.
-        @Nonnull final List<Mapcode> results =
-                Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, false, false);
+        final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, false, (restrictToTerritory == null));
         assert results != null;
         return results;
     }
 
-    // Convenience method.
     @Nonnull
-    public static List<Mapcode> encode(
-            @Nonnull final Point point,
-            @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException {
+    public static List<Mapcode> encode(@Nonnull final Point point,
+                                       @Nullable final Territory restrictToTerritory) throws IllegalArgumentException {
         checkNonnull("point", point);
         return encode(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
     }
@@ -138,20 +122,14 @@ public final class MapcodeCodec {
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
      */
     @Nonnull
-    public static Mapcode encodeToShortest(
-            final double latDeg,
-            final double lonDeg) throws IllegalArgumentException {
-        checkRange("latDeg", latDeg, Point.LAT_DEG_MIN, Point.LAT_DEG_MAX);
-        checkRange("lonDeg", lonDeg, Point.LON_DEG_MIN, Point.LON_DEG_MAX);
-
-        // Call mapcode encoder.
-        @Nonnull final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, null, false, true, true);
-        assert results != null;
-        assert results.size() == 1;
-        return results.get(0);
+    public static Mapcode encodeToShortest(final double latDeg, final double lonDeg) throws IllegalArgumentException {
+        try {
+            return encodeToShortest(latDeg, lonDeg, null);
+        } catch (final UnknownMapcodeException e) {
+            throw new IllegalStateException("Encoding should never fail for + " + latDeg + ", " + lonDeg, e);
+        }
     }
 
-    // Convenience method.
     @Nonnull
     public static Mapcode encodeToShortest(@Nonnull final Point point) throws IllegalArgumentException {
         checkNonnull("point", point);
@@ -163,24 +141,20 @@ public final class MapcodeCodec {
      *
      * @param latDeg              Latitude, accepted range: -90..90.
      * @param lonDeg              Longitude, accepted range: -180..180.
-     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. Cannot
-     *                            be null.
+     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. May be null.
      * @return Shortest mapcode, see {@link Mapcode}.
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
      * @throws UnknownMapcodeException  Thrown if no mapcode was found for the lat/lon matching the territory.
      */
     @Nonnull
-    public static Mapcode encodeToShortest(
-            final double latDeg,
-            final double lonDeg,
-            @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
+    public static Mapcode encodeToShortest(final double latDeg, final double lonDeg,
+                                           @Nullable final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
         checkRange("latDeg", latDeg, Point.LAT_DEG_MIN, Point.LAT_DEG_MAX);
         checkRange("lonDeg", lonDeg, Point.LON_DEG_MIN, Point.LON_DEG_MAX);
-        checkNonnull("restrictToTerritory", restrictToTerritory);
 
         // Call mapcode encoder.
         @Nonnull final List<Mapcode> results =
-                Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, true, false);
+                Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, true, (restrictToTerritory == null));
         assert results != null;
         assert results.size() <= 1;
         if (results.isEmpty()) {
@@ -190,11 +164,9 @@ public final class MapcodeCodec {
         return results.get(0);
     }
 
-    // Convenience method.
     @Nonnull
-    public static Mapcode encodeToShortest(
-            @Nonnull final Point point,
-            @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
+    public static Mapcode encodeToShortest(@Nonnull final Point point,
+                                           @Nullable final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
         checkNonnull("point", point);
         return encodeToShortest(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
     }
@@ -208,9 +180,7 @@ public final class MapcodeCodec {
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
      */
     @Nonnull
-    public static Mapcode encodeToInternational(
-            final double latDeg,
-            final double lonDeg) throws IllegalArgumentException {
+    public static Mapcode encodeToInternational(final double latDeg, final double lonDeg) throws IllegalArgumentException {
         checkRange("latDeg", latDeg, Point.LAT_DEG_MIN, Point.LAT_DEG_MAX);
         checkRange("lonDeg", lonDeg, Point.LON_DEG_MIN, Point.LON_DEG_MAX);
 
@@ -221,7 +191,6 @@ public final class MapcodeCodec {
         return results.get(results.size() - 1);
     }
 
-    // Convenience method.
     @Nonnull
     public static Mapcode encodeToInternational(@Nonnull final Point point) throws IllegalArgumentException {
         checkNonnull("point", point);
@@ -263,7 +232,7 @@ public final class MapcodeCodec {
      * Note that if a territory-code is supplied in the string, it takes preferences over the parameter.
      *
      * @param mapcode                 Mapcode.
-     * @param defaultTerritoryContext Default territory context for disambiguation purposes.
+     * @param defaultTerritoryContext Default territory context for disambiguation purposes. May be null.
      * @return Point corresponding to mapcode. Latitude range: -90..90, longitude range: -180..180.
      * @throws UnknownMapcodeException  Thrown if the mapcode has the right syntax, but cannot be decoded into a point.
      * @throws IllegalArgumentException Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
@@ -271,12 +240,11 @@ public final class MapcodeCodec {
     @Nonnull
     public static Point decode(
             @Nonnull final String mapcode,
-            @Nonnull final Territory defaultTerritoryContext) throws UnknownMapcodeException, IllegalArgumentException {
+            @Nullable final Territory defaultTerritoryContext) throws UnknownMapcodeException, IllegalArgumentException {
         checkNonnull("mapcode", mapcode);
-        checkNonnull("territoryContext", defaultTerritoryContext);
 
         // Clean up mapcode.
-        String mapcodeClean = mapcode.trim().toUpperCase();
+        String mapcodeClean = Mapcode.convertStringToPlainAscii(mapcode.trim().toUpperCase());
 
         // Determine territory from mapcode.
         final Territory territory;
@@ -284,7 +252,7 @@ public final class MapcodeCodec {
         if (!matcherTerritory.find()) {
 
             // No territory code was supplied in the string, use specified territory context parameter.
-            territory = defaultTerritoryContext;
+            territory = (defaultTerritoryContext != null) ? defaultTerritoryContext : Territory.AAA;
         } else {
 
             // Use the territory code from the string.
@@ -296,7 +264,7 @@ public final class MapcodeCodec {
             }
 
             // Cut off the territory part.
-            mapcodeClean = mapcode.substring(matcherTerritory.end()).trim();
+            mapcodeClean = mapcodeClean.substring(matcherTerritory.end()).trim();
         }
 
         if (!Mapcode.isValidMapcodeFormat(mapcodeClean)) {

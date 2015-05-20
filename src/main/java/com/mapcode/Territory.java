@@ -685,14 +685,27 @@ public enum Territory {
     }
 
     /**
-     * Return the territory name, with dashes rather than underscores.
+     * Return the international value of the territory name, with dashes rather than underscores.
+     * This is the same as {@link #toNameFormat(NameFormat)} for {@link NameFormat#INTERNATIONAL}.
+     *
+     * @param alphabet Alphabet. May be null.
+     * @return Territory name. Underscores have been replaced with dashes.
+     */
+    @Nonnull
+    public String toString(@Nullable final Alphabet alphabet) {
+        return toNameFormat(NameFormat.INTERNATIONAL, alphabet);
+    }
+
+    /**
+     * Return the international value of the territory name, with dashes rather than underscores.
+     * This is the same as {@link #toNameFormat(NameFormat)} for {@link NameFormat#INTERNATIONAL}.
      *
      * @return Territory name. Underscores have been replaced with dashes.
      */
     @Override
     @Nonnull
     public String toString() {
-        return name().replace('_', '-');
+        return toString(null);
     }
 
     /**
@@ -707,23 +720,30 @@ public enum Territory {
     /**
      * Return the territory name, given a specific territory name format.
      *
-     * @param format Format to be used.
+     * @param format   Format to be used.
+     * @param alphabet Alphabet. May be null.
      * @return Mapcode
      */
     @Nonnull
-    public String toNameFormat(@Nonnull final NameFormat format) {
+    public String toNameFormat(@Nonnull final NameFormat format, @Nullable final Alphabet alphabet) {
         checkNonnull("format", format);
+        String result = name().replace('_', '-');
         if (format != NameFormat.INTERNATIONAL) {
             final int index = name().indexOf('_');
             if (index != -1) {
                 assert name().length() > (index + 1);
                 final String shortName = name().substring(index + 1);
                 if ((format == NameFormat.MINIMAL) || (nameMap.get(shortName).size() == 1)) {
-                    return shortName;
+                    result = shortName;
                 }
             }
         }
-        return toString();
+        return (alphabet != null) ? Mapcode.convertStringToAlphabet(result, alphabet) : result;
+    }
+
+    @Nonnull
+    public String toNameFormat(@Nonnull final NameFormat format) {
+        return toNameFormat(format, null);
     }
 
     /**
@@ -842,7 +862,7 @@ public enum Territory {
     private static Territory createFromString(
             @Nonnull final String numericOrAlpha,
             @Nullable final ParentTerritory parentTerritory) throws UnknownTerritoryException {
-        final String trimmed = numericOrAlpha.trim().replace('_', '-').toUpperCase();
+        final String trimmed = Mapcode.convertStringToPlainAscii(numericOrAlpha.trim().replace('_', '-').toUpperCase());
 
         // First, try as numeric code.
         try {

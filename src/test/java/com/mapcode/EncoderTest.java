@@ -176,11 +176,4 @@ public class EncoderTest {
         LOG.info("illegalArgument4");
         MapcodeCodec.encode(0, 181);
     }
-
-    @SuppressWarnings("ConstantConditions")
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument5() {
-        LOG.info("illegalArgument4");
-        MapcodeCodec.encode(0, 0, null);
-    }
 }

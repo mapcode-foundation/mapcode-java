@@ -116,7 +116,7 @@ public class EncodeDecodeTest {
                     // Check conversion from/to alphabets.
                     for (final Alphabet alphabet : Alphabet.values()) {
                         final String mapcodeAlphabet = mapcode.getCode(alphabet);
-                        final String mapcodeAscii = Mapcode.convertMapcodeToPlainAscii(mapcodeAlphabet);
+                        final String mapcodeAscii = Mapcode.convertStringToPlainAscii(mapcodeAlphabet);
                         assertEquals("alphabet=" + alphabet + ", original=" + codePrecision0 +
                                         ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii,
                                 codePrecision0, mapcodeAscii);

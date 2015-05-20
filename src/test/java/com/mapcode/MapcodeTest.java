@@ -108,13 +108,13 @@ public class MapcodeTest {
         LOG.info("checkConvertToAscii");
 
         // Check ASCII characters.
-        assertEquals("KM.8K", Mapcode.convertMapcodeToPlainAscii("KM.8K"));
-        assertEquals("HJ.Q2-Z", Mapcode.convertMapcodeToPlainAscii("HJ.Q2-Z"));
-        assertEquals("36228.92UW", Mapcode.convertMapcodeToPlainAscii("36228.92UW"));
-        assertEquals("36228.92UW-TK", Mapcode.convertMapcodeToPlainAscii("36228.92UW-TK"));
+        assertEquals("KM.8K", Mapcode.convertStringToPlainAscii("KM.8K"));
+        assertEquals("HJ.Q2-Z", Mapcode.convertStringToPlainAscii("HJ.Q2-Z"));
+        assertEquals("36228.92UW", Mapcode.convertStringToPlainAscii("36228.92UW"));
+        assertEquals("36228.92UW-TK", Mapcode.convertStringToPlainAscii("36228.92UW-TK"));
 
         // Check unicode characters.
-        assertEquals("KM.8K", Mapcode.convertMapcodeToPlainAscii("\u30c1\u30ca.8\u30c1"));
-        assertEquals("HJ.Q2-Z", Mapcode.convertMapcodeToPlainAscii("\u0397\u03a0.\u03982-\u0411"));
+        assertEquals("KM.8K", Mapcode.convertStringToPlainAscii("\u30c1\u30ca.8\u30c1"));
+        assertEquals("HJ.Q2-Z", Mapcode.convertStringToPlainAscii("\u0397\u03a0.\u03982-\u0411"));
     }
 }

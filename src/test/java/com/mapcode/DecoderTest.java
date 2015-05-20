@@ -135,6 +135,15 @@ public class DecoderTest {
     }
 
     @Test
+    public void unicodeMapcodeAthensAcropolis3() throws Exception {
+        LOG.info("unicodeMapcodeAthensAcropolis3");
+        final Point point = MapcodeCodec.decode("\u0393\u03a8\u039e \u0397\u03a0.\u03982");
+        assertEquals("decodeUnicode latitude", 37971812, point.getLatMicroDeg());
+        assertEquals("decodeUnicode longitude", 23726247,
+                point.getLonMicroDeg());
+    }
+
+    @Test
     public void unicodeMapcodeTokyoTower1() throws Exception {
         LOG.info("unicodeMapcodeTokyoTower1");
         final Point point = MapcodeCodec.decode("\u30c1\u30ca.8\u30c1",
@@ -165,6 +174,10 @@ public class DecoderTest {
     @Test
     public void validTerritory() throws Exception {
         LOG.info("validTerritory");
+        final Point point0 = MapcodeCodec.decode("NLD 49.4V", null);
+        assertEquals("decode latitude", 52376514, point0.getLatMicroDeg());
+        assertEquals("decode longitude", 4908542, point0.getLonMicroDeg());
+
         final Point point1 = MapcodeCodec.decode("NLD 49.4V", Territory.NLD);
         assertEquals("decode latitude", 52376514, point1.getLatMicroDeg());
         assertEquals("decode longitude", 4908542, point1.getLonMicroDeg());
@@ -240,7 +253,7 @@ public class DecoderTest {
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = UnknownMapcodeException.class)
     public void illegalArgument2() throws Exception {
         LOG.info("illegalArgument2");
         MapcodeCodec.decode("494.V494V", null);

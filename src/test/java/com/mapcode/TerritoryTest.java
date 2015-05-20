@@ -16,6 +16,7 @@
 
 package com.mapcode;
 
+import com.mapcode.Territory.NameFormat;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +93,20 @@ public class TerritoryTest {
             assertEquals(territory, Territory.fromString(territory.toString()));
             assertEquals(territory, Territory.fromString(String.valueOf(territory.getCode())));
         }
+    }
+
+    @Test
+    public void checkAlphabet() throws Exception {
+        LOG.info("checkAlphabet");
+        assertEquals(Territory.NLD, Territory.fromString("NLD"));
+        assertEquals(Territory.NLD, Territory.fromString("\u039d\u039b\u0394"));
+        assertEquals(Territory.NLD, Territory.fromString("\u0417\u041b\u0414"));
+
+        assertEquals("NLD", Territory.NLD.toNameFormat(NameFormat.INTERNATIONAL));
+        assertEquals("NLD", Territory.NLD.toNameFormat(NameFormat.INTERNATIONAL, Alphabet.ROMAN));
+        assertEquals("\u0417\u041b\u0414", Territory.NLD.toNameFormat(NameFormat.INTERNATIONAL, Alphabet.CYRILLIC));
+        assertEquals("\u039d\u039b\u0394", Territory.NLD.toNameFormat(NameFormat.INTERNATIONAL, Alphabet.GREEK));
+        assertEquals("\u0393\u03a8\u039e", Territory.GRC.toNameFormat(NameFormat.INTERNATIONAL, Alphabet.GREEK));
     }
 
     @Test(expected = IllegalArgumentException.class)

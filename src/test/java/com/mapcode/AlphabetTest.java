@@ -37,8 +37,8 @@ public class AlphabetTest {
         convertCodeInAlphabet("GRC \u0397\u03a0.\u03982-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
 
         final String code = "26.53UK";
-        final String codeGreek = Mapcode.convertMapcodeToAlphabet(code, Alphabet.GREEK);
-        final String codeAscii = Mapcode.convertMapcodeToPlainAscii(codeGreek);
+        final String codeGreek = Mapcode.convertStringToAlphabet(code, Alphabet.GREEK);
+        final String codeAscii = Mapcode.convertStringToPlainAscii(codeGreek);
         LOG.info("code = {}, codeGreek = {}, codeAscii = {}", code, codeGreek, codeAscii);
         assertEquals(code, codeAscii);
     }
@@ -91,7 +91,7 @@ public class AlphabetTest {
         assertEquals("code = " + code + ", type = " + type, formatType, type);
 
         // Check original code and converted to ASCII point at same location.
-        final String codeAscii = Mapcode.convertMapcodeToPlainAscii(code);
+        final String codeAscii = Mapcode.convertStringToPlainAscii(code);
         final Point pointCode = MapcodeCodec.decode(code, territory);
         final Point pointAscii = MapcodeCodec.decode(codeAscii, territory);
         assertEquals("code = " + code + ", pointCode = " + pointCode + ", pointAscii = " + pointAscii,

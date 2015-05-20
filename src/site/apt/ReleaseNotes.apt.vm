@@ -23,9 +23,11 @@ Release Notes (Version ${project.version})
     * Added convencience methods for <<<MapcodeCodec>>> to accept <<<Point>>> for all encode functions
       as well (not just <<<latDeg>>>, <<<lonDeg>>>).
 
-    * Added alphabet support to convert mapcodes between <<<Alphabet>>>s.
+    * Added alphabet support to convert mapcodes (both codes and territories) between <<<Alphabet>>>s.
 
     * Exceptions have been corrected and documented in code.
+
+    * Allowed nullable values in <<<MapcodeCodec>>> encode and decode methods to assume reasonable defaults.
 
     []
 

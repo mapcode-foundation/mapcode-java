@@ -86,10 +86,11 @@ public final class Mapcode {
             @Nonnull final Territory territory) throws IllegalArgumentException {
 
         checkMapcodeCode("code", code);
-        if (containsTerritory(code)) {
+        final String ascii = convertStringToPlainAscii(code);
+        if (containsTerritory(ascii)) {
             throw new IllegalArgumentException("Must not contain territory: " + code);
         }
-        final String codeUppercase = code.toUpperCase();
+        final String codeUppercase = ascii.toUpperCase();
         this.codePrecision2 = codeUppercase;
         if (codeUppercase.contains("-")) {
             this.codePrecision0 = codeUppercase.substring(0, codeUppercase.length() - 3);
@@ -114,12 +115,12 @@ public final class Mapcode {
      */
     @Nonnull
     public String getCode(@Nullable final Alphabet alphabet) {
-        return convertMapcodeToAlphabet(codePrecision0, alphabet);
+        return convertStringToAlphabet(codePrecision0, alphabet);
     }
 
     @Nonnull
     public String getCode() {
-        return convertMapcodeToAlphabet(codePrecision0, null);
+        return convertStringToAlphabet(codePrecision0, null);
     }
 
     /**
@@ -146,11 +147,11 @@ public final class Mapcode {
     public String getCode(final int precision, @Nullable final Alphabet alphabet) {
         switch (precision) {
             case 0:
-                return convertMapcodeToAlphabet(codePrecision0, alphabet);
+                return convertStringToAlphabet(codePrecision0, alphabet);
             case 1:
-                return convertMapcodeToAlphabet(codePrecision1, alphabet);
+                return convertStringToAlphabet(codePrecision1, alphabet);
             case 2:
-                return convertMapcodeToAlphabet(codePrecision2, alphabet);
+                return convertStringToAlphabet(codePrecision2, alphabet);
             default:
                 throw new IllegalArgumentException("getCodePrecision: precision must be in [0, 2]");
         }
@@ -308,7 +309,7 @@ public final class Mapcode {
     public static FormatType getMapcodeFormatType(@Nonnull final String mapcode) throws IllegalArgumentException {
 
         // First, decode to ASCII.
-        final String decodedMapcode = convertMapcodeToPlainAscii(mapcode.toUpperCase());
+        final String decodedMapcode = convertStringToPlainAscii(mapcode.toUpperCase());
 
         // Syntax needs to be OK.
         if (!PATTERN_MAPCODE.matcher(decodedMapcode).matches()) {
@@ -375,29 +376,27 @@ public final class Mapcode {
     }
 
     /**
-     * Convert a mapcode which potentially contains Unicode characters, to an ASCII variant.
+     * Convert a string which potentially contains Unicode characters, to an ASCII variant.
      *
-     * @param mapcode Mapcode (optionally with a territory), with optional Unicode characters.
+     * @param string Any string.
      * @return ASCII, non-Unicode string.
      */
     @Nonnull
-    static String convertMapcodeToPlainAscii(@Nonnull final String mapcode) {
-        // Cannot call: checkMapcodeCode() - recursive.
-        return Decoder.decodeUTF16(mapcode.toUpperCase());
+    static String convertStringToPlainAscii(@Nonnull final String string) {
+        return Decoder.decodeUTF16(string.toUpperCase());
     }
 
     /**
-     * Convert a mapcode into the same mapcode using a different (or the same) alphabet.
+     * Convert a string into the same string using a different (or the same) alphabet.
      *
-     * @param mapcode  Mapcode (optionally with a territory) to be converted.
+     * @param string   Any string.
      * @param alphabet Alphabet to convert to, may contain Unicode characters.
      * @return Converted mapcode.
      * @throws IllegalArgumentException Thrown if mapcode has incorrect syntax.
      */
     @Nonnull
-    static String convertMapcodeToAlphabet(@Nonnull final String mapcode, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
-        checkMapcodeCode("mapcode", mapcode);
-        return (alphabet != null) ? Decoder.encodeUTF16(mapcode.toUpperCase(), alphabet.getCode()) : mapcode.toUpperCase();
+    static String convertStringToAlphabet(@Nonnull final String string, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
+        return (alphabet != null) ? Decoder.encodeUTF16(string.toUpperCase(), alphabet.getCode()) : string.toUpperCase();
     }
 
     /**
