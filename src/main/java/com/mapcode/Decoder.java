@@ -79,7 +79,7 @@ class Decoder {
             }
         }
 
-        final int ccode = territory.getTerritoryCode();
+        final int ccode = territory.getCode();
 
         final int from = DataAccess.dataFirstRecord(ccode);
         if (DataAccess.dataFlags(from) == 0) {

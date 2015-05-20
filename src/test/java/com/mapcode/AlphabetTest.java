@@ -43,6 +43,43 @@ public class AlphabetTest {
         assertEquals(code, codeAscii);
     }
 
+    @Test
+    public void testFromString() throws Exception {
+        LOG.info("testFromString");
+        assertEquals(Alphabet.ROMAN, Alphabet.fromString("ROMAN"));
+        assertEquals(Alphabet.ROMAN, Alphabet.fromString("0"));
+        assertEquals(Alphabet.ROMAN, Alphabet.fromString("roman"));
+
+        for (final Alphabet alphabet : Alphabet.values()) {
+            assertEquals(alphabet, Alphabet.fromString(alphabet.toString()));
+            assertEquals(alphabet, Alphabet.fromString(String.valueOf(alphabet.getCode())));
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError1() {
+        LOG.info("testFromStringError1");
+        Alphabet.fromString("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError2() {
+        LOG.info("testFromStringError2");
+        Alphabet.fromString("1A");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError3() {
+        LOG.info("testFromStringError3");
+        Alphabet.fromString("99");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError4() {
+        LOG.info("testFromStringError4");
+        Alphabet.fromString("ROMAN1");
+    }
+
     private static void convertCodeInAlphabet(
             @Nonnull final String code,
             @Nonnull final Territory territory, @Nonnull final Alphabet alphabet,

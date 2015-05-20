@@ -63,6 +63,8 @@ public class TerritoryTest {
     @Test
     public void territoryFromStringTest() throws Exception {
         LOG.info("territoryFromStringTest");
+
+        // Accept ISO-style codes.
         assertEquals(Territory.NLD, Territory.fromString("NLD"));
         assertEquals(Territory.ARG, Territory.fromString("ARG"));
         assertEquals(Territory.ASM, Territory.fromString("US-AS"));
@@ -76,5 +78,43 @@ public class TerritoryTest {
         assertEquals(Territory.RU_IN, Territory.fromString("RUS-IN"));
         assertEquals(Territory.IN_BR, Territory.fromString("BR"));
         assertEquals(Territory.IN_AS, Territory.fromString("AS"));
+
+        // Accept long and short.
+        assertEquals(Territory.USA, Territory.fromString("USA"));
+        assertEquals(Territory.USA, Territory.fromString("US"));
+
+        // Accept numeric codes as well.
+        assertEquals(Territory.VAT, Territory.fromString("0"));
+        assertEquals(Territory.AAA, Territory.fromString("532"));
+        assertEquals(Territory.NLD, Territory.fromString("112"));
+
+        for (final Territory territory : Territory.values()) {
+            assertEquals(territory, Territory.fromString(territory.toString()));
+            assertEquals(territory, Territory.fromString(String.valueOf(territory.getCode())));
+        }
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError1() {
+        LOG.info("testFromStringError1");
+        Territory.fromString("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError2() {
+        LOG.info("testFromStringError2");
+        Territory.fromString("1A");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError3() {
+        LOG.info("testFromStringError3");
+        Territory.fromString("999");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError4() {
+        LOG.info("testFromStringError4");
+        Territory.fromString("Netherlands");
     }
 }

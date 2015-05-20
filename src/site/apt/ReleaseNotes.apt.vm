@@ -25,6 +25,8 @@ Release Notes (Version ${project.version})
 
     * Added alphabet support to convert mapcodes between <<<Alphabet>>>s.
 
+    * Exceptions have been corrected and documented in code.
+
     []
 
 

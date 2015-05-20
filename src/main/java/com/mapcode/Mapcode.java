@@ -87,7 +87,7 @@ public final class Mapcode {
 
         checkMapcodeCode("code", code);
         if (containsTerritory(code)) {
-            throw new IllegalArgumentException("code cannot territory information: " + code);
+            throw new IllegalArgumentException("Must not contain territory: " + code);
         }
         final String codeUppercase = code.toUpperCase();
         this.codePrecision2 = codeUppercase;
@@ -140,6 +140,7 @@ public final class Mapcode {
      * @param precision Precision. Range: 0..2.
      * @param alphabet  Alphabet.
      * @return Mapcode code.
+     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 2]).
      */
     @Nonnull
     public String getCode(final int precision, @Nullable final Alphabet alphabet) {
@@ -156,7 +157,7 @@ public final class Mapcode {
     }
 
     @Nonnull
-    public String getCode(final int precision) {
+    public String getCode(final int precision) throws IllegalArgumentException {
         return getCode(precision, null);
     }
 
@@ -172,14 +173,15 @@ public final class Mapcode {
      * @param precision Precision specifier. Range: [0, 2].
      * @param alphabet  Alphabet.
      * @return Full international mapcode.
+     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 2]).
      */
     @Nonnull
-    public String getCodeWithTerritoryFullname(final int precision, @Nullable final Alphabet alphabet) {
+    public String getCodeWithTerritoryFullname(final int precision, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
         return territory.getFullName() + ' ' + getCode(precision, alphabet);
     }
 
     @Nonnull
-    public String getCodeWithTerritoryFullname(final int precision) {
+    public String getCodeWithTerritoryFullname(final int precision) throws IllegalArgumentException {
         return getCodeWithTerritoryFullname(precision, null);
     }
 
@@ -206,14 +208,15 @@ public final class Mapcode {
      * @param precision Precision specifier. Range: [0, 2].
      * @param alphabet  Alphabet.
      * @return Short-hand international mapcode.
+     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 2]).
      */
     @Nonnull
-    public String getCodeWithTerritory(final int precision, @Nullable final Alphabet alphabet) {
+    public String getCodeWithTerritory(final int precision, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
         return territory.toString() + ' ' + getCode(precision, alphabet);
     }
 
     @Nonnull
-    public String getCodeWithTerritory(final int precision) {
+    public String getCodeWithTerritory(final int precision) throws IllegalArgumentException {
         return getCodeWithTerritory(precision, null);
     }
 
@@ -389,12 +392,12 @@ public final class Mapcode {
      * @param mapcode  Mapcode (optionally with a territory) to be converted.
      * @param alphabet Alphabet to convert to, may contain Unicode characters.
      * @return Converted mapcode.
-     * @throws IllegalArgumentException If mapcode has incorrect syntax.
+     * @throws IllegalArgumentException Thrown if mapcode has incorrect syntax.
      */
     @Nonnull
     static String convertMapcodeToAlphabet(@Nonnull final String mapcode, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
         checkMapcodeCode("mapcode", mapcode);
-        return (alphabet != null) ? Decoder.encodeUTF16(mapcode.toUpperCase(), alphabet.code) : mapcode.toUpperCase();
+        return (alphabet != null) ? Decoder.encodeUTF16(mapcode.toUpperCase(), alphabet.getCode()) : mapcode.toUpperCase();
     }
 
     /**
