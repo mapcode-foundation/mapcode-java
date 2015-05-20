@@ -244,7 +244,7 @@ public final class MapcodeCodec {
         checkNonnull("mapcode", mapcode);
 
         // Clean up mapcode.
-        String mapcodeClean = Mapcode.convertStringToPlainAscii(mapcode.trim().toUpperCase());
+        String mapcodeClean = Mapcode.convertStringToPlainAscii(mapcode.trim()).toUpperCase();
 
         // Determine territory from mapcode.
         final Territory territory;

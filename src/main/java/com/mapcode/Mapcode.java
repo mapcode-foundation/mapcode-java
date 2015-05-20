@@ -309,7 +309,7 @@ public final class Mapcode {
     public static FormatType getMapcodeFormatType(@Nonnull final String mapcode) throws IllegalArgumentException {
 
         // First, decode to ASCII.
-        final String decodedMapcode = convertStringToPlainAscii(mapcode.toUpperCase());
+        final String decodedMapcode = convertStringToPlainAscii(mapcode).toUpperCase();
 
         // Syntax needs to be OK.
         if (!PATTERN_MAPCODE.matcher(decodedMapcode).matches()) {
@@ -392,7 +392,8 @@ public final class Mapcode {
      * @param string   Any string.
      * @param alphabet Alphabet to convert to, may contain Unicode characters.
      * @return Converted mapcode.
-     * @throws IllegalArgumentException Thrown if mapcode has incorrect syntax.
+     * @throws IllegalArgumentException Thrown if string has incorrect syntax or if the string cannot be encoded in
+     *                                  the specified alphabet.
      */
     @Nonnull
     static String convertStringToAlphabet(@Nonnull final String string, @Nullable final Alphabet alphabet) throws IllegalArgumentException {

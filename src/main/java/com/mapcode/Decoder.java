@@ -645,7 +645,7 @@ class Decoder {
         return result;
     }
 
-    static String encodeUTF16(final String mapcode, int alphabetCode) {
+    static String encodeUTF16(final String mapcode, int alphabetCode) throws IllegalArgumentException {
         final String mapcodeToEncode;
         if (ASCII2LANGUAGE[alphabetCode][4] == 0x003f) {
 
@@ -653,7 +653,7 @@ class Decoder {
             if (mapcode.matches("^.*[EU].*")) {
                 final String unpacked = aeuUnpack(mapcode);
                 if (unpacked.isEmpty()) {
-                    throw new AssertionError("encodeToAlphabetCode: cannot encode '" + mapcode +
+                    throw new IllegalArgumentException("encodeToAlphabetCode: cannot encode '" + mapcode +
                             "' to alphabet " + alphabetCode + ' ' + Alphabet.fromCode(alphabetCode));
                 }
                 mapcodeToEncode = Encoder.aeuPack(unpacked, true);

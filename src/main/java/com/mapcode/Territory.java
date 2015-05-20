@@ -722,7 +722,7 @@ public enum Territory {
      *
      * @param format   Format to be used.
      * @param alphabet Alphabet. May be null.
-     * @return Mapcode
+     * @return Mapcode.
      */
     @Nonnull
     public String toNameFormat(@Nonnull final NameFormat format, @Nullable final Alphabet alphabet) {
@@ -738,7 +738,14 @@ public enum Territory {
                 }
             }
         }
-        return (alphabet != null) ? Mapcode.convertStringToAlphabet(result, alphabet) : result;
+        if (alphabet != null) {
+            try {
+                result = Mapcode.convertStringToAlphabet(result, alphabet);
+            } catch (final IllegalArgumentException ignored) {
+                // Simply return result if translation to alphabet fails.
+            }
+        }
+        return result;
     }
 
     @Nonnull
@@ -862,7 +869,7 @@ public enum Territory {
     private static Territory createFromString(
             @Nonnull final String numericOrAlpha,
             @Nullable final ParentTerritory parentTerritory) throws UnknownTerritoryException {
-        final String trimmed = Mapcode.convertStringToPlainAscii(numericOrAlpha.trim().replace('_', '-').toUpperCase());
+        final String trimmed = Mapcode.convertStringToPlainAscii(numericOrAlpha.trim().replace('_', '-')).toUpperCase();
 
         // First, try as numeric code.
         try {
