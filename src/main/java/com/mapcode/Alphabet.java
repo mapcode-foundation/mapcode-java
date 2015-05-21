@@ -30,7 +30,7 @@ public enum Alphabet {
     CYRILLIC(2),
     HEBREW(3),
     HINDI(4),
-    MALAI(5),
+    MALAY(5),
     GEORGIAN(6),
     KATAKANA(7),
     THAI(8),
