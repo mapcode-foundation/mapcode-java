@@ -39,6 +39,15 @@ public class PointTest {
         LOG.info("validPoint");
         final Point point = Point.fromMicroDeg(2, 1);
         assertEquals("Valid point", true, point.isDefined());
+
+        assertEquals(0, Point.fromDeg(0, 0).getLatMicroDeg());
+        assertEquals(0, Point.fromDeg(0, 0).getLonMicroDeg());
+
+        assertEquals(90000000, Point.fromDeg(90, 0).getLatMicroDeg());
+        assertEquals(-90000000, Point.fromDeg(-90, 0).getLatMicroDeg());
+
+        assertEquals(-180000000, Point.fromDeg(0, 180).getLonMicroDeg());
+        assertEquals(-180000000, Point.fromDeg(0, 180).getLonMicroDeg());
     }
 
     @Test

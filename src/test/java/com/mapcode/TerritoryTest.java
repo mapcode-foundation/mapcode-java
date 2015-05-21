@@ -35,6 +35,28 @@ public class TerritoryTest {
     }
 
     @Test
+    public void checkAlphabetCode() throws Exception {
+        LOG.info("checkAlphabetCode");
+        int i = 0;
+        for (final Alphabet alphabet : Alphabet.values()) {
+            assertEquals(alphabet, Alphabet.fromCode(i));
+            ++i;
+        }
+    }
+
+    @Test(expected = UnknownAlphabetException.class)
+    public void checkAlphabetCodeError1() throws Exception {
+        LOG.info("checkAlphabetCodeError1");
+        Alphabet.fromCode(-1);
+    }
+
+    @Test(expected = UnknownAlphabetException.class)
+    public void checkAlphabetCodeError2() throws Exception {
+        LOG.info("checkAlphabetCodeError2");
+        Alphabet.fromCode(Alphabet.values().length);
+    }
+
+    @Test
     public void checkDash() throws Exception {
         LOG.info("checkDash");
         assertEquals(Territory.IN_MN, Territory.fromString("IND-MN"));

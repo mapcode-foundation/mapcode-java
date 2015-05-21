@@ -17,14 +17,12 @@
 package com.mapcode;
 
 import javax.annotation.Nonnull;
-import java.util.HashSet;
-import java.util.Set;
 
 import static com.mapcode.CheckArgs.checkNonnull;
 
 /**
  * This enum defines all alphabets supported for mapcodes. Mapcodes can be safely converted between
- * alphabets and fed to the mapcode decoder.
+ * alphabets and fed to the mapcode decoder in the regular ASCII Roman alphabet or any other.
  */
 public enum Alphabet {
     ROMAN(0),
@@ -42,6 +40,10 @@ public enum Alphabet {
     GURMUKHI(12),
     TIBETAN(13);
 
+    /**
+     * The numeric code is synonym for the alphanumeric code. It can be used in the decoder
+     * to define a territory as well.
+     */
     private final int code;
 
     private Alphabet(final int code) {
@@ -52,12 +54,17 @@ public enum Alphabet {
         return code;
     }
 
+    /**
+     * Get an alphabet from a numeric code.
+     *
+     * @param code Numeric code.
+     * @return Alphabet.
+     * @throws UnknownAlphabetException Thrown if code out of range.
+     */
     @Nonnull
     public static Alphabet fromCode(final int code) throws UnknownAlphabetException {
-        for (final Alphabet alphabet : values()) {
-            if (alphabet.code == code) {
-                return alphabet;
-            }
+        if ((code >= 0) && (code < Alphabet.values().length)) {
+            return Alphabet.values()[code];
         }
         throw new UnknownAlphabetException(code);
     }
@@ -89,20 +96,12 @@ public enum Alphabet {
      * Static checking of the static data structures.
      */
     static {
-        final String errorPrefix = "Initializing error: ";
-        final Set<Integer> alphabetCodeList = new HashSet<>();
-
+        int i = 0;
         for (final Alphabet alphabet : Alphabet.values()) {
-            final int alphabetCode = alphabet.getCode();
-            if ((alphabetCode < 0) || (alphabetCode >= Alphabet.values().length)) {
-                throw new ExceptionInInitializerError(errorPrefix + "alphabet code out of range: " + alphabetCode);
-
+            if (Alphabet.values()[i].code != i) {
+                throw new ExceptionInInitializerError("Incorrect alphabet code: " + alphabet + ".code should be " + i);
             }
-            if (alphabetCodeList.contains(alphabetCode)) {
-                throw new ExceptionInInitializerError(errorPrefix + "non-unique alphabet code: " + alphabetCode);
-            }
-            alphabetCodeList.add(alphabet.getCode());
+            ++i;
         }
-        assert alphabetCodeList.size() == Alphabet.values().length;
     }
 }

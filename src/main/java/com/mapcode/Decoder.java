@@ -165,8 +165,7 @@ class Decoder {
         LOG.trace("decode: result=({}, {})",
                 result.isDefined() ? result.getLatDeg() : Double.NaN,
                 result.isDefined() ? result.getLonDeg() : Double.NaN);
-        result = Point.restrictLatLon(result);
-        return result;
+        return result.wrap();
     }
 
     // ----------------------------------------------------------------------

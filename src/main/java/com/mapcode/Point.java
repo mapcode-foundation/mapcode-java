@@ -65,39 +65,7 @@ public class Point {
      */
     @Nonnull
     public static Point fromDeg(final double latDeg, final double lonDeg) {
-        return new Point(latDeg, lonDeg);
-    }
-
-    /**
-     * Create a point from lat/lon in micro-degrees (i.e. degrees * 1,000,000).
-     *
-     * @param latMicroDeg Longitude in microdegrees.
-     * @param lonMicroDeg Latitude in microdegrees.
-     * @return A defined point.
-     */
-    @Nonnull
-    public static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
-        return new Point(microDegToDeg(latMicroDeg), microDegToDeg(lonMicroDeg));
-    }
-
-    /**
-     * Get the latitude in microdegrees.
-     *
-     * @return Latitude in microdegrees. No range is enforced.
-     */
-    public int getLatMicroDeg() {
-        assert defined;
-        return degToMicroDeg(latDeg);
-    }
-
-    /**
-     * Get the longitude in microdegrees.
-     *
-     * @return Longitude in microdegrees. No range is enforced.
-     */
-    public int getLonMicroDeg() {
-        assert defined;
-        return degToMicroDeg(lonDeg);
+        return new Point(latDeg, lonDeg, true);
     }
 
     /**
@@ -118,25 +86,6 @@ public class Point {
     public double getLonDeg() {
         assert defined;
         return lonDeg;
-    }
-
-    public static int degToMicroDeg(final double deg) {
-        //noinspection NumericCastThatLosesPrecision
-        return (int) Math.round(deg * MICRODEG_TO_DEG_FACTOR);
-    }
-
-    public static double microDegToDeg(final int microDeg) {
-        return ((double) microDeg) / MICRODEG_TO_DEG_FACTOR;
-    }
-
-    @Nonnull
-    public static Point restrictLatLon(@Nonnull final Point point) {
-        if (!point.defined) {
-            return undefined();
-        }
-        final double latDeg = Math.max(Math.min(LAT_DEG_MAX, point.getLatDeg()), LAT_DEG_MIN);
-        final double lonDeg = Math.max(Math.min(LON_DEG_MAX, point.getLonDeg()), LON_DEG_MIN);
-        return new Point(latDeg, lonDeg);
     }
 
     /**
@@ -222,6 +171,33 @@ public class Point {
         return (eastMeters / METERS_PER_DEGREE_LON_EQUATOR) / Math.cos(Math.toRadians(lat));
     }
 
+    @Nonnull
+    @Override
+    public String toString() {
+        return defined ? ("(" + latDeg + ", " + lonDeg + ')') : "undefined";
+    }
+
+    @SuppressWarnings("NonFinalFieldReferencedInHashCode")
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(new Object[]{latDeg, lonDeg, defined});
+    }
+
+    @SuppressWarnings("NonFinalFieldReferenceInEquals")
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Point)) {
+            return false;
+        }
+        final Point that = (Point) obj;
+        return (Double.compare(this.latDeg, that.latDeg) == 0) &&
+                (Double.compare(this.lonDeg, that.lonDeg) == 0) &&
+                (this.defined == that.defined);
+    }
+
     /**
      * Private data.
      */
@@ -244,18 +220,80 @@ public class Point {
         defined = false;
     }
 
-    private Point(final double latDeg, final double lonDeg) {
-        // These assertions are not valid, as the ranges cannot be enforced currently:
-        // assert (LON_DEG_MIN <= lonDeg) && (lonDeg <= LON_DEG_MAX) : "lon [-180..180]: " + lonDeg;
-        // assert (LAT_DEG_MIN <= latDeg) && (latDeg <= LAT_DEG_MAX) : "lat [-90..90]: " + latDeg;
-        this.latDeg = latDeg;
-        this.lonDeg = lonDeg;
+    private Point(final double latDeg, final double lonDeg, boolean wrap) {
+        if (wrap) {
+            this.latDeg = mapToLat(latDeg);
+            this.lonDeg = mapToLon(lonDeg);
+            assert (LON_DEG_MIN <= this.lonDeg) && (this.lonDeg <= LON_DEG_MAX) : "lon [-180..180]: " + this.lonDeg;
+            assert (LAT_DEG_MIN <= this.latDeg) && (this.latDeg <= LAT_DEG_MAX) : "lat [-90..90]: " + this.latDeg;
+        } else {
+            this.latDeg = latDeg;
+            this.lonDeg = lonDeg;
+        }
         this.defined = true;
     }
 
     /**
      * Package private methods. Only used in the mapcode implementation modules.
      */
+
+    @Nonnull
+    static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
+        return new Point(microDegToDeg(latMicroDeg), microDegToDeg(lonMicroDeg), false);
+    }
+
+    int getLatMicroDeg() {
+        assert defined;
+        return degToMicroDeg(latDeg);
+    }
+
+    int getLonMicroDeg() {
+        assert defined;
+        return degToMicroDeg(lonDeg);
+    }
+
+    static int degToMicroDeg(final double deg) {
+        //noinspection NumericCastThatLosesPrecision
+        return (int) Math.round(deg * MICRODEG_TO_DEG_FACTOR);
+    }
+
+    static double microDegToDeg(final int microDeg) {
+        return ((double) microDeg) / MICRODEG_TO_DEG_FACTOR;
+    }
+
+    @Nonnull
+    Point wrap() {
+        if (defined) {
+            this.latDeg = mapToLat(latDeg);
+            this.lonDeg = mapToLon(lonDeg);
+        }
+        return this;
+    }
+
+    /**
+     * Map a longitude to [-90, 90]. Values outside this range are limited to this range.
+     *
+     * @param value Latitude, any range.
+     * @return Limited to [-90, 90].
+     */
+    static double mapToLat(final double value) {
+        final double lat = (value < -90.0) ? -90.0 : ((value > 90.0) ? 90.0 : value);
+        return lat;
+    }
+
+    /**
+     * Map a longitude to [-180, 180). Values outside this range are wrapped to this range.
+     *
+     * @param value Longitude, any range.
+     * @return Mapped to [-180, 180).
+     */
+    static double mapToLon(final double value) {
+        double lon = (((((value >= 0) ? value : -value) + 180) % 360) - 180) * ((value >= 0) ? 1.0 : -1.0);
+        if (Double.compare(lon, 180.0) == 0) {
+            lon = -lon;
+        }
+        return lon;
+    }
 
     /**
      * Create an undefined points. No latitude or longitude can be obtained from it.
@@ -286,32 +324,5 @@ public class Point {
      */
     boolean isDefined() {
         return defined;
-    }
-
-    @Nonnull
-    @Override
-    public String toString() {
-        return defined ? ("(" + latDeg + ", " + lonDeg + ')') : "undefined";
-    }
-
-    @SuppressWarnings("NonFinalFieldReferencedInHashCode")
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(new Object[]{latDeg, lonDeg, defined});
-    }
-
-    @SuppressWarnings("NonFinalFieldReferenceInEquals")
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (!(obj instanceof Point)) {
-            return false;
-        }
-        final Point that = (Point) obj;
-        return (Double.compare(this.latDeg, that.latDeg) == 0) &&
-                (Double.compare(this.lonDeg, that.lonDeg) == 0) &&
-                (this.defined == that.defined);
     }
 }

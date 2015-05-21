@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 
 import static com.mapcode.CheckArgs.checkNonnull;
-import static com.mapcode.CheckArgs.checkRange;
 
 /**
  * ----------------------------------------------------------------------------------------------
@@ -86,8 +85,8 @@ public final class MapcodeCodec {
      * that the first result is the shortest mapcode. If you want to use the shortest mapcode, use
      * {@link #encodeToShortest(double, double, Territory)}.
      *
-     * @param latDeg              Latitude, accepted range: -90..90.
-     * @param lonDeg              Longitude, accepted range: -180..180.
+     * @param latDeg              Latitude, accepted range: -90..90 (limited to this range if outside).
+     * @param lonDeg              Longitude, accepted range: -180..180 (wrapped to this range if outside).
      * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. May be null.
      * @return List of mapcode information records, see {@link Mapcode}. This list is empty if no
      * Mapcode can be generated for this territory matching the lat/lon.
@@ -96,9 +95,6 @@ public final class MapcodeCodec {
     @Nonnull
     public static List<Mapcode> encode(final double latDeg, final double lonDeg,
                                        @Nullable final Territory restrictToTerritory) throws IllegalArgumentException {
-        checkRange("latDeg", latDeg, Point.LAT_DEG_MIN, Point.LAT_DEG_MAX);
-        checkRange("lonDeg", lonDeg, Point.LON_DEG_MIN, Point.LON_DEG_MAX);
-
         // Call Mapcode encoder.
         final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, false, (restrictToTerritory == null));
         assert results != null;
@@ -149,9 +145,6 @@ public final class MapcodeCodec {
     @Nonnull
     public static Mapcode encodeToShortest(final double latDeg, final double lonDeg,
                                            @Nullable final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
-        checkRange("latDeg", latDeg, Point.LAT_DEG_MIN, Point.LAT_DEG_MAX);
-        checkRange("lonDeg", lonDeg, Point.LON_DEG_MIN, Point.LON_DEG_MAX);
-
         // Call mapcode encoder.
         @Nonnull final List<Mapcode> results =
                 Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, true, (restrictToTerritory == null));
@@ -181,8 +174,6 @@ public final class MapcodeCodec {
      */
     @Nonnull
     public static Mapcode encodeToInternational(final double latDeg, final double lonDeg) throws IllegalArgumentException {
-        checkRange("latDeg", latDeg, Point.LAT_DEG_MIN, Point.LAT_DEG_MAX);
-        checkRange("lonDeg", lonDeg, Point.LON_DEG_MIN, Point.LON_DEG_MAX);
 
         // Call mapcode encoder.
         @Nonnull final List<Mapcode> results = encode(latDeg, lonDeg, Territory.AAA);
@@ -280,8 +271,6 @@ public final class MapcodeCodec {
             throw new UnknownMapcodeException("Unknown Mapcode: " + mapcodeClean +
                     ", territoryContext=" + defaultTerritoryContext);
         }
-        assert (Point.LAT_DEG_MIN <= point.getLatDeg()) && (point.getLatDeg() <= Point.LAT_DEG_MAX) : point.getLatDeg();
-        assert (Point.LON_DEG_MIN <= point.getLonDeg()) && (point.getLonDeg() <= Point.LON_DEG_MAX) : point.getLonDeg();
         return point;
     }
 }

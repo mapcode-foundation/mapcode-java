@@ -145,35 +145,16 @@ public class EncoderTest {
         MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
     }
 
-    public void legalArgument() {
-        LOG.info("legalArgument");
+    @Test
+    public void legalArguments() {
+        LOG.info("legalArguments");
         MapcodeCodec.encode(-90, 0);
         MapcodeCodec.encode(90, 0);
         MapcodeCodec.encode(0, -180);
         MapcodeCodec.encode(0, 180);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument1() {
-        LOG.info("illegalArgument1");
-        MapcodeCodec.encode(-91, 0);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument2() {
-        LOG.info("illegalArgument2");
-        MapcodeCodec.encode(91, 0);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument3() {
-        LOG.info("illegalArgument3");
-        MapcodeCodec.encode(0, -181);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument4() {
-        LOG.info("illegalArgument4");
-        MapcodeCodec.encode(0, 181);
+        assertEquals(MapcodeCodec.encode(-91, 0), MapcodeCodec.encode(-90, 0));
+        assertEquals(MapcodeCodec.encode(91, 0), MapcodeCodec.encode(90, 0));
+        assertEquals(MapcodeCodec.encode(0, -181), MapcodeCodec.encode(0, 179));
+        assertEquals(MapcodeCodec.encode(0, 181), MapcodeCodec.encode(0, -179));
     }
 }

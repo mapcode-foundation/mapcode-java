@@ -64,20 +64,9 @@ class Encoder {
                 argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), isRecursive, limitToOneResult,
                 allowWorld);
 
-        double latDeg = argLatDeg;
-        double lonDeg = argLonDeg;
+        double latDeg = Point.mapToLat(argLatDeg);
+        double lonDeg = Point.mapToLon(argLonDeg);
         Territory stateOverride = argStateOverride;
-
-        if (latDeg > 90) {
-            latDeg -= 180;
-        } else if (latDeg < -90) {
-            latDeg += 180;
-        }
-        if (lonDeg > 179.999999) {
-            lonDeg -= 360;
-        } else if (lonDeg < -180) {
-            lonDeg += 180;
-        }
 
         final Point pointToEncode = Point.fromDeg(latDeg, lonDeg);
         final List<SubArea> areas = SubArea.getAreasForPoint(pointToEncode);

@@ -107,16 +107,6 @@ catch (final UnknownMapcodeException e) {
 }
 +---
 
-    * It's important to note that for the encoding methods:
-
-        * <<latitudes>> are always between <<<-90>>> and <<<90>>>, and
-
-        * <<longitudes>> are always between <<<-180>>> and <<<180>>>.
-
-        An runtime exception <<<IllegalArgumentException>>> exception is thrown for values outside these ranges.
-
-        []
-
     * <<<Point decode(String mapcode)>>> decodes a mapcode to a <<<Point>>> which contains a location. Example:
 
 +----
@@ -144,58 +134,46 @@ Class <<<Mapcode.java>>>
     it allows string-formatted mapcodes to be converted to <<<Mapcode>>> objects, where territory information
     is properly parsed and converted to a <<<Territory>>> enumeration value.
 
-    * <<<String getMapcode()>>> returns the mapcode string which does not include territory information. You can also
-    use <<<getMapcodePrecision1()>>> and <<<getMapcodePrecision2()>>> for more precision, but longer
+    * <<<String getCode()>>> returns the mapcode string which does not include territory information. You can also
+    use <<<getCode(1)>>> and <<<getCode(2)>>> for more precision, but longer
     mapcodes.
 
-        * The default precision offered by <<<getMapcode()>>> is approximately 5m (maximum distance to latitude,
-        longitude the mapcode decodes to). This corresponds to an area of 10m x 10m (100m2). These mapcodes include
+        * The default precision offered by <<<getCode()>>> is approximately 10m (maximum distance to latitude,
+        longitude the mapcode decodes to). This corresponds to an area of 20m x 20m (400m2). These mapcodes include
         no additional precision digits.
 
-        * The precision offered by <<<getMapcodePrecision1()>>> is approximately 1m.
-        This corresponds to an area of 2m x 2m (4m2). These mapcodes include 1 additional precision digit.
+        * The precision offered by <<<getMapcodePrecision1()>>> is approximately 2m.
+        This corresponds to an area of 4m x 4m (16m2). These mapcodes include 1 additional precision digit.
 
-        * The precision offered by <<<getMapcodePrecision2()>>> is approximately 0.16m. This corresponds to an area
-        of 0.32m x 0.32m (0.1m2). These mapcodes include 2 additional precision digits.
+        * The precision offered by <<<getMapcodePrecision2()>>> is approximately 0.40m. This corresponds to an area
+        of 0.80m x 0.80m (0.64m2). These mapcodes include 2 additional precision digits.
 
     * <<<Territory getTerritory()>>> returns the territory information.
 
-    * <<<StringasInternationFullname()>>> returns mapcodes string with territory information, specified as a full
-    country name.
-
-    * <<<String asInternationISO()>>> returns mapcodes string with territory information, specified as an ISO code
-    name. Importanmt: This is returns the same result as <<<toString()>>>.
+    * <<<toString()>>> and <<<getCodeWithTerritory()>>> return mapcodes string with territory information,
+    specified as a ISO code.
 
     []
 
 Class <<<Point.java>>>
 
     This class represents (latitude, longitude) locations. It offers methods to create locations using
-    degrees or micro-degrees (which are degrees times 1.000.000).
+    degrees.
 
     * <<<Point fromDeg(double latitude, double longitude)>>> returns a <<<Point>>> for a given (latitude, longitude)
     pair. Note that:
 
         * <<latitudes>> are always between <<<-90>>> and <<<90>>>, and
 
-        * <<longitudes>> are always between <<<-180>>> and <<<180>>>.
+        * <<longitudes>> are always between <<<-180>>> and <<<180>>>;
 
-        []
-
-    * <<<Point fromMicroDeg(int latitude, int longitude)>>> is the same as <<<fromDeg>>> except the values are
-    integers and are degerees times 1.000.000, so the ranges are:
-
-        * <<latitudes>> are always between <<<-90000000>>> and <<<90000000>>>, and
-
-        * <<longitudes>> are always between <<<-180000000>>> and <<<180000000>>>.
+        * Values outside these range are correctly limited (latitude) or wrapped (longitude) to these ranges.
 
         []
 
     * <<<double getLat()>>> and <<<getLon()>>> return the latitude and longitude respectively, in degrees.
 
-    * <<<int getLatMicroDegrees()>>> and <<<getLonMicroDegrees()>>> return the latitude and longitude respectively,
-    in micro-degrees.
-
+    []
 
 What Is A Mapcode?
 

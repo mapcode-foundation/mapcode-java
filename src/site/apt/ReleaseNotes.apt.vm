@@ -29,6 +29,10 @@ Release Notes (Version ${project.version})
 
     * Allowed nullable values in <<<MapcodeCodec>>> encode and decode methods to assume reasonable defaults.
 
+    * Microdegrees are no longer support publicly in <<<Point>>>. Only degrees.
+
+    * Latitudes are limited to -90..90 and longitudes are wrapped to -180..180 (non inclusive).
+
     []
 
 

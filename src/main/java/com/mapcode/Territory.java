@@ -823,6 +823,8 @@ public enum Territory {
         codeList = new ArrayList<>();
         nameMap = new HashMap<>();
         parentList = new ArrayList<>();
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
         final Set<Integer> territoryCodes = new HashSet<>();
         final Set<String> aliasesSet = new HashSet<>();
 
@@ -853,8 +855,15 @@ public enum Territory {
                 aliasesSet.add(alias);
                 addNameWithParentVariants(alias, territory);
             }
+            min = Math.min(min, territory.code);
+            max = Math.max(max, territory.code);
         }
         assert territoryCodes.size() == Territory.values().length;
+
+        // Check for missing codes.
+        if (!((min == 0) && (max == (Territory.values().length - 1)))) {
+            throw new ExceptionInInitializerError(errorPrefix + "incorrect min/max: " + min + '/' + max);
+        }
     }
 
     /**

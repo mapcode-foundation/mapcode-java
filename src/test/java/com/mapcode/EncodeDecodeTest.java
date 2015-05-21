@@ -106,18 +106,18 @@ public class EncodeDecodeTest {
                     maxDistancePrecision1Meters = Math.max(maxDistancePrecision1Meters, distancePrecision1Meters);
                     maxDistancePrecision2Meters = Math.max(maxDistancePrecision2Meters, distancePrecision2Meters);
 
-                    assertTrue("distancePrecision0Meters=" + distancePrecision0Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(0),
+                    assertTrue(mapcode + " distancePrecision0Meters=" + distancePrecision0Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(0),
                             distancePrecision0Meters < Mapcode.getSafeMaxOffsetInMeters(0));
-                    assertTrue("distancePrecision1Meters=" + distancePrecision1Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(1),
+                    assertTrue(mapcode + "distancePrecision1Meters=" + distancePrecision1Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(1),
                             distancePrecision1Meters < Mapcode.getSafeMaxOffsetInMeters(1));
-                    assertTrue("distancePrecision2Meters=" + distancePrecision2Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(2),
+                    assertTrue(mapcode + "distancePrecision2Meters=" + distancePrecision2Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(2),
                             distancePrecision2Meters < Mapcode.getSafeMaxOffsetInMeters(2));
 
                     // Check conversion from/to alphabets.
                     for (final Alphabet alphabet : Alphabet.values()) {
                         final String mapcodeAlphabet = mapcode.getCode(alphabet);
                         final String mapcodeAscii = Mapcode.convertStringToPlainAscii(mapcodeAlphabet);
-                        assertEquals("alphabet=" + alphabet + ", original=" + codePrecision0 +
+                        assertEquals(mapcode + " alphabet=" + alphabet + ", original=" + codePrecision0 +
                                         ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii,
                                 codePrecision0, mapcodeAscii);
                     }

@@ -22,7 +22,7 @@ import javax.annotation.Nullable;
 import static com.mapcode.Mapcode.isValidMapcodeFormat;
 
 /**
- * Package private helper methods.
+ * Package private helper methods to check arguments for validity.
  */
 class CheckArgs {
 
