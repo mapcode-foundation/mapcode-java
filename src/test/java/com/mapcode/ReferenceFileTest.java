@@ -172,12 +172,12 @@ public class ReferenceFileTest {
                     for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
                         if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
                             if (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodePrecision(2))) {
+                                if (referenceMapcodeRec.mapcode.equals(result.getCode(2))) {
                                     found = true;
                                     break;
                                 }
                             } else {
-                                if (referenceMapcodeRec.mapcode.equals(result.getMapcode())) {
+                                if (referenceMapcodeRec.mapcode.equals(result.getCode())) {
                                     found = true;
                                     break;
                                 }
@@ -200,12 +200,12 @@ public class ReferenceFileTest {
                     for (final Mapcode result : results) {
                         if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
                             if (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getMapcodePrecision(2))) {
+                                if (referenceMapcodeRec.mapcode.equals(result.getCode(2))) {
                                     found = true;
                                     break;
                                 }
                             } else {
-                                if (referenceMapcodeRec.mapcode.equals(result.getMapcode())) {
+                                if (referenceMapcodeRec.mapcode.equals(result.getCode())) {
                                     found = true;
                                     break;
                                 }
@@ -228,7 +228,7 @@ public class ReferenceFileTest {
                         maxdelta = Math.max(maxdelta, distanceMeters);
 
                         final double maxDeltaMeters = (mapcodeRec.mapcode.lastIndexOf('-') > 4) ?
-                                Mapcode.PRECISION_2_MAX_DELTA_METERS : Mapcode.PRECISION_0_MAX_DELTA_METERS;
+                                Mapcode.getSafeMaxOffsetInMeters(2) : Mapcode.getSafeMaxOffsetInMeters(0);
                         if (distanceMeters > maxDeltaMeters) {
                             LOG.error("Mapcode {} {} was generated for point {}, but decodes to point {} " +
                                             "which is {} meters from the original point (max is {} meters).",

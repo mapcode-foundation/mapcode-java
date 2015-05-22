@@ -20,9 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
+
+    private static final char GREEK_CAPITAL_ALPHA = 'Α';
 
     private Decoder() {
         // Prevent instantiation.
@@ -76,7 +79,7 @@ class Decoder {
             }
         }
 
-        final int ccode = territory.getTerritoryCode();
+        final int ccode = territory.getCode();
 
         final int from = DataAccess.dataFirstRecord(ccode);
         if (DataAccess.dataFlags(from) == 0) {
@@ -162,8 +165,7 @@ class Decoder {
         LOG.trace("decode: result=({}, {})",
                 result.isDefined() ? result.getLatDeg() : Double.NaN,
                 result.isDefined() ? result.getLonDeg() : Double.NaN);
-        result = Point.restrictLatLon(result);
-        return result;
+        return result.wrap();
     }
 
     // ----------------------------------------------------------------------
@@ -172,7 +174,8 @@ class Decoder {
 
     private static final int CCODE_EARTH = 540;
 
-    private final static int[] decode_chars = {-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+    private final static int[] DECODE_CHARS = {
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1, -1, -2, 10, 11, 12, -3, 13, 14, 15,
             1, 16, 17, 18, 19, 20, 0, 21, 22, 23, 24, 25, -4, 26, 27, 28, 29, 30, -1, -1, -1, -1, -1, -1, -2, 10, 11,
@@ -189,41 +192,58 @@ class Decoder {
         public final int max;
         public final String convert;
 
-        public Unicode2Ascii(final int min, final int max, final String convert) {
+        public Unicode2Ascii(final int min, final int max, @Nullable final String convert) {
             this.min = min;
             this.max = max;
             this.convert = convert;
         }
     }
 
+    private final static int[][] ASCII2LANGUAGE = {
+            {0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047, 0x0048, 0x0049, 0x004a, 0x004b, 0x004c, 0x004d, 0x004e, 0x004f, 0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057, 0x0058, 0x0059, 0x005a, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // roman
+            {0x0391, 0x0392, 0x039e, 0x0394, 0x003f, 0x0395, 0x0393, 0x0397, 0x0399, 0x03a0, 0x039a, 0x039b, 0x039c, 0x039d, 0x039f, 0x03a1, 0x0398, 0x03a8, 0x03a3, 0x03a4, 0x003f, 0x03a6, 0x03a9, 0x03a7, 0x03a5, 0x0396, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // greek
+            {0x0410, 0x0412, 0x0421, 0x0414, 0x0415, 0x0416, 0x0413, 0x041d, 0x0418, 0x041f, 0x041a, 0x041b, 0x041c, 0x0417, 0x041e, 0x0420, 0x0424, 0x042f, 0x0426, 0x0422, 0x042d, 0x0427, 0x0428, 0x0425, 0x0423, 0x0411, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // cyrillic
+            {0x05d0, 0x05d1, 0x05d2, 0x05d3, 0x05e3, 0x05d4, 0x05d6, 0x05d7, 0x05d5, 0x05d8, 0x05d9, 0x05da, 0x05db, 0x05dc, 0x05e1, 0x05dd, 0x05de, 0x05e0, 0x05e2, 0x05e4, 0x05e5, 0x05e6, 0x05e7, 0x05e8, 0x05e9, 0x05ea, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // hebrew
+            {0x0905, 0x0915, 0x0917, 0x0918, 0x090f, 0x091a, 0x091c, 0x091f, 0x003f, 0x0920, 0x0923, 0x0924, 0x0926, 0x0927, 0x003f, 0x0928, 0x092a, 0x092d, 0x092e, 0x0930, 0x092b, 0x0932, 0x0935, 0x0938, 0x0939, 0x0921, 0x0966, 0x0967, 0x0968, 0x0969, 0x096a, 0x096b, 0x096c, 0x096d, 0x096e, 0x096f}, // hindi
+            {0x0d12, 0x0d15, 0x0d16, 0x0d17, 0x0d0b, 0x0d1a, 0x0d1c, 0x0d1f, 0x0d07, 0x0d21, 0x0d24, 0x0d25, 0x0d26, 0x0d27, 0x0d20, 0x0d28, 0x0d2e, 0x0d30, 0x0d31, 0x0d32, 0x0d09, 0x0d34, 0x0d35, 0x0d36, 0x0d38, 0x0d39, 0x0d66, 0x0d67, 0x0d68, 0x0d69, 0x0d6a, 0x0d6b, 0x0d6c, 0x0d6d, 0x0d6e, 0x0d6f}, // malay
+            {0x10a0, 0x10a1, 0x10a3, 0x10a6, 0x10a4, 0x10a9, 0x10ab, 0x10ac, 0x10b3, 0x10ae, 0x10b0, 0x10b1, 0x10b2, 0x10b4, 0x10ad, 0x10b5, 0x10b6, 0x10b7, 0x10b8, 0x10b9, 0x10a8, 0x10ba, 0x10bb, 0x10bd, 0x10be, 0x10bf, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // Georgian
+            {0x30a2, 0x30ab, 0x30ad, 0x30af, 0x30aa, 0x30b1, 0x30b3, 0x30b5, 0x30a4, 0x30b9, 0x30c1, 0x30c8, 0x30ca, 0x30cc, 0x30a6, 0x30d2, 0x30d5, 0x30d8, 0x30db, 0x30e1, 0x30a8, 0x30e2, 0x30e8, 0x30e9, 0x30ed, 0x30f2, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // Katakana
+            {0x0e30, 0x0e01, 0x0e02, 0x0e04, 0x0e32, 0x0e07, 0x0e08, 0x0e09, 0x0e31, 0x0e0a, 0x0e11, 0x0e14, 0x0e16, 0x0e17, 0x0e0d, 0x0e18, 0x0e1a, 0x0e1c, 0x0e21, 0x0e23, 0x0e2c, 0x0e25, 0x0e27, 0x0e2d, 0x0e2e, 0x0e2f, 0x0e50, 0x0e51, 0x0e52, 0x0e53, 0x0e54, 0x0e55, 0x0e56, 0x0e57, 0x0e58, 0x0e59}, // Thai
+            {0x0eb0, 0x0e81, 0x0e82, 0x0e84, 0x0ec3, 0x0e87, 0x0e88, 0x0e8a, 0x0ec4, 0x0e8d, 0x0e94, 0x0e97, 0x0e99, 0x0e9a, 0x0ec6, 0x0e9c, 0x0e9e, 0x0ea1, 0x0ea2, 0x0ea3, 0x0ebd, 0x0ea7, 0x0eaa, 0x0eab, 0x0ead, 0x0eaf, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // Laos
+            {0x0556, 0x0532, 0x0533, 0x0534, 0x0535, 0x0538, 0x0539, 0x053a, 0x053b, 0x053d, 0x053f, 0x0540, 0x0541, 0x0543, 0x0555, 0x0547, 0x0548, 0x054a, 0x054d, 0x054e, 0x0545, 0x054f, 0x0550, 0x0551, 0x0552, 0x0553, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // armenian
+            {0x0985, 0x098c, 0x0995, 0x0996, 0x098f, 0x0997, 0x0999, 0x099a, 0x003f, 0x099d, 0x09a0, 0x09a1, 0x09a2, 0x09a3, 0x003f, 0x09a4, 0x09a5, 0x09a6, 0x09a8, 0x09aa, 0x0993, 0x09ac, 0x09ad, 0x09af, 0x09b2, 0x09b9, 0x09e6, 0x09e7, 0x09e8, 0x09e9, 0x09ea, 0x09eb, 0x09ec, 0x09ed, 0x09ee, 0x09ef}, // Bengali
+            {0x0a05, 0x0a15, 0x0a17, 0x0a18, 0x0a0f, 0x0a1a, 0x0a1c, 0x0a1f, 0x003f, 0x0a20, 0x0a23, 0x0a24, 0x0a26, 0x0a27, 0x003f, 0x0a28, 0x0a2a, 0x0a2d, 0x0a2e, 0x0a30, 0x0a2b, 0x0a32, 0x0a35, 0x0a38, 0x0a39, 0x0a21, 0x0a66, 0x0a67, 0x0a68, 0x0a69, 0x0a6a, 0x0a6b, 0x0a6c, 0x0a6d, 0x0a6e, 0x0a6f}, // Gurmukhi
+            {0x0f58, 0x0f40, 0x0f41, 0x0f42, 0x0f64, 0x0f44, 0x0f45, 0x0f46, 0x003f, 0x0f47, 0x0f4a, 0x0f4c, 0x0f4e, 0x0f4f, 0x003f, 0x0f51, 0x0f53, 0x0f54, 0x0f56, 0x0f5e, 0x0f65, 0x0f5f, 0x0f61, 0x0f62, 0x0f63, 0x0f66, 0x0f20, 0x0f21, 0x0f22, 0x0f23, 0x0f24, 0x0f25, 0x0f26, 0x0f27, 0x0f28, 0x0f29}, // Tibetan
+    };
+
     private final static Unicode2Ascii[] UNICODE2ASCII = {
-            new Unicode2Ascii(0x0041, 0x005a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"), // Roman
-            new Unicode2Ascii(0x0391, 0x03a9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
-            new Unicode2Ascii(0x0410, 0x042f, "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"), // Cyrillic
-            new Unicode2Ascii(0x05d0, 0x05ea, "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"), // Hebrew
-            new Unicode2Ascii(0x0905, 0x0939, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Hindi
-            new Unicode2Ascii(0x0d07, 0x0d39, "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"), // Malai
-            new Unicode2Ascii(0x10a0, 0x10bf, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch
+            new Unicode2Ascii(0x0041, 0x005a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),                                                        // Roman
+            new Unicode2Ascii(0x0391, 0x03a9, "ABGDFZHQIKLMNCOJP?STYVXRW"),                                                         // Greek
+            new Unicode2Ascii(0x0410, 0x042f, "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"),                                                  // Cyrillic
+            new Unicode2Ascii(0x05d0, 0x05ea, "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"),                                                       // Hebrew
+            new Unicode2Ascii(0x0905, 0x0939, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Hindi
+            new Unicode2Ascii(0x0d07, 0x0d39, "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"),                               // Malai
+            new Unicode2Ascii(0x10a0, 0x10bf, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),                                                  // Georgian
             new Unicode2Ascii(0x30a2, 0x30f2, "A?I?O?U?EB?C?D?F?G?H???J???????K??????L?M?N?????P??Q??R??S?????TV?????WX???Y????Z"), // Katakana
-            new Unicode2Ascii(0x0e01, 0x0e32, "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"), // Thai
-            new Unicode2Ascii(0x0e81, 0x0ec6, "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"), // Lao
-            new Unicode2Ascii(0x0532, 0x0556, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
-            new Unicode2Ascii(0x0985, 0x09b9, "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"), // Bengali
-            new Unicode2Ascii(0x0a05, 0x0a39, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"), // Gurmukhi
-            new Unicode2Ascii(0x0f40, 0x0f66, "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"), // Tibetan
+            new Unicode2Ascii(0x0e01, 0x0e32, "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"),                                // Thai
+            new Unicode2Ascii(0x0e81, 0x0ec6, "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"),            // Lao
+            new Unicode2Ascii(0x0532, 0x0556, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"),                                             // Armenian
+            new Unicode2Ascii(0x0985, 0x09b9, "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"),                             // Bengali
+            new Unicode2Ascii(0x0a05, 0x0a39, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Gurmukhi
+            new Unicode2Ascii(0x0f40, 0x0f66, "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"),                                           // Tibetan
 
-            new Unicode2Ascii(0x0966, 0x096f, ""), // Hindi
-            new Unicode2Ascii(0x0d66, 0x0d6f, ""), // Malai
-            new Unicode2Ascii(0x0e50, 0x0e59, ""), // Thai
-            new Unicode2Ascii(0x09e6, 0x09ef, ""), // Bengali
-            new Unicode2Ascii(0x0a66, 0x0a6f, ""), // Gurmukhi
-            new Unicode2Ascii(0x0f20, 0x0f29, ""), // Tibetan
+            new Unicode2Ascii(0x0966, 0x096f, ""),  // Hindi
+            new Unicode2Ascii(0x0d66, 0x0d6f, ""),  // Malai
+            new Unicode2Ascii(0x0e50, 0x0e59, ""),  // Thai
+            new Unicode2Ascii(0x09e6, 0x09ef, ""),  // Bengali
+            new Unicode2Ascii(0x0a66, 0x0a6f, ""),  // Gurmukhi
+            new Unicode2Ascii(0x0f20, 0x0f29, ""),  // Tibetan
 
-            // lowercase variants: greek, georgisch
-            new Unicode2Ascii(0x03B1, 0x03c9, "ABGDFZHQIKLMNCOJP?STYVXRW"), // Greek
+            // lowercase variants: greek, georgian
+            new Unicode2Ascii(0x03B1, 0x03c9, "ABGDFZHQIKLMNCOJP?STYVXRW"),                                                         // Greek
             // lowercase
-            new Unicode2Ascii(0x10d0, 0x10ef, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"), // Georgisch lowercase
-            new Unicode2Ascii(0x0562, 0x0586, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"), // Armenian
+            new Unicode2Ascii(0x10d0, 0x10ef, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),                                                  // Georgisch lowercase
+            new Unicode2Ascii(0x0562, 0x0586, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"),                                             // Armenian
             // lowercase
             new Unicode2Ascii(0, 0, null)
     };
@@ -330,7 +350,7 @@ class Decoder {
         boolean swapletters = false;
 
         if ((mapcoderData.getCodex() != 21) && (a <= 31)) {
-            final int offset = decode_chars[(int) result.charAt(0)];
+            final int offset = DECODE_CHARS[(int) result.charAt(0)];
 
             if (offset < (r * (p + 1))) {
                 nrX = offset / (p + 1);
@@ -339,7 +359,7 @@ class Decoder {
                 nrX = r + ((offset - (r * (p + 1))) / p);
             }
         } else if ((mapcoderData.getCodex() != 21) && (a < 62)) {
-            nrX = decode_chars[(int) result.charAt(0)];
+            nrX = DECODE_CHARS[(int) result.charAt(0)];
             if (nrX < (62 - a)) {
                 swapletters = mapcoderData.getCodex() == 22;
             } else {
@@ -489,9 +509,7 @@ class Decoder {
                  * }
                  */
 
-                final Point retval = add2res(cornery, cornerx, dividerx << 2, dividery, -1, extrapostfix);
-
-                return retval;
+                return add2res(cornery, cornerx, dividerx << 2, dividery, -1, extrapostfix);
             }
             storageStart += product;
             i++;
@@ -511,7 +529,19 @@ class Decoder {
         }
         // less than 2 letters after dot
 
-        if (str.charAt(0) == 'A') {
+        if (str.charAt(0) == 'A') { // v1.50
+            int v1 = DECODE_CHARS[(int) str.charAt(lastpos)];
+            if (v1 < 0) {
+                v1 = 31;
+            }
+            int v2 = DECODE_CHARS[(int) str.charAt(lastpos - 1)];
+            if (v2 < 0) {
+                v2 = 31;
+            }
+            String s = String.valueOf(1000 + v1 + (32 * v2));
+            str = s.charAt(1) + str.substring(1, lastpos - 1) + s.charAt(2) + s.charAt(3);
+            voweled = true;
+        } else if (str.charAt(0) == 'U') { // v.1.50 debug decoding of U+alldigitmapcode
             voweled = true;
             str = str.substring(1);
             dotpos--;
@@ -535,7 +565,7 @@ class Decoder {
                 } else if (e == 'U') {
                     v += 33;
                 } else {
-                    final int ve = decode_chars[(int) str.charAt(lastpos)];
+                    final int ve = DECODE_CHARS[(int) str.charAt(lastpos)];
                     if (ve < 0) {
                         return "";
                     }
@@ -556,9 +586,10 @@ class Decoder {
 
         for (int v = 0; v <= lastpos; v++) {
             if (v != dotpos) {
-                if (decode_chars[(int) str.charAt(v)] < 0) {
+                final int i = (int) str.charAt(v);
+                if (DECODE_CHARS[i] < 0) {
                     return ""; // bad char!
-                } else if (voweled && (decode_chars[(int) str.charAt(v)] > 9)) {
+                } else if (voweled && (DECODE_CHARS[(int) str.charAt(v)] > 9)) {
                     return ""; // nonodigit!
                 }
             }
@@ -570,45 +601,89 @@ class Decoder {
     /**
      * This method decodes a Unicode string to ASCII. Package private for access by other modules.
      *
-     * @param str Unicode string.
+     * @param mapcode Unicode string.
      * @return ASCII string.
      */
-    static String decodeUTF16(final String str) {
-        final StringBuilder asciibuf = new StringBuilder();
-        for (int index = 0; index < str.length(); index++) {
-            if (str.charAt(index) == '.') {
-                asciibuf.append(str.charAt(index));
-            } else if ((str.charAt(index) >= 1) && (str.charAt(index) <= 'z')) {
+    static String decodeUTF16(final String mapcode) {
+        String result;
+        final StringBuilder asciiBuf = new StringBuilder();
+        for (int index = 0; index < mapcode.length(); index++) {
+            final char ch = mapcode.charAt(index);
+            if (ch == '.') {
+                asciiBuf.append(ch);
+            } else if ((ch >= 1) && (ch <= 'z')) {
                 // normal ascii
-                asciibuf.append(str.charAt(index));
+                asciiBuf.append(ch);
             } else {
                 boolean found = false;
                 for (int i = 0; UNICODE2ASCII[i].min != 0; i++) {
-                    if ((str.charAt(index) >= UNICODE2ASCII[i].min)
-                            && (str.charAt(index) <= UNICODE2ASCII[i].max)) {
-                        String convert = UNICODE2ASCII[i].convert;
-                        if (convert == null) {
-                            convert = "0123456789";
-                        }
-                        asciibuf.append(convert.charAt(((int) str.charAt(index)) - UNICODE2ASCII[i].min));
+                    if ((ch >= UNICODE2ASCII[i].min) && (ch <= UNICODE2ASCII[i].max)) {
+                        final String convert = (UNICODE2ASCII[i].convert != null) ? UNICODE2ASCII[i].convert : "0123456789";
+                        final int pos = ((int) ch) - UNICODE2ASCII[i].min;
+                        asciiBuf.append(convert.charAt(pos));
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    asciibuf.append('?');
+                    asciiBuf.append('?');
                     break;
                 }
             }
         }
+        result = asciiBuf.toString();
 
-        return asciibuf.toString();
+        // Repack if this was a Greek 'alpha' code. This will have been converted to a regular 'A' after one iteration.
+        if (mapcode.startsWith(String.valueOf(GREEK_CAPITAL_ALPHA))) {
+            final String unpacked = aeuUnpack(result);
+            if (unpacked.isEmpty()) {
+                throw new AssertionError("decodeUTF16: cannot decode " + mapcode);
+            }
+            result = Encoder.aeuPack(unpacked, false);
+        }
+        return result;
+    }
+
+    static String encodeUTF16(final String mapcode, int alphabetCode) throws IllegalArgumentException {
+        final String mapcodeToEncode;
+        if (ASCII2LANGUAGE[alphabetCode][4] == 0x003f) {
+
+            // Alphabet does not contain 'E'.
+            if (mapcode.matches("^.*[EU].*")) {
+                final String unpacked = aeuUnpack(mapcode);
+                if (unpacked.isEmpty()) {
+                    throw new IllegalArgumentException("encodeToAlphabetCode: cannot encode '" + mapcode +
+                            "' to alphabet " + alphabetCode + ' ' + Alphabet.fromCode(alphabetCode));
+                }
+                mapcodeToEncode = Encoder.aeuPack(unpacked, true);
+            }
+            else {
+                mapcodeToEncode = mapcode;
+            }
+        }
+        else {
+            mapcodeToEncode = mapcode;
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (char ch : mapcodeToEncode.toCharArray()) {
+            ch = Character.toUpperCase(ch);
+            if (ch > 'Z') {
+                // Not in any valid range?
+                sb.append('?');
+            } else if (ch < 'A') {
+                // Valid but not a letter (e.g. a dot, a space...). Leave untranslated.
+                sb.append(ch);
+            } else {
+                sb.append((char) ASCII2LANGUAGE[alphabetCode][(int) ch - (int) 'A']);
+            }
+        }
+        return sb.toString();
     }
 
     @Nonnull
     private static Point decodeTriple(final String str) {
         //noinspection NumericCastThatLosesPrecision
-        final byte c1 = (byte) decode_chars[(int) str.charAt(0)];
+        final byte c1 = (byte) DECODE_CHARS[(int) str.charAt(0)];
         final int x = fastDecode(str.substring(1));
         if (c1 < 24) {
             return Point.fromMicroDeg(((c1 / 6) * 34) + (x % 34), ((c1 % 6) * 28) + (x / 34));
@@ -642,10 +717,10 @@ class Decoder {
             {
                 return value;
             }
-            if (decode_chars[c] < 0) {
+            if (DECODE_CHARS[c] < 0) {
                 return -1;
             }
-            value = (value * 31) + decode_chars[c];
+            value = (value * 31) + DECODE_CHARS[c];
         }
         return value;
     }
@@ -654,7 +729,7 @@ class Decoder {
     private static Point add2res(final int y, final int x, final int dividerx4, final int dividery, final int ydirection, final String extrapostfix) {
         if (!extrapostfix.isEmpty()) {
             int c1 = (int) extrapostfix.charAt(0);
-            c1 = decode_chars[c1];
+            c1 = DECODE_CHARS[c1];
             if (c1 < 0) {
                 c1 = 0;
             } else if (c1 > 29) {
@@ -664,7 +739,7 @@ class Decoder {
             final int x1 = c1 % 5;
             int c2 = (extrapostfix.length() == 2) ? (int) extrapostfix.charAt(1) : 72; // 72='H'=code
             // 15=(3+2*6)
-            c2 = decode_chars[c2];
+            c2 = DECODE_CHARS[c2];
             if (c2 < 0) {
                 c2 = 0;
             } else if (c2 > 29) {

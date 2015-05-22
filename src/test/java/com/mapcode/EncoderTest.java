@@ -37,10 +37,10 @@ public class EncoderTest {
 
         final List<Mapcode> results = MapcodeCodec.encode(lat, lon, Territory.NLD);
         assertEquals(4, results.size());
-        assertEquals("NLD 49.4V", results.get(0).asInternationalISO());
-        assertEquals("NLD G9.VWG", results.get(1).asInternationalISO());
-        assertEquals("NLD DL6.H9L", results.get(2).asInternationalISO());
-        assertEquals("NLD P25Z.N3Z", results.get(3).asInternationalISO());
+        assertEquals("NLD 49.4V", results.get(0).getCodeWithTerritory());
+        assertEquals("NLD G9.VWG", results.get(1).getCodeWithTerritory());
+        assertEquals("NLD DL6.H9L", results.get(2).getCodeWithTerritory());
+        assertEquals("NLD P25Z.N3Z", results.get(3).getCodeWithTerritory());
     }
 
     @Test
@@ -52,11 +52,11 @@ public class EncoderTest {
 
         final List<Mapcode> results = MapcodeCodec.encode(lat, lon);
         assertEquals(5, results.size());
-        assertEquals("NLD 49.4V", results.get(0).asInternationalISO());
-        assertEquals("NLD G9.VWG", results.get(1).asInternationalISO());
-        assertEquals("NLD DL6.H9L", results.get(2).asInternationalISO());
-        assertEquals("NLD P25Z.N3Z", results.get(3).asInternationalISO());
-        assertEquals("AAA VHXGB.1J9J", results.get(4).asInternationalISO());
+        assertEquals("NLD 49.4V", results.get(0).getCodeWithTerritory());
+        assertEquals("NLD G9.VWG", results.get(1).getCodeWithTerritory());
+        assertEquals("NLD DL6.H9L", results.get(2).getCodeWithTerritory());
+        assertEquals("NLD P25Z.N3Z", results.get(3).getCodeWithTerritory());
+        assertEquals("AAA VHXGB.1J9J", results.get(4).getCodeWithTerritory());
     }
 
     @Test
@@ -68,16 +68,16 @@ public class EncoderTest {
 
         final List<Mapcode> results = MapcodeCodec.encode(lat, lon);
         assertEquals(10, results.size());
-        assertEquals("IN-RJ XX.XX", results.get(0).asInternationalISO());
-        assertEquals("IN-RJ 6X.NHG", results.get(1).asInternationalISO());
-        assertEquals("IN-RJ KH9.FGV", results.get(2).asInternationalISO());
-        assertEquals("IN-RJ H8M.6FTF", results.get(3).asInternationalISO());
-        assertEquals("IN-RJ 8BZ9.D61B", results.get(4).asInternationalISO());
-        assertEquals("IN-MP H8M.6FTF", results.get(5).asInternationalISO());
-        assertEquals("IN-MP 8BZ9.D61B", results.get(6).asInternationalISO());
-        assertEquals("IND H8M.6FTF", results.get(7).asInternationalISO());
-        assertEquals("IND 8BZ9.D61B", results.get(8).asInternationalISO());
-        assertEquals("AAA PQ0PF.5M1H", results.get(9).asInternationalISO());
+        assertEquals("IN-RJ XX.XX", results.get(0).getCodeWithTerritory());
+        assertEquals("IN-RJ 6X.NHG", results.get(1).getCodeWithTerritory());
+        assertEquals("IN-RJ KH9.FGV", results.get(2).getCodeWithTerritory());
+        assertEquals("IN-RJ H8M.6FTF", results.get(3).getCodeWithTerritory());
+        assertEquals("IN-RJ 8BZ9.D61B", results.get(4).getCodeWithTerritory());
+        assertEquals("IN-MP H8M.6FTF", results.get(5).getCodeWithTerritory());
+        assertEquals("IN-MP 8BZ9.D61B", results.get(6).getCodeWithTerritory());
+        assertEquals("IND H8M.6FTF", results.get(7).getCodeWithTerritory());
+        assertEquals("IND 8BZ9.D61B", results.get(8).getCodeWithTerritory());
+        assertEquals("AAA PQ0PF.5M1H", results.get(9).getCodeWithTerritory());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class EncoderTest {
         final double lon = 4.908542;
 
         final Mapcode result = MapcodeCodec.encodeToInternational(lat, lon);
-        assertEquals("VHXGB.1J9J", result.getMapcode());
+        assertEquals("VHXGB.1J9J", result.getCode());
     }
 
     @Test
@@ -99,7 +99,7 @@ public class EncoderTest {
         final double lon = 75.847;
 
         final Mapcode result = MapcodeCodec.encodeToInternational(lat, lon);
-        assertEquals("PQ0PF.5M1H", result.getMapcode());
+        assertEquals("PQ0PF.5M1H", result.getCode());
     }
 
     @Test
@@ -110,7 +110,7 @@ public class EncoderTest {
         final double lon = 4.908542;
 
         final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon);
-        assertEquals("NLD 49.4V", result.asInternationalISO());
+        assertEquals("NLD 49.4V", result.getCodeWithTerritory());
     }
 
     @Test
@@ -121,7 +121,7 @@ public class EncoderTest {
         final double lon = 75.847;
 
         final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon);
-        assertEquals("IN-RJ XX.XX", result.asInternationalISO());
+        assertEquals("IN-RJ XX.XX", result.getCodeWithTerritory());
     }
 
     @Test
@@ -132,7 +132,7 @@ public class EncoderTest {
         final double lon = 4.908542;
 
         final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
-        assertEquals("NLD 49.4V", result.asInternationalISO());
+        assertEquals("NLD 49.4V", result.getCodeWithTerritory());
     }
 
     @Test(expected = UnknownMapcodeException.class)
@@ -145,42 +145,16 @@ public class EncoderTest {
         MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
     }
 
-    public void legalArgument() {
-        LOG.info("legalArgument");
+    @Test
+    public void legalArguments() {
+        LOG.info("legalArguments");
         MapcodeCodec.encode(-90, 0);
         MapcodeCodec.encode(90, 0);
         MapcodeCodec.encode(0, -180);
         MapcodeCodec.encode(0, 180);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument1() {
-        LOG.info("illegalArgument1");
-        MapcodeCodec.encode(-91, 0);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument2() {
-        LOG.info("illegalArgument2");
-        MapcodeCodec.encode(91, 0);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument3() {
-        LOG.info("illegalArgument3");
-        MapcodeCodec.encode(0, -181);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument4() {
-        LOG.info("illegalArgument4");
-        MapcodeCodec.encode(0, 181);
-    }
-
-    @SuppressWarnings("ConstantConditions")
-    @Test(expected = IllegalArgumentException.class)
-    public void illegalArgument5() {
-        LOG.info("illegalArgument4");
-        MapcodeCodec.encode(0, 0, null);
+        assertEquals(MapcodeCodec.encode(-91, 0), MapcodeCodec.encode(-90, 0));
+        assertEquals(MapcodeCodec.encode(91, 0), MapcodeCodec.encode(90, 0));
+        assertEquals(MapcodeCodec.encode(0, -181), MapcodeCodec.encode(0, 179));
+        assertEquals(MapcodeCodec.encode(0, 181), MapcodeCodec.encode(0, -179));
     }
 }

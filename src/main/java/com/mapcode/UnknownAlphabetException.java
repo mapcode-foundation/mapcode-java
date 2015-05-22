@@ -19,27 +19,27 @@ package com.mapcode;
 import javax.annotation.Nonnull;
 
 /**
- * This runtime exception is thrown for unknown territory codes. It is specifically a runtime exception, because
+ * This runtime exception is thrown for unknown alphabet codes. It is specifically a runtime exception, because
  * it (more or less) resembles an IllegalArgumentException, which is also a RuntimeException.
  */
-public final class UnknownTerritoryException extends IllegalArgumentException {
+public final class UnknownAlphabetException extends IllegalArgumentException {
     private static final long serialVersionUID = 1L;
 
     final Integer code;
 
-    public UnknownTerritoryException(@Nonnull final String message) {
+    public UnknownAlphabetException(@Nonnull final String message) {
         super(message);
         assert message != null;
         this.code = null;
     }
 
-    public UnknownTerritoryException(@Nonnull final String message, final int code) {
+    public UnknownAlphabetException(@Nonnull final String message, final int code) {
         super(message);
         assert message != null;
         this.code = code;
     }
 
-    public UnknownTerritoryException(final int code) {
+    public UnknownAlphabetException(final int code) {
         super();
         this.code = code;
     }

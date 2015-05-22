@@ -53,8 +53,8 @@ class Encoder {
     // Private methods.
     // ----------------------------------------------------------------------
 
-    private final static char[] encode_chars = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
-            'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
+    private final static char[] ENCODE_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
+            'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z', 'A', 'E', 'U'};
 
     @Nonnull
     private static List<Mapcode> encode(final double argLatDeg, final double argLonDeg,
@@ -64,20 +64,9 @@ class Encoder {
                 argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), isRecursive, limitToOneResult,
                 allowWorld);
 
-        double latDeg = argLatDeg;
-        double lonDeg = argLonDeg;
+        double latDeg = Point.mapToLat(argLatDeg);
+        double lonDeg = Point.mapToLon(argLonDeg);
         Territory stateOverride = argStateOverride;
-
-        if (latDeg > 90) {
-            latDeg -= 180;
-        } else if (latDeg < -90) {
-            latDeg += 180;
-        }
-        if (lonDeg > 179.999999) {
-            lonDeg -= 360;
-        } else if (lonDeg < -180) {
-            lonDeg += 180;
-        }
 
         final Point pointToEncode = Point.fromDeg(latDeg, lonDeg);
         final List<SubArea> areas = SubArea.getAreasForPoint(pointToEncode);
@@ -97,12 +86,12 @@ class Encoder {
                 continue;
             }
 
-            final int from = DataAccess.dataFirstRecord(currentEncodeTerritory.getTerritoryCode());
+            final int from = DataAccess.dataFirstRecord(currentEncodeTerritory.getCode());
             final Data mapcoderData = new Data(from);
             if (mapcoderData.getFlags() == 0) {
                 continue;
             }
-            final int upto = DataAccess.dataLastRecord(currentEncodeTerritory.getTerritoryCode());
+            final int upto = DataAccess.dataLastRecord(currentEncodeTerritory.getCode());
 
 
             final int i = subArea.getSubAreaID();
@@ -134,7 +123,7 @@ class Encoder {
                 }
 
                 if (mapcode.length() > 4) {
-                    mapcode = aeuPack(mapcode);
+                    mapcode = aeuPack(mapcode, false);
 
                     Territory encodeTerritory = currentEncodeTerritory;
                     if (stateOverride != null) {
@@ -152,7 +141,7 @@ class Encoder {
                         results.add(newResult);
                     } else {
                         LOG.error("encode: Duplicate results found, newResult={}, results={} items",
-                                newResult.asInternationalISO(), results.size());
+                                newResult.getCodeWithTerritory(), results.size());
                     }
 
                     lastbasesubareaID = from;
@@ -172,10 +161,10 @@ class Encoder {
         final int gy = ((30 * extray) / dividery);
         final int x1 = (gx / 6);
         final int y1 = (gy / 5);
-        String s = "-" + encode_chars[((y1 * 5) + x1)];
+        String s = "-" + ENCODE_CHARS[((y1 * 5) + x1)];
         final int x2 = (gx % 6);
         final int y2 = (gy % 5);
-        s += encode_chars[((y2 * 6) + x2)];
+        s += ENCODE_CHARS[((y2 * 6) + x2)];
         return s;
     }
 
@@ -446,7 +435,7 @@ class Encoder {
         return "";
     }
 
-    private static String aeuPack(final String argStr) {
+    static String aeuPack(final String argStr, final boolean argShort) {
         String str = argStr;
         int dotpos = -9;
         int rlen = str.length();
@@ -471,11 +460,13 @@ class Encoder {
         if ((rlen - 2) > dotpos) {
             // does r have a dot, AND at least 2 chars
             // after the dot?
-            final int v = (((((int) str.charAt(rlen - 2)) - 48) * 10) + ((int) str.charAt(rlen - 1))) - 48;
-            final int last = v % 34;
-            final char[] vowels = {'A', 'E', 'U'};
-            str =
-                    str.substring(0, rlen - 2) + vowels[v / 34] + (last < 31 ? encode_chars[last] : vowels[last - 31]);
+            if (argShort) {
+                final int v = ((((int) str.charAt(0)) - 48) * 100) + ((((int) str.charAt(rlen - 2)) - 48) * 10) + (((int) str.charAt(rlen - 1)) - 48);
+                return 'A' + str.substring(1, rlen - 2) + ENCODE_CHARS[v / 32] + ENCODE_CHARS[v % 32] + rest;
+            } else {
+                final int v = (((((int) str.charAt(rlen - 2)) - 48) * 10) + ((int) str.charAt(rlen - 1))) - 48;
+                str = str.substring(0, rlen - 2) + ENCODE_CHARS[31 + (v / 34)] + ENCODE_CHARS[v % 34];
+            }
         }
         return str + rest;
     }
@@ -486,7 +477,7 @@ class Encoder {
         final StringBuilder result = new StringBuilder();
         while (nrChars > 0) {
             nrChars--;
-            result.insert(0, encode_chars[value % 31]);
+            result.insert(0, ENCODE_CHARS[value % 31]);
             value = value / 31;
         }
         return result.toString();
@@ -505,9 +496,9 @@ class Encoder {
 
     private static String encodeTriple(final int difx, final int dify) {
         if (dify < (4 * 34)) {
-            return encode_chars[((difx / 28) + (6 * (dify / 34)))] + fastEncode(((difx % 28) * 34) + (dify % 34), 2);
+            return ENCODE_CHARS[((difx / 28) + (6 * (dify / 34)))] + fastEncode(((difx % 28) * 34) + (dify % 34), 2);
         } else {
-            return encode_chars[((difx / 24) + 24)] + fastEncode((((difx % 24) * 40) + dify) - 136, 2);
+            return ENCODE_CHARS[((difx / 24) + 24)] + fastEncode((((difx % 24) * 40) + dify) - 136, 2);
         }
     }
 }

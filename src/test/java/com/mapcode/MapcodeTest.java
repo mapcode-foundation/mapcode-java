@@ -16,7 +16,7 @@
 
 package com.mapcode;
 
-import com.mapcode.Mapcode.MapcodeFormatType;
+import com.mapcode.Mapcode.FormatType;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class MapcodeTest {
     private static final Logger LOG = LoggerFactory.getLogger(MapcodeTest.class);
 
     @Test
-    public void checkValidMapcodeFormats() {
+    public void checkValidCodeFormats() {
         LOG.info("checkValidMapcodeFormats");
 
         assertTrue(Mapcode.isValidMapcodeFormat("A1.B1"));
@@ -45,12 +45,25 @@ public class MapcodeTest {
         assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-AA"));
         assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-Y"));
         assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-1Y"));
+
+        // Mapcode may contain correctly formatted (possible incorrect) territory code.
+        assertTrue(Mapcode.isValidMapcodeFormat("NLD XX.XX"));
+        assertTrue(Mapcode.isValidMapcodeFormat("USA-NLD XX.XX"));
+        assertTrue(Mapcode.isValidMapcodeFormat("IN XX.XX"));
+        assertTrue(Mapcode.isValidMapcodeFormat("US-IN XX.XX"));
+        assertTrue(Mapcode.isValidMapcodeFormat("US_IN XX.XX"));
+        assertTrue(Mapcode.isValidMapcodeFormat("RU-IN XX.XX"));
+
+        // Territory code must be correct syntax.
+        assertFalse(Mapcode.isValidMapcodeFormat("NL- XX.XX"));
+        assertFalse(Mapcode.isValidMapcodeFormat("US IN XX.XX"));
     }
 
     @Test
-    public void checkInvalidMapcodeFormats() {
+    public void checkInvalidCodeFormats() {
         LOG.info("checkInvalidMapcodeFormats");
 
+        // Incorrect (nunber of) characters.
         assertFalse(Mapcode.isValidMapcodeFormat("A"));
         assertFalse(Mapcode.isValidMapcodeFormat("AB"));
         assertFalse(Mapcode.isValidMapcodeFormat("AB."));
@@ -84,16 +97,25 @@ public class MapcodeTest {
     public void checkMapcodeFormatType() {
         LOG.info("checkMapcodeFormatType");
 
-        assertEquals(MapcodeFormatType.MAPCODE_TYPE_INVALID, Mapcode.getMapcodeFormatType("ABC"));
-        assertEquals(MapcodeFormatType.MAPCODE_TYPE_PRECISION_0, Mapcode.getMapcodeFormatType("AA.BB"));
-        assertEquals(MapcodeFormatType.MAPCODE_TYPE_PRECISION_1, Mapcode.getMapcodeFormatType("AA.BB-1"));
-        assertEquals(MapcodeFormatType.MAPCODE_TYPE_PRECISION_2, Mapcode.getMapcodeFormatType("AA.BB-12"));
+        assertEquals(FormatType.INVALID, Mapcode.getMapcodeFormatType("ABC"));
+        assertEquals(FormatType.PRECISION_0, Mapcode.getMapcodeFormatType("AA.BB"));
+        assertEquals(FormatType.PRECISION_1, Mapcode.getMapcodeFormatType("AA.BB-1"));
+        assertEquals(FormatType.PRECISION_2, Mapcode.getMapcodeFormatType("AA.BB-12"));
     }
 
     @Test
     public void checkConvertToAscii() {
         LOG.info("checkConvertToAscii");
-        assertEquals("KM.8K", Mapcode.convertToAscii("\u30c1\u30ca.8\u30c1"));
-        assertEquals("HJ.Q2-Z", Mapcode.convertToAscii("\u0397\u03a0.\u03982-\u0411"));
+
+        // Check ASCII characters.
+        assertEquals("KM.8K", Mapcode.convertStringToPlainAscii("KM.8K"));
+        assertEquals("HJ.Q2-Z", Mapcode.convertStringToPlainAscii("HJ.Q2-Z"));
+        assertEquals("36228.92UW", Mapcode.convertStringToPlainAscii("36228.92UW"));
+        assertEquals("36228.92UW-TK", Mapcode.convertStringToPlainAscii("36228.92UW-TK"));
+
+        // Check unicode characters.
+        assertEquals("GRC", Mapcode.convertStringToPlainAscii("\u0393\u03a8\u039e"));
+        assertEquals("KM.8K", Mapcode.convertStringToPlainAscii("\u30c1\u30ca.8\u30c1"));
+        assertEquals("HJ.Q2-Z", Mapcode.convertStringToPlainAscii("\u0397\u03a0.\u03982-\u0411"));
     }
 }

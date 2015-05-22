@@ -13,6 +13,9 @@ and to decode mapcodes back to latitude/longitude pairs.
 
 **An example of how to use this library can be found at: https://github.com/mapcode-foundation/mapcode-java-example**
 
+If you wish to use mapcodes in your own application landscape, consider using running an instance of the
+Mapcode REST API, which can be found on: **https://github.com/mapcode-foundation/mapcode-rest-service**
+
 # License
 
 Licensed under the Apache License, Version 2.0 (the "License");

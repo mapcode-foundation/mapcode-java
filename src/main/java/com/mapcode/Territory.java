@@ -18,13 +18,9 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.mapcode.CheckArgs.checkNonnull;
-import static com.mapcode.CheckArgs.checkRange;
 
 /**
  * ----------------------------------------------------------------------------------------------
@@ -42,7 +38,7 @@ public enum Territory {
     BRA(409, "Brazil", null, new String[]{"BR"}),
     RUS(496, "Russia", null, new String[]{"RU"}),
     CHN(528, "China", null, new String[]{"CN"}),
-    ATA(540, "Antarctica"),
+    ATA(531, "Antarctica"),
 
     VAT(0, "Vatican City", null, null, new String[]{"Holy See)"}),
     MCO(1, "Monaco"),
@@ -52,10 +48,10 @@ public enum Territory {
     BLM(5, "Saint-Barthelemy"),
     NRU(6, "Nauru"),
     TUV(7, "Tuvalu"),
-    MAC(8, "Macau", null, new String[]{"CN-92", "CHN-92", "CN-MC", "CHN-MC"}),
+    MAC(8, "Macau", null, new String[]{"CN-92", "CHN-92", "CN-MC", "CHN-MC"}, new String[]{"Aomen"}),
     SXM(9, "Sint Maarten"),
     MAF(10, "Saint-Martin"),
-    NFK(11, "Norfolk and Philip Island", null, new String[]{"AU-NI", "AUS-NI", "AU-NF", "AUS-NF"},
+    NFK(11, "Norfolk and Philip Island", null, new String[]{"AU-NF", "AUS-NF"},
             new String[]{"Philip Island"}),
     PCN(12, "Pitcairn Islands"),
     BVT(13, "Bouvet Island"),
@@ -86,7 +82,7 @@ public enum Territory {
     GRD(37, "Grenada"),
     VIR(38, "US Virgin Islands", null, new String[]{"US-VI", "USA-VI"}, new String[]{"Virgin Islands, US"}),
     MYT(39, "Mayotte"),
-    SJM(40, "Svalbard and Jan Mayen", null, null, new String[]{"Jan Mayen"}),
+    SJM(40, "Svalbard and Jan Mayen", null, null, new String[]{"Jan Mayen", "Spitsbergen"}),
     VCT(41, "Saint Vincent and the Grenadines", null, null, new String[]{"Grenadines"}),
     HMD(42, "Heard Island and McDonald Islands", null, new String[]{"AU-HM", "AUS-HM"},
             new String[]{"McDonald Islands"}),
@@ -108,7 +104,7 @@ public enum Territory {
     KIR(58, "Kiribati"),
     TCA(59, "Turks and Caicos Islands", null, null, new String[]{"Caicos Islands"}),
     STP(60, "Sao Tome and Principe", null, null, new String[]{"Principe"}),
-    HKG(61, "Hong Kong", null, new String[]{"CN-91", "CHN-91", "CN-HK", "CHN-HK"}),
+    HKG(61, "Hong Kong", null, new String[]{"CN-91", "CHN-91", "CN-HK", "CHN-HK"}, new String[]{"Xianggang"}),
     MTQ(62, "Martinique"),
     FRO(63, "Faroe Islands"),
     GLP(64, "Guadeloupe"),
@@ -264,7 +260,7 @@ public enum Territory {
     NAM(213, "Namibia"),
     VEN(214, "Venezuela"),
     NGA(215, "Nigeria"),
-    TZA(216, "Tanzania", null, new String[]{"EAZ"}),
+    TZA(216, "Tanzania"),
     EGY(217, "Egypt"),
     MRT(218, "Mauritania"),
     BOL(219, "Bolivia"),
@@ -330,7 +326,7 @@ public enum Territory {
     IN_MN(279, "Manipur", ParentTerritory.IND),
     IN_TR(280, "Tripura", ParentTerritory.IND),
     IN_MZ(281, "Mizoram", ParentTerritory.IND),
-    IN_SK(282, "Sikkim", ParentTerritory.IND, new String[]{"IN-SKM"}),
+    IN_SK(282, "Sikkim", ParentTerritory.IND),
     IN_PB(283, "Punjab", ParentTerritory.IND),
     IN_HR(284, "Haryana", ParentTerritory.IND),
     IN_AR(285, "Arunachal Pradesh", ParentTerritory.IND),
@@ -339,7 +335,7 @@ public enum Territory {
     IN_UT(288, "Uttarakhand", ParentTerritory.IND, new String[]{"IN-UK"}),
     IN_GA(289, "Goa", ParentTerritory.IND),
     IN_KL(290, "Kerala", ParentTerritory.IND),
-    IN_TN(291, "Tamil Nuda", ParentTerritory.IND),
+    IN_TN(291, "Tamil Nadu", ParentTerritory.IND),
     IN_HP(292, "Himachal Pradesh", ParentTerritory.IND),
     IN_JK(293, "Jammu and Kashmir", ParentTerritory.IND),
     IN_CT(294, "Chhattisgarh", ParentTerritory.IND, new String[]{"IN-CG"}),
@@ -357,13 +353,13 @@ public enum Territory {
     IN_PY(306, "Puducherry", ParentTerritory.IND),
     AU_NSW(307, "New South Wales", ParentTerritory.AUS),
     AU_ACT(308, "Australian Capital Territory", ParentTerritory.AUS),
-    AU_JBT(309, "Jervis Bay Territory", ParentTerritory.AUS, new String[]{"AU-JB"}),
+    AU_JBT(309, "Jervis Bay Territory", ParentTerritory.AUS),
     AU_NT(310, "Northern Territory", ParentTerritory.AUS),
     AU_SA(311, "South Australia", ParentTerritory.AUS),
-    AU_TAS(312, "Tasmania", ParentTerritory.AUS, new String[]{"AU-TS"}),
+    AU_TAS(312, "Tasmania", ParentTerritory.AUS),
     AU_VIC(313, "Victoria", ParentTerritory.AUS),
     AU_WA(314, "Western Australia", ParentTerritory.AUS),
-    AU_QLD(315, "Queensland", ParentTerritory.AUS, new String[]{"AU-QL"}),
+    AU_QLD(315, "Queensland", ParentTerritory.AUS),
     BR_DF(316, "Distrito Federal", ParentTerritory.BRA),
     BR_SE(317, "Sergipe", ParentTerritory.BRA),
     BR_AL(318, "Alagoas", ParentTerritory.BRA),
@@ -571,18 +567,9 @@ public enum Territory {
     CN_XJ(527, "Xinjiang Uyghur", ParentTerritory.CHN, new String[]{"CN-65"}),
     UMI(529, "United States Minor Outlying Islands", null, new String[]{"US-UM", "USA-UM", "JTN"}),
     CPT(530, "Clipperton Island"),
-    AT0(531, "Macquarie Island", ParentTerritory.ATA),
-    AT1(532, "Ross Dependency", ParentTerritory.ATA),
-    AT2(533, "Adelie Land", ParentTerritory.ATA),
-    AT3(534, "Australian Antarctic Territory", ParentTerritory.ATA),
-    AT4(535, "Queen Maud Land", ParentTerritory.ATA),
-    AT5(536, "British Antarctic Territory", ParentTerritory.ATA),
-    AT6(537, "Chile Antartica", ParentTerritory.ATA),
-    AT7(538, "Argentine Antarctica", ParentTerritory.ATA),
-    AT8(539, "Peter 1 Island", ParentTerritory.ATA),
-    AAA(541, "International", null, null, new String[]{"Worldwide", "Earth"});
+    AAA(532, "International", null, null, new String[]{"Worldwide", "Earth"});
 
-    private final int territoryCode;
+    private final int code;
     @Nonnull
     private final String fullName;
     @Nullable
@@ -597,8 +584,8 @@ public enum Territory {
      *
      * @return Integer territory code.
      */
-    public int getTerritoryCode() {
-        return territoryCode;
+    public int getCode() {
+        return code;
     }
 
     /**
@@ -646,10 +633,13 @@ public enum Territory {
      *
      * @param territoryCode Numeric territory code.
      * @return Territory.
+     * @throws UnknownTerritoryException Thrown if incorrect numeric or alphanumeric code.
      */
     @Nonnull
-    public static Territory fromTerritoryCode(final int territoryCode) {
-        checkRange("territoryCode", territoryCode, 0, codeList.size() - 1);
+    public static Territory fromTerritoryCode(final int territoryCode) throws UnknownTerritoryException {
+        if ((territoryCode < 0) || (territoryCode >= codeList.size())) {
+            throw new UnknownTerritoryException(territoryCode);
+        }
         return codeList.get(territoryCode);
     }
 
@@ -666,43 +656,56 @@ public enum Territory {
      *
      * Brazilian mapcodes, on the other hand, would be specified as "BRA BDHP.JK39-1D", using the ISO 3 letter code.
      *
-     * @param name Territory name.
+     * @param numericOrAlpha Territory, may be numeric or alphanumeric code.
      * @return Territory.
-     * @throws UnknownTerritoryException Thrown if the territory is not found.
+     * @throws UnknownTerritoryException Thrown if incorrect numeric or alphanumeric code.
      */
     @Nonnull
-    public static Territory fromString(@Nonnull final String name) throws UnknownTerritoryException {
-        checkNonnull("name", name);
-        return createFromString(name, null);
+    public static Territory fromString(@Nonnull final String numericOrAlpha) throws UnknownTerritoryException {
+        checkNonnull("numericOrAlpha", numericOrAlpha);
+        return createFromString(numericOrAlpha, null);
     }
 
     /**
      * Get a territory from a name, specifying a parent territory for disambiguation.
      *
-     * @param name            Territory name. See {@link #fromString(String)} for an explanation of the format for
-     *                        this name. (This is NOT strictly an ISO code!)
+     * @param numericOrAlpha  Territory, may be numeric or alphanumeric code. See {@link #fromString(String)}
+     *                        for an explanation of the format for this name. (This is NOT strictly an ISO code!)
      * @param parentTerritory Parent territory.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if the territory is not found given the parentTerritory.
      */
     @Nonnull
     public static Territory fromString(
-            @Nonnull final String name,
+            @Nonnull final String numericOrAlpha,
             @Nonnull final ParentTerritory parentTerritory) throws UnknownTerritoryException {
-        checkNonnull("name", name);
+        checkNonnull("numericOrAlpha", numericOrAlpha);
         checkNonnull("parentTerritory", parentTerritory);
-        return createFromString(name, parentTerritory);
+        return createFromString(numericOrAlpha, parentTerritory);
     }
 
     /**
-     * Return the territory name, with dashes rather than underscores.
+     * Return the international value of the territory name, with dashes rather than underscores.
+     * This is the same as {@link #toNameFormat(NameFormat)} for {@link NameFormat#INTERNATIONAL}.
+     *
+     * @param alphabet Alphabet. May be null.
+     * @return Territory name. Underscores have been replaced with dashes.
+     */
+    @Nonnull
+    public String toString(@Nullable final Alphabet alphabet) {
+        return toNameFormat(NameFormat.INTERNATIONAL, alphabet);
+    }
+
+    /**
+     * Return the international value of the territory name, with dashes rather than underscores.
+     * This is the same as {@link #toNameFormat(NameFormat)} for {@link NameFormat#INTERNATIONAL}.
      *
      * @return Territory name. Underscores have been replaced with dashes.
      */
     @Override
     @Nonnull
     public String toString() {
-        return name().replace('_', '-');
+        return toString(null);
     }
 
     /**
@@ -717,23 +720,37 @@ public enum Territory {
     /**
      * Return the territory name, given a specific territory name format.
      *
-     * @param format Format to be used.
-     * @return Mapcode
+     * @param format   Format to be used.
+     * @param alphabet Alphabet. May be null.
+     * @return Mapcode.
      */
     @Nonnull
-    public String toNameFormat(@Nonnull final NameFormat format) {
+    public String toNameFormat(@Nonnull final NameFormat format, @Nullable final Alphabet alphabet) {
         checkNonnull("format", format);
+        String result = name().replace('_', '-');
         if (format != NameFormat.INTERNATIONAL) {
             final int index = name().indexOf('_');
             if (index != -1) {
                 assert name().length() > (index + 1);
                 final String shortName = name().substring(index + 1);
                 if ((format == NameFormat.MINIMAL) || (nameMap.get(shortName).size() == 1)) {
-                    return shortName;
+                    result = shortName;
                 }
             }
         }
-        return toString();
+        if (alphabet != null) {
+            try {
+                result = Mapcode.convertStringToAlphabet(result, alphabet);
+            } catch (final IllegalArgumentException ignored) {
+                // Simply return result if translation to alphabet fails.
+            }
+        }
+        return result;
+    }
+
+    @Nonnull
+    public String toNameFormat(@Nonnull final NameFormat format) {
+        return toNameFormat(format, null);
     }
 
     /**
@@ -758,33 +775,33 @@ public enum Territory {
      * Local constructors to create a territory code.
      */
     private Territory(
-            final int territoryCode,
+            final int code,
             @Nonnull final String fullName) {
-        this(territoryCode, fullName, null, null, null);
+        this(code, fullName, null, null, null);
     }
 
     private Territory(
-            final int territoryCode,
+            final int code,
             @Nonnull final String fullName,
             @Nullable final ParentTerritory parentTerritory) {
-        this(territoryCode, fullName, parentTerritory, null, null);
+        this(code, fullName, parentTerritory, null, null);
     }
 
     private Territory(
-            final int territoryCode,
+            final int code,
             @Nonnull final String fullName,
             @Nullable final ParentTerritory parentTerritory,
             @Nullable final String[] aliases) {
-        this(territoryCode, fullName, parentTerritory, aliases, null);
+        this(code, fullName, parentTerritory, aliases, null);
     }
 
     private Territory(
-            final int territoryCode,
+            final int code,
             @Nonnull final String fullName,
             @Nullable final ParentTerritory parentTerritory,
             @Nullable final String[] aliases,
             @Nullable final String[] fullNameAliases) {
-        this.territoryCode = territoryCode;
+        this.code = code;
         this.fullName = fullName;
         this.parentTerritory = (parentTerritory == null) ? null : parentTerritory.getTerritory();
         this.aliases = (aliases == null) ? new String[]{} : aliases;
@@ -799,50 +816,80 @@ public enum Territory {
     private static final List<Territory> parentList;
 
     /**
-     * Static initialization of the static data structures.
+     * Static checking of the static data structures.
      */
     static {
+        final String errorPrefix = "Initializing error: ";
         codeList = new ArrayList<>();
         nameMap = new HashMap<>();
         parentList = new ArrayList<>();
-        final ArrayList<Integer> territoryCodeList = new ArrayList<>();
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        final Set<Integer> territoryCodes = new HashSet<>();
+        final Set<String> aliasesSet = new HashSet<>();
 
         for (final Territory territory : Territory.values()) {
-            final int territoryCode = territory.getTerritoryCode();
-            assert (0 <= territoryCode) && (territoryCode < Territory.values().length) : territoryCode;
-            assert !territoryCodeList.contains(territoryCode) : territoryCode;
-            territoryCodeList.add(territory.getTerritoryCode());
+            final int territoryCode = territory.getCode();
+            if ((territoryCode < 0) || (territoryCode >= Territory.values().length)) {
+                throw new ExceptionInInitializerError(errorPrefix + "territory code out of range: " + territoryCode);
+
+            }
+            if (territoryCodes.contains(territoryCode)) {
+                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory code: " + territoryCode);
+            }
+            territoryCodes.add(territory.getCode());
 
             final int initialCodeListSize = codeList.size();
-            for (int i = initialCodeListSize; i <= territory.territoryCode; i++) {
+            for (int i = initialCodeListSize; i <= territory.code; i++) {
                 codeList.add(null);
             }
-            codeList.set(territory.territoryCode, territory);
+            codeList.set(territory.code, territory);
             if ((territory.parentTerritory != null) && !parentList.contains(territory.parentTerritory)) {
                 parentList.add(territory.parentTerritory);
             }
             addNameWithParentVariants(territory.toString(), territory);
             for (final String alias : territory.aliases) {
+                if (aliasesSet.contains(alias)) {
+                    throw new ExceptionInInitializerError(errorPrefix + "non-unique alias: " + alias);
+                }
+                aliasesSet.add(alias);
                 addNameWithParentVariants(alias, territory);
             }
+            min = Math.min(min, territory.code);
+            max = Math.max(max, territory.code);
         }
-        assert territoryCodeList.size() == Territory.values().length;
+        assert territoryCodes.size() == Territory.values().length;
+
+        // Check for missing codes.
+        if (!((min == 0) && (max == (Territory.values().length - 1)))) {
+            throw new ExceptionInInitializerError(errorPrefix + "incorrect min/max: " + min + '/' + max);
+        }
     }
 
     /**
      * Get a territory from a name, specifying a parent territory for disambiguation.
      *
-     * @param name            Territory name.
+     * @param numericOrAlpha  Territory name.
      * @param parentTerritory Parent territory.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if the territory is not found.
      */
     @Nonnull
     private static Territory createFromString(
-            @Nonnull final String name,
+            @Nonnull final String numericOrAlpha,
             @Nullable final ParentTerritory parentTerritory) throws UnknownTerritoryException {
-        final String nameTrimmed = name.trim().replace('_', '-');
-        final List<Territory> territories = nameMap.get(nameTrimmed);
+        final String trimmed = Mapcode.convertStringToPlainAscii(numericOrAlpha.trim().replace('_', '-')).toUpperCase();
+
+        // First, try as numeric code.
+        try {
+            final Integer territoryCode = Integer.valueOf(trimmed);
+            return fromTerritoryCode(territoryCode);
+        } catch (final NumberFormatException ignored) {
+            // Re-try as alpha code.
+        }
+
+        // Now, try as alpha code.
+        final List<Territory> territories = nameMap.get(trimmed);
         if (territories != null) {
             if (parentTerritory == null) {
                 return territories.get(0);
@@ -853,15 +900,15 @@ public enum Territory {
                     return territory;
                 }
             }
-            throw new UnknownTerritoryException(nameTrimmed);
+            throw new UnknownTerritoryException(trimmed);
         }
 
         // Check for a case such as USA-NLD (=NLD)
-        final int dividerLocation = Math.max(nameTrimmed.indexOf('-'), nameTrimmed.indexOf(' '));
+        final int dividerLocation = Math.max(trimmed.indexOf('-'), trimmed.indexOf(' '));
         if (dividerLocation >= 0) {
-            return createFromString(nameTrimmed.substring(dividerLocation + 1), parentTerritory);
+            return createFromString(trimmed.substring(dividerLocation + 1), parentTerritory);
         }
-        throw new UnknownTerritoryException(nameTrimmed);
+        throw new UnknownTerritoryException(trimmed);
     }
 
     /**
@@ -932,7 +979,7 @@ public enum Territory {
                 for (int i = 0; i < territories.size(); i++) {
 
                     final Territory existingTerritoryParent = territories.get(i).getParentTerritory();
-                    if (existingTerritoryParent == null && territories.get(i).toString().contentEquals(name)) {
+                    if ((existingTerritoryParent == null) && territories.get(i).toString().contentEquals(name)) {
                         // A primary identifier always takes priority.
                         return;
                     }

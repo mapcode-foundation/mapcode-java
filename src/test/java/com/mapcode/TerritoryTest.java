@@ -16,6 +16,7 @@
 
 package com.mapcode;
 
+import com.mapcode.Territory.NameFormat;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +35,28 @@ public class TerritoryTest {
     }
 
     @Test
+    public void checkAlphabetCode() throws Exception {
+        LOG.info("checkAlphabetCode");
+        int i = 0;
+        for (final Alphabet alphabet : Alphabet.values()) {
+            assertEquals(alphabet, Alphabet.fromCode(i));
+            ++i;
+        }
+    }
+
+    @Test(expected = UnknownAlphabetException.class)
+    public void checkAlphabetCodeError1() throws Exception {
+        LOG.info("checkAlphabetCodeError1");
+        Alphabet.fromCode(-1);
+    }
+
+    @Test(expected = UnknownAlphabetException.class)
+    public void checkAlphabetCodeError2() throws Exception {
+        LOG.info("checkAlphabetCodeError2");
+        Alphabet.fromCode(Alphabet.values().length);
+    }
+
+    @Test
     public void checkDash() throws Exception {
         LOG.info("checkDash");
         assertEquals(Territory.IN_MN, Territory.fromString("IND-MN"));
@@ -45,9 +68,11 @@ public class TerritoryTest {
     @Test
     public void disambiguateMNTest1() throws Exception {
         LOG.info("disambiguateMNTest2");
-        final Territory territory1 = Territory.fromString("IND-MN");
+        final Territory territory0 = Territory.fromString("IND-MN");
+        final Territory territory1 = Territory.fromString("IN-MN");
         final Territory territory2 = Territory.fromString("MN", ParentTerritory.IND);
         final Territory territory3 = Territory.fromString("MN", ParentTerritory.USA);
+        assertEquals(territory0, territory1);
         assertEquals(territory1, territory2);
         assertNotEquals(territory2, territory3);
     }
@@ -61,6 +86,8 @@ public class TerritoryTest {
     @Test
     public void territoryFromStringTest() throws Exception {
         LOG.info("territoryFromStringTest");
+
+        // Accept ISO-style codes.
         assertEquals(Territory.NLD, Territory.fromString("NLD"));
         assertEquals(Territory.ARG, Territory.fromString("ARG"));
         assertEquals(Territory.ASM, Territory.fromString("US-AS"));
@@ -69,7 +96,62 @@ public class TerritoryTest {
         assertEquals(Territory.CHN, Territory.fromString("CN"));
         assertEquals(Territory.AUS, Territory.fromString("AU"));
         assertEquals(Territory.US_IN, Territory.fromString("IN"));
+        assertEquals(Territory.US_IN, Territory.fromString("US-IN"));
+        assertEquals(Territory.US_IN, Territory.fromString("USA-IN"));
+        assertEquals(Territory.RU_IN, Territory.fromString("RUS-IN"));
         assertEquals(Territory.IN_BR, Territory.fromString("BR"));
         assertEquals(Territory.IN_AS, Territory.fromString("AS"));
+
+        // Accept long and short.
+        assertEquals(Territory.USA, Territory.fromString("USA"));
+        assertEquals(Territory.USA, Territory.fromString("US"));
+
+        // Accept numeric codes as well.
+        assertEquals(Territory.VAT, Territory.fromString("0"));
+        assertEquals(Territory.AAA, Territory.fromString("532"));
+        assertEquals(Territory.NLD, Territory.fromString("112"));
+
+        for (final Territory territory : Territory.values()) {
+            assertEquals(territory, Territory.fromString(territory.toString()));
+            assertEquals(territory, Territory.fromString(String.valueOf(territory.getCode())));
+        }
+    }
+
+    @Test
+    public void checkAlphabet() throws Exception {
+        LOG.info("checkAlphabet");
+        assertEquals(Territory.NLD, Territory.fromString("NLD"));
+        assertEquals(Territory.NLD, Territory.fromString("\u039d\u039b\u0394"));
+        assertEquals(Territory.NLD, Territory.fromString("\u0417\u041b\u0414"));
+
+        assertEquals("NLD", Territory.NLD.toNameFormat(NameFormat.INTERNATIONAL));
+        assertEquals("NLD", Territory.NLD.toNameFormat(NameFormat.INTERNATIONAL, Alphabet.ROMAN));
+        assertEquals("\u0417\u041b\u0414", Territory.NLD.toNameFormat(NameFormat.INTERNATIONAL, Alphabet.CYRILLIC));
+        assertEquals("\u039d\u039b\u0394", Territory.NLD.toNameFormat(NameFormat.INTERNATIONAL, Alphabet.GREEK));
+        assertEquals("\u0393\u03a8\u039e", Territory.GRC.toNameFormat(NameFormat.INTERNATIONAL, Alphabet.GREEK));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError1() {
+        LOG.info("testFromStringError1");
+        Territory.fromString("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError2() {
+        LOG.info("testFromStringError2");
+        Territory.fromString("1A");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError3() {
+        LOG.info("testFromStringError3");
+        Territory.fromString("999");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringError4() {
+        LOG.info("testFromStringError4");
+        Territory.fromString("Netherlands");
     }
 }

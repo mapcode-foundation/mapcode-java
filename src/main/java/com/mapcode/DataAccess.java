@@ -34,7 +34,6 @@ class DataAccess {
 
     // Read data only once in static initializer.
     static {
-        boolean initialized = false;
         final InputStream inputStream = DataAccess.class.getResourceAsStream(FILE_NAME);
         try {
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -45,9 +44,9 @@ class DataAccess {
             FILE_DATA = outputStream.toByteArray();
             inputStream.close();
             outputStream.close();
-            initialized = true;
         } catch (final IOException e) {
-            throw new ExceptionInInitializerError(e);
+            throw new ExceptionInInitializerError("Cannot initialize static data structure from: " + FILE_NAME +
+                    ", exception=" + e);
         } finally {
             try {
                 if (inputStream != null) {
@@ -56,9 +55,6 @@ class DataAccess {
             } catch (final IOException ignored) {
                 // Ignore.
             }
-        }
-        if (!initialized) {
-            throw new IllegalArgumentException("Cannot initialize static data structure from: " + FILE_NAME);
         }
     }
 
@@ -143,8 +139,7 @@ class DataAccess {
             15477, 15493, 15530, 15547, 15571, 15594, 15611, 15631, 15657, 15683,
             15702, 15719, 15772, 15813, 15835, 15862, 15882, 15903, 15921, 15951,
             15977, 15997, 16018, 16036, 16054, 16073, 16089, 16105, 16133, 16159,
-            16166, 16168, 16169, 16171, 16172, 16174, 16176, 16178, 16180, 16182,
-            16183, 16184, 16216};
+            16166, 16168, 16169, 16201};
 
     // / low-level routines for data access
     static int dataFirstRecord(final int ccode) {

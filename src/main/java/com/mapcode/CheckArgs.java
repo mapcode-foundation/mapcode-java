@@ -19,8 +19,10 @@ package com.mapcode;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.mapcode.Mapcode.isValidMapcodeFormat;
+
 /**
- * Package private helper methods.
+ * Package private helper methods to check arguments for validity.
  */
 class CheckArgs {
 
@@ -40,6 +42,15 @@ class CheckArgs {
             throws IllegalArgumentException {
         if (obj == null) {
             throw new IllegalArgumentException("Parameter " + param + " should not be null");
+        }
+    }
+
+    static void checkMapcodeCode(@Nonnull final String param, @Nullable final String code)
+            throws IllegalArgumentException {
+        checkNonnull(param, code);
+        if (!isValidMapcodeFormat(code)) {
+            throw new IllegalArgumentException(code + " is not a correctly formatted mapcode code; " +
+                    "the regular expression for the mapcode code syntax is: " + Mapcode.REGEX_MAPCODE);
         }
     }
 }
