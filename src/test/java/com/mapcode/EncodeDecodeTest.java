@@ -35,17 +35,17 @@ public class EncodeDecodeTest {
             new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
     private static final int NUMBER_OF_POINTS = 5000;
-    private static final int LOG_LINE_EVERY = 100;
+    private static final int LOG_LINE_EVERY = 500;
 
     @Test
     public void encodeDecodeTestFixedSeed() throws Exception {
-        LOG.info("encodeDecodeTestFixedSeed");
-        doEncodeDecode(1431977987367L);
+        final long seed = 1431977987367L;
+        LOG.info("encodeDecodeTestFixedSeed: seed={}", seed);
+        doEncodeDecode(seed);
     }
 
     @Test
     public void encodeDecodeTestRandomSeed() throws Exception {
-        LOG.info("encodeDecodeTestRandomSeed");
         final long seed = System.currentTimeMillis();
         LOG.info("encodeDecodeTestRandomSeed: seed={}", seed);
         doEncodeDecode(seed);
@@ -81,10 +81,6 @@ public class EncodeDecodeTest {
                 final List<Mapcode> resultsLimited = MapcodeCodec.encode(latDeg, lonDeg, territory);
                 for (final Mapcode mapcode : resultsLimited) {
                     found = true;
-                    if (showLogLine) {
-                        LOG.info("encodeDecodeTest: #{}/{}, encode={}, {} {} --> results={}",
-                                i, NUMBER_OF_POINTS, latDeg, lonDeg, territory, GSON.toJson(resultsLimited));
-                    }
 
                     // Check if the territory matches.
                     assertEquals(territory, mapcode.getTerritory());
@@ -127,14 +123,13 @@ public class EncodeDecodeTest {
                                         "lat={}, lon={}; delta={}", i, NUMBER_OF_POINTS,
                                 mapcode, codePrecision0, territory.getFullName(), decodeLocationPrecision0.getLatDeg(),
                                 decodeLocationPrecision0.getLonDeg(), distancePrecision0Meters);
-                        LOG.info("");
                     }
                     showLogLine = false;
                 }
             }
             assertTrue(found);
         }
-        LOG.info("encodeDecodeTest: maximum distances, precision 0, 1, 2: {}, {}, {} meters, ",
+        LOG.debug("encodeDecodeTest: maximum distances, precision 0, 1, 2: {}, {}, {} meters, ",
                 maxDistancePrecision0Meters, maxDistancePrecision1Meters, maxDistancePrecision2Meters);
     }
 }

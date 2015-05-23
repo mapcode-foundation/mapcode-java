@@ -124,16 +124,16 @@ public class ReferenceFileTest {
 
                 final boolean showLogLine = ((i % LOG_LINE_EVERY) == 0);
                 if (showLogLine) {
-                    LOG.info("checkFile: #{}, file={}", i, chunkedFile.fileName);
-                    LOG.info("checkFile: lat/lon  = {}", reference.point);
-                    LOG.info("checkFile: expected = {}", GSON.toJson(reference.mapcodes));
+                    LOG.debug("checkFile: #{}, file={}", i, chunkedFile.fileName);
+                    LOG.debug("checkFile: lat/lon  = {}", reference.point);
+                    LOG.debug("checkFile: expected = #{}: {}", reference.mapcodes.size(), GSON.toJson(reference.mapcodes));
                 }
 
                 // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
                 final List<Mapcode> results = MapcodeCodec.encode(
                         reference.point.getLatDeg(), reference.point.getLonDeg());
                 if (showLogLine) {
-                    LOG.info("checkFile: actual   = {}", GSON.toJson(results));
+                    LOG.debug("checkFile: actual   = #{}: {}", results.size(), GSON.toJson(results));
                 }
 
                 // Check the number of mapcodes.
@@ -154,15 +154,20 @@ public class ReferenceFileTest {
 
                 // Check the size of the results.
                 if (reference.mapcodes.size() != results.size()) {
+                    final ArrayList<MapcodeRec> resultsConverted = new ArrayList<>(results.size());
+                    for (final Mapcode mapcode : results) {
+                        resultsConverted.add(new MapcodeRec(mapcode.getCode(2), mapcode.getTerritory()));
+                    }
                     LOG.error("checkFile: Encode #{} incorrect number of results:" +
                                     "\n  lat/lon  = {}" +
-                                    "\n  expected = {} results," +
-                                    "\n  actual   = {} results",
+                                    "\n  expected = #{}: {} results," +
+                                    "\n  actual   = #{}: {} results\n",
                             i,
                             reference.point,
                             reference.mapcodes.size(),
                             GSON.toJson(reference.mapcodes),
-                            GSON.toJson(results));
+                            results.size(),
+                            GSON.toJson(resultsConverted));
                     ++error;
                 }
 
@@ -243,7 +248,7 @@ public class ReferenceFileTest {
                 }
 
                 if (showLogLine) {
-                    LOG.info("");
+                    LOG.debug("");
                 }
                 ++i;
             }
@@ -252,7 +257,7 @@ public class ReferenceFileTest {
         } finally {
             chunkedFile.close();
         }
-        LOG.info("checkFile: Maximum delta for this testset = {}", maxdelta);
+        LOG.debug("checkFile: Maximum delta for this testset = {}", maxdelta);
         assertEquals("Found errors", 0, error);
     }
 
