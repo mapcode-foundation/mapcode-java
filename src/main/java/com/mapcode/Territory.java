@@ -686,19 +686,19 @@ public enum Territory {
 
     /**
      * Return the international value of the territory name, with dashes rather than underscores.
-     * This is the same as {@link #toNameFormat(NameFormat)} for {@link NameFormat#INTERNATIONAL}.
+     * This is the same as {@link #toAlpha(AlphaFormat)} for {@link AlphaFormat#INTERNATIONAL}.
      *
      * @param alphabet Alphabet. May be null.
      * @return Territory name. Underscores have been replaced with dashes.
      */
     @Nonnull
     public String toString(@Nullable final Alphabet alphabet) {
-        return toNameFormat(NameFormat.INTERNATIONAL, alphabet);
+        return toAlpha(AlphaFormat.INTERNATIONAL, alphabet);
     }
 
     /**
      * Return the international value of the territory name, with dashes rather than underscores.
-     * This is the same as {@link #toNameFormat(NameFormat)} for {@link NameFormat#INTERNATIONAL}.
+     * This is the same as {@link #toAlpha(AlphaFormat)} for {@link AlphaFormat#INTERNATIONAL}.
      *
      * @return Territory name. Underscores have been replaced with dashes.
      */
@@ -711,7 +711,7 @@ public enum Territory {
     /**
      * Enumeration that specifies the format for mapcodes.
      */
-    public enum NameFormat {
+    public enum AlphaFormat {
         INTERNATIONAL,          // Same as name() with underscores replaces with dashes.
         MINIMAL_UNAMBIGUOUS,    // Minimal code, which is still unambiguous.
         MINIMAL                 // Minimal code, may be ambiguous, eg. RJ instead of IN-RJ.
@@ -725,15 +725,15 @@ public enum Territory {
      * @return Mapcode.
      */
     @Nonnull
-    public String toNameFormat(@Nonnull final NameFormat format, @Nullable final Alphabet alphabet) {
+    public String toAlpha(@Nonnull final AlphaFormat format, @Nullable final Alphabet alphabet) {
         checkNonnull("format", format);
         String result = name().replace('_', '-');
-        if (format != NameFormat.INTERNATIONAL) {
+        if (format != AlphaFormat.INTERNATIONAL) {
             final int index = name().indexOf('_');
             if (index != -1) {
                 assert name().length() > (index + 1);
                 final String shortName = name().substring(index + 1);
-                if ((format == NameFormat.MINIMAL) || (nameMap.get(shortName).size() == 1)) {
+                if ((format == AlphaFormat.MINIMAL) || (nameMap.get(shortName).size() == 1)) {
                     result = shortName;
                 }
             }
@@ -749,8 +749,8 @@ public enum Territory {
     }
 
     @Nonnull
-    public String toNameFormat(@Nonnull final NameFormat format) {
-        return toNameFormat(format, null);
+    public String toAlpha(@Nonnull final AlphaFormat format) {
+        return toAlpha(format, null);
     }
 
     /**
