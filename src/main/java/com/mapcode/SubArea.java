@@ -34,79 +34,81 @@ import java.util.Map.Entry;
 class SubArea {
     private static final Logger LOG = LoggerFactory.getLogger(SubArea.class);
 
-    private static final ArrayList<SubArea> subAreas = new ArrayList<>();
-    private static final TreeMap<Integer, ArrayList<SubArea>> lonMap = new TreeMap<>();
-    private static final TreeMap<Integer, ArrayList<SubArea>> latMap = new TreeMap<>();
+    private static final int SUB_AREAS_INITIAL_CAPACITY = 16250;
 
-    private static final Range<Integer> latBoundingRange =
-            new Range<>(Point.LAT_MICRODEG_MIN, Point.LAT_MICRODEG_MAX);
-    private static final Range<Integer> lonBoundingRange =
-            new Range<>(Point.LON_MICRODEG_MIN, Point.LON_MICRODEG_MAX);
+    private static final List<SubArea> SUB_AREAS = new ArrayList<>(SUB_AREAS_INITIAL_CAPACITY);
+    private static final TreeMap<Integer, ArrayList<SubArea>> LON_MAP = new TreeMap<>();
+    private static final TreeMap<Integer, ArrayList<SubArea>> LAT_MAP = new TreeMap<>();
+
+    private static final Range<Integer> LAT_BOUNDING_RANGE = new Range<>(Point.LAT_MICRODEG_MIN, Point.LAT_MICRODEG_MAX);
+    private static final Range<Integer> LON_BOUNDING_RANGE = new Range<>(Point.LON_MICRODEG_MIN, Point.LON_MICRODEG_MAX);
 
     static {
+        LOG.info("SubArea: Initialize sub-areas for {} territories", Territory.values().length);
         for (final Territory territory : Territory.values()) {
             final int territoryCode = territory.getCode();
             final int first = DataAccess.dataFirstRecord(territoryCode);
             final int last = DataAccess.dataLastRecord(territoryCode);
 
             // Add a number sub areas.
-            for (int i = subAreas.size(); i <= last; i++) {
-                subAreas.add(null);
+            for (int i = SUB_AREAS.size(); i <= last; i++) {
+                SUB_AREAS.add(null);
             }
             for (int i = last; i >= first; i--) {
-                final SubArea newSubArea = new SubArea(i, territory, subAreas.get(last));
-                subAreas.set(i, newSubArea);
+                final SubArea newSubArea = new SubArea(i, territory, SUB_AREAS.get(last));
+                SUB_AREAS.set(i, newSubArea);
 
                 if ((newSubArea.boundedLatRange == null) || (newSubArea.boundedLonRange == null)) {
                     continue;
                 }
 
                 for (final Range<Integer> longitudeRange : newSubArea.boundedLonRange) {
-                    if (!lonMap.containsKey(longitudeRange.getMin())) {
-                        lonMap.put(longitudeRange.getMin(), new ArrayList<SubArea>());
+                    if (!LON_MAP.containsKey(longitudeRange.getMin())) {
+                        LON_MAP.put(longitudeRange.getMin(), new ArrayList<SubArea>());
                     }
-                    if (!lonMap.containsKey(longitudeRange.getMax())) {
-                        lonMap.put(longitudeRange.getMax(), new ArrayList<SubArea>());
+                    if (!LON_MAP.containsKey(longitudeRange.getMax())) {
+                        LON_MAP.put(longitudeRange.getMax(), new ArrayList<SubArea>());
                     }
                 }
 
                 for (final Range<Integer> latitudeRange : newSubArea.boundedLatRange) {
-                    if (!latMap.containsKey(latitudeRange.getMin())) {
-                        latMap.put(latitudeRange.getMin(), new ArrayList<SubArea>());
+                    if (!LAT_MAP.containsKey(latitudeRange.getMin())) {
+                        LAT_MAP.put(latitudeRange.getMin(), new ArrayList<SubArea>());
                     }
-                    if (!latMap.containsKey(latitudeRange.getMax())) {
-                        latMap.put(latitudeRange.getMax(), new ArrayList<SubArea>());
+                    if (!LAT_MAP.containsKey(latitudeRange.getMax())) {
+                        LAT_MAP.put(latitudeRange.getMax(), new ArrayList<SubArea>());
                     }
                 }
             }
         }
-        for (final SubArea subArea : subAreas) {
+        LOG.info("SubArea: Created {} sub-areas", SUB_AREAS.size());
+        for (final SubArea subArea : SUB_AREAS) {
             if ((subArea.boundedLatRange == null) || (subArea.boundedLonRange == null)) {
                 continue;
             }
             SortedMap<Integer, ArrayList<SubArea>> subMap;
 
             for (final Range<Integer> longitudeRange : subArea.boundedLonRange) {
-                subMap = lonMap.subMap(longitudeRange.getMin(), longitudeRange.getMax() + 1);
+                subMap = LON_MAP.subMap(longitudeRange.getMin(), longitudeRange.getMax() + 1);
                 for (final ArrayList<SubArea> areaList : subMap.values()) {
                     areaList.add(subArea);
                 }
             }
 
             for (final Range<Integer> latitudeRange : subArea.boundedLatRange) {
-                subMap = latMap.subMap(latitudeRange.getMin(), latitudeRange.getMax() + 1);
+                subMap = LAT_MAP.subMap(latitudeRange.getMin(), latitudeRange.getMax() + 1);
                 for (final ArrayList<SubArea> areaList : subMap.values()) {
                     areaList.add(subArea);
                 }
             }
         }
-        LOG.debug("SubArea (init): lat=[{}, {}], lon=[{}, {}]",
-                Point.microDegToDeg(latMap.firstKey()), Point.microDegToDeg(latMap.lastKey()),
-                Point.microDegToDeg(lonMap.firstKey()), Point.microDegToDeg(lonMap.lastKey()));
+        LOG.info("SubArea: sub-areas initialized: aslat=[{}, {}], lon=[{}, {}]",
+                Point.microDegToDeg(LAT_MAP.firstKey()), Point.microDegToDeg(LAT_MAP.lastKey()),
+                Point.microDegToDeg(LON_MAP.firstKey()), Point.microDegToDeg(LON_MAP.lastKey()));
     }
 
     static SubArea getArea(final int i) {
-        return subAreas.get(i);
+        return SUB_AREAS.get(i);
     }
 
 
@@ -115,19 +117,19 @@ class SubArea {
     static List<SubArea> getAreasForPoint(@Nonnull final Point point) {
         final ArrayList<ArrayList<SubArea>> areaLists = new ArrayList<>();
         ArrayList<SubArea> list;
-        list = latMap.get(point.getLatMicroDeg());
+        list = LAT_MAP.get(point.getLatMicroDeg());
 
         if (list != null) {
             areaLists.add(list);
         } else {
-            Entry<Integer, ArrayList<SubArea>> entry = latMap.lowerEntry(point.getLatMicroDeg());
+            Entry<Integer, ArrayList<SubArea>> entry = LAT_MAP.lowerEntry(point.getLatMicroDeg());
             if (entry == null) {
                 return Collections.EMPTY_LIST;
             }
             list = entry.getValue();
             assert list != null;
             areaLists.add(list);
-            entry = latMap.higherEntry(point.getLatMicroDeg());
+            entry = LAT_MAP.higherEntry(point.getLatMicroDeg());
             if (entry == null) {
                 return Collections.EMPTY_LIST;
             }
@@ -136,18 +138,18 @@ class SubArea {
             areaLists.add(list);
         }
 
-        list = lonMap.get(point.getLonMicroDeg());
+        list = LON_MAP.get(point.getLonMicroDeg());
         if (list != null) {
             areaLists.add(list);
         } else {
-            Entry<Integer, ArrayList<SubArea>> entry = lonMap.lowerEntry(point.getLonMicroDeg());
+            Entry<Integer, ArrayList<SubArea>> entry = LON_MAP.lowerEntry(point.getLonMicroDeg());
             if (entry == null) {
                 return Collections.EMPTY_LIST;
             }
             list = entry.getValue();
             assert list != null;
             areaLists.add(list);
-            entry = lonMap.higherEntry(point.getLonMicroDeg());
+            entry = LON_MAP.higherEntry(point.getLonMicroDeg());
             if (entry == null) {
                 return Collections.EMPTY_LIST;
             }
@@ -161,14 +163,13 @@ class SubArea {
 
         mainLoop:
         for (final SubArea subArea : list) {
-            for (int i = 1; i < areaLists.size(); i++) {
-                if (!areaLists.get(i).contains(subArea)) {
+            for (final ArrayList<SubArea> subAreas : areaLists) {
+                if (!subAreas.contains(subArea)) {
                     continue mainLoop;
                 }
             }
             result.add(subArea);
         }
-
         return result;
     }
 
@@ -219,8 +220,8 @@ class SubArea {
         if (latRange.getMax() != 90000000) {
             trimmedLatRange = trimRange(latRange);
         }
-        final ArrayList<Range<Integer>> normalisedLonRange = normaliseRange(trimmedLonRange, lonBoundingRange);
-        final ArrayList<Range<Integer>> normalisedLatRange = normaliseRange(trimmedLatRange, latBoundingRange);
+        final ArrayList<Range<Integer>> normalisedLonRange = normaliseRange(trimmedLonRange, LON_BOUNDING_RANGE);
+        final ArrayList<Range<Integer>> normalisedLatRange = normaliseRange(trimmedLatRange, LAT_BOUNDING_RANGE);
         if (territoryBounds == null) {
             boundedLonRange = normalisedLonRange;
             boundedLatRange = normalisedLatRange;

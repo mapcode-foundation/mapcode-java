@@ -16,6 +16,9 @@
 
 package com.mapcode;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,61 +31,61 @@ import java.io.InputStream;
  * This class contains the module that reads the Mapcode areas into memory and processes them.
  */
 class DataAccess {
+    private static final Logger LOG = LoggerFactory.getLogger(DataAccess.class);
 
-    private static final byte[] FILE_DATA;
+    private static final int[] FILE_DATA;
     private static final String FILE_NAME = "/com/mapcode/mminfo.dat";
 
     // Read data only once in static initializer.
     static {
-        final InputStream inputStream = DataAccess.class.getResourceAsStream(FILE_NAME);
-        try {
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            for (int readBytes = inputStream.read(); readBytes >= 0; readBytes = inputStream.read()) {
-                outputStream.write(readBytes);
-            }
-
-            FILE_DATA = outputStream.toByteArray();
-            inputStream.close();
-            outputStream.close();
-        } catch (final IOException e) {
-            throw new ExceptionInInitializerError("Cannot initialize static data structure from: " + FILE_NAME +
-                    ", exception=" + e);
-        } finally {
-            try {
-                if (inputStream != null) {
-                    inputStream.close();
+        LOG.info("DataAccess: reading regions from file: {}", FILE_NAME);
+        final int bufferSize = 100000;
+        final byte[] readBuffer = new byte[bufferSize];
+        int total = 0;
+        try (final InputStream inputStream = DataAccess.class.getResourceAsStream(FILE_NAME)) {
+            try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                int nrBytes = inputStream.read(readBuffer);
+                while (nrBytes >= 0) {
+                    total += nrBytes;
+                    outputStream.write(readBuffer, 0, nrBytes);
+                    nrBytes = inputStream.read(readBuffer);
                 }
-            } catch (final IOException ignored) {
-                // Ignore.
+
+                // Copy stream as unsigned bytes (ints).
+                final byte[] bytes = outputStream.toByteArray();
+                assert total == bytes.length;
+                FILE_DATA = new int[total];
+                for (int i = 0; i < total; ++i) {
+                    FILE_DATA[i] = (bytes[i] < 0) ? (bytes[i] + 256) : bytes[i];
+
+                }
             }
+        } catch (final IOException e) {
+            throw new ExceptionInInitializerError("Cannot initialize static data structure from: " +
+                    FILE_NAME + ", exception=" + e);
         }
+        LOG.info("DataAccess: regions initialized, read {} bytes", total);
     }
 
     private DataAccess() {
         // Empty.
     }
 
-    private static int asUnsignedByte(final int i) {
-        int u = FILE_DATA[i];
-        if (u < 0) {
-            u += 256;
-        }
-        return u;
-    }
-
     static int dataFlags(final int i) {
-        return asUnsignedByte((i * 20) + 16) + (asUnsignedByte((i * 20) + 17) * 256);
+        return FILE_DATA[(i * 20) + 16] +
+                (FILE_DATA[(i * 20) + 17] * 256);
     }
 
     static int asLong(final int i) {
-        return asUnsignedByte(i) +
-                (asUnsignedByte(i + 1) << 8) +
-                (asUnsignedByte(i + 2) << 16) +
-                (asUnsignedByte(i + 3) << 24);
+        return FILE_DATA[i] +
+                (FILE_DATA[i + 1] << 8) +
+                (FILE_DATA[i + 2] << 16) +
+                (FILE_DATA[i + 3] << 24);
     }
 
     static int smartDiv(final int i) {
-        return asUnsignedByte((i * 20) + 18) + (asUnsignedByte((i * 20) + 19) * 256);
+        return FILE_DATA[(i * 20) + 18] +
+                (FILE_DATA[(i * 20) + 19] * 256);
     }
 
     private final static int[] DATA_START = {

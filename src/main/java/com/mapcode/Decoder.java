@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
@@ -35,6 +34,7 @@ class Decoder {
     // Method called from public Java API.
     // ----------------------------------------------------------------------
 
+    @SuppressWarnings("ConstantConditions")
     @Nonnull
     static Point decode(@Nonnull final String argMapcode,
                         @Nonnull final Territory argTerritory)
@@ -188,64 +188,66 @@ class Decoder {
 
     private static class Unicode2Ascii {
 
-        public final int min;
-        public final int max;
+        public final char min;
+        public final char max;
+        @Nonnull
         public final String convert;
 
-        public Unicode2Ascii(final int min, final int max, @Nullable final String convert) {
+        public Unicode2Ascii(final char min, final char max, @Nonnull final String convert) {
             this.min = min;
             this.max = max;
             this.convert = convert;
         }
     }
 
-    private final static int[][] ASCII2LANGUAGE = {
-            {0x0041, 0x0042, 0x0043, 0x0044, 0x0045, 0x0046, 0x0047, 0x0048, 0x0049, 0x004a, 0x004b, 0x004c, 0x004d, 0x004e, 0x004f, 0x0050, 0x0051, 0x0052, 0x0053, 0x0054, 0x0055, 0x0056, 0x0057, 0x0058, 0x0059, 0x005a, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // roman
-            {0x0391, 0x0392, 0x039e, 0x0394, 0x003f, 0x0395, 0x0393, 0x0397, 0x0399, 0x03a0, 0x039a, 0x039b, 0x039c, 0x039d, 0x039f, 0x03a1, 0x0398, 0x03a8, 0x03a3, 0x03a4, 0x003f, 0x03a6, 0x03a9, 0x03a7, 0x03a5, 0x0396, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // greek
-            {0x0410, 0x0412, 0x0421, 0x0414, 0x0415, 0x0416, 0x0413, 0x041d, 0x0418, 0x041f, 0x041a, 0x041b, 0x041c, 0x0417, 0x041e, 0x0420, 0x0424, 0x042f, 0x0426, 0x0422, 0x042d, 0x0427, 0x0428, 0x0425, 0x0423, 0x0411, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // cyrillic
-            {0x05d0, 0x05d1, 0x05d2, 0x05d3, 0x05e3, 0x05d4, 0x05d6, 0x05d7, 0x05d5, 0x05d8, 0x05d9, 0x05da, 0x05db, 0x05dc, 0x05e1, 0x05dd, 0x05de, 0x05e0, 0x05e2, 0x05e4, 0x05e5, 0x05e6, 0x05e7, 0x05e8, 0x05e9, 0x05ea, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // hebrew
-            {0x0905, 0x0915, 0x0917, 0x0918, 0x090f, 0x091a, 0x091c, 0x091f, 0x003f, 0x0920, 0x0923, 0x0924, 0x0926, 0x0927, 0x003f, 0x0928, 0x092a, 0x092d, 0x092e, 0x0930, 0x092b, 0x0932, 0x0935, 0x0938, 0x0939, 0x0921, 0x0966, 0x0967, 0x0968, 0x0969, 0x096a, 0x096b, 0x096c, 0x096d, 0x096e, 0x096f}, // hindi
-            {0x0d12, 0x0d15, 0x0d16, 0x0d17, 0x0d0b, 0x0d1a, 0x0d1c, 0x0d1f, 0x0d07, 0x0d21, 0x0d24, 0x0d25, 0x0d26, 0x0d27, 0x0d20, 0x0d28, 0x0d2e, 0x0d30, 0x0d31, 0x0d32, 0x0d09, 0x0d34, 0x0d35, 0x0d36, 0x0d38, 0x0d39, 0x0d66, 0x0d67, 0x0d68, 0x0d69, 0x0d6a, 0x0d6b, 0x0d6c, 0x0d6d, 0x0d6e, 0x0d6f}, // malay
-            {0x10a0, 0x10a1, 0x10a3, 0x10a6, 0x10a4, 0x10a9, 0x10ab, 0x10ac, 0x10b3, 0x10ae, 0x10b0, 0x10b1, 0x10b2, 0x10b4, 0x10ad, 0x10b5, 0x10b6, 0x10b7, 0x10b8, 0x10b9, 0x10a8, 0x10ba, 0x10bb, 0x10bd, 0x10be, 0x10bf, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // Georgian
-            {0x30a2, 0x30ab, 0x30ad, 0x30af, 0x30aa, 0x30b1, 0x30b3, 0x30b5, 0x30a4, 0x30b9, 0x30c1, 0x30c8, 0x30ca, 0x30cc, 0x30a6, 0x30d2, 0x30d5, 0x30d8, 0x30db, 0x30e1, 0x30a8, 0x30e2, 0x30e8, 0x30e9, 0x30ed, 0x30f2, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // Katakana
-            {0x0e30, 0x0e01, 0x0e02, 0x0e04, 0x0e32, 0x0e07, 0x0e08, 0x0e09, 0x0e31, 0x0e0a, 0x0e11, 0x0e14, 0x0e16, 0x0e17, 0x0e0d, 0x0e18, 0x0e1a, 0x0e1c, 0x0e21, 0x0e23, 0x0e2c, 0x0e25, 0x0e27, 0x0e2d, 0x0e2e, 0x0e2f, 0x0e50, 0x0e51, 0x0e52, 0x0e53, 0x0e54, 0x0e55, 0x0e56, 0x0e57, 0x0e58, 0x0e59}, // Thai
-            {0x0eb0, 0x0e81, 0x0e82, 0x0e84, 0x0ec3, 0x0e87, 0x0e88, 0x0e8a, 0x0ec4, 0x0e8d, 0x0e94, 0x0e97, 0x0e99, 0x0e9a, 0x0ec6, 0x0e9c, 0x0e9e, 0x0ea1, 0x0ea2, 0x0ea3, 0x0ebd, 0x0ea7, 0x0eaa, 0x0eab, 0x0ead, 0x0eaf, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // Laos
-            {0x0556, 0x0532, 0x0533, 0x0534, 0x0535, 0x0538, 0x0539, 0x053a, 0x053b, 0x053d, 0x053f, 0x0540, 0x0541, 0x0543, 0x0555, 0x0547, 0x0548, 0x054a, 0x054d, 0x054e, 0x0545, 0x054f, 0x0550, 0x0551, 0x0552, 0x0553, 0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039}, // armenian
-            {0x0985, 0x098c, 0x0995, 0x0996, 0x098f, 0x0997, 0x0999, 0x099a, 0x003f, 0x099d, 0x09a0, 0x09a1, 0x09a2, 0x09a3, 0x003f, 0x09a4, 0x09a5, 0x09a6, 0x09a8, 0x09aa, 0x0993, 0x09ac, 0x09ad, 0x09af, 0x09b2, 0x09b9, 0x09e6, 0x09e7, 0x09e8, 0x09e9, 0x09ea, 0x09eb, 0x09ec, 0x09ed, 0x09ee, 0x09ef}, // Bengali
-            {0x0a05, 0x0a15, 0x0a17, 0x0a18, 0x0a0f, 0x0a1a, 0x0a1c, 0x0a1f, 0x003f, 0x0a20, 0x0a23, 0x0a24, 0x0a26, 0x0a27, 0x003f, 0x0a28, 0x0a2a, 0x0a2d, 0x0a2e, 0x0a30, 0x0a2b, 0x0a32, 0x0a35, 0x0a38, 0x0a39, 0x0a21, 0x0a66, 0x0a67, 0x0a68, 0x0a69, 0x0a6a, 0x0a6b, 0x0a6c, 0x0a6d, 0x0a6e, 0x0a6f}, // Gurmukhi
-            {0x0f58, 0x0f40, 0x0f41, 0x0f42, 0x0f64, 0x0f44, 0x0f45, 0x0f46, 0x003f, 0x0f47, 0x0f4a, 0x0f4c, 0x0f4e, 0x0f4f, 0x003f, 0x0f51, 0x0f53, 0x0f54, 0x0f56, 0x0f5e, 0x0f65, 0x0f5f, 0x0f61, 0x0f62, 0x0f63, 0x0f66, 0x0f20, 0x0f21, 0x0f22, 0x0f23, 0x0f24, 0x0f25, 0x0f26, 0x0f27, 0x0f28, 0x0f29}, // Tibetan
+    // Special character '?' indicating missing character in alphabet.
+    private static final char MISSCODE = '?';
+
+    private final static char[][] ASCII2LANGUAGE = {
+            // Character:   A       B       C       D       E       F       G       H       I       J      K        L       M       N       O       P       Q       R       S       T       U       V       W       X       Y       Z       0       1       2       3       4       5       6       7       8       9
+            /* Roman    */ {'\u0041', '\u0042', '\u0043', '\u0044', '\u0045', '\u0046', '\u0047', '\u0048', '\u0049', '\u004a', '\u004b', '\u004c', '\u004d', '\u004e', '\u004f', '\u0050', '\u0051', '\u0052', '\u0053', '\u0054', '\u0055', '\u0056', '\u0057', '\u0058', '\u0059', '\u005a', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Roman
+            /* Greek    */ {'\u0391', '\u0392', '\u039e', '\u0394', MISSCODE, '\u0395', '\u0393', '\u0397', '\u0399', '\u03a0', '\u039a', '\u039b', '\u039c', '\u039d', '\u039f', '\u03a1', '\u0398', '\u03a8', '\u03a3', '\u03a4', MISSCODE, '\u03a6', '\u03a9', '\u03a7', '\u03a5', '\u0396', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Greek
+            /* Cyrillic */ {'\u0410', '\u0412', '\u0421', '\u0414', '\u0415', '\u0416', '\u0413', '\u041d', '\u0418', '\u041f', '\u041a', '\u041b', '\u041c', '\u0417', '\u041e', '\u0420', '\u0424', '\u042f', '\u0426', '\u0422', '\u042d', '\u0427', '\u0428', '\u0425', '\u0423', '\u0411', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Cyrillic
+            /* Hebrew   */ {'\u05d0', '\u05d1', '\u05d2', '\u05d3', '\u05e3', '\u05d4', '\u05d6', '\u05d7', '\u05d5', '\u05d8', '\u05d9', '\u05da', '\u05db', '\u05dc', '\u05e1', '\u05dd', '\u05de', '\u05e0', '\u05e2', '\u05e4', '\u05e5', '\u05e6', '\u05e7', '\u05e8', '\u05e9', '\u05ea', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Hebrew
+            /* Hindi    */ {'\u0905', '\u0915', '\u0917', '\u0918', '\u090f', '\u091a', '\u091c', '\u091f', MISSCODE, '\u0920', '\u0923', '\u0924', '\u0926', '\u0927', MISSCODE, '\u0928', '\u092a', '\u092d', '\u092e', '\u0930', '\u092b', '\u0932', '\u0935', '\u0938', '\u0939', '\u0921', '\u0966', '\u0967', '\u0968', '\u0969', '\u096a', '\u096b', '\u096c', '\u096d', '\u096e', '\u096f'}, // Hindi
+            /* Malay    */ {'\u0d12', '\u0d15', '\u0d16', '\u0d17', '\u0d0b', '\u0d1a', '\u0d1c', '\u0d1f', '\u0d07', '\u0d21', '\u0d24', '\u0d25', '\u0d26', '\u0d27', '\u0d20', '\u0d28', '\u0d2e', '\u0d30', '\u0d31', '\u0d32', '\u0d09', '\u0d34', '\u0d35', '\u0d36', '\u0d38', '\u0d39', '\u0d66', '\u0d67', '\u0d68', '\u0d69', '\u0d6a', '\u0d6b', '\u0d6c', '\u0d6d', '\u0d6e', '\u0d6f'}, // Malay
+            /* Georgian */ {'\u10a0', '\u10a1', '\u10a3', '\u10a6', '\u10a4', '\u10a9', '\u10ab', '\u10ac', '\u10b3', '\u10ae', '\u10b0', '\u10b1', '\u10b2', '\u10b4', '\u10ad', '\u10b5', '\u10b6', '\u10b7', '\u10b8', '\u10b9', '\u10a8', '\u10ba', '\u10bb', '\u10bd', '\u10be', '\u10bf', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Georgian
+            /* Katakana */ {'\u30a2', '\u30ab', '\u30ad', '\u30af', '\u30aa', '\u30b1', '\u30b3', '\u30b5', '\u30a4', '\u30b9', '\u30c1', '\u30c8', '\u30ca', '\u30cc', '\u30a6', '\u30d2', '\u30d5', '\u30d8', '\u30db', '\u30e1', '\u30a8', '\u30e2', '\u30e8', '\u30e9', '\u30ed', '\u30f2', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Katakana
+            /* Thai     */ {'\u0e30', '\u0e01', '\u0e02', '\u0e04', '\u0e32', '\u0e07', '\u0e08', '\u0e09', '\u0e31', '\u0e0a', '\u0e11', '\u0e14', '\u0e16', '\u0e17', '\u0e0d', '\u0e18', '\u0e1a', '\u0e1c', '\u0e21', '\u0e23', '\u0e2c', '\u0e25', '\u0e27', '\u0e2d', '\u0e2e', '\u0e2f', '\u0e50', '\u0e51', '\u0e52', '\u0e53', '\u0e54', '\u0e55', '\u0e56', '\u0e57', '\u0e58', '\u0e59'}, // Thai
+            /* Laos     */ {'\u0eb0', '\u0e81', '\u0e82', '\u0e84', '\u0ec3', '\u0e87', '\u0e88', '\u0e8a', '\u0ec4', '\u0e8d', '\u0e94', '\u0e97', '\u0e99', '\u0e9a', '\u0ec6', '\u0e9c', '\u0e9e', '\u0ea1', '\u0ea2', '\u0ea3', '\u0ebd', '\u0ea7', '\u0eaa', '\u0eab', '\u0ead', '\u0eaf', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Laos
+            /* Armenian */ {'\u0556', '\u0532', '\u0533', '\u0534', '\u0535', '\u0538', '\u0539', '\u053a', '\u053b', '\u053d', '\u053f', '\u0540', '\u0541', '\u0543', '\u0555', '\u0547', '\u0548', '\u054a', '\u054d', '\u054e', '\u0545', '\u054f', '\u0550', '\u0551', '\u0552', '\u0553', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Armenian
+            /* Bengali  */ {'\u0985', '\u098c', '\u0995', '\u0996', '\u098f', '\u0997', '\u0999', '\u099a', MISSCODE, '\u099d', '\u09a0', '\u09a1', '\u09a2', '\u09a3', MISSCODE, '\u09a4', '\u09a5', '\u09a6', '\u09a8', '\u09aa', '\u0993', '\u09ac', '\u09ad', '\u09af', '\u09b2', '\u09b9', '\u09e6', '\u09e7', '\u09e8', '\u09e9', '\u09ea', '\u09eb', '\u09ec', '\u09ed', '\u09ee', '\u09ef'}, // Bengali
+            /* Gurmukhi */ {'\u0a05', '\u0a15', '\u0a17', '\u0a18', '\u0a0f', '\u0a1a', '\u0a1c', '\u0a1f', MISSCODE, '\u0a20', '\u0a23', '\u0a24', '\u0a26', '\u0a27', MISSCODE, '\u0a28', '\u0a2a', '\u0a2d', '\u0a2e', '\u0a30', '\u0a2b', '\u0a32', '\u0a35', '\u0a38', '\u0a39', '\u0a21', '\u0a66', '\u0a67', '\u0a68', '\u0a69', '\u0a6a', '\u0a6b', '\u0a6c', '\u0a6d', '\u0a6e', '\u0a6f'}, // Gurmukhi
+            /* Tibetan  */ {'\u0f58', '\u0f40', '\u0f41', '\u0f42', '\u0f64', '\u0f44', '\u0f45', '\u0f46', MISSCODE, '\u0f47', '\u0f4a', '\u0f4c', '\u0f4e', '\u0f4f', MISSCODE, '\u0f51', '\u0f53', '\u0f54', '\u0f56', '\u0f5e', '\u0f65', '\u0f5f', '\u0f61', '\u0f62', '\u0f63', '\u0f66', '\u0f20', '\u0f21', '\u0f22', '\u0f23', '\u0f24', '\u0f25', '\u0f26', '\u0f27', '\u0f28', '\u0f29'}, // Tibetan
     };
 
     private final static Unicode2Ascii[] UNICODE2ASCII = {
-            new Unicode2Ascii(0x0041, 0x005a, "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),                                                        // Roman
-            new Unicode2Ascii(0x0391, 0x03a9, "ABGDFZHQIKLMNCOJP?STYVXRW"),                                                         // Greek
-            new Unicode2Ascii(0x0410, 0x042f, "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"),                                                  // Cyrillic
-            new Unicode2Ascii(0x05d0, 0x05ea, "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"),                                                       // Hebrew
-            new Unicode2Ascii(0x0905, 0x0939, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Hindi
-            new Unicode2Ascii(0x0d07, 0x0d39, "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"),                               // Malai
-            new Unicode2Ascii(0x10a0, 0x10bf, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),                                                  // Georgian
-            new Unicode2Ascii(0x30a2, 0x30f2, "A?I?O?U?EB?C?D?F?G?H???J???????K??????L?M?N?????P??Q??R??S?????TV?????WX???Y????Z"), // Katakana
-            new Unicode2Ascii(0x0e01, 0x0e32, "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"),                                // Thai
-            new Unicode2Ascii(0x0e81, 0x0ec6, "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"),            // Lao
-            new Unicode2Ascii(0x0532, 0x0556, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"),                                             // Armenian
-            new Unicode2Ascii(0x0985, 0x09b9, "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"),                             // Bengali
-            new Unicode2Ascii(0x0a05, 0x0a39, "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Gurmukhi
-            new Unicode2Ascii(0x0f40, 0x0f66, "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"),                                           // Tibetan
+            /* Roman    */ new Unicode2Ascii('\u0041', '\u005a', "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),                                                        // Roman
+            /* Greek    */ new Unicode2Ascii('\u0391', '\u03a9', "ABGDFZHQIKLMNCOJP?STYVXRW"),                                                         // Greek
+            /* Cyrillic */ new Unicode2Ascii('\u0410', '\u042f', "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"),                                                  // Cyrillic
+            /* Hebrew   */ new Unicode2Ascii('\u05d0', '\u05ea', "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"),                                                       // Hebrew
+            /* Hindi    */ new Unicode2Ascii('\u0905', '\u0939', "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Hindi
+            /* Malay    */ new Unicode2Ascii('\u0d07', '\u0d39', "I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ"),                               // Malai
+            /* Georgian */ new Unicode2Ascii('\u10a0', '\u10bf', "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),                                                  // Georgian
+            /* Katakana */ new Unicode2Ascii('\u30a2', '\u30f2', "A?I?O?U?EB?C?D?F?G?H???J???????K??????L?M?N?????P??Q??R??S?????TV?????WX???Y????Z"), // Katakana
+            /* Thai     */ new Unicode2Ascii('\u0e01', '\u0e32', "BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE"),                                // Thai
+            /* Laos     */ new Unicode2Ascii('\u0e81', '\u0ec6', "BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O"),            // Lao
+            /* Armenian */ new Unicode2Ascii('\u0532', '\u0556', "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"),                                             // Armenian
+            /* Bengali  */ new Unicode2Ascii('\u0985', '\u09b9', "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"),                             // Bengali
+            /* Gurmukhi */ new Unicode2Ascii('\u0a05', '\u0a39', "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Gurmukhi
+            /* Tibetan  */ new Unicode2Ascii('\u0f40', '\u0f66', "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"),                                           // Tibetan
 
-            new Unicode2Ascii(0x0966, 0x096f, ""),  // Hindi
-            new Unicode2Ascii(0x0d66, 0x0d6f, ""),  // Malai
-            new Unicode2Ascii(0x0e50, 0x0e59, ""),  // Thai
-            new Unicode2Ascii(0x09e6, 0x09ef, ""),  // Bengali
-            new Unicode2Ascii(0x0a66, 0x0a6f, ""),  // Gurmukhi
-            new Unicode2Ascii(0x0f20, 0x0f29, ""),  // Tibetan
+            /* Hindi    */ new Unicode2Ascii('\u0966', '\u096f', ""),
+            /* Malai    */ new Unicode2Ascii('\u0d66', '\u0d6f', ""),
+            /* Thai     */ new Unicode2Ascii('\u0e50', '\u0e59', ""),
+            /* Bengali  */ new Unicode2Ascii('\u09e6', '\u09ef', ""),
+            /* Gurmukhi */ new Unicode2Ascii('\u0a66', '\u0a6f', ""),
+            /* Tibetan  */ new Unicode2Ascii('\u0f20', '\u0f29', ""),
 
-            // lowercase variants: greek, georgian
-            new Unicode2Ascii(0x03B1, 0x03c9, "ABGDFZHQIKLMNCOJP?STYVXRW"),                                                         // Greek
-            // lowercase
-            new Unicode2Ascii(0x10d0, 0x10ef, "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),                                                  // Georgisch lowercase
-            new Unicode2Ascii(0x0562, 0x0586, "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"),                                             // Armenian
-            // lowercase
-            new Unicode2Ascii(0, 0, null)
+            // Lowercase variants:
+            /* Greek    */ new Unicode2Ascii('\u03B1', '\u03c9', "ABGDFZHQIKLMNCOJP?STYVXRW"),
+            /* Georgian */ new Unicode2Ascii('\u10d0', '\u10ef', "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),
+            /* Armenian */ new Unicode2Ascii('\u0562', '\u0586', "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA")
     };
 
     @Nonnull
@@ -607,8 +609,7 @@ class Decoder {
     static String decodeUTF16(final String mapcode) {
         String result;
         final StringBuilder asciiBuf = new StringBuilder();
-        for (int index = 0; index < mapcode.length(); index++) {
-            final char ch = mapcode.charAt(index);
+        for (final char ch : mapcode.toCharArray()) {
             if (ch == '.') {
                 asciiBuf.append(ch);
             } else if ((ch >= 1) && (ch <= 'z')) {
@@ -616,11 +617,10 @@ class Decoder {
                 asciiBuf.append(ch);
             } else {
                 boolean found = false;
-                for (int i = 0; UNICODE2ASCII[i].min != 0; i++) {
-                    if ((ch >= UNICODE2ASCII[i].min) && (ch <= UNICODE2ASCII[i].max)) {
-                        final String convert = (UNICODE2ASCII[i].convert != null) ? UNICODE2ASCII[i].convert : "0123456789";
-                        final int pos = ((int) ch) - UNICODE2ASCII[i].min;
-                        asciiBuf.append(convert.charAt(pos));
+                for (final Unicode2Ascii unicode2Ascii : UNICODE2ASCII) {
+                    if ((ch >= unicode2Ascii.min) && (ch <= unicode2Ascii.max)) {
+                        final int pos = ((int) ch) - (int) unicode2Ascii.min;
+                        asciiBuf.append(unicode2Ascii.convert.charAt(pos));
                         found = true;
                         break;
                     }
@@ -646,22 +646,20 @@ class Decoder {
 
     static String encodeUTF16(final String mapcode, int alphabetCode) throws IllegalArgumentException {
         final String mapcodeToEncode;
-        if (ASCII2LANGUAGE[alphabetCode][4] == 0x003f) {
+        if (ASCII2LANGUAGE[alphabetCode][4] == MISSCODE) {
 
-            // Alphabet does not contain 'E'.
+            // Alphabet does not contain 'E' (Greek).
             if (mapcode.matches("^.*[EU].*")) {
                 final String unpacked = aeuUnpack(mapcode);
                 if (unpacked.isEmpty()) {
                     throw new IllegalArgumentException("encodeToAlphabetCode: cannot encode '" + mapcode +
-                            "' to alphabet " + alphabetCode + ' ' + Alphabet.fromCode(alphabetCode));
+                            "' to alphabet " + alphabetCode);
                 }
                 mapcodeToEncode = Encoder.aeuPack(unpacked, true);
-            }
-            else {
+            } else {
                 mapcodeToEncode = mapcode;
             }
-        }
-        else {
+        } else {
             mapcodeToEncode = mapcode;
         }
         final StringBuilder sb = new StringBuilder();
@@ -674,7 +672,7 @@ class Decoder {
                 // Valid but not a letter (e.g. a dot, a space...). Leave untranslated.
                 sb.append(ch);
             } else {
-                sb.append((char) ASCII2LANGUAGE[alphabetCode][(int) ch - (int) 'A']);
+                sb.append(ASCII2LANGUAGE[alphabetCode][(int) ch - (int) 'A']);
             }
         }
         return sb.toString();
@@ -682,8 +680,7 @@ class Decoder {
 
     @Nonnull
     private static Point decodeTriple(final String str) {
-        //noinspection NumericCastThatLosesPrecision
-        final byte c1 = (byte) DECODE_CHARS[(int) str.charAt(0)];
+        final int c1 = DECODE_CHARS[(int) str.charAt(0)];
         final int x = fastDecode(str.substring(1));
         if (c1 < 24) {
             return Point.fromMicroDeg(((c1 / 6) * 34) + (x % 34), ((c1 % 6) * 28) + (x / 34));
@@ -705,16 +702,12 @@ class Decoder {
     }
 
     // / lowest level encode/decode routines
-    private static int fastDecode(final String code)
     // decode up to dot or EOS;
     // returns negative in case of error
-    {
+    private static int fastDecode(final String code) {
         int value = 0;
-        int i;
-        for (i = 0; i < code.length(); i++) {
-            final int c = (int) code.charAt(i);
-            if (c == 46) // dot!
-            {
+        for (final char c : code.toCharArray()) {
+            if (c == '.') {
                 return value;
             }
             if (DECODE_CHARS[c] < 0) {

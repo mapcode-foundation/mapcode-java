@@ -11,7 +11,11 @@ Release Notes (Version ${project.version})
 
 * 1.50.2
 
-    * To do.
+    * Cleaned up Unicode handling a bit.
+
+    * Speed up of reading initialization data.
+
+    * Rename <<<toNameFormat>>> into <<<toAlphaFormat>>> and <<<NAME_FORMAT>>> to <<<ALPHA_FORMAT>>>.
 
     []
 
