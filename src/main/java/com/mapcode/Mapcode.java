@@ -271,16 +271,15 @@ public final class Mapcode {
             Pattern.compile(REGEX_CODE_PRECISION + '$', Pattern.UNICODE_CHARACTER_CLASS);
 
     /**
-     * This enum describes the types of available mapcodes (as returned by {@link #getMapcodeFormatType(String)}.
+     * This enum describes the types of available mapcodes (as returned by {@link #getPrecisionFormat(String)}.
      */
-    public enum FormatType {
+    public enum PrecisionFormat {
         PRECISION_0,
         PRECISION_1,
-        PRECISION_2,
-        INVALID;
+        PRECISION_2;
 
-        public static FormatType fromPrecision(final int precision) {
-            switch (precision) {
+        public static PrecisionFormat fromNumber(final int number) {
+            switch (number) {
                 case 0:
                     return PRECISION_0;
                 case 1:
@@ -288,58 +287,64 @@ public final class Mapcode {
                 case 2:
                     return PRECISION_2;
                 default:
-                    return INVALID;
+                    throw new UnknownPrecisionFormatException("Precision must be in [0, 2], is: " + number, number);
             }
         }
     }
 
     /**
      * This method return the mapcode type, given a mapcode string. If the mapcode string has an invalid
-     * format, {@link FormatType#INVALID} is returned. If another value is returned,
-     * the precision of the mapcode is given.
+     * format, an exception is thrown.
      *
      * Note that this method only checks the syntactic validity of the mapcode, the string format. It does not
      * check if the mapcode is really a valid mapcode representing a position on Earth.
      *
      * @param mapcode Mapcode (optionally with a territory).
-     * @return Type of mapcode code format, or {@link FormatType#INVALID} if not valid.
-     * @throws IllegalArgumentException If mapcode has incorrect syntax.
+     * @return Type of mapcode code format.
+     * @throws UnknownPrecisionFormatException If precision format is incorrect.
      */
     @Nonnull
-    public static FormatType getMapcodeFormatType(@Nonnull final String mapcode) throws IllegalArgumentException {
+    public static PrecisionFormat getPrecisionFormat(@Nonnull final String mapcode) throws UnknownPrecisionFormatException {
 
         // First, decode to ASCII.
         final String decodedMapcode = convertStringToPlainAscii(mapcode).toUpperCase();
 
         // Syntax needs to be OK.
         if (!PATTERN_MAPCODE.matcher(decodedMapcode).matches()) {
-            return FormatType.INVALID;
+            throw new UnknownPrecisionFormatException(decodedMapcode + " is not a correctly formatted mapcode code; " +
+                    "the regular expression for the mapcode code syntax is: " + REGEX_MAPCODE);
         }
 
         // Precision part should be OK.
         final Matcher matcherPrecision = PATTERN_PRECISION.matcher(decodedMapcode);
         if (!matcherPrecision.find()) {
-            return FormatType.PRECISION_0;
+            return PrecisionFormat.PRECISION_0;
         }
         final int length = matcherPrecision.end() - matcherPrecision.start();
         assert (2 <= length) && (length <= 3);
         if (length == 2) {
-            return FormatType.PRECISION_1;
+            return PrecisionFormat.PRECISION_1;
         }
-        return FormatType.PRECISION_2;
+        return PrecisionFormat.PRECISION_2;
     }
 
     /**
      * This method provides a shortcut to checking if a mapcode string is formatted properly or not at all.
      *
-     * @param mapcode Mapcode (optionally with a territory_).
+     * @param mapcode Mapcode (optionally with a territory).
      * @return True if the mapcode format, the syntax, is correct. This does not mean the mapcode code is
      * actually a valid  mapcode representing a location on Earth.
      * @throws IllegalArgumentException If mapcode is null.
      */
-    public static boolean isValidMapcodeFormat(@Nonnull final String mapcode) throws IllegalArgumentException {
+    public static boolean isValidPrecisionFormat(@Nonnull final String mapcode) throws IllegalArgumentException {
         checkNonnull("mapcode", mapcode);
-        return getMapcodeFormatType(mapcode.toUpperCase()) != FormatType.INVALID;
+        try {
+            // Throws an exception if the format is incorrect.
+            getPrecisionFormat(mapcode.toUpperCase());
+            return true;
+        } catch (final UnknownPrecisionFormatException ignored) {
+            return false;
+        }
     }
 
     /**
@@ -362,8 +367,11 @@ public final class Mapcode {
 
     /**
      * Get a safe maximum for the distance between a decoded mapcode and its original
-     * location used for encoding the mapcode. The actual accuracy (resolution) of mapcodes is slightly
+     * location used for encoding the mapcode. The actual accuracy (resolution) of mapcodes is
      * better than this, but these are safe values to use under normal circumstances.
+     *
+     * Do not make any other assumptions on these numbers than that mapcodes are never more off
+     * by this distance.
      *
      * @param precision Precision of mapcode.
      * @return Maximum offset in meters.
@@ -397,7 +405,7 @@ public final class Mapcode {
      */
     @Nonnull
     static String convertStringToAlphabet(@Nonnull final String string, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
-        return (alphabet != null) ? Decoder.encodeUTF16(string.toUpperCase(), alphabet.getCode()) : string.toUpperCase();
+        return (alphabet != null) ? Decoder.encodeUTF16(string.toUpperCase(), alphabet.getNumber()) : string.toUpperCase();
     }
 
     /**
@@ -430,125 +438,5 @@ public final class Mapcode {
                 codePrecision1.equals(that.codePrecision1) &&
                 codePrecision2.equals(that.codePrecision2) &&
                 (this.territory.equals(that.territory));
-    }
-
-    /**
-     * ----------------------------------------------------------------------
-     * Deprecated methods.
-     * ----------------------------------------------------------------------
-     *
-     * Important: these methods will potentially be removed from the interface in later releases.
-     * It is advised to migrate to the newer variants.
-     */
-
-    /**
-     * Deprecated. Replaced with {@link #getCode}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String getMapcode() {
-        return getCode();
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCode}.
-     *
-     * @param precision Deprecated.
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String getMapcodePrecision(final int precision) {
-        return getCode(precision);
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCode(int)}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String getMapcodePrecision0() {
-        return codePrecision0;
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCode(int)}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String getMapcodePrecision1() {
-        return codePrecision1;
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCode(int)}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String getMapcodeMediumPrecision() {
-        return codePrecision1;
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCode(int)}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String getMapcodePrecision2() {
-        return codePrecision2;
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCode(int)}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String getMapcodeHighPrecision() {
-        return codePrecision2;
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCode()}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String asLocal() {
-        return getCode();
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCodeWithTerritoryFullname()}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String asInternationalFullName() {
-        return getCodeWithTerritoryFullname();
-    }
-
-    /**
-     * Deprecated. Replaced with {@link #getCodeWithTerritory()}.
-     *
-     * @return Deprecated.
-     */
-    @Deprecated
-    @Nonnull
-    public String asInternationalISO() {
-        return getCodeWithTerritory();
     }
 }

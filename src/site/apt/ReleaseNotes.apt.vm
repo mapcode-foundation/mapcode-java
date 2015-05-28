@@ -11,7 +11,22 @@ Release Notes (Version ${project.version})
 
 * 1.50.3
 
-    * To do.
+    * Removed <<<Mapcode.encodeToShortest(lat, lon))>>> as this will produce a randomly chosen territory.
+      You must specify a <<<restrictToTerritory>>> now.
+
+    * Renamed <<<Territory.code>>> to <<<Territory.number>>>.
+
+    * Renamed <<<fromTerritoryCode())>>> to <<<fromNumber())>>>.
+
+    * Renamed <<<Territory.isState())>>> to <<<Territory.isSubdivision())>>> and
+
+    * Renamed <<<Territory.hasStates())>>> to <<<Territory.hasSubdivision())>>>.
+
+    * Renamed <<<Alphabet.code>>> to <<<Alphabet.number>>>.
+
+    * Renamed <<<fromCode())>>> to <<<fromNumber())>>>.
+
+    * Renamed <<<MapcodeFormat>>> to <<<PrecisionFormat>>>.
 
     []
 

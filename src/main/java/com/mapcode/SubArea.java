@@ -46,7 +46,7 @@ class SubArea {
     static {
         LOG.info("SubArea: Initialize sub-areas for {} territories", Territory.values().length);
         for (final Territory territory : Territory.values()) {
-            final int territoryCode = territory.getCode();
+            final int territoryCode = territory.getNumber();
             final int first = DataAccess.dataFirstRecord(territoryCode);
             final int last = DataAccess.dataLastRecord(territoryCode);
 

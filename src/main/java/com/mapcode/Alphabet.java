@@ -44,44 +44,44 @@ public enum Alphabet {
      * The numeric code is synonym for the alphanumeric code. It can be used in the decoder
      * to define a territory as well.
      */
-    private final int code;
+    private final int number;
 
-    private Alphabet(final int code) {
-        this.code = code;
+    private Alphabet(final int number) {
+        this.number = number;
     }
 
-    public int getCode() {
-        return code;
+    public int getNumber() {
+        return number;
     }
 
     /**
      * Get an alphabet from a numeric code.
      *
-     * @param code Numeric code.
+     * @param number Numeric code.
      * @return Alphabet.
      * @throws UnknownAlphabetException Thrown if code out of range.
      */
     @Nonnull
-    public static Alphabet fromCode(final int code) throws UnknownAlphabetException {
-        if ((code >= 0) && (code < Alphabet.values().length)) {
-            return Alphabet.values()[code];
+    public static Alphabet fromNumber(final int number) throws UnknownAlphabetException {
+        if ((number >= 0) && (number < Alphabet.values().length)) {
+            return Alphabet.values()[number];
         }
-        throw new UnknownAlphabetException(code);
+        throw new UnknownAlphabetException(number);
     }
 
     /**
      * Return alphabet from a string, which can be a numeric or alpha code.
      *
-     * @param numericOrAlpha Alphabet. May be a numeric or alphanumeric code.
+     * @param numberOrString Alphabet. May be a numeric or alphanumeric code.
      * @return Alphabet.
      * @throws UnknownAlphabetException Thrown if incorrect numeric or alphanumeric code.
      */
     @Nonnull
-    public static Alphabet fromString(@Nonnull final String numericOrAlpha) throws UnknownAlphabetException {
-        checkNonnull("name", numericOrAlpha);
-        final String trimmed = numericOrAlpha.trim().toUpperCase();
+    public static Alphabet fromString(@Nonnull final String numberOrString) throws UnknownAlphabetException {
+        checkNonnull("numberOrString", numberOrString);
+        final String trimmed = numberOrString.trim().toUpperCase();
         try {
-            return fromCode(Integer.valueOf(numericOrAlpha));
+            return fromNumber(Integer.valueOf(numberOrString));
         } catch (final IllegalArgumentException ignored) {
             // Ignore. Re-try as alpha code.
         }
@@ -98,8 +98,8 @@ public enum Alphabet {
     static {
         int i = 0;
         for (final Alphabet alphabet : Alphabet.values()) {
-            if (Alphabet.values()[i].code != i) {
-                throw new ExceptionInInitializerError("Incorrect alphabet code: " + alphabet + ".code should be " + i);
+            if (Alphabet.values()[i].number != i) {
+                throw new ExceptionInInitializerError("Incorrect alphabet number: " + alphabet + ".number should be " + i);
             }
             ++i;
         }

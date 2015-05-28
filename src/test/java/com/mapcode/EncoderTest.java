@@ -103,24 +103,24 @@ public class EncoderTest {
     }
 
     @Test
-    public void encodeToShortest1() {
+    public void encodeToShortest1() throws Exception {
         LOG.info("encodeToShortest1");
 
         final double lat = 52.376514;
         final double lon = 4.908542;
 
-        final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon);
+        final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
         assertEquals("NLD 49.4V", result.getCodeWithTerritory());
     }
 
     @Test
-    public void encodeToShortest2() {
+    public void encodeToShortest2() throws Exception {
         LOG.info("encodeToShortest2");
 
         final double lat = 26.87016;
         final double lon = 75.847;
 
-        final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon);
+        final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon, Territory.IN_RJ);
         assertEquals("IN-RJ XX.XX", result.getCodeWithTerritory());
     }
 

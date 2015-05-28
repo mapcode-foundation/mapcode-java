@@ -16,7 +16,7 @@
 
 package com.mapcode;
 
-import com.mapcode.Territory.AlphaFormat;
+import com.mapcode.Territory.AlphaCodeFormat;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class TerritoryTest {
         LOG.info("checkAlphabetCode");
         int i = 0;
         for (final Alphabet alphabet : Alphabet.values()) {
-            assertEquals(alphabet, Alphabet.fromCode(i));
+            assertEquals(alphabet, Alphabet.fromNumber(i));
             ++i;
         }
     }
@@ -47,13 +47,13 @@ public class TerritoryTest {
     @Test(expected = UnknownAlphabetException.class)
     public void checkAlphabetCodeError1() throws Exception {
         LOG.info("checkAlphabetCodeError1");
-        Alphabet.fromCode(-1);
+        Alphabet.fromNumber(-1);
     }
 
     @Test(expected = UnknownAlphabetException.class)
     public void checkAlphabetCodeError2() throws Exception {
         LOG.info("checkAlphabetCodeError2");
-        Alphabet.fromCode(Alphabet.values().length);
+        Alphabet.fromNumber(Alphabet.values().length);
     }
 
     @Test
@@ -113,7 +113,7 @@ public class TerritoryTest {
 
         for (final Territory territory : Territory.values()) {
             assertEquals(territory, Territory.fromString(territory.toString()));
-            assertEquals(territory, Territory.fromString(String.valueOf(territory.getCode())));
+            assertEquals(territory, Territory.fromString(String.valueOf(territory.getNumber())));
         }
     }
 
@@ -124,11 +124,11 @@ public class TerritoryTest {
         assertEquals(Territory.NLD, Territory.fromString("\u039d\u039b\u0394"));
         assertEquals(Territory.NLD, Territory.fromString("\u0417\u041b\u0414"));
 
-        assertEquals("NLD", Territory.NLD.toAlpha(AlphaFormat.INTERNATIONAL));
-        assertEquals("NLD", Territory.NLD.toAlpha(AlphaFormat.INTERNATIONAL, Alphabet.ROMAN));
-        assertEquals("\u0417\u041b\u0414", Territory.NLD.toAlpha(AlphaFormat.INTERNATIONAL, Alphabet.CYRILLIC));
-        assertEquals("\u039d\u039b\u0394", Territory.NLD.toAlpha(AlphaFormat.INTERNATIONAL, Alphabet.GREEK));
-        assertEquals("\u0393\u03a8\u039e", Territory.GRC.toAlpha(AlphaFormat.INTERNATIONAL, Alphabet.GREEK));
+        assertEquals("NLD", Territory.NLD.toAlphaCode(AlphaCodeFormat.INTERNATIONAL));
+        assertEquals("NLD", Territory.NLD.toAlphaCode(AlphaCodeFormat.INTERNATIONAL, Alphabet.ROMAN));
+        assertEquals("\u0417\u041b\u0414", Territory.NLD.toAlphaCode(AlphaCodeFormat.INTERNATIONAL, Alphabet.CYRILLIC));
+        assertEquals("\u039d\u039b\u0394", Territory.NLD.toAlphaCode(AlphaCodeFormat.INTERNATIONAL, Alphabet.GREEK));
+        assertEquals("\u0393\u03a8\u039e", Territory.GRC.toAlphaCode(AlphaCodeFormat.INTERNATIONAL, Alphabet.GREEK));
     }
 
     @Test(expected = IllegalArgumentException.class)
