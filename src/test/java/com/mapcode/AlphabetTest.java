@@ -16,7 +16,7 @@
 
 package com.mapcode;
 
-import com.mapcode.Mapcode.FormatType;
+import com.mapcode.Mapcode.PrecisionFormat;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public class AlphabetTest {
 
         for (final Alphabet alphabet : Alphabet.values()) {
             assertEquals(alphabet, Alphabet.fromString(alphabet.toString()));
-            assertEquals(alphabet, Alphabet.fromString(String.valueOf(alphabet.getCode())));
+            assertEquals(alphabet, Alphabet.fromString(String.valueOf(alphabet.getNumber())));
         }
     }
 
@@ -86,9 +86,9 @@ public class AlphabetTest {
             final int precision) throws Exception {
 
         // Check type.
-        final FormatType formatType = FormatType.fromPrecision(precision);
-        final FormatType type = Mapcode.getMapcodeFormatType(code);
-        assertEquals("code = " + code + ", type = " + type, formatType, type);
+        final PrecisionFormat precisionFormat = PrecisionFormat.fromNumber(precision);
+        final PrecisionFormat type = Mapcode.getPrecisionFormat(code);
+        assertEquals("code = " + code + ", type = " + type, precisionFormat, type);
 
         // Check original code and converted to ASCII point at same location.
         final String codeAscii = Mapcode.convertStringToPlainAscii(code);
@@ -98,7 +98,7 @@ public class AlphabetTest {
                 pointCode, pointAscii);
 
         // Check if it re-encodes to the same mapcode codes.
-        final Mapcode mapcode = MapcodeCodec.encodeToShortest(pointCode);
+        final Mapcode mapcode = MapcodeCodec.encodeToShortest(pointCode, territory);
         final String codeRoman;
         final String codeAlphabet;
         if (Mapcode.containsTerritory(code)) {

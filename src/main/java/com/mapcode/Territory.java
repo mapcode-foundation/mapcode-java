@@ -569,7 +569,7 @@ public enum Territory {
     CPT(530, "Clipperton Island"),
     AAA(532, "International", null, null, new String[]{"Worldwide", "Earth"});
 
-    private final int code;
+    private final int number;
     @Nonnull
     private final String fullName;
     @Nullable
@@ -584,8 +584,8 @@ public enum Territory {
      *
      * @return Integer territory code.
      */
-    public int getCode() {
-        return code;
+    public int getNumber() {
+        return number;
     }
 
     /**
@@ -631,22 +631,22 @@ public enum Territory {
     /**
      * Return the territory for a specific code.
      *
-     * @param territoryCode Numeric territory code.
+     * @param number Numeric territory code.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if incorrect numeric or alphanumeric code.
      */
     @Nonnull
-    public static Territory fromTerritoryCode(final int territoryCode) throws UnknownTerritoryException {
-        if ((territoryCode < 0) || (territoryCode >= codeList.size())) {
-            throw new UnknownTerritoryException(territoryCode);
+    public static Territory fromNumber(final int number) throws UnknownTerritoryException {
+        if ((number < 0) || (number >= codeList.size())) {
+            throw new UnknownTerritoryException(number);
         }
-        return codeList.get(territoryCode);
+        return codeList.get(number);
     }
 
     /**
      * Get a territory from a mapcode territory abbreviation. Note that the provided abbreviation is NOT an
-     * ISO code: it's a mapcode prefix. As local mapcodes for states have been optimized to prefer to use 2-character
-     * state codes in local codes, states are preferred over countries in this case.
+     * ISO code: it's a mapcode prefix. As local mapcodes for subdivisions have been optimized to prefer to use 2-character
+     * subdivisions codes in local codes, subdivisions are preferred over countries in this case.
      *
      * For example, fromString("AS") returns {@link Territory#IN_AS} rather than {@link Territory#ASM} and
      * fromString("BR") returns {@link Territory#IN_BR} rather than {@link Territory#BRA}.
@@ -686,19 +686,19 @@ public enum Territory {
 
     /**
      * Return the international value of the territory name, with dashes rather than underscores.
-     * This is the same as {@link #toAlpha(AlphaFormat)} for {@link AlphaFormat#INTERNATIONAL}.
+     * This is the same as {@link #toAlphaCode(AlphaCodeFormat)} for {@link AlphaCodeFormat#INTERNATIONAL}.
      *
      * @param alphabet Alphabet. May be null.
      * @return Territory name. Underscores have been replaced with dashes.
      */
     @Nonnull
     public String toString(@Nullable final Alphabet alphabet) {
-        return toAlpha(AlphaFormat.INTERNATIONAL, alphabet);
+        return toAlphaCode(AlphaCodeFormat.INTERNATIONAL, alphabet);
     }
 
     /**
      * Return the international value of the territory name, with dashes rather than underscores.
-     * This is the same as {@link #toAlpha(AlphaFormat)} for {@link AlphaFormat#INTERNATIONAL}.
+     * This is the same as {@link #toAlphaCode(AlphaCodeFormat)} for {@link AlphaCodeFormat#INTERNATIONAL}.
      *
      * @return Territory name. Underscores have been replaced with dashes.
      */
@@ -711,7 +711,7 @@ public enum Territory {
     /**
      * Enumeration that specifies the format for mapcodes.
      */
-    public enum AlphaFormat {
+    public enum AlphaCodeFormat {
         INTERNATIONAL,          // Same as name() with underscores replaces with dashes.
         MINIMAL_UNAMBIGUOUS,    // Minimal code, which is still unambiguous.
         MINIMAL                 // Minimal code, may be ambiguous, eg. RJ instead of IN-RJ.
@@ -725,15 +725,15 @@ public enum Territory {
      * @return Mapcode.
      */
     @Nonnull
-    public String toAlpha(@Nonnull final AlphaFormat format, @Nullable final Alphabet alphabet) {
+    public String toAlphaCode(@Nonnull final AlphaCodeFormat format, @Nullable final Alphabet alphabet) {
         checkNonnull("format", format);
         String result = name().replace('_', '-');
-        if (format != AlphaFormat.INTERNATIONAL) {
+        if (format != AlphaCodeFormat.INTERNATIONAL) {
             final int index = name().indexOf('_');
             if (index != -1) {
                 assert name().length() > (index + 1);
                 final String shortName = name().substring(index + 1);
-                if ((format == AlphaFormat.MINIMAL) || (nameMap.get(shortName).size() == 1)) {
+                if ((format == AlphaCodeFormat.MINIMAL) || (nameMap.get(shortName).size() == 1)) {
                     result = shortName;
                 }
             }
@@ -749,25 +749,25 @@ public enum Territory {
     }
 
     @Nonnull
-    public String toAlpha(@Nonnull final AlphaFormat format) {
-        return toAlpha(format, null);
+    public String toAlphaCode(@Nonnull final AlphaCodeFormat format) {
+        return toAlphaCode(format, null);
     }
 
     /**
-     * Returns if this territory is a state of another territory.
+     * Returns if this territory is a subdivisions of another territory.
      *
      * @return True if this territory has a parent territory.
      */
-    public boolean isState() {
+    public boolean isSubdivision() {
         return parentTerritory != null;
     }
 
     /**
-     * Returns if this territory contains other territory states.
+     * Returns if this territory contains other territory subdivisions.
      *
-     * @return True if this territory contains other territory states.
+     * @return True if this territory contains other territory subdivisions.
      */
-    public boolean hasStates() {
+    public boolean hasSubdivisions() {
         return parentList.contains(this);
     }
 
@@ -775,33 +775,33 @@ public enum Territory {
      * Local constructors to create a territory code.
      */
     private Territory(
-            final int code,
+            final int number,
             @Nonnull final String fullName) {
-        this(code, fullName, null, null, null);
+        this(number, fullName, null, null, null);
     }
 
     private Territory(
-            final int code,
+            final int number,
             @Nonnull final String fullName,
             @Nullable final ParentTerritory parentTerritory) {
-        this(code, fullName, parentTerritory, null, null);
+        this(number, fullName, parentTerritory, null, null);
     }
 
     private Territory(
-            final int code,
+            final int number,
             @Nonnull final String fullName,
             @Nullable final ParentTerritory parentTerritory,
             @Nullable final String[] aliases) {
-        this(code, fullName, parentTerritory, aliases, null);
+        this(number, fullName, parentTerritory, aliases, null);
     }
 
     private Territory(
-            final int code,
+            final int number,
             @Nonnull final String fullName,
             @Nullable final ParentTerritory parentTerritory,
             @Nullable final String[] aliases,
             @Nullable final String[] fullNameAliases) {
-        this.code = code;
+        this.number = number;
         this.fullName = fullName;
         this.parentTerritory = (parentTerritory == null) ? null : parentTerritory.getTerritory();
         this.aliases = (aliases == null) ? new String[]{} : aliases;
@@ -829,21 +829,21 @@ public enum Territory {
         final Set<String> aliasesSet = new HashSet<>();
 
         for (final Territory territory : Territory.values()) {
-            final int territoryCode = territory.getCode();
-            if ((territoryCode < 0) || (territoryCode >= Territory.values().length)) {
-                throw new ExceptionInInitializerError(errorPrefix + "territory code out of range: " + territoryCode);
+            final int territoryNumber = territory.getNumber();
+            if ((territoryNumber < 0) || (territoryNumber >= Territory.values().length)) {
+                throw new ExceptionInInitializerError(errorPrefix + "territory number out of range: " + territoryNumber);
 
             }
-            if (territoryCodes.contains(territoryCode)) {
-                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory code: " + territoryCode);
+            if (territoryCodes.contains(territoryNumber)) {
+                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory number: " + territoryNumber);
             }
-            territoryCodes.add(territory.getCode());
+            territoryCodes.add(territory.getNumber());
 
             final int initialCodeListSize = codeList.size();
-            for (int i = initialCodeListSize; i <= territory.code; i++) {
+            for (int i = initialCodeListSize; i <= territory.number; i++) {
                 codeList.add(null);
             }
-            codeList.set(territory.code, territory);
+            codeList.set(territory.number, territory);
             if ((territory.parentTerritory != null) && !parentList.contains(territory.parentTerritory)) {
                 parentList.add(territory.parentTerritory);
             }
@@ -855,8 +855,8 @@ public enum Territory {
                 aliasesSet.add(alias);
                 addNameWithParentVariants(alias, territory);
             }
-            min = Math.min(min, territory.code);
-            max = Math.max(max, territory.code);
+            min = Math.min(min, territory.number);
+            max = Math.max(max, territory.number);
         }
         assert territoryCodes.size() == Territory.values().length;
 
@@ -883,7 +883,7 @@ public enum Territory {
         // First, try as numeric code.
         try {
             final Integer territoryCode = Integer.valueOf(trimmed);
-            return fromTerritoryCode(territoryCode);
+            return fromNumber(territoryCode);
         } catch (final NumberFormatException ignored) {
             // Re-try as alpha code.
         }

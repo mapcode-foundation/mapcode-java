@@ -87,12 +87,12 @@ class Encoder {
                 continue;
             }
 
-            final int from = DataAccess.dataFirstRecord(currentEncodeTerritory.getCode());
+            final int from = DataAccess.dataFirstRecord(currentEncodeTerritory.getNumber());
             final Data mapcoderData = new Data(from);
             if (mapcoderData.getFlags() == 0) {
                 continue;
             }
-            final int upto = DataAccess.dataLastRecord(currentEncodeTerritory.getCode());
+            final int upto = DataAccess.dataLastRecord(currentEncodeTerritory.getNumber());
 
 
             final int i = subArea.getSubAreaID();

@@ -16,7 +16,7 @@
 
 package com.mapcode;
 
-import com.mapcode.Mapcode.FormatType;
+import com.mapcode.Mapcode.PrecisionFormat;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,80 +27,86 @@ public class MapcodeTest {
     private static final Logger LOG = LoggerFactory.getLogger(MapcodeTest.class);
 
     @Test
-    public void checkValidCodeFormats() {
-        LOG.info("checkValidMapcodeFormats");
+    public void checkValidPrecisionFormats() {
+        LOG.info("checkValidPrecisionFormats");
 
-        assertTrue(Mapcode.isValidMapcodeFormat("A1.B1"));
-        assertTrue(Mapcode.isValidMapcodeFormat("a1.B1"));
-        assertTrue(Mapcode.isValidMapcodeFormat("00.01"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AAA.01"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AAA.BBB"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AAAA.BBB"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AAAA.BBBB"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AAAAA.BBBB"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AAAAA.BBBBB"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-0"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-01"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-A"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-AA"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-Y"));
-        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-1Y"));
+        assertTrue(Mapcode.isValidPrecisionFormat("A1.B1"));
+        assertTrue(Mapcode.isValidPrecisionFormat("a1.B1"));
+        assertTrue(Mapcode.isValidPrecisionFormat("00.01"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AAA.01"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AAA.BBB"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AAAA.BBB"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AAAA.BBBB"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AAAAA.BBBB"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AAAAA.BBBBB"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AA.AA-0"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AA.AA-01"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AA.AA-A"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AA.AA-AA"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AA.AA-Y"));
+        assertTrue(Mapcode.isValidPrecisionFormat("AA.AA-1Y"));
 
         // Mapcode may contain correctly formatted (possible incorrect) territory code.
-        assertTrue(Mapcode.isValidMapcodeFormat("NLD XX.XX"));
-        assertTrue(Mapcode.isValidMapcodeFormat("USA-NLD XX.XX"));
-        assertTrue(Mapcode.isValidMapcodeFormat("IN XX.XX"));
-        assertTrue(Mapcode.isValidMapcodeFormat("US-IN XX.XX"));
-        assertTrue(Mapcode.isValidMapcodeFormat("US_IN XX.XX"));
-        assertTrue(Mapcode.isValidMapcodeFormat("RU-IN XX.XX"));
+        assertTrue(Mapcode.isValidPrecisionFormat("NLD XX.XX"));
+        assertTrue(Mapcode.isValidPrecisionFormat("USA-NLD XX.XX"));
+        assertTrue(Mapcode.isValidPrecisionFormat("IN XX.XX"));
+        assertTrue(Mapcode.isValidPrecisionFormat("US-IN XX.XX"));
+        assertTrue(Mapcode.isValidPrecisionFormat("US_IN XX.XX"));
+        assertTrue(Mapcode.isValidPrecisionFormat("RU-IN XX.XX"));
+    }
+
+    @Test
+    public void checkInvalidPrecisionFormats() {
+        LOG.info("checkInvalidPrecisionFormats");
 
         // Territory code must be correct syntax.
-        assertFalse(Mapcode.isValidMapcodeFormat("NL- XX.XX"));
-        assertFalse(Mapcode.isValidMapcodeFormat("US IN XX.XX"));
-    }
-
-    @Test
-    public void checkInvalidCodeFormats() {
-        LOG.info("checkInvalidMapcodeFormats");
+        assertFalse(Mapcode.isValidPrecisionFormat("NL- XX.XX"));
+        assertFalse(Mapcode.isValidPrecisionFormat("US IN XX.XX"));
 
         // Incorrect (nunber of) characters.
-        assertFalse(Mapcode.isValidMapcodeFormat("A"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AB"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AB."));
-        assertFalse(Mapcode.isValidMapcodeFormat(".A"));
-        assertFalse(Mapcode.isValidMapcodeFormat(".AB"));
-        assertFalse(Mapcode.isValidMapcodeFormat("A.B"));
-        assertFalse(Mapcode.isValidMapcodeFormat("a.B"));
-        assertFalse(Mapcode.isValidMapcodeFormat("0.1"));
-        assertFalse(Mapcode.isValidMapcodeFormat("0.1"));
-        assertFalse(Mapcode.isValidMapcodeFormat("00.1"));
-        assertFalse(Mapcode.isValidMapcodeFormat("0.01"));
-        assertFalse(Mapcode.isValidMapcodeFormat("00.01."));
-        assertFalse(Mapcode.isValidMapcodeFormat("00.01.0"));
-        assertFalse(Mapcode.isValidMapcodeFormat("00.01.00"));
-        assertFalse(Mapcode.isValidMapcodeFormat("00.01-"));
-        assertFalse(Mapcode.isValidMapcodeFormat("00.01-"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAAAAA.BBBBB"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAAAA.BBBBBB"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-012"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-1Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A"));
-        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA-1"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A-1"));
-        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA-12"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A-12"));
+        assertFalse(Mapcode.isValidPrecisionFormat("A"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AB"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AB."));
+        assertFalse(Mapcode.isValidPrecisionFormat(".A"));
+        assertFalse(Mapcode.isValidPrecisionFormat(".AB"));
+        assertFalse(Mapcode.isValidPrecisionFormat("A.B"));
+        assertFalse(Mapcode.isValidPrecisionFormat("a.B"));
+        assertFalse(Mapcode.isValidPrecisionFormat("0.1"));
+        assertFalse(Mapcode.isValidPrecisionFormat("0.1"));
+        assertFalse(Mapcode.isValidPrecisionFormat("00.1"));
+        assertFalse(Mapcode.isValidPrecisionFormat("0.01"));
+        assertFalse(Mapcode.isValidPrecisionFormat("00.01."));
+        assertFalse(Mapcode.isValidPrecisionFormat("00.01.0"));
+        assertFalse(Mapcode.isValidPrecisionFormat("00.01.00"));
+        assertFalse(Mapcode.isValidPrecisionFormat("00.01-"));
+        assertFalse(Mapcode.isValidPrecisionFormat("00.01-"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AAAAAA.BBBBB"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AAAAA.BBBBBB"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AA.AA-012"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AA.AA-Z"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AA.AA-1Z"));
+        assertFalse(Mapcode.isValidPrecisionFormat("A.AAA"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AAA.A"));
+        assertFalse(Mapcode.isValidPrecisionFormat("A.AAA-1"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AAA.A-1"));
+        assertFalse(Mapcode.isValidPrecisionFormat("A.AAA-12"));
+        assertFalse(Mapcode.isValidPrecisionFormat("AAA.A-12"));
     }
 
     @Test
-    public void checkMapcodeFormatType() {
-        LOG.info("checkMapcodeFormatType");
+    public void checkPrecisionFormat1() {
+        LOG.info("checkPrecisionFormat1");
 
-        assertEquals(FormatType.INVALID, Mapcode.getMapcodeFormatType("ABC"));
-        assertEquals(FormatType.PRECISION_0, Mapcode.getMapcodeFormatType("AA.BB"));
-        assertEquals(FormatType.PRECISION_1, Mapcode.getMapcodeFormatType("AA.BB-1"));
-        assertEquals(FormatType.PRECISION_2, Mapcode.getMapcodeFormatType("AA.BB-12"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("AA.BB"));
+        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("AA.BB-1"));
+        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("AA.BB-12"));
+    }
+
+    @Test(expected = UnknownPrecisionFormatException.class)
+    public void checkPrecisionFormat2() {
+        LOG.info("checkPrecisionFormat2");
+
+        Mapcode.getPrecisionFormat("ABC");
     }
 
     @Test

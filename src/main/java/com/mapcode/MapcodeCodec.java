@@ -16,15 +16,13 @@
 
 package com.mapcode;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.regex.Matcher;
 
 import static com.mapcode.CheckArgs.checkNonnull;
+import static com.mapcode.Mapcode.getPrecisionFormat;
 
 /**
  * ----------------------------------------------------------------------------------------------
@@ -34,7 +32,6 @@ import static com.mapcode.CheckArgs.checkNonnull;
  * This class is the external Java interface for encoding and decoding mapcodes.
  */
 public final class MapcodeCodec {
-    private static final Logger LOG = LoggerFactory.getLogger(MapcodeCodec.class);
 
     private MapcodeCodec() {
         // Prevent instantiation.
@@ -54,7 +51,7 @@ public final class MapcodeCodec {
      *
      * The list is ordered in such a way that the last result is the international code. However, you cannot assume
      * that the first result is the shortest mapcode. If you want to use the shortest mapcode, use
-     * {@link #encodeToShortest(double, double)}.
+     * {@link #encodeToShortest(double, double, Territory)}.
      *
      * The international code can be obtained from the list by using: "results.get(results.size() - 1)", or
      * you can use {@link #encodeToInternational(double, double)}, which is faster.
@@ -109,45 +106,23 @@ public final class MapcodeCodec {
     }
 
     /**
-     * Encode a lat/lon pair to its shortest mapcode without specifying territory information. For a valid lat/lon pair,
-     * this will always yield a mapcode.
-     *
-     * @param latDeg Latitude, accepted range: -90..90.
-     * @param lonDeg Longitude, accepted range: -180..180.
-     * @return Shortest mapcode (always exists), see {@link Mapcode}.
-     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
-     */
-    @Nonnull
-    public static Mapcode encodeToShortest(final double latDeg, final double lonDeg) throws IllegalArgumentException {
-        try {
-            return encodeToShortest(latDeg, lonDeg, null);
-        } catch (final UnknownMapcodeException e) {
-            throw new IllegalStateException("Encoding should never fail for + " + latDeg + ", " + lonDeg, e);
-        }
-    }
-
-    @Nonnull
-    public static Mapcode encodeToShortest(@Nonnull final Point point) throws IllegalArgumentException {
-        checkNonnull("point", point);
-        return encodeToShortest(point.getLatDeg(), point.getLonDeg());
-    }
-
-    /**
      * Encode a lat/lon pair to its shortest mapcode with territory information.
      *
      * @param latDeg              Latitude, accepted range: -90..90.
      * @param lonDeg              Longitude, accepted range: -180..180.
-     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. May be null.
+     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. Cannot be null.
      * @return Shortest mapcode, see {@link Mapcode}.
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
      * @throws UnknownMapcodeException  Thrown if no mapcode was found for the lat/lon matching the territory.
      */
     @Nonnull
     public static Mapcode encodeToShortest(final double latDeg, final double lonDeg,
-                                           @Nullable final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
+                                           @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
+        checkNonnull("restrictToTerritory", restrictToTerritory);
+
         // Call mapcode encoder.
         @Nonnull final List<Mapcode> results =
-                Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, true, (restrictToTerritory == null));
+                Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, true, false);
         assert results != null;
         assert results.size() <= 1;
         if (results.isEmpty()) {
@@ -159,7 +134,7 @@ public final class MapcodeCodec {
 
     @Nonnull
     public static Mapcode encodeToShortest(@Nonnull final Point point,
-                                           @Nullable final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
+                                           @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
         checkNonnull("point", point);
         return encodeToShortest(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
     }
@@ -204,12 +179,14 @@ public final class MapcodeCodec {
      *
      * @param mapcode Mapcode.
      * @return Point corresponding to mapcode.
-     * @throws UnknownMapcodeException  Thrown if the mapcode has the correct syntax,
-     *                                  but cannot be decoded into a point.
-     * @throws IllegalArgumentException Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
+     * @throws UnknownMapcodeException         Thrown if the mapcode has the correct syntax,
+     *                                         but cannot be decoded into a point.
+     * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
+     * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
      */
+    @SuppressWarnings("DuplicateThrows")
     @Nonnull
-    public static Point decode(@Nonnull final String mapcode) throws UnknownMapcodeException, IllegalArgumentException {
+    public static Point decode(@Nonnull final String mapcode) throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
         return decode(mapcode, Territory.AAA);
     }
 
@@ -225,13 +202,15 @@ public final class MapcodeCodec {
      * @param mapcode                 Mapcode.
      * @param defaultTerritoryContext Default territory context for disambiguation purposes. May be null.
      * @return Point corresponding to mapcode. Latitude range: -90..90, longitude range: -180..180.
-     * @throws UnknownMapcodeException  Thrown if the mapcode has the right syntax, but cannot be decoded into a point.
-     * @throws IllegalArgumentException Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
+     * @throws UnknownMapcodeException         Thrown if the mapcode has the right syntax, but cannot be decoded into a point.
+     * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
+     * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
      */
+    @SuppressWarnings("DuplicateThrows")
     @Nonnull
     public static Point decode(
             @Nonnull final String mapcode,
-            @Nullable final Territory defaultTerritoryContext) throws UnknownMapcodeException, IllegalArgumentException {
+            @Nullable final Territory defaultTerritoryContext) throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
         checkNonnull("mapcode", mapcode);
 
         // Clean up mapcode.
@@ -258,10 +237,8 @@ public final class MapcodeCodec {
             mapcodeClean = mapcodeClean.substring(matcherTerritory.end()).trim();
         }
 
-        if (!Mapcode.isValidMapcodeFormat(mapcodeClean)) {
-            throw new IllegalArgumentException(mapcodeClean + " is not a correctly formatted mapcode; " +
-                    "the regular expression for the mapcode syntax is: " + Mapcode.REGEX_MAPCODE);
-        }
+        // Throws an exception if the format is incorrect.
+        getPrecisionFormat(mapcodeClean);
 
         @Nonnull final Point point = Decoder.decode(mapcodeClean, territory);
         assert point != null;
