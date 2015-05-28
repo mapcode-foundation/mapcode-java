@@ -28,6 +28,8 @@ Release Notes (Version ${project.version})
 
     * Renamed <<<MapcodeFormat>>> to <<<PrecisionFormat>>>.
 
+    * Deprecated methods have been removed.
+
     []
 
 * 1.50.2
