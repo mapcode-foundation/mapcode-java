@@ -29,6 +29,40 @@ public class EncoderTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncoderTest.class);
 
     @Test
+    public void encodeMostResults() {
+        LOG.info("encodeMostResults");
+
+        final double lat = 26.904899;
+        final double lon = 95.138515;
+
+        final List<Mapcode> results = MapcodeCodec.encode(lat, lon);
+        assertEquals(21, results.size());
+        int i = 0;
+        assertEquals("MMR 9Z3R.YKP", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-NL WKS.H6", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-NL X57.Q6V", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-NL W7Y.9WBB", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-NL YT0.W584", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-NL XBN8.W4TD", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-AR 51.XYW3", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-AR W7Y.9WBB", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-AR YT0.W584", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-AR XBN8.W4TD", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-AS SC86.C8", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-AS W7Y.9WBB", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-AS YT0.W584", results.get(i++).getCodeWithTerritory());
+        assertEquals("IN-AS XBN8.W4TD", results.get(i++).getCodeWithTerritory());
+        assertEquals("IND W7Y.9WBB", results.get(i++).getCodeWithTerritory());
+        assertEquals("IND YT0.W584", results.get(i++).getCodeWithTerritory());
+        assertEquals("IND XBN8.W4TD", results.get(i++).getCodeWithTerritory());
+        assertEquals("CN-XZ SZW8.2TR", results.get(i++).getCodeWithTerritory());
+        assertEquals("CN-XZ KQLF.C2K7", results.get(i++).getCodeWithTerritory());
+        assertEquals("CHN KQLF.C2K7", results.get(i++).getCodeWithTerritory());
+        assertEquals("AAA PRP60.0RVD", results.get(i++).getCodeWithTerritory());
+        assertEquals(i, results.size());
+    }
+
+    @Test
     public void encodeWithTerritory() {
         LOG.info("encodeWithTerritory");
 
