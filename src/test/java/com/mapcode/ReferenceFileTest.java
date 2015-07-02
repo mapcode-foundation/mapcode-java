@@ -128,6 +128,7 @@ public class ReferenceFileTest {
                     LOG.debug("checkFile: lat/lon  = {}", reference.point);
                     LOG.debug("checkFile: expected = #{}: {}", reference.mapcodes.size(), GSON.toJson(reference.mapcodes));
                 }
+                ++i;
 
                 // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
                 final List<Mapcode> results = MapcodeCodec.encode(
@@ -172,20 +173,16 @@ public class ReferenceFileTest {
                 }
 
                 // For every mapcode in the result set, check if it is contained in the reference set.
+                int precision = 0;
                 for (final Mapcode result : results) {
                     boolean found = false;
                     for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
+                        precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? 2 : 0;
+
                         if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
-                            if (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getCode(2))) {
-                                    found = true;
-                                    break;
-                                }
-                            } else {
-                                if (referenceMapcodeRec.mapcode.equals(result.getCode())) {
-                                    found = true;
-                                    break;
-                                }
+                            if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
+                                found = true;
+                                break;
                             }
                         }
                     }
@@ -193,32 +190,26 @@ public class ReferenceFileTest {
 
                         // This does not fail the test, but rather produces an ERROR in the log file.
                         // It indicates a discrepancy in the C and Java implementations.
-                        LOG.error("checkFile: Mapcode '{}' at {} is not in the reference file!",
-                                result, reference.point);
+                        LOG.error("checkFile: Created '{}' at {} which is not present in the reference file!\nref={}\nresult={}",
+                                result.getCode(precision), reference.point, GSON.toJson(reference), GSON.toJson(result));
                         ++error;
                     }
                 }
 
                 // For every Mapcode in the reference set, check if it is contained in the result set.
                 for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
+                    precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? 2 : 0;
                     boolean found = false;
                     for (final Mapcode result : results) {
                         if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
-                            if (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getCode(2))) {
-                                    found = true;
-                                    break;
-                                }
-                            } else {
-                                if (referenceMapcodeRec.mapcode.equals(result.getCode())) {
-                                    found = true;
-                                    break;
-                                }
+                            if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
+                                found = true;
+                                break;
                             }
                         }
                     }
                     if (!found) {
-                        LOG.error("checkFile: Mapcode '{} {}' at {} is not produced by the decoder!",
+                        LOG.error("checkFile: Found   '{} {}' at {} in reference file, not produced by new decoder!",
                                 referenceMapcodeRec.territory, referenceMapcodeRec.mapcode, reference.point);
                         ++error;
                     }
@@ -246,11 +237,6 @@ public class ReferenceFileTest {
                         ++error;
                     }
                 }
-
-                if (showLogLine) {
-                    LOG.debug("");
-                }
-                ++i;
             }
         } catch (final EOFException e) {
             // OK.
