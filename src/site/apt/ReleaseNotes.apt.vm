@@ -9,9 +9,12 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
-* 1.50.4
+* 2.0.0
 
-    * To do.
+    * Fixes to the data rectangles (primarily intended for ISO proposal).
+
+    * Note that this release only allows high-precision mapcodes up to 2 additional suffix characters.
+    A future release will be scheduled to allow up to 8 suffix characters (nanometer accuracy).
 
     []
 

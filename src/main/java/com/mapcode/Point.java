@@ -220,7 +220,7 @@ public class Point {
         defined = false;
     }
 
-    private Point(final double latDeg, final double lonDeg, boolean wrap) {
+    private Point(final double latDeg, final double lonDeg, final boolean wrap) {
         if (wrap) {
             this.latDeg = mapToLat(latDeg);
             this.lonDeg = mapToLon(lonDeg);
