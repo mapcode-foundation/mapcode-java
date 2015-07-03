@@ -102,7 +102,7 @@ class SubArea {
                 }
             }
         }
-        LOG.info("SubArea: sub-areas initialized: aslat=[{}, {}], lon=[{}, {}]",
+        LOG.info("SubArea: sub-areas initialized: lat=[{}, {}], lon=[{}, {}]",
                 Point.microDegToDeg(LAT_MAP.firstKey()), Point.microDegToDeg(LAT_MAP.lastKey()),
                 Point.microDegToDeg(LON_MAP.firstKey()), Point.microDegToDeg(LON_MAP.lastKey()));
     }

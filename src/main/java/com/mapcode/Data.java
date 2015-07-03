@@ -27,8 +27,12 @@ import javax.annotation.Nullable;
  * This class the data class for Mapcode codex items.
  */
 class Data {
-    static final char[] ENCODE_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
-            'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z'};
+    static final char[] ENCODE_CHARS = {
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+            'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+            'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z',
+            'A', 'E', 'U'
+    };
 
     private int flags;
     private int codex;

@@ -46,45 +46,35 @@ public enum Alphabet {
      */
     private final int number;
 
+    /**
+     * Private constructor.
+     *
+     * @param number Alphabet number, for internal use only.
+     */
     private Alphabet(final int number) {
         this.number = number;
     }
 
-    public int getNumber() {
-        return number;
-    }
-
     /**
-     * Get an alphabet from a numeric code.
+     * Get alphabet number. Package private, for internal use only.
      *
-     * @param number Numeric code.
-     * @return Alphabet.
-     * @throws UnknownAlphabetException Thrown if code out of range.
+     * @return Numeric code.
      */
-    @Nonnull
-    public static Alphabet fromNumber(final int number) throws UnknownAlphabetException {
-        if ((number >= 0) && (number < Alphabet.values().length)) {
-            return Alphabet.values()[number];
-        }
-        throw new UnknownAlphabetException(number);
+    int getNumber() {
+        return number;
     }
 
     /**
      * Return alphabet from a string, which can be a numeric or alpha code.
      *
-     * @param numberOrString Alphabet. May be a numeric or alphanumeric code.
+     * @param alphaCode Alphabet, alphanumeric code.
      * @return Alphabet.
      * @throws UnknownAlphabetException Thrown if incorrect numeric or alphanumeric code.
      */
     @Nonnull
-    public static Alphabet fromString(@Nonnull final String numberOrString) throws UnknownAlphabetException {
-        checkNonnull("numberOrString", numberOrString);
-        final String trimmed = numberOrString.trim().toUpperCase();
-        try {
-            return fromNumber(Integer.valueOf(numberOrString));
-        } catch (final IllegalArgumentException ignored) {
-            // Ignore. Re-try as alpha code.
-        }
+    public static Alphabet fromString(@Nonnull final String alphaCode) throws UnknownAlphabetException {
+        checkNonnull("alphaCode", alphaCode);
+        final String trimmed = alphaCode.trim().toUpperCase();
         try {
             return valueOf(trimmed);
         } catch (final IllegalArgumentException ignored) {

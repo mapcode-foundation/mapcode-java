@@ -9,6 +9,17 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 2.0.0
+
+    * Fixes to the data rectangles (primarily intended for ISO proposal).
+
+    * Removed functionality to use numeric territory codes; only alpha codes are accepted.
+
+    * Note that this release only allows high-precision mapcodes up to 2 additional suffix characters.
+    A future release will be scheduled to allow up to 8 suffix characters (nanometer accuracy).
+
+    []
+
 * 1.50.3
 
     * This release breaks compatiblity with earlier releases, to clean up the interface significantly.

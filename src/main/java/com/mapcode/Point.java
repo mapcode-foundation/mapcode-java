@@ -118,7 +118,7 @@ public class Point {
         assert !Double.isNaN(lonRad);
         final double lat = latRad * (180.0 / Math.PI);
         final double lon = lonRad * (180.0 / Math.PI);
-        return fromMicroDeg(degToMicroDeg(lat), degToMicroDeg(lon));
+        return fromDeg(lat, lon);
     }
 
     /**
@@ -220,7 +220,7 @@ public class Point {
         defined = false;
     }
 
-    private Point(final double latDeg, final double lonDeg, boolean wrap) {
+    private Point(final double latDeg, final double lonDeg, final boolean wrap) {
         if (wrap) {
             this.latDeg = mapToLat(latDeg);
             this.lonDeg = mapToLon(lonDeg);
@@ -242,11 +242,21 @@ public class Point {
         return new Point(microDegToDeg(latMicroDeg), microDegToDeg(lonMicroDeg), false);
     }
 
+    /**
+     * Get latitude as micro-degrees. Note that this looses precision beyond microdegrees!
+     *
+     * @return Latitude in microdegrees (may loose precision if latitude has higher precision than microdegrees).
+     */
     int getLatMicroDeg() {
         assert defined;
         return degToMicroDeg(latDeg);
     }
 
+    /**
+     * Get longitude as micro-degrees. Note that this looses precision beyond microdegrees!
+     *
+     * @return Longitude in microdegrees (may loose precision if longitude has higher precision than microdegrees).
+     */
     int getLonMicroDeg() {
         assert defined;
         return degToMicroDeg(lonDeg);

@@ -580,11 +580,12 @@ public enum Territory {
     private final String[] fullNameAliases;
 
     /**
-     * Return the numeric territory code for a territory.
+     * Return the numeric territory code for a territory. Package private, because territory numbers are no longer
+     * exposed publicly.
      *
      * @return Integer territory code.
      */
-    public int getNumber() {
+    int getNumber() {
         return number;
     }
 
@@ -629,14 +630,15 @@ public enum Territory {
     }
 
     /**
-     * Return the territory for a specific code.
+     * Return the territory for a specific code. Package private, because territory numbers are no longer exposed
+     * publicly.
      *
      * @param number Numeric territory code.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if incorrect numeric or alphanumeric code.
      */
     @Nonnull
-    public static Territory fromNumber(final int number) throws UnknownTerritoryException {
+    static Territory fromNumber(final int number) throws UnknownTerritoryException {
         if ((number < 0) || (number >= codeList.size())) {
             throw new UnknownTerritoryException(number);
         }
@@ -656,20 +658,20 @@ public enum Territory {
      *
      * Brazilian mapcodes, on the other hand, would be specified as "BRA BDHP.JK39-1D", using the ISO 3 letter code.
      *
-     * @param numericOrAlpha Territory, may be numeric or alphanumeric code.
+     * @param alphaCode Territory, alphanumeric code.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if incorrect numeric or alphanumeric code.
      */
     @Nonnull
-    public static Territory fromString(@Nonnull final String numericOrAlpha) throws UnknownTerritoryException {
-        checkNonnull("numericOrAlpha", numericOrAlpha);
-        return createFromString(numericOrAlpha, null);
+    public static Territory fromString(@Nonnull final String alphaCode) throws UnknownTerritoryException {
+        checkNonnull("alphaCode", alphaCode);
+        return createFromString(alphaCode, null);
     }
 
     /**
      * Get a territory from a name, specifying a parent territory for disambiguation.
      *
-     * @param numericOrAlpha  Territory, may be numeric or alphanumeric code. See {@link #fromString(String)}
+     * @param alphaCode       Territory, alphanumeric code. See {@link #fromString(String)}
      *                        for an explanation of the format for this name. (This is NOT strictly an ISO code!)
      * @param parentTerritory Parent territory.
      * @return Territory.
@@ -677,11 +679,11 @@ public enum Territory {
      */
     @Nonnull
     public static Territory fromString(
-            @Nonnull final String numericOrAlpha,
+            @Nonnull final String alphaCode,
             @Nonnull final ParentTerritory parentTerritory) throws UnknownTerritoryException {
-        checkNonnull("numericOrAlpha", numericOrAlpha);
+        checkNonnull("alphaCode", alphaCode);
         checkNonnull("parentTerritory", parentTerritory);
-        return createFromString(numericOrAlpha, parentTerritory);
+        return createFromString(alphaCode, parentTerritory);
     }
 
     /**
@@ -772,7 +774,7 @@ public enum Territory {
     }
 
     /**
-     * Local constructors to create a territory code.
+     * Private constructors to create a territory code.
      */
     private Territory(
             final int number,
@@ -869,26 +871,18 @@ public enum Territory {
     /**
      * Get a territory from a name, specifying a parent territory for disambiguation.
      *
-     * @param numericOrAlpha  Territory name.
+     * @param alphaCode       Territory, alphanumeric code.
      * @param parentTerritory Parent territory.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if the territory is not found.
      */
     @Nonnull
     private static Territory createFromString(
-            @Nonnull final String numericOrAlpha,
+            @Nonnull final String alphaCode,
             @Nullable final ParentTerritory parentTerritory) throws UnknownTerritoryException {
-        final String trimmed = Mapcode.convertStringToPlainAscii(numericOrAlpha.trim().replace('_', '-')).toUpperCase();
+        final String trimmed = Mapcode.convertStringToPlainAscii(alphaCode.trim().replace('_', '-')).toUpperCase();
 
-        // First, try as numeric code.
-        try {
-            final Integer territoryCode = Integer.valueOf(trimmed);
-            return fromNumber(territoryCode);
-        } catch (final NumberFormatException ignored) {
-            // Re-try as alpha code.
-        }
-
-        // Now, try as alpha code.
+        // Try as alpha code.
         final List<Territory> territories = nameMap.get(trimmed);
         if (territories != null) {
             if (parentTerritory == null) {

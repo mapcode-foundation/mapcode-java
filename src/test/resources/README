@@ -37,11 +37,7 @@ mapcode --grid   10000   0    > grid_10k.txt
 mapcode --grid   100000  0    > grid_100k.txt
 
 mapcode --boundaries        > boundaries.txt
-+----
 
-And for the high-precision codes:
-
-+----
 mapcode --random 1000    2 12 > random_hp_1k.txt
 mapcode --random 10000   2 12 > random_hp_10k.txt
 mapcode --random 100000  2 12 > random_hp_100k.txt
@@ -51,6 +47,8 @@ mapcode --grid   10000   2    > grid_hp_10k.txt
 mapcode --grid   100000  2    > grid_hp_100k.txt
 
 mapcode --boundaries     2    > boundaries_hp.txt
+
+for f in *.txt; do split -l 200000 -a 1 $f $f.; rm $f; done
 +----
 
 IMPORTANT: Please note that an explicit seed (12) is used for the generation of
@@ -58,11 +56,7 @@ random data sets, so they can be compared across different version of the softwa
 
 After generating the files, they must be split into smaller pieces (in this case
 5Mb chunks) to allow uploading to Github or other source code control systems,
-by executing:
-
-+----
-for f in *.txt; do split -l 200000 -a 1 $f $f.; rm $f; done
-+----
+hence the 'split' command.
 
 -------------------------------------------------------------------------------
 COMPILING THE MAPCODE UTILITY
