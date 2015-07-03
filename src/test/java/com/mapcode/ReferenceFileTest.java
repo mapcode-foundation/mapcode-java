@@ -190,7 +190,8 @@ public class ReferenceFileTest {
 
                         // This does not fail the test, but rather produces an ERROR in the log file.
                         // It indicates a discrepancy in the C and Java implementations.
-                        LOG.error("checkFile: Created '{}' at {} which is not present in the reference file!\nref={}\nresult={}",
+                        LOG.error("checkFile: Created '{}' at {} which is not present in the reference file!\n" +
+                                        "ref={}\n" + "new={}",
                                 result.getCode(precision), reference.point, GSON.toJson(reference), GSON.toJson(result));
                         ++error;
                     }
@@ -209,8 +210,10 @@ public class ReferenceFileTest {
                         }
                     }
                     if (!found) {
-                        LOG.error("checkFile: Found   '{} {}' at {} in reference file, not produced by new decoder!",
-                                referenceMapcodeRec.territory, referenceMapcodeRec.mapcode, reference.point);
+                        LOG.error("checkFile: Found   '{} {}' at {} in reference file, not produced by new decoder!\n" +
+                                        "ref={}",
+                                referenceMapcodeRec.territory, referenceMapcodeRec.mapcode, reference.point,
+                                GSON.toJson(reference));
                         ++error;
                     }
                 }
