@@ -13,6 +13,8 @@ Release Notes (Version ${project.version})
 
     * Fixes to the data rectangles (primarily intended for ISO proposal).
 
+    * Removed functionality to use numeric territory codes; only alpha codes are accepted.
+
     * Note that this release only allows high-precision mapcodes up to 2 additional suffix characters.
     A future release will be scheduled to allow up to 8 suffix characters (nanometer accuracy).
 

@@ -547,7 +547,7 @@ class Decoder {
             if (v2 < 0) {
                 v2 = 31;
             }
-            String s = String.valueOf(1000 + v1 + (32 * v2));
+            final String s = String.valueOf(1000 + v1 + (32 * v2));
             str = s.charAt(1) + str.substring(1, lastpos - 1) + s.charAt(2) + s.charAt(3);
             voweled = true;
         } else if (str.charAt(0) == 'U') { // v.1.50 debug decoding of U+alldigitmapcode
@@ -651,7 +651,7 @@ class Decoder {
         return result;
     }
 
-    static String encodeUTF16(final String mapcode, int alphabetCode) throws IllegalArgumentException {
+    static String encodeUTF16(final String mapcode, final int alphabetCode) throws IllegalArgumentException {
         final String mapcodeToEncode;
         if (ASCII2LANGUAGE[alphabetCode][4] == MISSCODE) {
 

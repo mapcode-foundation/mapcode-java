@@ -65,8 +65,8 @@ class Encoder {
                 argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), isRecursive, limitToOneResult,
                 allowWorld);
 
-        double latDeg = Point.mapToLat(argLatDeg);
-        double lonDeg = Point.mapToLon(argLonDeg);
+        final double latDeg = Point.mapToLat(argLatDeg);
+        final double lonDeg = Point.mapToLon(argLonDeg);
         Territory stateOverride = argStateOverride;
 
         final Point pointToEncode = Point.fromDeg(latDeg, lonDeg);

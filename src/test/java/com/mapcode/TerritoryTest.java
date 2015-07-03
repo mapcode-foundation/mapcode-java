@@ -35,28 +35,6 @@ public class TerritoryTest {
     }
 
     @Test
-    public void checkAlphabetCode() throws Exception {
-        LOG.info("checkAlphabetCode");
-        int i = 0;
-        for (final Alphabet alphabet : Alphabet.values()) {
-            assertEquals(alphabet, Alphabet.fromNumber(i));
-            ++i;
-        }
-    }
-
-    @Test(expected = UnknownAlphabetException.class)
-    public void checkAlphabetCodeError1() throws Exception {
-        LOG.info("checkAlphabetCodeError1");
-        Alphabet.fromNumber(-1);
-    }
-
-    @Test(expected = UnknownAlphabetException.class)
-    public void checkAlphabetCodeError2() throws Exception {
-        LOG.info("checkAlphabetCodeError2");
-        Alphabet.fromNumber(Alphabet.values().length);
-    }
-
-    @Test
     public void checkDash() throws Exception {
         LOG.info("checkDash");
         assertEquals(Territory.IN_MN, Territory.fromString("IND-MN"));
@@ -84,8 +62,8 @@ public class TerritoryTest {
     }
 
     @Test
-    public void territoryFromStringTest() throws Exception {
-        LOG.info("territoryFromStringTest");
+    public void testTerritoryFromString() throws Exception {
+        LOG.info("testTerritoryFromString");
 
         // Accept ISO-style codes.
         assertEquals(Territory.NLD, Territory.fromString("NLD"));
@@ -106,15 +84,15 @@ public class TerritoryTest {
         assertEquals(Territory.USA, Territory.fromString("USA"));
         assertEquals(Territory.USA, Territory.fromString("US"));
 
-        // Accept numeric codes as well.
-        assertEquals(Territory.VAT, Territory.fromString("0"));
-        assertEquals(Territory.AAA, Territory.fromString("532"));
-        assertEquals(Territory.NLD, Territory.fromString("112"));
-
         for (final Territory territory : Territory.values()) {
             assertEquals(territory, Territory.fromString(territory.toString()));
-            assertEquals(territory, Territory.fromString(String.valueOf(territory.getNumber())));
         }
+    }
+
+    @Test(expected = UnknownTerritoryException.class)
+    public void testTerritoryFromStringNumeric() throws Exception {
+        LOG.info("testTerritoryFromStringNumeric");
+        assertEquals(Territory.VAT, Territory.fromString("0"));
     }
 
     @Test

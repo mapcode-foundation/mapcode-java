@@ -47,13 +47,17 @@ public class AlphabetTest {
     public void testFromString() throws Exception {
         LOG.info("testFromString");
         assertEquals(Alphabet.ROMAN, Alphabet.fromString("ROMAN"));
-        assertEquals(Alphabet.ROMAN, Alphabet.fromString("0"));
         assertEquals(Alphabet.ROMAN, Alphabet.fromString("roman"));
 
         for (final Alphabet alphabet : Alphabet.values()) {
             assertEquals(alphabet, Alphabet.fromString(alphabet.toString()));
-            assertEquals(alphabet, Alphabet.fromString(String.valueOf(alphabet.getNumber())));
         }
+    }
+
+    @Test(expected = UnknownAlphabetException.class)
+    public void testFromStringNumeric() throws Exception {
+        LOG.info("testFromStringNumeric");
+        assertEquals(Alphabet.ROMAN, Alphabet.fromString("0"));
     }
 
     @Test(expected = IllegalArgumentException.class)
