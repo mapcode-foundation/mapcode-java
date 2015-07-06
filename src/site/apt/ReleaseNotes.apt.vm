@@ -9,6 +9,10 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 2.0.1
+
+    * Use multi-threading for long running test to speed them up (uses all CPU cores now).
+
 * 2.0.0
 
     * Fixes to the data rectangles (primarily intended for ISO proposal).
