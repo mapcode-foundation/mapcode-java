@@ -16,6 +16,8 @@ Release Notes (Version ${project.version})
 
     * Use multi-threading for long running test to speed them up (uses all CPU cores now).
 
+    * Added the ability to use a country name for <<<Territory.fromString()>>>.
+
 * 2.0.0
 
     * Fixes to the data rectangles (primarily intended for ISO proposal).

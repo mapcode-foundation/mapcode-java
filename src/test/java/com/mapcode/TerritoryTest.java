@@ -35,6 +35,17 @@ public class TerritoryTest {
     }
 
     @Test
+    public void checkFullName() throws Exception {
+        LOG.info("checkFullName");
+        assertEquals(Territory.AAA, Territory.fromString("International"));
+        assertEquals(Territory.AAA, Territory.fromString("Worldwide"));
+        assertEquals(Territory.AAA, Territory.fromString("Earth"));
+        assertEquals(Territory.NLD, Territory.fromString("Netherlands"));
+        assertEquals(Territory.CN_XZ, Territory.fromString("Xizang"));
+        assertEquals(Territory.CN_XZ, Territory.fromString("Tibet"));
+    }
+
+    @Test
     public void checkDash() throws Exception {
         LOG.info("checkDash");
         assertEquals(Territory.IN_MN, Territory.fromString("IND-MN"));
@@ -125,11 +136,5 @@ public class TerritoryTest {
     public void testFromStringError3() {
         LOG.info("testFromStringError3");
         Territory.fromString("999");
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testFromStringError4() {
-        LOG.info("testFromStringError4");
-        Territory.fromString("Netherlands");
     }
 }
