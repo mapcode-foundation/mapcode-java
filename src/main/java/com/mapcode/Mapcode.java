@@ -246,11 +246,11 @@ public final class Mapcode {
      * provided as statics to only compile these patterns once.
      */
     @Nonnull
-    static final String REGEX_TERRITORY = "[\\p{Alpha}\\p{Digit}]{2,3}+([-_][\\p{Alpha}\\p{Digit}]{2,3}+)?";
+    static final String REGEX_TERRITORY = "[\\p{L}\\p{N}]{2,3}+([-_][\\p{L}\\p{N}]{2,3}+)?";
     @Nonnull
-    static final String REGEX_CODE_PART = "[\\p{Alpha}\\p{Digit}]{2,5}+";
+    static final String REGEX_CODE_PART = "[\\p{L}\\p{N}]{2,5}+";
     @Nonnull
-    static final String REGEX_CODE_PRECISION = "[-][\\p{Alpha}\\p{Digit}&&[^zZ]]{1,2}+";
+    static final String REGEX_CODE_PRECISION = "[-][\\p{L}\\p{N}&&[^zZ]]{1,2}+";
 
     /**
      * This patterns/regular expressions is used for checking mapcode format strings.
@@ -261,14 +261,11 @@ public final class Mapcode {
             REGEX_CODE_PART + "[.]" + REGEX_CODE_PART + '(' + REGEX_CODE_PRECISION + ")?";
 
     @Nonnull
-    static final Pattern PATTERN_MAPCODE =
-            Pattern.compile('^' + REGEX_MAPCODE + '$', Pattern.UNICODE_CHARACTER_CLASS);
+    static final Pattern PATTERN_MAPCODE = Pattern.compile('^' + REGEX_MAPCODE + '$');
     @Nonnull
-    static final Pattern PATTERN_TERRITORY =
-            Pattern.compile('^' + REGEX_TERRITORY + ' ', Pattern.UNICODE_CHARACTER_CLASS);
+    static final Pattern PATTERN_TERRITORY = Pattern.compile('^' + REGEX_TERRITORY + ' ');
     @Nonnull
-    static final Pattern PATTERN_PRECISION =
-            Pattern.compile(REGEX_CODE_PRECISION + '$', Pattern.UNICODE_CHARACTER_CLASS);
+    static final Pattern PATTERN_PRECISION = Pattern.compile(REGEX_CODE_PRECISION + '$');
 
     /**
      * This enum describes the types of available mapcodes (as returned by {@link #getPrecisionFormat(String)}.

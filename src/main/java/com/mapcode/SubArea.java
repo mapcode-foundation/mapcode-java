@@ -36,12 +36,12 @@ class SubArea {
 
     private static final int SUB_AREAS_INITIAL_CAPACITY = 16250;
 
-    private static final List<SubArea> SUB_AREAS = new ArrayList<>(SUB_AREAS_INITIAL_CAPACITY);
-    private static final TreeMap<Integer, ArrayList<SubArea>> LON_MAP = new TreeMap<>();
-    private static final TreeMap<Integer, ArrayList<SubArea>> LAT_MAP = new TreeMap<>();
+    private static final List<SubArea> SUB_AREAS = new ArrayList<SubArea>(SUB_AREAS_INITIAL_CAPACITY);
+    private static final TreeMap<Integer, ArrayList<SubArea>> LON_MAP = new TreeMap<Integer, ArrayList<SubArea>>();
+    private static final TreeMap<Integer, ArrayList<SubArea>> LAT_MAP = new TreeMap<Integer, ArrayList<SubArea>>();
 
-    private static final Range<Integer> LAT_BOUNDING_RANGE = new Range<>(Point.LAT_MICRODEG_MIN, Point.LAT_MICRODEG_MAX);
-    private static final Range<Integer> LON_BOUNDING_RANGE = new Range<>(Point.LON_MICRODEG_MIN, Point.LON_MICRODEG_MAX);
+    private static final Range<Integer> LAT_BOUNDING_RANGE = new Range<Integer>(Point.LAT_MICRODEG_MIN, Point.LAT_MICRODEG_MAX);
+    private static final Range<Integer> LON_BOUNDING_RANGE = new Range<Integer>(Point.LON_MICRODEG_MIN, Point.LON_MICRODEG_MAX);
 
     static {
         LOG.info("SubArea: Initialize sub-areas for {} territories", Territory.values().length);
@@ -115,7 +115,7 @@ class SubArea {
     @SuppressWarnings("unchecked")
     @Nonnull
     static List<SubArea> getAreasForPoint(@Nonnull final Point point) {
-        final ArrayList<ArrayList<SubArea>> areaLists = new ArrayList<>();
+        final ArrayList<ArrayList<SubArea>> areaLists = new ArrayList<ArrayList<SubArea>>();
         ArrayList<SubArea> list;
         list = LAT_MAP.get(point.getLatMicroDeg());
 
@@ -158,7 +158,7 @@ class SubArea {
             areaLists.add(list);
         }
 
-        final ArrayList<SubArea> result = new ArrayList<>();
+        final ArrayList<SubArea> result = new ArrayList<SubArea>();
         list = areaLists.get(0);
 
         mainLoop:
@@ -208,8 +208,8 @@ class SubArea {
         minMaxSetup(i);
         parentTerritory = territory;
         subAreaID = i;
-        boundedLonRange = new ArrayList<>();
-        boundedLatRange = new ArrayList<>();
+        boundedLonRange = new ArrayList<Range<Integer>>();
+        boundedLatRange = new ArrayList<Range<Integer>>();
 
         // Mapcode areas are inclusive for the minimum bounds and exclusive for the maximum bounds
         // Trim max by 1, to address boundary cases.
@@ -246,7 +246,7 @@ class SubArea {
     @Nonnull
     private static ArrayList<Range<Integer>> normaliseRange(
             @Nonnull final Range<Integer> range, @Nonnull final Range<Integer> boundingRange) {
-        final ArrayList<Range<Integer>> ranges = new ArrayList<>();
+        final ArrayList<Range<Integer>> ranges = new ArrayList<Range<Integer>>();
 
         Range<Integer> tempRange = range.constrain(boundingRange);
         if (tempRange != null) {
@@ -255,7 +255,7 @@ class SubArea {
 
         Range<Integer> normalisingRange = range;
         while (normalisingRange.getMin() < boundingRange.getMin()) {
-            normalisingRange = new Range<>((normalisingRange.getMin() + boundingRange.getMax())
+            normalisingRange = new Range<Integer>((normalisingRange.getMin() + boundingRange.getMax())
                     - boundingRange.getMin(), (normalisingRange.getMax() + boundingRange.getMax())
                     - boundingRange.getMin());
             tempRange = normalisingRange.constrain(boundingRange);
@@ -266,7 +266,7 @@ class SubArea {
 
         normalisingRange = range;
         while (normalisingRange.getMax() > boundingRange.getMax()) {
-            normalisingRange = new Range<>((normalisingRange.getMin() - boundingRange.getMax())
+            normalisingRange = new Range<Integer>((normalisingRange.getMin() - boundingRange.getMax())
                     + boundingRange.getMin(), (normalisingRange.getMax() - boundingRange.getMax())
                     + boundingRange.getMin());
             tempRange = normalisingRange.constrain(boundingRange);
@@ -293,8 +293,8 @@ class SubArea {
     @Nonnull
     SubArea extendBounds(final int xExtension, final int yExtension) {
         final SubArea result = new SubArea();
-        result.latRange = new Range<>(this.getMinY() - yExtension, getMaxY() + yExtension);
-        result.lonRange = new Range<>(this.getMinX() - xExtension, getMaxX() + xExtension);
+        result.latRange = new Range<Integer>(this.getMinY() - yExtension, getMaxY() + yExtension);
+        result.lonRange = new Range<Integer>(this.getMinX() - xExtension, getMaxX() + xExtension);
         return result;
     }
 
@@ -327,11 +327,11 @@ class SubArea {
         i += 4;
         final int maxY = DataAccess.asLong(i);
 
-        latRange = new Range<>(minY, maxY);
-        lonRange = new Range<>(minX, maxX);
+        latRange = new Range<Integer>(minY, maxY);
+        lonRange = new Range<Integer>(minX, maxX);
     }
 
     private static Range<Integer> trimRange(final Range<Integer> range) {
-        return new Range<>(range.getMin(), range.getMax() - 1);
+        return new Range<Integer>(range.getMin(), range.getMax() - 1);
     }
 }

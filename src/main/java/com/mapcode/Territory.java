@@ -822,13 +822,13 @@ public enum Territory {
      */
     static {
         final String errorPrefix = "Initializing error: ";
-        codeList = new ArrayList<>();
-        nameMap = new HashMap<>();
-        parentList = new ArrayList<>();
+        codeList = new ArrayList<Territory>();
+        nameMap = new HashMap<String, List<Territory>>();
+        parentList = new ArrayList<Territory>();
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
-        final Set<Integer> territoryCodes = new HashSet<>();
-        final Set<String> aliasesSet = new HashSet<>();
+        final Set<Integer> territoryCodes = new HashSet<Integer>();
+        final Set<String> aliasesSet = new HashSet<String>();
 
         for (final Territory territory : Territory.values()) {
             final int territoryNumber = territory.getNumber();
@@ -986,7 +986,7 @@ public enum Territory {
             }
             territories.add(territory);
         } else {
-            final ArrayList<Territory> arrayList = new ArrayList<>();
+            final ArrayList<Territory> arrayList = new ArrayList<Territory>();
             arrayList.add(territory);
             nameMap.put(name, arrayList);
         }

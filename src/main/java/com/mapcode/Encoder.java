@@ -71,7 +71,7 @@ class Encoder {
 
         final Point pointToEncode = Point.fromDeg(latDeg, lonDeg);
         final List<SubArea> areas = SubArea.getAreasForPoint(pointToEncode);
-        final List<Mapcode> results = new ArrayList<>();
+        final List<Mapcode> results = new ArrayList<Mapcode>();
 
         int lastbasesubareaID = -1;
 

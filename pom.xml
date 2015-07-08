@@ -68,7 +68,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jdk.version>1.8</jdk.version>
+        <jdk.version>1.6</jdk.version>
 
         <gson.version>2.3.1</gson.version>
         <jsr305.version>3.0.0</jsr305.version>
