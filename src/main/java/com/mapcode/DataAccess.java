@@ -42,23 +42,31 @@ class DataAccess {
         final int bufferSize = 100000;
         final byte[] readBuffer = new byte[bufferSize];
         int total = 0;
-        try (final InputStream inputStream = DataAccess.class.getResourceAsStream(FILE_NAME)) {
-            try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                int nrBytes = inputStream.read(readBuffer);
-                while (nrBytes >= 0) {
-                    total += nrBytes;
-                    outputStream.write(readBuffer, 0, nrBytes);
-                    nrBytes = inputStream.read(readBuffer);
-                }
+        try {
+            final InputStream inputStream = DataAccess.class.getResourceAsStream(FILE_NAME);
+            try {
+                final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                try {
+                    int nrBytes = inputStream.read(readBuffer);
+                    while (nrBytes >= 0) {
+                        total += nrBytes;
+                        outputStream.write(readBuffer, 0, nrBytes);
+                        nrBytes = inputStream.read(readBuffer);
+                    }
 
-                // Copy stream as unsigned bytes (ints).
-                final byte[] bytes = outputStream.toByteArray();
-                assert total == bytes.length;
-                FILE_DATA = new int[total];
-                for (int i = 0; i < total; ++i) {
-                    FILE_DATA[i] = (bytes[i] < 0) ? (bytes[i] + 256) : bytes[i];
+                    // Copy stream as unsigned bytes (ints).
+                    final byte[] bytes = outputStream.toByteArray();
+                    assert total == bytes.length;
+                    FILE_DATA = new int[total];
+                    for (int i = 0; i < total; ++i) {
+                        FILE_DATA[i] = (bytes[i] < 0) ? (bytes[i] + 256) : bytes[i];
 
+                    }
+                } finally {
+                    outputStream.close();
                 }
+            } finally {
+                inputStream.close();
             }
         } catch (final IOException e) {
             throw new ExceptionInInitializerError("Cannot initialize static data structure from: " +

@@ -26,9 +26,7 @@ import javax.annotation.Nonnull;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -59,7 +57,7 @@ public class ReferenceFileTest {
     private static final String BOUNDARIES_REFERENCE_FILE = "/boundaries.txt";
     private static final String BOUNDARIES_REFERENCE_FILE_HP = "/boundaries_hp.txt";
 
-    private static final int LOG_LINE_EVERY = 25000;
+    private static final int LOG_LINE_EVERY = 10000;
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
@@ -111,12 +109,15 @@ public class ReferenceFileTest {
         checkFile(BOUNDARIES_REFERENCE_FILE_HP);
     }
 
+    @SuppressWarnings("BusyWait")
     private static void checkFile(@Nonnull final String baseFileName) throws Exception {
 
         // Reset error count.
         final AtomicLong deltaNm = new AtomicLong(0);
         final AtomicInteger errors = new AtomicInteger(0);
-        final int threads = Runtime.getRuntime().availableProcessors();
+        final AtomicInteger tasks = new AtomicInteger(0);
+
+        final int threads = Runtime.getRuntime().availableProcessors() * 2;
         LOG.info("checkFile: Starting {} threads...", threads);
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
@@ -124,128 +125,129 @@ public class ReferenceFileTest {
         final ChunkedFile chunkedFile = new ChunkedFile(baseFileName);
         try {
 
-            int i = 1;
             //noinspection InfiniteLoopStatement
             while (true) {
 
                 // Get next record.
                 @Nonnull final ReferenceRec reference = getNextReferenceRecord(chunkedFile);
 
-                if (((i % LOG_LINE_EVERY) == 0)) {
-                    LOG.debug("checkFile: #{}, file={}", i, chunkedFile.fileName);
-                    LOG.debug("checkFile: lat/lon  = {}", reference.point);
-                    LOG.debug("checkFile: expected = #{}: {}", reference.mapcodes.size(), GSON.toJson(reference.mapcodes));
-                }
-                ++i;
+                // Add task. This may throw an exception if the queue is full. Retry in that case.
+                executor.execute(new Runnable() {
 
-
-                executor.execute(() -> {
-                    // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
-                    final List<Mapcode> results = MapcodeCodec.encode(
-                            reference.point.getLatDeg(), reference.point.getLonDeg());
-
-                    // Check the number of mapcodes.
-                    if (results.isEmpty()) {
-                        LOG.error("checkFile: encode fails, no results found for reference={}", reference);
-                        errors.incrementAndGet();
-                    }
-
-                    // Check encodeToInternational.
-                    final Mapcode resultInternational = MapcodeCodec.encodeToInternational(
-                            reference.point.getLatDeg(), reference.point.getLonDeg());
-                    final Mapcode expectedInternational = results.get(results.size() - 1);
-                    if (!resultInternational.equals(expectedInternational)) {
-                        LOG.error("checkFile: encodeToInternational fails, expected={}, got={} for reference",
-                                expectedInternational, resultInternational, reference);
-                        errors.incrementAndGet();
-                    }
-
-                    // Check the size of the results.
-                    if (reference.mapcodes.size() != results.size()) {
-                        final ArrayList<MapcodeRec> resultsConverted = new ArrayList<>(results.size());
-                        for (final Mapcode mapcode : results) {
-                            resultsConverted.add(new MapcodeRec(mapcode.getCode(2), mapcode.getTerritory()));
+                    @Override
+                    public void run() {
+                        final int count = tasks.getAndIncrement();
+                        if (((count % LOG_LINE_EVERY) == 0)) {
+                            LOG.info("checkFile: #{}, file={}", count, chunkedFile.fileName);
                         }
-                        LOG.error("checkFile: Incorrect number of results:" +
-                                        "\n  lat/lon  = {}" +
-                                        "\n  expected = #{}: {} results," +
-                                        "\n  actual   = #{}: {} results\n",
-                                reference.point,
-                                reference.mapcodes.size(),
-                                GSON.toJson(reference.mapcodes),
-                                results.size(),
-                                GSON.toJson(resultsConverted));
-                        errors.incrementAndGet();
-                    }
 
-                    // For every mapcode in the result set, check if it is contained in the reference set.
-                    int precision = 0;
-                    for (final Mapcode result : results) {
-                        boolean found = false;
-                        for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
-                            precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? 2 : 0;
+                        // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
+                        final List<Mapcode> results = MapcodeCodec.encode(
+                                reference.point.getLatDeg(), reference.point.getLonDeg());
 
-                            if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
-                                    found = true;
-                                    break;
-                                }
-                            }
-                        }
-                        if (!found) {
-
-                            // This does not fail the test, but rather produces an ERROR in the log file.
-                            // It indicates a discrepancy in the C and Java implementations.
-                            LOG.error("checkFile: Created '{}' at {} which is not present in the reference file!\n" +
-                                            "ref={}\n" + "new={}",
-                                    result.getCode(precision), reference.point, GSON.toJson(reference), GSON.toJson(result));
+                        // Check the number of mapcodes.
+                        if (results.isEmpty()) {
+                            LOG.error("checkFile: encode fails, no results found for reference={}", reference);
                             errors.incrementAndGet();
                         }
-                    }
 
-                    // For every Mapcode in the reference set, check if it is contained in the result set.
-                    for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
-                        precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? 2 : 0;
-                        boolean found = false;
+                        // Check encodeToInternational.
+                        final Mapcode resultInternational = MapcodeCodec.encodeToInternational(
+                                reference.point.getLatDeg(), reference.point.getLonDeg());
+                        final Mapcode expectedInternational = results.get(results.size() - 1);
+                        if (!resultInternational.equals(expectedInternational)) {
+                            LOG.error("checkFile: encodeToInternational fails, expected={}, got={} for reference",
+                                    expectedInternational, resultInternational, reference);
+                            errors.incrementAndGet();
+                        }
+
+                        // Check the size of the results.
+                        if (reference.mapcodes.size() != results.size()) {
+                            final ArrayList<MapcodeRec> resultsConverted = new ArrayList<MapcodeRec>(results.size());
+                            for (final Mapcode mapcode : results) {
+                                resultsConverted.add(new MapcodeRec(mapcode.getCode(2), mapcode.getTerritory()));
+                            }
+                            LOG.error("checkFile: Incorrect number of results:" +
+                                            "\n  lat/lon  = {}" +
+                                            "\n  expected = #{}: {} results," +
+                                            "\n  actual   = #{}: {} results\n",
+                                    reference.point,
+                                    reference.mapcodes.size(),
+                                    GSON.toJson(reference.mapcodes),
+                                    results.size(),
+                                    GSON.toJson(resultsConverted));
+                            errors.incrementAndGet();
+                        }
+
+                        // For every mapcode in the result set, check if it is contained in the reference set.
+                        int precision = 0;
                         for (final Mapcode result : results) {
-                            if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
-                                if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
-                                    found = true;
-                                    break;
+                            boolean found = false;
+                            for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
+                                precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? 2 : 0;
+
+                                if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
+                                    if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
+                                        found = true;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if (!found) {
-                            LOG.error("checkFile: Found   '{} {}' at {} in reference file, not produced by new decoder!\n" +
-                                            "ref={}",
-                                    referenceMapcodeRec.territory, referenceMapcodeRec.mapcode, reference.point,
-                                    GSON.toJson(reference));
-                            errors.incrementAndGet();
-                        }
-                    }
+                            if (!found) {
 
-                    // Check distance of decoded point to reference point.
-                    for (final MapcodeRec mapcodeRec : reference.mapcodes) {
-                        //noinspection NestedTryStatement
-                        try {
-                            final Point result = MapcodeCodec.decode(mapcodeRec.mapcode, mapcodeRec.territory);
-                            final long distanceNm = (long) (Point.distanceInMeters(reference.point, result) * 1000000.0);
-                            synchronized (deltaNm) {
-                                deltaNm.set(Math.max(deltaNm.get(), distanceNm));
-                            }
-
-                            final long maxDeltaNm = (long) (((mapcodeRec.mapcode.lastIndexOf('-') > 4) ?
-                                    Mapcode.getSafeMaxOffsetInMeters(2) : Mapcode.getSafeMaxOffsetInMeters(0)) * 1000000.0);
-                            if (distanceNm > maxDeltaNm) {
-                                LOG.error("Mapcode {} {} was generated for point {}, but decodes to point {} " +
-                                                "which is {} meters from the original point (max is {} meters).",
-                                        mapcodeRec.territory, mapcodeRec.mapcode, reference.point, result,
-                                        ((double) distanceNm) / 1000000.0, ((double) maxDeltaNm) / 1000000.0);
+                                // This does not fail the test, but rather produces an ERROR in the log file.
+                                // It indicates a discrepancy in the C and Java implementations.
+                                LOG.error("checkFile: Created '{}' at {} which is not present in the reference file!\n" +
+                                                "ref={}\n" + "new={}",
+                                        result.getCode(precision), reference.point, GSON.toJson(reference), GSON.toJson(result));
                                 errors.incrementAndGet();
                             }
-                        } catch (final UnknownMapcodeException unknownMapcodeException) {
-                            LOG.error("Mapcode {} {} was generated for point {}, but cannot be decoded.",
-                                    mapcodeRec.territory, mapcodeRec.mapcode, reference.point);
+                        }
+
+                        // For every Mapcode in the reference set, check if it is contained in the result set.
+                        for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
+                            precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? 2 : 0;
+                            boolean found = false;
+                            for (final Mapcode result : results) {
+                                if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
+                                    if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!found) {
+                                LOG.error("checkFile: Found   '{} {}' at {} in reference file, not produced by new decoder!\n" +
+                                                "ref={}",
+                                        referenceMapcodeRec.territory, referenceMapcodeRec.mapcode, reference.point,
+                                        GSON.toJson(reference));
+                                errors.incrementAndGet();
+                            }
+                        }
+
+                        try {
+                            // Check distance of decoded point to reference point.
+                            for (final MapcodeRec mapcodeRec : reference.mapcodes) {
+                                //noinspection NestedTryStatement
+                                final Point result = MapcodeCodec.decode(mapcodeRec.mapcode, mapcodeRec.territory);
+                                final long distanceNm = (long) (Point.distanceInMeters(reference.point, result) * 1000000.0);
+                                synchronized (deltaNm) {
+                                    deltaNm.set(Math.max(deltaNm.get(), distanceNm));
+                                }
+
+                                final long maxDeltaNm = (long) (((mapcodeRec.mapcode.lastIndexOf('-') > 4) ?
+                                        Mapcode.getSafeMaxOffsetInMeters(2) : Mapcode.getSafeMaxOffsetInMeters(0)) * 1000000.0);
+                                if (distanceNm > maxDeltaNm) {
+                                    LOG.error("Mapcode {} {} was generated for point {}, but decodes to point {} " +
+                                                    "which is {} meters from the original point (max is {} meters).",
+                                            mapcodeRec.territory, mapcodeRec.mapcode, reference.point, result,
+                                            ((double) distanceNm) / 1000000.0, ((double) maxDeltaNm) / 1000000.0);
+                                    errors.incrementAndGet();
+                                }
+                            }
+                        } catch (final UnknownMapcodeException e) {
+                            LOG.error("Mapcode was generated for point {}, but cannot be decoded, msg={}",
+                                    reference.point, e.getMessage());
                             errors.incrementAndGet();
                         }
                     }
@@ -260,7 +262,7 @@ public class ReferenceFileTest {
         executor.awaitTermination(60, TimeUnit.SECONDS);
         assertEquals(0, errors.get());
         assertEquals("Found errors", 0, errors.get());
-        LOG.debug("checkFile: Maximum delta for this testset = {}m", ((double) deltaNm.get()) / 1000000.0);
+        LOG.info("checkFile: Maximum delta for this testset = {}m, executed {} tasks", ((double) deltaNm.get()) / 1000000.0, tasks);
     }
 
     private static class MapcodeRec {
@@ -308,7 +310,7 @@ public class ReferenceFileTest {
         assertTrue("Longitude must be in [-180, 180]", (-180 <= point.getLonDeg()) && (point.getLonDeg() <= 180));
 
         // Read mapcodes: <territory> <mapcode>
-        final ArrayList<MapcodeRec> mapcodeRecs = new ArrayList<>();
+        final ArrayList<MapcodeRec> mapcodeRecs = new ArrayList<MapcodeRec>();
         for (int i = 0; i < count; ++i) {
             final String line = chunkedFile.readNonEmptyLine();
             assertTrue("Line should not be empty", !line.isEmpty());

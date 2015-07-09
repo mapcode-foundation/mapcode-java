@@ -11,7 +11,12 @@ Release Notes (Version ${project.version})
 
 * 2.0.1
 
+    * Reverted Java JDK level to 1.6 (Java 6) from 1.8 (Java 8), so the library can be used on
+      Android platforms operating at Java 6 as well.
+
     * Use multi-threading for long running test to speed them up (uses all CPU cores now).
+
+    * Added the ability to use a country name for <<<Territory.fromString()>>>.
 
 * 2.0.0
 

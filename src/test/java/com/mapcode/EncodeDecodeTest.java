@@ -24,9 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -40,7 +38,6 @@ public class EncodeDecodeTest {
 
     private static final int NUMBER_OF_POINTS = 5000;
     private static final int LOG_LINE_EVERY = 500;
-
 
     @Test
     public void encodeDecodeTestFixedSeed() throws Exception {
@@ -56,19 +53,19 @@ public class EncodeDecodeTest {
         doEncodeDecode(seed);
     }
 
+    @SuppressWarnings("BusyWait")
     private static void doEncodeDecode(final long seed) throws InterruptedException {
 
         // Keep error count and create thread pool.
         final AtomicInteger errors = new AtomicInteger(0);
-        final int threads = Runtime.getRuntime().availableProcessors();
+        final AtomicInteger tasks = new AtomicInteger(0);
+
+        final int threads = Runtime.getRuntime().availableProcessors() * 2;
         LOG.info("encodeDecodeTest: Starting {} threads...", threads);
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
         final Random randomGenerator = new Random(seed);
         for (int i = 0; i < NUMBER_OF_POINTS; i++) {
-            if ((i % LOG_LINE_EVERY) == 0) {
-                LOG.info("encodeDecodeTest: #{}/{}", i, NUMBER_OF_POINTS);
-            }
 
             // Encode location.
             final Point encode = Point.fromUniformlyDistributedRandomPoints(randomGenerator);
@@ -84,61 +81,71 @@ public class EncodeDecodeTest {
             assertEquals("encodeToInternational failed, result=" + resultsAll,
                     resultsAll.get(resultsAll.size() - 1), mapcodeInternational);
 
-            // Walk through the list in reverse order to get International first.
-            for (final Territory territory : Territory.values()) {
-                executor.execute(() -> {
+            executor.execute(new Runnable() {
+
+                @Override
+                public void run() {
+                    final int count = tasks.incrementAndGet();
+                    if ((count % LOG_LINE_EVERY) == 0) {
+                        LOG.info("encodeDecodeTest: #{}/{}", count, NUMBER_OF_POINTS);
+                    }
+
                     try {
-                        final List<Mapcode> resultsLimited = MapcodeCodec.encode(latDeg, lonDeg, territory);
-                        for (final Mapcode mapcode : resultsLimited) {
+                        // Walk through the list in reverse order to get International first.
+                        for (final Territory territory : Territory.values()) {
+                            final List<Mapcode> resultsLimited = MapcodeCodec.encode(latDeg, lonDeg, territory);
+                            for (final Mapcode mapcode : resultsLimited) {
 
-                            // Check if the territory matches.
-                            assertEquals(territory, mapcode.getTerritory());
+                                // Check if the territory matches.
+                                assertEquals(territory, mapcode.getTerritory());
 
-                            // Check max distance.
-                            final String codePrecision0 = mapcode.getCode(0);
-                            final String codePrecision1 = mapcode.getCode(1);
-                            final String codePrecision2 = mapcode.getCode(2);
+                                // Check max distance.
+                                final String codePrecision0 = mapcode.getCode(0);
+                                final String codePrecision1 = mapcode.getCode(1);
+                                final String codePrecision2 = mapcode.getCode(2);
 
-                            final Point decodeLocationPrecision0 = MapcodeCodec.decode(codePrecision0, territory);
-                            final Point decodeLocationPrecision1 = MapcodeCodec.decode(codePrecision1, territory);
-                            final Point decodeLocationPrecision2 = MapcodeCodec.decode(codePrecision2, territory);
+                                final Point decodeLocationPrecision0 = MapcodeCodec.decode(codePrecision0, territory);
+                                final Point decodeLocationPrecision1 = MapcodeCodec.decode(codePrecision1, territory);
+                                final Point decodeLocationPrecision2 = MapcodeCodec.decode(codePrecision2, territory);
 
-                            final double distancePrecision0Meters = Point.distanceInMeters(encode, decodeLocationPrecision0);
-                            final double distancePrecision1Meters = Point.distanceInMeters(encode, decodeLocationPrecision1);
-                            final double distancePrecision2Meters = Point.distanceInMeters(encode, decodeLocationPrecision2);
+                                final double distancePrecision0Meters = Point.distanceInMeters(encode, decodeLocationPrecision0);
+                                final double distancePrecision1Meters = Point.distanceInMeters(encode, decodeLocationPrecision1);
+                                final double distancePrecision2Meters = Point.distanceInMeters(encode, decodeLocationPrecision2);
 
-                            if (distancePrecision0Meters >= Mapcode.getSafeMaxOffsetInMeters(0)) {
-                                LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision0Meters = " + distancePrecision0Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(0));
-                                errors.getAndIncrement();
-                            }
-                            if (distancePrecision1Meters >= Mapcode.getSafeMaxOffsetInMeters(1)) {
-                                LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision1Meters = " + distancePrecision1Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(1));
-                                errors.getAndIncrement();
-                            }
-                            if (distancePrecision2Meters >= Mapcode.getSafeMaxOffsetInMeters(2)) {
-                                LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision2Meters = " + distancePrecision2Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(2));
-                                errors.getAndIncrement();
-                            }
+                                if (distancePrecision0Meters >= Mapcode.getSafeMaxOffsetInMeters(0)) {
+                                    LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision0Meters = " + distancePrecision0Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(0));
+                                    errors.getAndIncrement();
+                                }
+                                if (distancePrecision1Meters >= Mapcode.getSafeMaxOffsetInMeters(1)) {
+                                    LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision1Meters = " + distancePrecision1Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(1));
+                                    errors.getAndIncrement();
+                                }
+                                if (distancePrecision2Meters >= Mapcode.getSafeMaxOffsetInMeters(2)) {
+                                    LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision2Meters = " + distancePrecision2Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(2));
+                                    errors.getAndIncrement();
+                                }
 
-                            // Check conversion from/to alphabets.
-                            for (final Alphabet alphabet : Alphabet.values()) {
-                                final String mapcodeAlphabet = mapcode.getCode(alphabet);
-                                final String mapcodeAscii = Mapcode.convertStringToPlainAscii(mapcodeAlphabet);
-                                if (!codePrecision0.equals(mapcodeAscii)) {
-                                    LOG.error("encodeDecodeTest: " + mapcode + " alphabet=" + alphabet + ", original=" + codePrecision0 +
-                                            ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii);
+                                // Check conversion from/to alphabets.
+                                for (final Alphabet alphabet : Alphabet.values()) {
+                                    final String mapcodeAlphabet = mapcode.getCode(alphabet);
+                                    final String mapcodeAscii = Mapcode.convertStringToPlainAscii(mapcodeAlphabet);
+                                    if (!codePrecision0.equals(mapcodeAscii)) {
+                                        LOG.error("encodeDecodeTest: " + mapcode + " alphabet=" + alphabet + ", original=" + codePrecision0 +
+                                                ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii);
+                                    }
                                 }
                             }
                         }
-                    } catch (final Exception e) {
-                        LOG.error("encodeDecodeTest: Unexpected exception: ", e);
+                    } catch (final UnknownMapcodeException e) {
+                        LOG.error("encodeDecodeTest: Unknown mapcode exception", e);
                         errors.getAndIncrement();
                     }
-                });
-            }
+                }
+            });
         }
         executor.shutdown();
         executor.awaitTermination(60, TimeUnit.SECONDS);
         assertEquals("Found errors", 0, errors.get());
+        LOG.info("encodeDecodeTest: Executed {} tasks", tasks);
     }
 }

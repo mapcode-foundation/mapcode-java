@@ -646,7 +646,7 @@ public enum Territory {
     }
 
     /**
-     * Get a territory from a mapcode territory abbreviation. Note that the provided abbreviation is NOT an
+     * Get a territory from a mapcode territory abbreviation (or a territory name). Note that the provided abbreviation is NOT an
      * ISO code: it's a mapcode prefix. As local mapcodes for subdivisions have been optimized to prefer to use 2-character
      * subdivisions codes in local codes, subdivisions are preferred over countries in this case.
      *
@@ -658,7 +658,7 @@ public enum Territory {
      *
      * Brazilian mapcodes, on the other hand, would be specified as "BRA BDHP.JK39-1D", using the ISO 3 letter code.
      *
-     * @param alphaCode Territory, alphanumeric code.
+     * @param alphaCode Territory name or alphanumeric code.
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if incorrect numeric or alphanumeric code.
      */
@@ -822,13 +822,13 @@ public enum Territory {
      */
     static {
         final String errorPrefix = "Initializing error: ";
-        codeList = new ArrayList<>();
-        nameMap = new HashMap<>();
-        parentList = new ArrayList<>();
+        codeList = new ArrayList<Territory>();
+        nameMap = new HashMap<String, List<Territory>>();
+        parentList = new ArrayList<Territory>();
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
-        final Set<Integer> territoryCodes = new HashSet<>();
-        final Set<String> aliasesSet = new HashSet<>();
+        final Set<Integer> territoryCodes = new HashSet<Integer>();
+        final Set<String> namesSet = new HashSet<String>();
 
         for (final Territory territory : Territory.values()) {
             final int territoryNumber = territory.getNumber();
@@ -849,13 +849,32 @@ public enum Territory {
             if ((territory.parentTerritory != null) && !parentList.contains(territory.parentTerritory)) {
                 parentList.add(territory.parentTerritory);
             }
+
+            // Add territory codes and alias codes.
+            if (namesSet.contains(territory.toString())) {
+                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory: " + territory.toString());
+            }
+            namesSet.add(territory.toString());
             addNameWithParentVariants(territory.toString(), territory);
             for (final String alias : territory.aliases) {
-                if (aliasesSet.contains(alias)) {
+                if (namesSet.contains(alias)) {
                     throw new ExceptionInInitializerError(errorPrefix + "non-unique alias: " + alias);
                 }
-                aliasesSet.add(alias);
+                namesSet.add(alias);
                 addNameWithParentVariants(alias, territory);
+            }
+
+            // Add territory fullnames and aliases as well. Skip special case: territory name == territory code (e.g. USA).
+            if (namesSet.contains(territory.fullName.toUpperCase()) && !territory.toString().equals(territory.fullName.toUpperCase())) {
+                throw new ExceptionInInitializerError(errorPrefix + "non-unique fullName: " + territory.fullName.toUpperCase());
+            }
+            addNameWithParentVariants(territory.fullName.toUpperCase(), territory);
+            for (final String fullNameAlias : territory.fullNameAliases) {
+                if (namesSet.contains(fullNameAlias.toUpperCase())) {
+                    throw new ExceptionInInitializerError(errorPrefix + "non-unique fullName alias: " + fullNameAlias);
+                }
+                namesSet.add(fullNameAlias.toUpperCase());
+                addNameWithParentVariants(fullNameAlias.toUpperCase(), territory);
             }
             min = Math.min(min, territory.number);
             max = Math.max(max, territory.number);
@@ -986,7 +1005,7 @@ public enum Territory {
             }
             territories.add(territory);
         } else {
-            final ArrayList<Territory> arrayList = new ArrayList<>();
+            final ArrayList<Territory> arrayList = new ArrayList<Territory>();
             arrayList.add(territory);
             nameMap.put(name, arrayList);
         }

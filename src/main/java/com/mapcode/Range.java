@@ -80,12 +80,12 @@ class Range<T extends Comparable<T>> {
             return null;
         }
 
-        return new Range<>(newMin, newMax);
+        return new Range<T>(newMin, newMax);
     }
 
     @Nullable
     ArrayList<Range<T>> constrain(@Nonnull final ArrayList<Range<T>> constrainingRanges) {
-        final ArrayList<Range<T>> resultRanges = new ArrayList<>();
+        final ArrayList<Range<T>> resultRanges = new ArrayList<Range<T>>();
         for (final Range<T> range : constrainingRanges) {
             final Range<T> constrainedRange = constrain(range);
             if (constrainedRange != null) {
