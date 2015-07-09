@@ -57,7 +57,7 @@ public class ReferenceFileTest {
     private static final String BOUNDARIES_REFERENCE_FILE = "/boundaries.txt";
     private static final String BOUNDARIES_REFERENCE_FILE_HP = "/boundaries_hp.txt";
 
-    private static final int LOG_LINE_EVERY = 25000;
+    private static final int LOG_LINE_EVERY = 10000;
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
@@ -117,7 +117,7 @@ public class ReferenceFileTest {
         final AtomicInteger errors = new AtomicInteger(0);
         final AtomicInteger tasks = new AtomicInteger(0);
 
-        final int threads = Runtime.getRuntime().availableProcessors();
+        final int threads = Runtime.getRuntime().availableProcessors() * 2;
         LOG.info("checkFile: Starting {} threads...", threads);
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
@@ -131,18 +131,16 @@ public class ReferenceFileTest {
                 // Get next record.
                 @Nonnull final ReferenceRec reference = getNextReferenceRecord(chunkedFile);
 
-                final int count = tasks.getAndIncrement();
-                if (((count % LOG_LINE_EVERY) == 0)) {
-                    LOG.debug("checkFile: #{}, file={}", count, chunkedFile.fileName);
-                    LOG.debug("checkFile: lat/lon  = {}", reference.point);
-                    LOG.debug("checkFile: expected = #{}: {}", reference.mapcodes.size(), GSON.toJson(reference.mapcodes));
-                }
-
                 // Add task. This may throw an exception if the queue is full. Retry in that case.
                 executor.execute(new Runnable() {
 
                     @Override
                     public void run() {
+                        final int count = tasks.getAndIncrement();
+                        if (((count % LOG_LINE_EVERY) == 0)) {
+                            LOG.info("checkFile: #{}, file={}", count, chunkedFile.fileName);
+                        }
+
                         // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
                         final List<Mapcode> results = MapcodeCodec.encode(
                                 reference.point.getLatDeg(), reference.point.getLonDeg());
@@ -227,10 +225,10 @@ public class ReferenceFileTest {
                             }
                         }
 
-                        // Check distance of decoded point to reference point.
-                        for (final MapcodeRec mapcodeRec : reference.mapcodes) {
-                            //noinspection NestedTryStatement
-                            try {
+                        try {
+                            // Check distance of decoded point to reference point.
+                            for (final MapcodeRec mapcodeRec : reference.mapcodes) {
+                                //noinspection NestedTryStatement
                                 final Point result = MapcodeCodec.decode(mapcodeRec.mapcode, mapcodeRec.territory);
                                 final long distanceNm = (long) (Point.distanceInMeters(reference.point, result) * 1000000.0);
                                 synchronized (deltaNm) {
@@ -246,11 +244,11 @@ public class ReferenceFileTest {
                                             ((double) distanceNm) / 1000000.0, ((double) maxDeltaNm) / 1000000.0);
                                     errors.incrementAndGet();
                                 }
-                            } catch (final UnknownMapcodeException unknownMapcodeException) {
-                                LOG.error("Mapcode {} {} was generated for point {}, but cannot be decoded.",
-                                        mapcodeRec.territory, mapcodeRec.mapcode, reference.point);
-                                errors.incrementAndGet();
                             }
+                        } catch (final UnknownMapcodeException e) {
+                            LOG.error("Mapcode was generated for point {}, but cannot be decoded, msg={}",
+                                    reference.point, e.getMessage());
+                            errors.incrementAndGet();
                         }
                     }
                 });
@@ -264,7 +262,7 @@ public class ReferenceFileTest {
         executor.awaitTermination(60, TimeUnit.SECONDS);
         assertEquals(0, errors.get());
         assertEquals("Found errors", 0, errors.get());
-        LOG.debug("checkFile: Maximum delta for this testset = {}m, executed {} tasks", ((double) deltaNm.get()) / 1000000.0, tasks);
+        LOG.info("checkFile: Maximum delta for this testset = {}m, executed {} tasks", ((double) deltaNm.get()) / 1000000.0, tasks);
     }
 
     private static class MapcodeRec {
