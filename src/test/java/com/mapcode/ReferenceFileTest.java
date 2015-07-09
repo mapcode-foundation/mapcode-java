@@ -115,30 +115,20 @@ public class ReferenceFileTest {
         // Reset error count.
         final AtomicLong deltaNm = new AtomicLong(0);
         final AtomicInteger errors = new AtomicInteger(0);
-        final int threads = Runtime.getRuntime().availableProcessors();
+        final AtomicInteger tasks = new AtomicInteger(0);
+        final int threads = Runtime.getRuntime().availableProcessors() * 2;
         LOG.info("checkFile: Starting {} threads...", threads);
-        final ExecutorService executor = new ThreadPoolExecutor(
-                threads, threads,                           // Fixed number of threads.
-                0L, TimeUnit.MILLISECONDS,                  // No keep-alive.
-                new LinkedBlockingQueue<Runnable>(1000));   // Reasonable-size blocking queue.
+        final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
         // Open data file.
         final ChunkedFile chunkedFile = new ChunkedFile(baseFileName);
         try {
 
-            int i = 1;
             //noinspection InfiniteLoopStatement
             while (true) {
 
                 // Get next record.
                 @Nonnull final ReferenceRec reference = getNextReferenceRecord(chunkedFile);
-
-                if (((i % LOG_LINE_EVERY) == 0)) {
-                    LOG.debug("checkFile: #{}, file={}", i, chunkedFile.fileName);
-                    LOG.debug("checkFile: lat/lon  = {}", reference.point);
-                    LOG.debug("checkFile: expected = #{}: {}", reference.mapcodes.size(), GSON.toJson(reference.mapcodes));
-                }
-                ++i;
 
                 while (true) {
                     try {
@@ -147,6 +137,13 @@ public class ReferenceFileTest {
 
                             @Override
                             public void run() {
+                                final int count = tasks.getAndIncrement();
+                                if (((count % LOG_LINE_EVERY) == 0)) {
+                                    LOG.debug("checkFile: #{}, file={}", count, chunkedFile.fileName);
+                                    LOG.debug("checkFile: lat/lon  = {}", reference.point);
+                                    LOG.debug("checkFile: expected = #{}: {}", reference.mapcodes.size(), GSON.toJson(reference.mapcodes));
+                                }
+
                                 // Encode lat/lon to series of mapcodes and check the resulting mapcodes.
                                 final List<Mapcode> results = MapcodeCodec.encode(
                                         reference.point.getLatDeg(), reference.point.getLonDeg());
