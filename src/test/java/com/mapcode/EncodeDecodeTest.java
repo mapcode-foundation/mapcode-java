@@ -60,7 +60,7 @@ public class EncodeDecodeTest {
         final AtomicInteger errors = new AtomicInteger(0);
         final AtomicInteger tasks = new AtomicInteger(0);
 
-        final int threads = Runtime.getRuntime().availableProcessors() * 2;
+        final int threads = Runtime.getRuntime().availableProcessors();
         LOG.info("encodeDecodeTest: Starting {} threads...", threads);
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
@@ -85,14 +85,14 @@ public class EncodeDecodeTest {
 
                 @Override
                 public void run() {
-                    final int count = tasks.getAndIncrement();
+                    final int count = tasks.incrementAndGet();
                     if ((count % LOG_LINE_EVERY) == 0) {
                         LOG.info("encodeDecodeTest: #{}/{}", count, NUMBER_OF_POINTS);
                     }
 
-                    // Walk through the list in reverse order to get International first.
-                    for (final Territory territory : Territory.values()) {
-                        try {
+                    try {
+                        // Walk through the list in reverse order to get International first.
+                        for (final Territory territory : Territory.values()) {
                             final List<Mapcode> resultsLimited = MapcodeCodec.encode(latDeg, lonDeg, territory);
                             for (final Mapcode mapcode : resultsLimited) {
 
@@ -135,10 +135,10 @@ public class EncodeDecodeTest {
                                     }
                                 }
                             }
-                        } catch (final Exception e) {
-                            LOG.error("encodeDecodeTest: Unexpected exception: ", e);
-                            errors.getAndIncrement();
                         }
+                    } catch (final UnknownMapcodeException e) {
+                        LOG.error("encodeDecodeTest: Unknown mapcode exception", e);
+                        errors.getAndIncrement();
                     }
                 }
             });
@@ -146,5 +146,6 @@ public class EncodeDecodeTest {
         executor.shutdown();
         executor.awaitTermination(60, TimeUnit.SECONDS);
         assertEquals("Found errors", 0, errors.get());
+        LOG.info("encodeDecodeTest: Executed {} tasks", tasks);
     }
 }
