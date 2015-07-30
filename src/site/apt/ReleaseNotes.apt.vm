@@ -11,7 +11,9 @@ Release Notes (Version ${project.version})
 
 * 2.0.2
 
-    * To do.
+    * Renamed <<<isValidPrecisionFormat>>> to <<<isValidMapcodeFormat>>>.
+
+    * Removed public microdegree references from <<<Point>>> class.
 
     []
 

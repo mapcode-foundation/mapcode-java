@@ -22,20 +22,14 @@ import javax.annotation.Nullable;
 import static com.mapcode.Mapcode.getPrecisionFormat;
 
 /**
- * Package private helper methods to check arguments for validity.
+ * ----------------------------------------------------------------------------------------------
+ * Package private implementation class. For internal use within the Mapcode implementation only.
+ * ----------------------------------------------------------------------------------------------
  */
 class CheckArgs {
 
     private CheckArgs() {
         // Prevent instantiation.
-    }
-
-    static void checkRange(@Nonnull final String param, final double value,
-                           final double min, final double max) throws IllegalArgumentException {
-        if ((value < min) || (value > max)) {
-            throw new IllegalArgumentException("Parameter " + param +
-                    " should be in range [" + min + ", " + max + "], but is: " + value);
-        }
     }
 
     static void checkNonnull(@Nonnull final String param, @Nullable final Object obj)

@@ -21,12 +21,15 @@ import javax.annotation.Nonnull;
 import static com.mapcode.CheckArgs.checkNonnull;
 
 /**
- * This enum defines all alphabets supported for mapcodes. Mapcodes can be safely converted between
- * alphabets and fed to the mapcode decoder in the regular ASCII Roman alphabet or any other.
+ * This enum defines all alphabets supported for mapcodes. Note that an alphabet is different from a
+ * language or locale. An alternative name for an alphabet is "script".
+ *
+ * Mapcodes can be safely converted between alphabets and fed to the mapcode decoder in the regular
+ * ASCII Roman alphabet or any other.
  */
 public enum Alphabet {
-    ROMAN(0),
-    GREEK(1),
+    ROMAN(0),               // The numeric codes for alphabets are used by the implementation
+    GREEK(1),               // of the mapcode library. Do not change them.
     CYRILLIC(2),
     HEBREW(3),
     HINDI(4),
@@ -41,8 +44,7 @@ public enum Alphabet {
     TIBETAN(13);
 
     /**
-     * The numeric code is synonym for the alphanumeric code. It can be used in the decoder
-     * to define a territory as well.
+     * The numeric code is synonym for the alphanumeric code. Used in the decoder.
      */
     private final int number;
 
@@ -65,7 +67,7 @@ public enum Alphabet {
     }
 
     /**
-     * Return alphabet from a string, which can be a numeric or alpha code.
+     * Return alphabet from a string, which needs to be an alphanumeric code.
      *
      * @param alphaCode Alphabet, alphanumeric code.
      * @return Alphabet.
@@ -83,7 +85,7 @@ public enum Alphabet {
     }
 
     /**
-     * Static checking of the static data structures.
+     * Static consistency check of internal data structures.
      */
     static {
         int i = 0;
