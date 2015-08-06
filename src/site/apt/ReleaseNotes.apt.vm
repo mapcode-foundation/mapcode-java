@@ -13,7 +13,7 @@ Release Notes (Version ${project.version})
 
     * Renamed <<<isValidPrecisionFormat>>> to <<<isValidMapcodeFormat>>>.
 
-    * Removed public microdegree references from <<<Point>>> class.
+    * Removed public microdegree references from <<<Point>>> class. Everything is degrees now.
 
     * Removed <<<ParentTerritory>>> class.
 
