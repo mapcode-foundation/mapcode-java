@@ -333,7 +333,7 @@ public final class Mapcode {
      * actually a valid  mapcode representing a location on Earth.
      * @throws IllegalArgumentException If mapcode is null.
      */
-    public static boolean isValidPrecisionFormat(@Nonnull final String mapcode) throws IllegalArgumentException {
+    public static boolean isValidMapcodeFormat(@Nonnull final String mapcode) throws IllegalArgumentException {
         checkNonnull("mapcode", mapcode);
         try {
             // Throws an exception if the format is incorrect.

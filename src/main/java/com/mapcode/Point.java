@@ -23,10 +23,6 @@ import java.util.Random;
 import static com.mapcode.CheckArgs.checkNonnull;
 
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * This class defines a class for lat/lon points.
  */
 public class Point {
@@ -36,13 +32,6 @@ public class Point {
     public static final double LON_DEG_MAX = 180.0;
     public static final double LAT_DEG_MIN = -90.0;
     public static final double LAT_DEG_MAX = 90.0;
-
-    public static final int LON_MICRODEG_MIN = degToMicroDeg(LON_DEG_MIN);
-    public static final int LON_MICRODEG_MAX = degToMicroDeg(LON_DEG_MAX);
-    public static final int LAT_MICRODEG_MIN = degToMicroDeg(LAT_DEG_MIN);
-    public static final int LAT_MICRODEG_MAX = degToMicroDeg(LAT_DEG_MAX);
-
-    public static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
 
     // Radius of Earth.
     public static final double EARTH_RADIUS_X_METERS = 6378137.0;
@@ -155,8 +144,7 @@ public class Point {
         final double deltaYMeters = degreesLatToMeters(deltaLatDeg);
 
         // Calculate length through Earth. This is an approximation, but works fine for short distances.
-        final double lenMeters = Math.sqrt((deltaXMeters * deltaXMeters) + (deltaYMeters * deltaYMeters));
-        return lenMeters;
+        return Math.sqrt((deltaXMeters * deltaXMeters) + (deltaYMeters * deltaYMeters));
     }
 
     public static double degreesLatToMeters(final double latDegrees) {
@@ -236,6 +224,11 @@ public class Point {
     /**
      * Package private methods. Only used in the mapcode implementation modules.
      */
+    static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
+    static final int LON_MICRODEG_MIN = degToMicroDeg(LON_DEG_MIN);
+    static final int LON_MICRODEG_MAX = degToMicroDeg(LON_DEG_MAX);
+    static final int LAT_MICRODEG_MIN = degToMicroDeg(LAT_DEG_MIN);
+    static final int LAT_MICRODEG_MAX = degToMicroDeg(LAT_DEG_MAX);
 
     @Nonnull
     static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
@@ -287,8 +280,7 @@ public class Point {
      * @return Limited to [-90, 90].
      */
     static double mapToLat(final double value) {
-        final double lat = (value < -90.0) ? -90.0 : ((value > 90.0) ? 90.0 : value);
-        return lat;
+        return (value < -90.0) ? -90.0 : ((value > 90.0) ? 90.0 : value);
     }
 
     /**

@@ -9,6 +9,16 @@ Release Notes (Version ${project.version})
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 2.0.2
+
+    * Renamed <<<isValidPrecisionFormat>>> to <<<isValidMapcodeFormat>>>.
+
+    * Removed public microdegree references from <<<Point>>> class. Everything is degrees now.
+
+    * Removed <<<ParentTerritory>>> class.
+
+    []
+
 * 2.0.1
 
     * Reverted Java JDK level to 1.6 (Java 6) from 1.8 (Java 8), so the library can be used on
