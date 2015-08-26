@@ -40,12 +40,11 @@ class Data {
     private int codexHi;
     private int codexLen;
     private boolean nameless;
-    private boolean useless;
+    private boolean restricted;
     private boolean specialShape;
     private int pipeType;
     @Nullable
     private String pipeLetter;
-    private boolean starPipe;
     @Nullable
     private SubArea mapcoderRect;
     private boolean initialized;
@@ -80,9 +79,9 @@ class Data {
         return nameless;
     }
 
-    boolean isUseless() {
+    boolean isRestricted() {
         assert initialized;
-        return useless;
+        return restricted;
     }
 
     boolean isSpecialShape() {
@@ -100,11 +99,6 @@ class Data {
         assert initialized;
         assert pipeLetter != null;
         return pipeLetter;
-    }
-
-    boolean isStarPipe() {
-        assert initialized;
-        return starPipe;
     }
 
     @Nonnull
@@ -129,7 +123,7 @@ class Data {
         codexLen = calcCodexLen(codexHi, codexLo);
         codex = calcCodex(codexHi, codexLo);
         nameless = isNameless(i);
-        useless = (flags & 512) != 0;
+        restricted = (flags & 512) != 0;
         specialShape = isSpecialShape(i);
         pipeType = (flags >> 5) & 12; // 4=pipe 8=plus 12=star
         if (pipeType == 4) {
@@ -142,7 +136,6 @@ class Data {
             codexLo++;
             codexLen++;
         }
-        starPipe = calcStarPipe(i);
         mapcoderRect = SubArea.getArea(i);
         initialized = true;
     }
@@ -155,6 +148,10 @@ class Data {
         return (DataAccess.dataFlags(i) & 1024) != 0;
     }
 
+    static int recType(final int i) {
+        return (DataAccess.dataFlags(i) >> 7) & 3; // 1=pipe 2=plus 3=star
+    }
+
     static int calcCodex(final int i) {
         final int flags = DataAccess.dataFlags(i);
         return calcCodex(calcCodexHi(flags), calcCodexLo(flags));
@@ -165,7 +162,7 @@ class Data {
         return calcCodexLen(calcCodexHi(flags), calcCodexLo(flags));
     }
 
-    static boolean calcStarPipe(final int i) {
+    static boolean isAutoHeader(final int i) {
         return (DataAccess.dataFlags(i) & (8 << 5)) != 0;
     }
 

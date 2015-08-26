@@ -100,7 +100,7 @@ class Encoder {
             if ((mapcoderData.getCodex() < 54) && mapcoderData.getMapcoderRect().containsPoint(pointToEncode)) {
                 String mapcode = "";
                 final Territory territoryParent = currentEncodeTerritory.getParentTerritory();
-                if (mapcoderData.isUseless() && (i == upto) && (territoryParent != null)) {
+                if ((i == upto) && mapcoderData.isRestricted() && (territoryParent != null)) {
 
                     if (!isRecursive) {
                         stateOverride = currentEncodeTerritory;
@@ -112,7 +112,7 @@ class Encoder {
                     continue;
                 }
                 if ((mapcoderData.getPipeType() == 0) && !mapcoderData.isNameless()) {
-                    if (!mapcoderData.isUseless() || (lastbasesubareaID == from)) {
+                    if (!mapcoderData.isRestricted() || (lastbasesubareaID == from)) {
                         mapcode = encodeGrid(i, pointToEncode, mapcoderData);
                     }
                 } else if (mapcoderData.getPipeType() == 4) {
@@ -120,7 +120,7 @@ class Encoder {
                 } else if (mapcoderData.isNameless()) { // auto-pipe 21/22
                     mapcode = encodeNameless(pointToEncode, mapcoderData, i, from);
                 } else { // pipe star, pipe plus
-                    mapcode = encodeStarpipe(pointToEncode, mapcoderData, i);
+                    mapcode = encodeAutoHeader(pointToEncode, mapcoderData, i);
                 }
 
                 if (mapcode.length() > 4) {
@@ -157,7 +157,7 @@ class Encoder {
         return results;
     }
 
-    private static String addPostfix(final int extrax4, final int extray, final int dividerx4, final int dividery) {
+    private static String encodeExtension(final int extrax4, final int extray, final int dividerx4, final int dividery) {
         final int gx = ((30 * extrax4) / dividerx4);
         final int gy = ((30 * extray) / dividery);
         final int x1 = (gx / 6);
@@ -171,32 +171,33 @@ class Encoder {
 
     private static String encodeGrid(final int m, final Point point, final Data mapcoderData) {
         Point pointToEncode = point;
-        int codex = mapcoderData.getCodex();
-        final int orgcodex = codex;
-        if (codex == 14) {
-            codex = 23;
+        int codexm = mapcoderData.getCodex();
+        final int orgcodex = codexm;
+        if (codexm == 14) {
+            codexm = 23;
         }
-        final int dc = codex / 10;
-        final int codexlow = codex % 10;
+        final int prelen = codexm / 10;
+        final int postlen = codexm % 10;
         final int divx;
         int divy = DataAccess.smartDiv(m);
         if (divy == 1) {
-            divx = xSide[dc];
-            divy = ySide[dc];
+            divx = xSide[prelen];
+            divy = ySide[prelen];
         } else {
-            divx = nc[dc] / divy;
+            divx = nc[prelen] / divy;
         }
 
-        final int ygridsize =
-                (((mapcoderData.getMapcoderRect().getMaxY() - mapcoderData.getMapcoderRect().getMinY()) + divy) - 1)
-                        / divy;
-        int rely = pointToEncode.getLatMicroDeg() - mapcoderData.getMapcoderRect().getMinY();
-        rely = rely / ygridsize;
-        final int xgridsize =
-                (((mapcoderData.getMapcoderRect().getMaxX() - mapcoderData.getMapcoderRect().getMinX()) + divx) - 1)
-                        / divx;
+        final int minx = mapcoderData.getMapcoderRect().getMinX();
+        final int miny = mapcoderData.getMapcoderRect().getMinY();
+        final int maxx = mapcoderData.getMapcoderRect().getMaxX();
+        final int maxy = mapcoderData.getMapcoderRect().getMaxY();
 
-        int relx = pointToEncode.getLonMicroDeg() - mapcoderData.getMapcoderRect().getMinX();
+        final int ygridsize = (maxy - miny + divy - 1) / divy;
+        int rely = pointToEncode.getLatMicroDeg() - miny;
+        rely = rely / ygridsize;
+
+        final int xgridsize = (maxx - minx + divx - 1) / divx;
+        int relx = pointToEncode.getLonMicroDeg() - minx;
         if (relx < 0) {
             pointToEncode =
                     Point.fromMicroDeg(pointToEncode.getLatMicroDeg(), pointToEncode.getLonMicroDeg() + 360000000);
@@ -210,35 +211,30 @@ class Encoder {
             return "";
         }
         relx = relx / xgridsize;
-        if (relx >= divx) {
+        if (relx >= divx || rely >= divy) {
             return "";
         }
 
         final int v;
-        if ((divx != divy) && (codex > 24)) // D==6
-        {
-            v = encode6(relx, rely, divx, divy);
+        if ((divx != divy) && (prelen > 2)) {
+            v = encodeSixWide(relx, rely, divx, divy);
         } else {
             v = ((relx * divy) + divy) - 1 - rely;
         }
 
-        String result = fastEncode(v, dc);
+        String result = encodeBase31(v, prelen);
 
-        if ((dc == 4) && (divx == xSide[4]) && (divy == ySide[4])) {
+        if ((prelen == 4) && (divx == 961) && (divy == 961)) {
             result = String.valueOf(result.charAt(0)) + result.charAt(2) + result.charAt(1) + result.charAt(3);
         }
 
-        rely = mapcoderData.getMapcoderRect().getMinY() + (rely * ygridsize);
-        relx = mapcoderData.getMapcoderRect().getMinX() + (relx * xgridsize);
+        rely = miny + (rely * ygridsize);
+        relx = minx + (relx * xgridsize);
 
-        final int dividery = ((ygridsize + ySide[codexlow]) - 1) / ySide[codexlow];
-        final int dividerx = ((xgridsize + xSide[codexlow]) - 1) / xSide[codexlow];
+        final int dividery = ((ygridsize + ySide[postlen]) - 1) / ySide[postlen];
+        final int dividerx = ((xgridsize + xSide[postlen]) - 1) / xSide[postlen];
 
         result += '.';
-
-        // encoderelative
-
-        final int nrchars = codexlow;
 
         int difx = pointToEncode.getLonMicroDeg() - relx;
         int dify = pointToEncode.getLatMicroDeg() - rely;
@@ -249,97 +245,87 @@ class Encoder {
         difx = difx / dividerx;
         dify = dify / dividery;
 
-        dify = ySide[nrchars] - 1 - dify;
-        if (nrchars == 3) {
+        dify = ySide[postlen] - 1 - dify;
+        if (postlen == 3) {
             result += encodeTriple(difx, dify);
         } else {
 
-            String postfix = fastEncode(((difx) * ySide[nrchars]) + dify, nrchars);
-            if (nrchars == 4) {
+            String postfix = encodeBase31(((difx) * ySide[postlen]) + dify, postlen);
+            if (postlen == 4) {
                 postfix = String.valueOf(postfix.charAt(0)) + postfix.charAt(2) + postfix.charAt(1) + postfix.charAt(3);
             }
             result += postfix;
         }
-        // encoderelative
 
         if (orgcodex == 14) {
             result = result.charAt(0) + "." + result.charAt(1) + result.substring(3);
         }
 
-        result += addPostfix(extrax << 2, extray, dividerx << 2, dividery); // for encodeGrid
+        result += encodeExtension(extrax << 2, extray, dividerx << 2, dividery); // grid
 
         return mapcoderData.getPipeLetter() + result;
     }
 
-    private static String encodeStarpipe(final Point pointToEncode, final Data mapcoderData, final int thisindex) {
-        final StringBuilder starpipe_result = new StringBuilder();
+    private static String encodeAutoHeader(final Point pointToEncode, final Data mapcoderData, final int thisindex) {
+        final StringBuilder autoheader_result = new StringBuilder();
         final int thiscodexlen = mapcoderData.getCodexLen();
-        boolean done = false;
         int storageStart = 0;
 
         // search back to first pipe star
         int firstindex = thisindex;
-        while (Data.calcStarPipe(firstindex - 1) && (Data.calcCodexLen(firstindex - 1) == thiscodexlen)) {
+        while (Data.isAutoHeader(firstindex - 1) && (Data.calcCodexLen(firstindex - 1) == thiscodexlen)) {
             firstindex--;
         }
 
         int i = firstindex;
         while (true) {
-            if (Data.calcCodexLen(i) != thiscodexlen) {
-                return starpipe_result.toString();
-            }
-
             mapcoderData.dataSetup(i);
-            if (!done) {
-                final int maxx = mapcoderData.getMapcoderRect().getMaxX();
-                final int maxy = mapcoderData.getMapcoderRect().getMaxY();
-                final int minx = mapcoderData.getMapcoderRect().getMinX();
-                final int miny = mapcoderData.getMapcoderRect().getMinY();
 
-                int h = ((maxy - miny) + 89) / 90;
-                final int xdiv = xDivider(miny, maxy);
-                int w = ((((maxx - minx) * 4) + xdiv) - 1) / xdiv;
+            final int maxx = mapcoderData.getMapcoderRect().getMaxX();
+            final int maxy = mapcoderData.getMapcoderRect().getMaxY();
+            final int minx = mapcoderData.getMapcoderRect().getMinX();
+            final int miny = mapcoderData.getMapcoderRect().getMinY();
 
-                h = 176 * (((h + 176) - 1) / 176);
-                w = 168 * (((w + 168) - 1) / 168);
+            int h = ((maxy - miny) + 89) / 90;
+            final int xdiv = xDivider(miny, maxy);
+            int w = ((((maxx - minx) * 4) + xdiv) - 1) / xdiv;
 
-                int product = (w / 168) * (h / 176) * 961 * 31;
+            h = 176 * (((h + 176) - 1) / 176);
+            w = 168 * (((w + 168) - 1) / 168);
 
+            int product = (w / 168) * (h / 176) * 961 * 31;
+
+            if (mapcoderData.recType(i) == 2) // plus pipe
+            {
                 final int goodRounder = (mapcoderData.getCodex() >= 23) ? (961 * 961 * 31) : (961 * 961);
-                if (mapcoderData.getPipeType() == 8) // *+
-                {
-                    product =
-                            ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
-                }
-
-                if ((i == thisindex) && mapcoderData.getMapcoderRect().containsPoint(pointToEncode)) {
-                    final int dividerx = (((maxx - minx) + w) - 1) / w;
-                    int vx = (pointToEncode.getLonMicroDeg() - minx) / dividerx;
-                    final int extrax = (pointToEncode.getLonMicroDeg() - minx) % dividerx;
-                    final int dividery = (((maxy - miny) + h) - 1) / h;
-                    int vy = (maxy - pointToEncode.getLatMicroDeg()) / dividery;
-                    final int extray = (maxy - pointToEncode.getLatMicroDeg()) % dividery;
-                    final int spx = vx % 168;
-                    final int spy = vy % 176;
-
-                    vx = vx / 168;
-                    vy = vy / 176;
-
-                    // PIPELETTER ENCODE
-                    final int value = (vx * (h / 176)) + vy;
-
-                    starpipe_result.append(fastEncode((storageStart / (961 * 31)) + value,
-                            mapcoderData.getCodexLen() - 2));
-                    starpipe_result.append('.');
-                    starpipe_result.append(encodeTriple(spx, spy));
-
-                    starpipe_result.append(
-                            addPostfix(extrax << 2, extray, dividerx << 2, dividery)); // for encodeStarpipe
-                    done = true; // will be returned soon, but look for end
-                    // of pipes
-                }
-                storageStart += product;
+                product =
+                        ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
             }
+
+            if ( i == thisindex ) {
+                final int dividerx = (((maxx - minx) + w) - 1) / w;
+                final int vx = (pointToEncode.getLonMicroDeg() - minx) / dividerx;
+                final int extrax = (pointToEncode.getLonMicroDeg() - minx) % dividerx;
+
+                final int dividery = (((maxy - miny) + h) - 1) / h;
+                final int vy = (maxy - pointToEncode.getLatMicroDeg()) / dividery;
+                final int extray = (maxy - pointToEncode.getLatMicroDeg()) % dividery;
+
+                int value = (vx / 168) * (h / 176);
+                // placeholder for fraclat
+                value += (vy / 176);
+
+                autoheader_result.append(encodeBase31((storageStart / (961 * 31)) + value,
+                        mapcoderData.getCodexLen() - 2));
+                autoheader_result.append('.');
+                autoheader_result.append(encodeTriple(vx % 168, vy % 176));
+
+                autoheader_result.append(
+                        encodeExtension(extrax << 2, extray, dividerx << 2, dividery)); // for encodeAutoHeader
+                return autoheader_result.toString();
+            }
+
+            storageStart += product;
             i++;
         }
     }
@@ -353,6 +339,7 @@ class Encoder {
         final int a = countCityCoordinatesForCountry(mapcoderData.getCodex(), index, firstcode);
         final int p = 31 / a;
         final int r = 31 % a;
+        final int codexm = mapcoderData.getCodex();
         final int nrX = index - first_nameless_record;
 
         final int maxy = mapcoderData.getMapcoderRect().getMaxY();
@@ -362,78 +349,73 @@ class Encoder {
         final int x = pointToEncode.getLonMicroDeg();
         final int y = pointToEncode.getLatMicroDeg();
 
-        if (a > 1) {
-            int storage_offset;
+        int storage_offset;
 
-            if ((mapcoderData.getCodex() != 21) && (a <= 31)) {
-                storage_offset = ((nrX * p) + ((nrX < r) ? nrX : r)) * (961 * 961);
-            } else if ((mapcoderData.getCodex() != 21) && (a < 62)) {
-                if (nrX < (62 - a)) {
-                    storage_offset = nrX * 961 * 961;
-                } else {
-                    storage_offset = ((62 - a) + (((nrX - 62) + a) / 2)) * 961 * 961;
-                    if (((nrX + a) & 1) != 0) {
-                        storage_offset += 16 * 961 * 31;
-                    }
-                }
+        if ((codexm != 21) && (a <= 31)) {
+            storage_offset = ((nrX * p) + ((nrX < r) ? nrX : r)) * (961 * 961);
+        } else if ((codexm != 21) && (a < 62)) {
+            if (nrX < (62 - a)) {
+                storage_offset = nrX * 961 * 961;
             } else {
-                final int basePower = (mapcoderData.getCodex() == 21) ? (961 * 961) : (961 * 961 * 31);
-                int basePowerA = basePower / a;
-                if (a == 62) {
-                    basePowerA++;
-                } else {
-                    basePowerA = 961 * (basePowerA / 961);
+                storage_offset = ((62 - a) + (((nrX - 62) + a) / 2)) * 961 * 961;
+                if (((nrX + a) & 1) != 0) {
+                    storage_offset += 16 * 961 * 31;
                 }
-
-                storage_offset = nrX * basePowerA;
             }
-
-            int side = DataAccess.smartDiv(index);
-            final int orgSide = side;
-            int xSide = side;
-            if (mapcoderData.isSpecialShape()) {
-                xSide *= side;
-                side = 1 + ((maxy - miny) / 90);
-                xSide = xSide / side;
-            }
-
-            final int dividerx4 = xDivider(miny, maxy);
-            // 4 times too large
-
-            final int dx = (4 * (x - minx)) / dividerx4;
-            // div with floating point value
-
-            final int extrax4 = ((x - minx) * 4) - (dx * dividerx4); // like modulus, but with floating point value
-
-            final int dividery = 90;
-            final int dy = (maxy - y) / dividery;
-            final int extray = (maxy - y) % dividery;
-            int v = storage_offset;
-            if (mapcoderData.isSpecialShape()) {
-                v += encode6(dx, side - 1 - dy, xSide, side);
+        } else {
+            final int basePower = (codexm == 21) ? (961 * 961) : (961 * 961 * 31);
+            int basePowerA = basePower / a;
+            if (a == 62) {
+                basePowerA++;
             } else {
-                v += (dx * side) + dy;
+                basePowerA = 961 * (basePowerA / 961);
             }
 
-            String result = fastEncode(v, mapcoderData.getCodexLen() + 1);
-
-            if (mapcoderData.getCodexLen() == 3) {
-                result = result.substring(0, 2) + '.' + result.substring(2);
-            } else if (mapcoderData.getCodexLen() == 4) {
-                if ((mapcoderData.getCodex() == 22) && (a < 62) && (orgSide == 961) && !mapcoderData.isSpecialShape()) {
-                    result = result.substring(0, 2) + result.charAt(3) + result.charAt(2) + result.charAt(4);
-                }
-                if (mapcoderData.getCodex() == 13) {
-                    result = result.substring(0, 2) + '.' + result.substring(2);
-                } else {
-                    result = result.substring(0, 3) + '.' + result.substring(3);
-                }
-            }
-            result += addPostfix(extrax4, extray, dividerx4, dividery); // for encodeNameless
-
-            return result;
+            storage_offset = nrX * basePowerA;
         }
-        return "";
+
+        int side = DataAccess.smartDiv(index);
+        final int orgSide = side;
+        int xSide = side;
+        if (mapcoderData.isSpecialShape()) {
+            xSide *= side;
+            side = 1 + ((maxy - miny) / 90);
+            xSide = xSide / side;
+        }
+
+        final int dividerx4 = xDivider(miny, maxy);
+        final int xFracture = 0;
+        final int dx = ((4 * (x - minx)) + xFracture) / dividerx4;
+        final int extrax4 = ((x - minx) * 4) - (dx * dividerx4); // like modulus, but with floating point value
+
+        final int dividery = 90;
+        final int dy = (maxy - y) / dividery;
+        final int extray = (maxy - y) % dividery;
+
+        int v = storage_offset;
+        if (mapcoderData.isSpecialShape()) {
+            v += encodeSixWide(dx, side - 1 - dy, xSide, side);
+        } else {
+            v += (dx * side) + dy;
+        }
+
+        String result = encodeBase31(v, mapcoderData.getCodexLen() + 1);
+
+        if (mapcoderData.getCodexLen() == 3) {
+            result = result.substring(0, 2) + '.' + result.substring(2);
+        } else if (mapcoderData.getCodexLen() == 4) {
+            if ((codexm == 22) && (a < 62) && (orgSide == 961) && !mapcoderData.isSpecialShape()) {
+                result = result.substring(0, 2) + result.charAt(3) + result.charAt(2) + result.charAt(4);
+            }
+            if (codexm == 13) {
+                result = result.substring(0, 2) + '.' + result.substring(2);
+            } else {
+                result = result.substring(0, 3) + '.' + result.substring(3);
+            }
+        }
+        result += encodeExtension(extrax4, extray, dividerx4, dividery); // for encodeNameless
+
+        return result;
     }
 
     static String aeuPack(final String argStr, final boolean argShort) {
@@ -472,7 +454,7 @@ class Encoder {
         return str + rest;
     }
 
-    private static String fastEncode(final int argValue, final int argNrChars) {
+    private static String encodeBase31(final int argValue, final int argNrChars) {
         int value = argValue;
         int nrChars = argNrChars;
         final StringBuilder result = new StringBuilder();
@@ -484,22 +466,25 @@ class Encoder {
         return result.toString();
     }
 
-    private static int encode6(final int x, final int y, final int width, final int height) {
-        int d = 6;
+    private static int encodeSixWide(final int x, final int y, final int width, final int height) {
+        int d;
         int col = x / 6;
         final int maxcol = (width - 4) / 6;
         if (col >= maxcol) {
             col = maxcol;
             d = width - (maxcol * 6);
         }
+        else {
+            d = 6;
+        }
         return ((height * 6 * col) + ((height - 1 - y) * d) + x) - (col * 6);
     }
 
     private static String encodeTriple(final int difx, final int dify) {
         if (dify < (4 * 34)) {
-            return ENCODE_CHARS[((difx / 28) + (6 * (dify / 34)))] + fastEncode(((difx % 28) * 34) + (dify % 34), 2);
+            return ENCODE_CHARS[((difx / 28) + (6 * (dify / 34)))] + encodeBase31(((difx % 28) * 34) + (dify % 34), 2);
         } else {
-            return ENCODE_CHARS[((difx / 24) + 24)] + fastEncode((((difx % 24) * 40) + dify) - 136, 2);
+            return ENCODE_CHARS[((difx / 24) + 24)] + encodeBase31((((difx % 24) * 40) + dify) - 136, 2);
         }
     }
 }

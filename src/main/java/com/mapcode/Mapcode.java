@@ -130,11 +130,11 @@ public final class Mapcode {
      * The precision defines the size of a geographical area a single mapcode covers. This means It also defines
      * the maximum distance to the location, a (latitude, longitude) pair, that encoded to this mapcode.
      *
-     * Precision 0: area is approx 20 x 20 meters; max. distance from original location less than 10 meters.
+     * Precision 0: area is approx 10 x 10 meters; max. distance from original location less than 7.5 meters.
      *
-     * Precision 1: area is approx 4 x 4 meters; max. distance from original location less than 2 meters.
+     * Precision 1: area is approx 2 x 2 meters; max. distance from original location less than 1.5 meters.
      *
-     * Precision 2: area is approx 0.8 x 0.8 meters; max. distance from original location less than 0.4 meters.
+     * Precision 2: area is approx 0.35 x 0.35 meters; max. distance from original location less than 0.26 meters.
      *
      * The accuracy is slightly better than the figures above, but these figures are safe assumptions.
      *
@@ -361,6 +361,20 @@ public final class Mapcode {
      * location used for encoding the mapcode.
      */
     private static final double[] PRECISION_0_MAX_OFFSET_METERS = {10.0, 2.0, 0.4};
+        /*
+        8.0 , 1.60 , 0.32, 
+        /* @@@ correct values
+        7.49,         // PRECISION_0: 7.49 meters or less       7.5 m
+        1.45,         // PRECISION_1: 1.45 meters or less       1.5 m
+        0.251,        // PRECISION_2: 25.1 cm or less           25 cm
+        0.0462,       // PRECISION_3: 4.62 cm or less           5 cm
+        0.00837,      // PRECISION_4: 8.37 mm or less           1 cm
+        0.00154,      // PRECISION_5: 1.54 mm or less           2 mm
+        0.000279,     // PRECISION_6: 279 micrometer or less    1/3 mm
+        0.0000514,    // PRECISION_7: 51.4 micrometer or less   1/20 mm
+        0.0000093     // PRECISION_8: 9.3 micrometer or less    1/100 mm
+        */
+  
 
     /**
      * Get a safe maximum for the distance between a decoded mapcode and its original
