@@ -34,9 +34,6 @@ class Data {
             'A', 'E', 'U'
     };
 
-    Data() {
-    }
-
     static boolean isNameless(final int i) {
         return (DataAccess.dataFlags(i) & 64) != 0;
     }

@@ -88,20 +88,20 @@ class Encoder {
             }
 
             final int from = DataAccess.dataFirstRecord(currentEncodeTerritory.getNumber());
-            final Data mapcoderData = new Data();
+            
             if (DataAccess.dataFlags(from) == 0) { // no data for this territory?
                 continue;
             }
             final int upto = DataAccess.dataLastRecord(currentEncodeTerritory.getNumber());
 
             final int i = subArea.getSubAreaID();
-            if (mapcoderData.getBoundaries(i).containsPoint(pointToEncode)) {
+            if (Data.getBoundaries(i).containsPoint(pointToEncode)) {
                 String mapcode = "";
-                if (mapcoderData.isNameless(i)) {
-                    mapcode = encodeNameless(pointToEncode, mapcoderData, i, from);
-                } else if (mapcoderData.recType(i) > 1) {
-                    mapcode = encodeAutoHeader(pointToEncode, mapcoderData, i);
-                } else if ((i == upto) && mapcoderData.isRestricted(i) && (currentEncodeTerritory.getParentTerritory() != null)) {
+                if (Data.isNameless(i)) {
+                    mapcode = encodeNameless(pointToEncode, i, from);
+                } else if (Data.recType(i) > 1) {
+                    mapcode = encodeAutoHeader(pointToEncode, i);
+                } else if ((i == upto) && Data.isRestricted(i) && (currentEncodeTerritory.getParentTerritory() != null)) {
 
                     if (!isRecursive) {
                         stateOverride = currentEncodeTerritory;
@@ -111,9 +111,9 @@ class Encoder {
                     }
 
                     continue;
-                } else if (!mapcoderData.isRestricted(i) || (lastbasesubareaID == from)) {
-                    if (mapcoderData.calcCodex(i) < 54) {
-                        mapcode = encodeGrid(i, pointToEncode, mapcoderData);
+                } else if (!Data.isRestricted(i) || (lastbasesubareaID == from)) {
+                    if (Data.calcCodex(i) < 54) {
+                        mapcode = encodeGrid(i, pointToEncode);
                     }
                 } 
 
@@ -163,9 +163,9 @@ class Encoder {
         return s;
     }
 
-    private static String encodeGrid(final int m, final Point point, final Data mapcoderData) {
+    private static String encodeGrid(final int m, final Point point) {
         Point pointToEncode = point;
-        int codexm = mapcoderData.calcCodex(m);
+        int codexm = Data.calcCodex(m);
         final int orgcodex = codexm;
         if (codexm == 21) {
             codexm = 22;
@@ -184,10 +184,10 @@ class Encoder {
             divx = nc[prelen] / divy;
         }
 
-        final int minx = mapcoderData.getBoundaries(m).getMinX();
-        final int miny = mapcoderData.getBoundaries(m).getMinY();
-        final int maxx = mapcoderData.getBoundaries(m).getMaxX();
-        final int maxy = mapcoderData.getBoundaries(m).getMaxY();
+        final int minx = Data.getBoundaries(m).getMinX();
+        final int miny = Data.getBoundaries(m).getMinY();
+        final int maxx = Data.getBoundaries(m).getMaxX();
+        final int maxy = Data.getBoundaries(m).getMaxY();
 
         final int ygridsize = (maxy - miny + divy - 1) / divy;
         int rely = pointToEncode.getLatMicroDeg() - miny;
@@ -260,12 +260,12 @@ class Encoder {
 
         result += encodeExtension(extrax << 2, extray, dividerx << 2, dividery); // grid
 
-        return mapcoderData.headerLetter(m) + result;
+        return Data.headerLetter(m) + result;
     }
 
-    private static String encodeAutoHeader(final Point pointToEncode, final Data mapcoderData, final int thisindex) {
+    private static String encodeAutoHeader(final Point pointToEncode, final int thisindex) {
         final StringBuilder autoheader_result = new StringBuilder();
-        final int codexm = mapcoderData.calcCodex(thisindex);
+        final int codexm = Data.calcCodex(thisindex);
         int storageStart = 0;
 
         // search back to first pipe star
@@ -277,10 +277,10 @@ class Encoder {
         int i = firstindex;
         while (true) {
 
-            final int maxx = mapcoderData.getBoundaries(i).getMaxX();
-            final int maxy = mapcoderData.getBoundaries(i).getMaxY();
-            final int minx = mapcoderData.getBoundaries(i).getMinX();
-            final int miny = mapcoderData.getBoundaries(i).getMinY();
+            final int maxx = Data.getBoundaries(i).getMaxX();
+            final int maxy = Data.getBoundaries(i).getMaxY();
+            final int minx = Data.getBoundaries(i).getMinX();
+            final int miny = Data.getBoundaries(i).getMinY();
 
             int h = ((maxy - miny) + 89) / 90;
             final int xdiv = xDivider(miny, maxy);
@@ -291,7 +291,7 @@ class Encoder {
 
             int product = (w / 168) * (h / 176) * 961 * 31;
 
-            if (mapcoderData.recType(i) == 2) // plus pipe
+            if (Data.recType(i) == 2) // plus pipe
             {
                 final int goodRounder = (codexm >= 23) ? (961 * 961 * 31) : (961 * 961);
                 product =
@@ -327,10 +327,10 @@ class Encoder {
     }
 
     // mid-level encode/decode
-    private static String encodeNameless(final Point pointToEncode, final Data mapcoderData, final int index, final int firstcode)
+    private static String encodeNameless(final Point pointToEncode, final int index, final int firstcode)
     // returns "" in case of (argument) error
     {
-        final int codexm = mapcoderData.calcCodex(index);
+        final int codexm = Data.calcCodex(index);
         final int codexlen = (codexm / 10) + (codexm % 10);
         final int first_nameless_record = getFirstNamelessRecord(codexm, index, firstcode);
         final int a = countCityCoordinatesForCountry(codexm, index, firstcode);
@@ -370,9 +370,9 @@ class Encoder {
         final int orgSide = side;
         int xSide = side;
 
-        final int maxy = mapcoderData.getBoundaries(index).getMaxY();
-        final int minx = mapcoderData.getBoundaries(index).getMinX();
-        final int miny = mapcoderData.getBoundaries(index).getMinY();
+        final int maxy = Data.getBoundaries(index).getMaxY();
+        final int minx = Data.getBoundaries(index).getMinX();
+        final int miny = Data.getBoundaries(index).getMinY();
 
         final int dividerx4 = xDivider(miny, maxy);
         final int xFracture = 0;
@@ -384,7 +384,7 @@ class Encoder {
         final int extray = (maxy - y) % dividery;
 
         int v = storage_offset;
-        if (mapcoderData.isSpecialShape(index)) {
+        if (Data.isSpecialShape(index)) {
             xSide *= side;
             side = 1 + ((maxy - miny) / 90);
             xSide = xSide / side;
@@ -398,7 +398,7 @@ class Encoder {
         if (codexlen == 3) {
             result = result.substring(0, 2) + '.' + result.substring(2);
         } else if (codexlen == 4) {
-            if ((codexm == 22) && (a < 62) && (orgSide == 961) && !mapcoderData.isSpecialShape(index)) {
+            if ((codexm == 22) && (a < 62) && (orgSide == 961) && !Data.isSpecialShape(index)) {
                 result = result.substring(0, 2) + result.charAt(3) + result.charAt(2) + result.charAt(4);
             }
             if (codexm == 13) {

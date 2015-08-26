@@ -90,35 +90,33 @@ class Decoder {
         final int incodexhi = mapcode.indexOf('.');
         final int incodex = (incodexhi * 10) + (incodexlen - incodexhi);
 
-        final Data mapcoderData = new Data();
-
         for (int i = from; i <= upto; i++) {
-            final int codexi = mapcoderData.calcCodex(i);
-            if (mapcoderData.recType(i) == 0) {
-                if (mapcoderData.isNameless(i)) {
+            final int codexi = Data.calcCodex(i);
+            if (Data.recType(i) == 0) {
+                if (Data.isNameless(i)) {
                     // i = nameless
                     if (((codexi == 21) && (incodex == 22)) ||
                         ((codexi == 22) && (incodex == 32)) || 
                         ((codexi == 13) && (incodex == 23))) {
-                            result = decodeNameless(mapcode, i, extrapostfix, mapcoderData);
+                            result = decodeNameless(mapcode, i, extrapostfix);
                             break;
                     }
                 } else {
                     // i = grid without headerletter                    
                     if ((codexi == incodex) || ((incodex == 22) && (codexi == 21))) {
                         result = decodeGrid(mapcode, 
-                                mapcoderData.getBoundaries(i).getMinX(), mapcoderData.getBoundaries(i).getMinY(), 
-                                mapcoderData.getBoundaries(i).getMaxX(), mapcoderData.getBoundaries(i).getMaxY(),
+                                Data.getBoundaries(i).getMinX(), Data.getBoundaries(i).getMinY(), 
+                                Data.getBoundaries(i).getMaxX(), Data.getBoundaries(i).getMaxY(),
                                 i, extrapostfix);
                 
-                        if (mapcoderData.isRestricted(i) && result.isDefined()) {
+                        if (Data.isRestricted(i) && result.isDefined()) {
                             boolean fitssomewhere = false;
                             int j;
                             for (j = upto - 1; j >= from; j--) {
-                                if (!mapcoderData.isRestricted(j)) {
-                                  final int xdiv8 = Common.xDivider(mapcoderData.getBoundaries(j).getMinY(),
-                                          mapcoderData.getBoundaries(j).getMaxY()) / 4;
-                                  if (mapcoderData.getBoundaries(j).extendBounds(xdiv8, 60).containsPoint(result)) {
+                                if (!Data.isRestricted(j)) {
+                                  final int xdiv8 = Common.xDivider(Data.getBoundaries(j).getMinY(),
+                                          Data.getBoundaries(j).getMaxY()) / 4;
+                                  if (Data.getBoundaries(j).extendBounds(xdiv8, 60).containsPoint(result)) {
                                       fitssomewhere = true;
                                       break;
                                   }
@@ -131,12 +129,12 @@ class Decoder {
                         break;
                     }
                 }
-            } else if (mapcoderData.recType(i) == 1) {
+            } else if (Data.recType(i) == 1) {
                 // i = grid with headerletter
-                if ((incodex == codexi + 10) && (mapcoderData.headerLetter(i).charAt(0) == mapcode.charAt(0))) {
+                if ((incodex == codexi + 10) && (Data.headerLetter(i).charAt(0) == mapcode.charAt(0))) {
                         result = decodeGrid(mapcode.substring(1), 
-                            mapcoderData.getBoundaries(i).getMinX(), mapcoderData.getBoundaries(i).getMinY(), 
-                            mapcoderData.getBoundaries(i).getMaxX(), mapcoderData.getBoundaries(i).getMaxY(), 
+                            Data.getBoundaries(i).getMinX(), Data.getBoundaries(i).getMinY(), 
+                            Data.getBoundaries(i).getMaxX(), Data.getBoundaries(i).getMaxY(), 
                             i, extrapostfix);
                     break;
                 }
@@ -144,7 +142,7 @@ class Decoder {
             else {
                 // i = autoheader
                 if (((incodex == 23) && (codexi == 22)) || ((incodex == 33) && (codexi == 23))) {
-                    result = decodeAutoHeader(mapcode, i, extrapostfix, mapcoderData);
+                    result = decodeAutoHeader(mapcode, i, extrapostfix);
                     break;
                 }
             }
@@ -160,7 +158,7 @@ class Decoder {
 
             // LIMIT_TO_OUTRECT : make sure it fits the country
             if (ccode != CCODE_EARTH) {
-                final SubArea mapcoderRect = mapcoderData.getBoundaries(upto); // find
+                final SubArea mapcoderRect = Data.getBoundaries(upto); // find
                 // encompassing
                 // rect
                 final int xdiv8 = Common.xDivider(mapcoderRect.getMinY(), mapcoderRect.getMaxY()) / 4;
@@ -348,10 +346,9 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeNameless(final String str, final int firstrec, final String extrapostfix,
-                                        final Data mapcoderData) {
+    private static Point decodeNameless(final String str, final int firstrec, final String extrapostfix) {
         String result = str;
-        final int codexm = mapcoderData.calcCodex(firstrec);
+        final int codexm = Data.calcCodex(firstrec);
         if (codexm == 22) {
             result = result.substring(0, 3) + result.substring(4);
         } else {
@@ -420,14 +417,14 @@ class Decoder {
         int side = DataAccess.smartDiv(m);
         int xSIDE = side;
 
-        final int maxy = mapcoderData.getBoundaries(m).getMaxY();
-        final int minx = mapcoderData.getBoundaries(m).getMinX();
-        final int miny = mapcoderData.getBoundaries(m).getMinY();
+        final int maxy = Data.getBoundaries(m).getMaxY();
+        final int minx = Data.getBoundaries(m).getMinX();
+        final int miny = Data.getBoundaries(m).getMinY();
 
         final int dx;
         final int dy;
 
-        if (mapcoderData.isSpecialShape(m)) {
+        if (Data.isSpecialShape(m)) {
             xSIDE *= side;
             side = 1 + ((maxy - miny) / 90);
             xSIDE = xSIDE / side;
@@ -454,11 +451,10 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeAutoHeader(final String input, final int m, final String extrapostfix,
-                                        @Nonnull final Data mapcoderData) {
+    private static Point decodeAutoHeader(final String input, final int m, final String extrapostfix) {
         // returns Point.isUndefined() in case or error
         int storageStart = 0;
-        final int codexm = mapcoderData.calcCodex(m);
+        final int codexm = Data.calcCodex(m);
 
         int value = decodeBase31(input); // decode top (before dot)
         value *= 961 * 31;
@@ -468,14 +464,14 @@ class Decoder {
         int i;
         i = m;
         while (true) {
-            if ((mapcoderData.recType(i)<2) || (Data.calcCodex(i) != codexm)) {
+            if ((Data.recType(i)<2) || (Data.calcCodex(i) != codexm)) {
                 return Point.undefined(); // return undefined
             }
 
-            final int maxx = mapcoderData.getBoundaries(i).getMaxX();
-            final int maxy = mapcoderData.getBoundaries(i).getMaxY();
-            final int minx = mapcoderData.getBoundaries(i).getMinX();
-            final int miny = mapcoderData.getBoundaries(i).getMinY();
+            final int maxx = Data.getBoundaries(i).getMaxX();
+            final int maxy = Data.getBoundaries(i).getMaxY();
+            final int minx = Data.getBoundaries(i).getMinX();
+            final int miny = Data.getBoundaries(i).getMinY();
 
             int h = ((maxy - miny) + 89) / 90;
             final int xdiv = Common.xDivider(miny, maxy);
@@ -486,7 +482,7 @@ class Decoder {
 
             int product = (w / 168) * (h / 176) * 961 * 31;
 
-            if (mapcoderData.recType(i) == 2) {
+            if (Data.recType(i) == 2) {
                 final int goodRounder = (codexm >= 23) ? (961 * 961 * 31) : (961 * 961);
                 product = ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
             }
