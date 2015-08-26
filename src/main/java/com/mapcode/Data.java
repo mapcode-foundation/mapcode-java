@@ -34,110 +34,7 @@ class Data {
             'A', 'E', 'U'
     };
 
-    private int flags;
-    private int codex;
-    private int codexLo;
-    private int codexHi;
-    private int codexLen;
-    private boolean nameless;
-    private boolean restricted;
-    private boolean specialShape;
-    private int pipeType;
-    @Nullable
-    private String pipeLetter;
-    @Nullable
-    private SubArea mapcoderRect;
-    private boolean initialized;
-
-    int getFlags() {
-        assert initialized;
-        return flags;
-    }
-
-    int getCodex() {
-        assert initialized;
-        return codex;
-    }
-
-    int getCodexLo() {
-        assert initialized;
-        return codexLo;
-    }
-
-    int getCodexHi() {
-        assert initialized;
-        return codexHi;
-    }
-
-    int getCodexLen() {
-        assert initialized;
-        return codexLen;
-    }
-
-    boolean isNameless() {
-        assert initialized;
-        return nameless;
-    }
-
-    boolean isRestricted() {
-        assert initialized;
-        return restricted;
-    }
-
-    boolean isSpecialShape() {
-        assert initialized;
-        return specialShape;
-    }
-
-    int getPipeType() {
-        assert initialized;
-        return pipeType;
-    }
-
-    @Nonnull
-    String getPipeLetter() {
-        assert initialized;
-        assert pipeLetter != null;
-        return pipeLetter;
-    }
-
-    @Nonnull
-    SubArea getMapcoderRect() {
-        assert initialized;
-        assert mapcoderRect != null;
-        return mapcoderRect;
-    }
-
-    Data(final int i) {
-        dataSetup(i);
-    }
-
     Data() {
-        initialized = false;
-    }
-
-    void dataSetup(final int i) {
-        flags = DataAccess.dataFlags(i);
-        codexHi = calcCodexHi(flags);
-        codexLo = calcCodexLo(flags);
-        codexLen = calcCodexLen(codexHi, codexLo);
-        codex = calcCodex(codexHi, codexLo);
-        nameless = isNameless(i);
-        restricted = (flags & 512) != 0;
-        specialShape = isSpecialShape(i);
-        pipeType = (flags >> 5) & 12; // 4=pipe 8=plus 12=star
-        if (pipeType == 4) {
-            pipeLetter = Character.toString(ENCODE_CHARS[(flags >> 11) & 31]);
-        } else {
-            pipeLetter = "";
-        }
-        if ((codex == 21) && !nameless) {
-            codex++;
-            codexLo++;
-            codexLen++;
-        }
-        mapcoderRect = SubArea.getArea(i);
-        initialized = true;
     }
 
     static boolean isNameless(final int i) {
@@ -152,33 +49,24 @@ class Data {
         return (DataAccess.dataFlags(i) >> 7) & 3; // 1=pipe 2=plus 3=star
     }
 
+    static boolean isRestricted(final int i) {
+        return (DataAccess.dataFlags(i) & 512) != 0;
+    }
+
     static int calcCodex(final int i) {
+        final int codexflags = DataAccess.dataFlags(i) & 31;
+        return (10 * (codexflags / 5)) + (codexflags % 5) + 1;
+    }
+
+    static String headerLetter(final int i) {
         final int flags = DataAccess.dataFlags(i);
-        return calcCodex(calcCodexHi(flags), calcCodexLo(flags));
+        if (((flags >> 7) & 3) == 1) {
+            return Character.toString(ENCODE_CHARS[(flags >> 11) & 31]);
+        }
+        return "";
     }
 
-    static int calcCodexLen(final int i) {
-        final int flags = DataAccess.dataFlags(i);
-        return calcCodexLen(calcCodexHi(flags), calcCodexLo(flags));
-    }
-
-    static boolean isAutoHeader(final int i) {
-        return (DataAccess.dataFlags(i) & (8 << 5)) != 0;
-    }
-
-    private static int calcCodexHi(final int flags) {
-        return (flags & 31) / 5;
-    }
-
-    private static int calcCodexLo(final int flags) {
-        return ((flags & 31) % 5) + 1;
-    }
-
-    private static int calcCodex(final int codexhi, final int codexlo) {
-        return (10 * codexhi) + codexlo;
-    }
-
-    private static int calcCodexLen(final int codexhi, final int codexlo) {
-        return codexhi + codexlo;
+    static SubArea getBoundaries(final int i) {
+        return SubArea.getArea(i);
     }
 }

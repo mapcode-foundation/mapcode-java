@@ -82,63 +82,73 @@ class Decoder {
         final int ccode = territory.getNumber();
 
         final int from = DataAccess.dataFirstRecord(ccode);
-        if (DataAccess.dataFlags(from) == 0) {
+        if (DataAccess.dataFlags(from) == 0) { // no data for this territory?
             return Point.undefined(); // this territory is not in the current data
         }
         final int upto = DataAccess.dataLastRecord(ccode);
 
         final int incodexhi = mapcode.indexOf('.');
+        final int incodex = (incodexhi * 10) + (incodexlen - incodexhi);
 
         final Data mapcoderData = new Data();
 
         for (int i = from; i <= upto; i++) {
-            mapcoderData.dataSetup(i);
-            if ((mapcoderData.getPipeType() == 0) && !mapcoderData.isNameless()
-                    && (mapcoderData.getCodexLen() == incodexlen) && (mapcoderData.getCodexHi() == incodexhi)) {
-
-                result = decodeGrid(mapcode, mapcoderData.getMapcoderRect().getMinX(), mapcoderData.getMapcoderRect()
-                                .getMinY(), mapcoderData.getMapcoderRect().getMaxX(), mapcoderData.getMapcoderRect().getMaxY(),
-                        i, extrapostfix);
-                // RESTRICTUSELESS
-                if (mapcoderData.isRestricted() && result.isDefined()) {
-                    boolean fitssomewhere = false;
-                    int j;
-                    for (j = upto - 1; j >= from; j--) { // look in previous
-                        // rects
-                        mapcoderData.dataSetup(j);
-                        if (mapcoderData.isRestricted()) {
-                            continue;
-                        }
-                        final int xdiv8 = Common.xDivider(mapcoderData.getMapcoderRect().getMinY(),
-                                mapcoderData.getMapcoderRect().getMaxY()) / 4;
-                        if (mapcoderData.getMapcoderRect().extendBounds(xdiv8, 60).containsPoint(result)) {
-                            fitssomewhere = true;
+            final int codexi = mapcoderData.calcCodex(i);
+            if (mapcoderData.recType(i) == 0) {
+                if (mapcoderData.isNameless(i)) {
+                    // i = nameless
+                    if (((codexi == 21) && (incodex == 22)) ||
+                        ((codexi == 22) && (incodex == 32)) || 
+                        ((codexi == 13) && (incodex == 23))) {
+                            result = decodeNameless(mapcode, i, extrapostfix, mapcoderData);
                             break;
-                        }
                     }
-                    if (!fitssomewhere) {
-                        result.setUndefined();
+                } else {
+                    // i = grid without headerletter                    
+                    if ((codexi == incodex) || ((incodex == 22) && (codexi == 21))) {
+                        result = decodeGrid(mapcode, 
+                                mapcoderData.getBoundaries(i).getMinX(), mapcoderData.getBoundaries(i).getMinY(), 
+                                mapcoderData.getBoundaries(i).getMaxX(), mapcoderData.getBoundaries(i).getMaxY(),
+                                i, extrapostfix);
+                
+                        if (mapcoderData.isRestricted(i) && result.isDefined()) {
+                            boolean fitssomewhere = false;
+                            int j;
+                            for (j = upto - 1; j >= from; j--) {
+                                if (!mapcoderData.isRestricted(j)) {
+                                  final int xdiv8 = Common.xDivider(mapcoderData.getBoundaries(j).getMinY(),
+                                          mapcoderData.getBoundaries(j).getMaxY()) / 4;
+                                  if (mapcoderData.getBoundaries(j).extendBounds(xdiv8, 60).containsPoint(result)) {
+                                      fitssomewhere = true;
+                                      break;
+                                  }
+                                }
+                            }
+                            if (!fitssomewhere) {
+                                result.setUndefined();
+                            }
+                        }
+                        break;
                     }
                 }
-                break;
-            } else if ((mapcoderData.getPipeType() == 4) && ((mapcoderData.getCodexLen() + 1) == incodexlen)
-                    && ((mapcoderData.getCodexHi() + 1) == incodexhi)
-                    && (mapcoderData.getPipeLetter().charAt(0) == mapcode.charAt(0))) {
-                result = decodeGrid(mapcode.substring(1), mapcoderData.getMapcoderRect().getMinX(), mapcoderData
-                        .getMapcoderRect().getMinY(), mapcoderData.getMapcoderRect().getMaxX(), mapcoderData
-                        .getMapcoderRect().getMaxY(), i, extrapostfix);
-                break;
-            } else if (mapcoderData.isNameless()
-                    && (((mapcoderData.getCodex() == 21) && (incodexlen == 4) && (incodexhi == 2))
-                    || ((mapcoderData.getCodex() == 22) && (incodexlen == 5) && (incodexhi == 3)) || ((mapcoderData
-                    .getCodex() == 13) && (incodexlen == 5) && (incodexhi == 2)))) {
-                result = decodeNameless(mapcode, i, extrapostfix, mapcoderData);
-                break;
-            } else if ((mapcoderData.getPipeType() > 4) && (incodexlen == (incodexhi + 3))
-                    && ((mapcoderData.getCodexLen() + 1) == incodexlen)) {
-                result = decodeAutoHeader(mapcode, i, extrapostfix, mapcoderData);
-                break;
+            } else if (mapcoderData.recType(i) == 1) {
+                // i = grid with headerletter
+                if ((incodex == codexi + 10) && (mapcoderData.headerLetter(i).charAt(0) == mapcode.charAt(0))) {
+                        result = decodeGrid(mapcode.substring(1), 
+                            mapcoderData.getBoundaries(i).getMinX(), mapcoderData.getBoundaries(i).getMinY(), 
+                            mapcoderData.getBoundaries(i).getMaxX(), mapcoderData.getBoundaries(i).getMaxY(), 
+                            i, extrapostfix);
+                    break;
+                }
             }
+            else {
+                // i = autoheader
+                if (((incodex == 23) && (codexi == 22)) || ((incodex == 33) && (codexi == 23))) {
+                    result = decodeAutoHeader(mapcode, i, extrapostfix, mapcoderData);
+                    break;
+                }
+            }
+
         }
 
         if (result.isDefined()) {
@@ -150,7 +160,7 @@ class Decoder {
 
             // LIMIT_TO_OUTRECT : make sure it fits the country
             if (ccode != CCODE_EARTH) {
-                final SubArea mapcoderRect = SubArea.getArea(upto); // find
+                final SubArea mapcoderRect = mapcoderData.getBoundaries(upto); // find
                 // encompassing
                 // rect
                 final int xdiv8 = Common.xDivider(mapcoderRect.getMinY(), mapcoderRect.getMaxY()) / 4;
@@ -341,7 +351,7 @@ class Decoder {
     private static Point decodeNameless(final String str, final int firstrec, final String extrapostfix,
                                         final Data mapcoderData) {
         String result = str;
-        final int codexm = mapcoderData.getCodex();
+        final int codexm = mapcoderData.calcCodex(firstrec);
         if (codexm == 22) {
             result = result.substring(0, 3) + result.substring(4);
         } else {
@@ -405,19 +415,19 @@ class Decoder {
             }
         }
 
-        mapcoderData.dataSetup(firstrec + nrX);
+        final int m = firstrec + nrX;
 
-        int side = DataAccess.smartDiv(firstrec + nrX);
+        int side = DataAccess.smartDiv(m);
         int xSIDE = side;
 
-        final int maxy = mapcoderData.getMapcoderRect().getMaxY();
-        final int minx = mapcoderData.getMapcoderRect().getMinX();
-        final int miny = mapcoderData.getMapcoderRect().getMinY();
+        final int maxy = mapcoderData.getBoundaries(m).getMaxY();
+        final int minx = mapcoderData.getBoundaries(m).getMinX();
+        final int miny = mapcoderData.getBoundaries(m).getMinY();
 
         final int dx;
         final int dy;
 
-        if (mapcoderData.isSpecialShape()) {
+        if (mapcoderData.isSpecialShape(m)) {
             xSIDE *= side;
             side = 1 + ((maxy - miny) / 90);
             xSIDE = xSIDE / side;
@@ -444,11 +454,11 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeAutoHeader(final String input, final int firstindex, final String extrapostfix,
+    private static Point decodeAutoHeader(final String input, final int m, final String extrapostfix,
                                         @Nonnull final Data mapcoderData) {
         // returns Point.isUndefined() in case or error
         int storageStart = 0;
-        final int thiscodexlen = mapcoderData.getCodexLen();
+        final int codexm = mapcoderData.calcCodex(m);
 
         int value = decodeBase31(input); // decode top (before dot)
         value *= 961 * 31;
@@ -456,19 +466,16 @@ class Decoder {
         // decode bottom 3 chars
 
         int i;
-        i = firstindex;
+        i = m;
         while (true) {
-            if (Data.calcCodexLen(i) != thiscodexlen) {
+            if ((mapcoderData.recType(i)<2) || (Data.calcCodex(i) != codexm)) {
                 return Point.undefined(); // return undefined
             }
-            if (i > firstindex) {
-                mapcoderData.dataSetup(i);
-            }
 
-            final int maxx = mapcoderData.getMapcoderRect().getMaxX();
-            final int maxy = mapcoderData.getMapcoderRect().getMaxY();
-            final int minx = mapcoderData.getMapcoderRect().getMinX();
-            final int miny = mapcoderData.getMapcoderRect().getMinY();
+            final int maxx = mapcoderData.getBoundaries(i).getMaxX();
+            final int maxy = mapcoderData.getBoundaries(i).getMaxY();
+            final int minx = mapcoderData.getBoundaries(i).getMinX();
+            final int miny = mapcoderData.getBoundaries(i).getMinY();
 
             int h = ((maxy - miny) + 89) / 90;
             final int xdiv = Common.xDivider(miny, maxy);
@@ -479,8 +486,8 @@ class Decoder {
 
             int product = (w / 168) * (h / 176) * 961 * 31;
 
-            if (mapcoderData.getPipeType() == 8) {
-                final int goodRounder = (mapcoderData.getCodex() >= 23) ? (961 * 961 * 31) : (961 * 961);
+            if (mapcoderData.recType(i) == 2) {
+                final int goodRounder = (codexm >= 23) ? (961 * 961 * 31) : (961 * 961);
                 product = ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
             }
 
