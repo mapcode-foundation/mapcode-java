@@ -105,7 +105,7 @@ class Encoder {
 
                     if (!isRecursive) {
                         stateOverride = currentEncodeTerritory;
-                        results.addAll(encode(latDeg, lonDeg, currentEncodeTerritory.getParentTerritory(), true, limitToOneResult,
+                        results.addAll(encode(argLatDeg, argLonDeg, currentEncodeTerritory.getParentTerritory(), true, limitToOneResult,
                                 allowWorld, stateOverride));
                         stateOverride = null;
                     }
@@ -151,15 +151,36 @@ class Encoder {
         return results;
     }
 
-    private static String encodeExtension(final int extrax4, final int extray, final int dividerx4, final int dividery) {
-        final int gx = ((30 * extrax4) / dividerx4);
-        final int gy = ((30 * extray) / dividery);
-        final int x1 = (gx / 6);
-        final int y1 = (gy / 5);
-        String s = "-" + ENCODE_CHARS[((y1 * 5) + x1)];
-        final int x2 = (gx % 6);
-        final int y2 = (gy % 5);
-        s += ENCODE_CHARS[((y2 * 6) + x2)];
+    private static String encodeExtension(final int extrax4, final int extray, final int dividerx4, final int dividery, final int ydirection) {
+        int extraDigits = 8; // always generate 8 digits
+        final double MAX_PRECISION_FACTOR = 810000; // 30^4 (correct for 8 precision digits)
+
+        final double encfraclon = 0; // TODO @@@ should be the fraction (of millionths)
+        final double encfraclat = 0; // TODO @@@
+
+        double factorx = MAX_PRECISION_FACTOR * dividerx4;
+        double factory = MAX_PRECISION_FACTOR * dividery;
+        double valx = (MAX_PRECISION_FACTOR * extrax4) + encfraclon;
+        double valy = (MAX_PRECISION_FACTOR * extray ) + (ydirection * encfraclat);
+
+        String s = "-";
+
+        while (true) {
+            factorx /= 30;
+            final int gx = (int)(valx / factorx);
+          
+            factory /= 30;
+            final int gy = (int)(valy / factory);
+
+            s += ENCODE_CHARS[((gy / 5) * 5) + (gx / 6)];
+            if (--extraDigits == 0) break;
+
+            s += ENCODE_CHARS[(((gy % 5) * 6) + (gx % 6))];
+            if (--extraDigits == 0) break;
+
+            valx -= factorx * gx;
+            valy -= factory * gy;
+        }
         return s;
     }
 
@@ -258,7 +279,7 @@ class Encoder {
             result = result.charAt(0) + "." + result.charAt(1) + result.substring(3);
         }
 
-        result += encodeExtension(extrax << 2, extray, dividerx << 2, dividery); // grid
+        result += encodeExtension(extrax << 2, extray, dividerx << 2, dividery, 1); // grid
 
         return Data.headerLetter(m) + result;
     }
@@ -317,7 +338,7 @@ class Encoder {
                 autoheader_result.append(encodeTriple(vx % 168, vy % 176));
 
                 autoheader_result.append(
-                        encodeExtension(extrax << 2, extray, dividerx << 2, dividery)); // for encodeAutoHeader
+                        encodeExtension(extrax << 2, extray, dividerx << 2, dividery, -1)); // for encodeAutoHeader
                 return autoheader_result.toString();
             }
 
@@ -407,7 +428,7 @@ class Encoder {
                 result = result.substring(0, 3) + '.' + result.substring(3);
             }
         }
-        result += encodeExtension(extrax4, extray, dividerx4, dividery); // for encodeNameless
+        result += encodeExtension(extrax4, extray, dividerx4, dividery, -1); // for encodeNameless
 
         return result;
     }

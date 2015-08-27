@@ -101,28 +101,14 @@ public class EncodeDecodeTest {
 
                                 // Check max distance.
                                 final String codePrecision0 = mapcode.getCode(0);
-                                final String codePrecision1 = mapcode.getCode(1);
-                                final String codePrecision2 = mapcode.getCode(2);
-
-                                final Point decodeLocationPrecision0 = MapcodeCodec.decode(codePrecision0, territory);
-                                final Point decodeLocationPrecision1 = MapcodeCodec.decode(codePrecision1, territory);
-                                final Point decodeLocationPrecision2 = MapcodeCodec.decode(codePrecision2, territory);
-
-                                final double distancePrecision0Meters = Point.distanceInMeters(encode, decodeLocationPrecision0);
-                                final double distancePrecision1Meters = Point.distanceInMeters(encode, decodeLocationPrecision1);
-                                final double distancePrecision2Meters = Point.distanceInMeters(encode, decodeLocationPrecision2);
-
-                                if (distancePrecision0Meters >= Mapcode.getSafeMaxOffsetInMeters(0)) {
-                                    LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision0Meters = " + distancePrecision0Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(0));
-                                    errors.getAndIncrement();
-                                }
-                                if (distancePrecision1Meters >= Mapcode.getSafeMaxOffsetInMeters(1)) {
-                                    LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision1Meters = " + distancePrecision1Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(1));
-                                    errors.getAndIncrement();
-                                }
-                                if (distancePrecision2Meters >= Mapcode.getSafeMaxOffsetInMeters(2)) {
-                                    LOG.error("encodeDecodeTest: " + mapcode + " distancePrecision2Meters = " + distancePrecision2Meters + " >= " + Mapcode.getSafeMaxOffsetInMeters(2));
-                                    errors.getAndIncrement();
+                                for (int nrDigits = 0; nrDigits <= 8; nrDigits++) {
+                                    final String codePrecision = mapcode.getCode(nrDigits);
+                                    final Point decodeLocationPrecision = MapcodeCodec.decode(codePrecision, territory);
+                                    final double distance = Point.distanceInMeters(encode, decodeLocationPrecision);
+                                    if (distance >= Mapcode.getSafeMaxOffsetInMeters(nrDigits)) {
+                                        LOG.error("encodeDecodeTest: " + mapcode + " digits = " + nrDigits + " distance = " + distance + " >= " + Mapcode.getSafeMaxOffsetInMeters(nrDigits));
+                                        errors.getAndIncrement();
+                                    }
                                 }
 
                                 // Check conversion from/to alphabets.

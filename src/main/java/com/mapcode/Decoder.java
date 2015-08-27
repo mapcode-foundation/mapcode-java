@@ -342,7 +342,7 @@ class Decoder {
         final int cornery = rely + (dify * dividery);
         final int cornerx = relx + (difx * dividerx);
 
-        return decodeExtension(cornery, cornerx, dividerx << 2, dividery, 1, extrapostfix);
+        return decodeExtension(cornery, cornerx, dividerx << 2, dividery, extrapostfix, 0); // grid
     }
 
     @Nonnull
@@ -447,7 +447,7 @@ class Decoder {
 
         final int cornerx = minx + ((dx * dividerx4) / 4);
         final int cornery = maxy - (dy * dividery);
-        return decodeExtension(cornery, cornerx, dividerx4, dividery, -1, extrapostfix);
+        return decodeExtension(cornery, cornerx, dividerx4, -dividery, extrapostfix, ((dx * dividerx4) % 4) ); // nameless
     }
 
     @Nonnull
@@ -506,7 +506,7 @@ class Decoder {
                     return Point.undefined(); // corner out of bounds
                 }
 
-                return decodeExtension(cornery, cornerx, dividerx << 2, dividery, -1, extrapostfix);
+                return decodeExtension(cornery, cornerx, dividerx << 2, -dividery, extrapostfix, 0); // autoheader
             }
             storageStart += product;
             i++;
@@ -717,28 +717,65 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeExtension(final int y, final int x, final int dividerx4, final int dividery, final int ydirection, final String extrapostfix) {
-        if (!extrapostfix.isEmpty()) {
-            int c1 = (int) extrapostfix.charAt(0);
+    private static Point decodeExtension(final int y, final int x, final int dividerx4, final int dividery, final String extrapostfix, final int lon_offset4) {
+        final double dividerx = dividerx4 / 4;
+        double processor = 1;
+        double lon32 = 0;
+        double lat32 = 0;
+        boolean odd = false;
+        int idx = 0;
+        // decode up to 8 characters
+        final int len = extrapostfix.length() > 8 ? 8 : extrapostfix.length();
+        while (idx < len) {
+            int c1 = (int) extrapostfix.charAt(idx++);
             c1 = DECODE_CHARS[c1];
             if (c1 < 0 || c1 == 30) {
                 return Point.undefined();
             }
             final int y1 = c1 / 5;
             final int x1 = c1 % 5;
-            int c2 = (extrapostfix.length() == 2) ? (int) extrapostfix.charAt(1) : 72;
-            c2 = DECODE_CHARS[c2];
-            if (c2 < 0 || c2 == 30) {
-                return Point.undefined();
+            final int y2;
+            final int x2;
+            if (idx < len) {
+                int c2 = (int) extrapostfix.charAt(idx++);
+                c2 = DECODE_CHARS[c2];
+                if (c2 < 0 || c2 == 30) {
+                    return Point.undefined();
+                }
+                y2 = c2 / 6;
+                x2 = c2 % 6;
+            } else {
+                odd = true;
+                y2 = 0;
+                x2 = 0;
             }
-            final int y2 = c2 / 6;
-            final int x2 = c2 % 6;
 
-            final int extrax = ((((x1 * 12) + (2 * x2) + 1) * dividerx4) + 120) / 240;
-            final int extray = ((((y1 * 10) + (2 * y2) + 1) * dividery) + 30) / 60;
-
-            return Point.fromMicroDeg(y + (extray * ydirection), x + extrax);
+            processor *= 30;
+            lon32 = lon32 * 30 + (x1 * 6) + x2;
+            lat32 = lat32 * 30 + (y1 * 5) + y2;
         }
-        return Point.fromMicroDeg(y + ((dividery / 2) * ydirection), x + (dividerx4 / 8));
+
+        double lat = y + ((lat32 * dividery) / processor);
+        double lon = x + ((lon32 * dividerx) / processor) + ( lon_offset4 / 4.0 );
+
+        /* FORCE_RECODE : TO DO!
+        var range = {minlon:lon, maxlon:lon, minlat:lat, maxlat:lat};
+        if (odd) {
+            range.maxlon += (dividerx / (processor / 6));
+            range.maxlat += (dividery / (processor / 5));
+        } else {
+            range.maxlon += (dividerx / processor);
+            range.maxlat += (dividery / processor);
+        } // FORCE_RECODE */
+
+        if (odd) {
+            lon += (dividerx / (2 * (processor / 6)));
+            lat += (dividery / (2 * (processor / 5)));
+        } else {
+            lon += (dividerx / (2 * processor));
+            lat += (dividery / (2 * processor));
+        } // not odd
+
+        return Point.fromDeg( lat / 1000000.0, lon / 1000000.0 );
     }
 }

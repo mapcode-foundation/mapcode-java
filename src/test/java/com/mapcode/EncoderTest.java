@@ -60,6 +60,31 @@ public class EncoderTest {
         assertEquals("CHN KQLF.C2K7", results.get(i++).getCodeWithTerritory());
         assertEquals("AAA PRP60.0RVD", results.get(i++).getCodeWithTerritory());
         assertEquals(i, results.size());
+
+        // retrieve at different precisions
+        i = 0;
+        assertEquals("MMR 9Z3R.YKP-B4HPXXKP", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-NL WKS.H6-32112113", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-NL X57.Q6V-L4WW00TS", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-NL W7Y.9WBB-NQD30000", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-NL YT0.W584-FL321003", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-NL XBN8.W4TD-WL8H46QJ", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-AR 51.XYW3-6DG4", results.get(i++).getCodeWithTerritory(4));
+        assertEquals("IN-AR W7Y.9WBB-NQD30000", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-AR YT0.W584-FL321003", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-AR XBN8.W4TD-WL", results.get(i++).getCodeWithTerritory(2));
+        assertEquals("IN-AS SC86.C8-5TQ30000", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-AS W7Y.9WBB-NQD30000", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IN-AS YT0.W584-F", results.get(i++).getCodeWithTerritory(1));
+        assertEquals("IN-AS XBN8.W4TD-WL8H46QJ", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("IND W7Y.9WBB", results.get(i++).getCodeWithTerritory(0));
+        assertEquals("IND YT0.W584-FL", results.get(i++).getCodeWithTerritory(2));
+        assertEquals("IND XBN8.W4TD-WL8", results.get(i++).getCodeWithTerritory(3));
+        assertEquals("CN-XZ SZW8.2TR-VJFX4DX", results.get(i++).getCodeWithTerritory(7));
+        assertEquals("CN-XZ KQLF.C2K7-FG2S8QMK", results.get(i++).getCodeWithTerritory(8));
+        assertEquals("CHN KQLF.C2K7-FG2S8", results.get(i++).getCodeWithTerritory(5));
+        assertEquals("AAA PRP60.0RVD-VK1X5LHD", results.get(i++).getCodeWithTerritory(8));
+        assertEquals(i, results.size());
     }
 
     @Test

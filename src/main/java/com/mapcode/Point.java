@@ -290,9 +290,11 @@ public class Point {
      * @return Mapped to [-180, 180).
      */
     static double mapToLon(final double value) {
+        if ( value > -180 && value < 180 )
+          return value; // already in range
         double lon = (((((value >= 0) ? value : -value) + 180) % 360) - 180) * ((value >= 0) ? 1.0 : -1.0);
         if (Double.compare(lon, 180.0) == 0) {
-            lon = -lon;
+            return -180;
         }
         return lon;
     }

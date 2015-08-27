@@ -58,13 +58,7 @@ public final class Mapcode {
     private final Territory territory;
 
     @Nonnull
-    private final String codePrecision0;    // No additional precision characters.
-
-    @Nonnull
-    private final String codePrecision1;    // One precision character suffix.
-
-    @Nonnull
-    private final String codePrecision2;    // Two precision characters suffix.
+    private final String codePrecision8;    // Internally, codes are always stored at precision 8
 
     /**
      * Create a mapcode object. Normally, mapcodes are created be encoding a lat/lon pair
@@ -90,15 +84,29 @@ public final class Mapcode {
         if (containsTerritory(ascii)) {
             throw new IllegalArgumentException("Must not contain territory: " + code);
         }
-        final String codeUppercase = ascii.toUpperCase();
-        this.codePrecision2 = codeUppercase;
-        if (codeUppercase.contains("-")) {
-            this.codePrecision0 = codeUppercase.substring(0, codeUppercase.length() - 3);
-            this.codePrecision1 = codeUppercase.substring(0, codeUppercase.length() - 1);
-        } else {
-            this.codePrecision0 = codeUppercase;
-            this.codePrecision1 = codeUppercase;
+
+        // Build codeUppercase with EXACTLY eight precision digits
+        String codeUppercase = ascii.toUpperCase();
+        final int hyphenPos = codeUppercase.indexOf("-");
+        if (hyphenPos < 0) {
+            codeUppercase = codeUppercase + "-K3000000";
+        } 
+        else {
+            final int extensionLength = codeUppercase.length() - 1 - hyphenPos;
+            if (extensionLength < 8) {
+                if ((extensionLength % 2) == 1) { // odd extension
+                    codeUppercase = codeUppercase + ("HH000000".substring(0, 8 - extensionLength));
+                }
+                else { // even extension
+                    codeUppercase = codeUppercase + ("K3000000".substring(0, 8 - extensionLength));
+                }
+            }
+            else if (extensionLength > 8) { // cut to 8 characters
+                codeUppercase = codeUppercase.substring(0, hyphenPos + 9);
+            }
         }
+
+        this.codePrecision8 = codeUppercase;
         this.territory = territory;
     }
 
@@ -106,54 +114,50 @@ public final class Mapcode {
      * Get the Mapcode string (without territory information) with standard precision.
      * The returned mapcode does not include the '-' separator and additional digits.
      *
-     * The returned precision is approximately 5 meters. The precision is defined as the maximum distance to the
-     * (latitude, longitude) pair that encoded to this mapcode, which means the mapcode defines an area of
-     * approximately 10 x 10 meters (100 m2).
+     * A mapcode defines an area of approximately 10 x 10 meters (100 m2) and will decode
+     * to the center of that area. On average, the original coordinate will be 3.6 meters
+     * from this center: the average inaccuracy of a mapcode.
      *
      * @param alphabet Alphabet.
      * @return Mapcode string.
      */
     @Nonnull
     public String getCode(@Nullable final Alphabet alphabet) {
-        return convertStringToAlphabet(codePrecision0, alphabet);
+        return getCode(0, alphabet);
     }
 
     @Nonnull
     public String getCode() {
-        return convertStringToAlphabet(codePrecision0, null);
+        return getCode(0, null);
     }
 
     /**
      * Get the mapcode code (without territory information) with a specified precision.
-     * The returned mapcode includes a '-' separator and additional digits for precisions 1 and 2.
+     * The returned mapcode includes a '-' separator and additional digits for precisions 1 to 8.
      *
      * The precision defines the size of a geographical area a single mapcode covers. This means It also defines
      * the maximum distance to the location, a (latitude, longitude) pair, that encoded to this mapcode.
      *
-     * Precision 0: area is approx 10 x 10 meters; max. distance from original location less than 7.5 meters.
-     *
-     * Precision 1: area is approx 2 x 2 meters; max. distance from original location less than 1.5 meters.
-     *
-     * Precision 2: area is approx 0.35 x 0.35 meters; max. distance from original location less than 0.26 meters.
+     * Precision 0: area is approx 10 x 10 meters (100 m2); max. distance from original location less than 7.5 meters.
+     * Precision 1: area is approx 3.33 m2; max. distance from original location less than 1.5 meters.
+     * Precision 1: area is approx 0.11 m2; max. distance from original location less than 0.4 meters.
+     *   etc. (each level reduces the area by a factor of 30)
      *
      * The accuracy is slightly better than the figures above, but these figures are safe assumptions.
      *
-     * @param precision Precision. Range: 0..2.
+     * @param precision Precision. Range: 0..8.
      * @param alphabet  Alphabet.
      * @return Mapcode code.
-     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 2]).
+     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 8]).
      */
     @Nonnull
     public String getCode(final int precision, @Nullable final Alphabet alphabet) {
-        switch (precision) {
-            case 0:
-                return convertStringToAlphabet(codePrecision0, alphabet);
-            case 1:
-                return convertStringToAlphabet(codePrecision1, alphabet);
-            case 2:
-                return convertStringToAlphabet(codePrecision2, alphabet);
-            default:
-                throw new IllegalArgumentException("getCodePrecision: precision must be in [0, 2]");
+        if (precision == 0) {
+            return convertStringToAlphabet(codePrecision8.substring(0, codePrecision8.length() - 9), alphabet);
+        } else if (precision <= 8) {
+            return convertStringToAlphabet(codePrecision8.substring(0, codePrecision8.length() - 8 + precision), alphabet);
+        } else {
+            throw new IllegalArgumentException("getCodePrecision: precision must be in [0, 8]");
         }
     }
 
@@ -171,10 +175,10 @@ public final class Mapcode {
      * Netherlands 49.4V           (regular code)
      * Netherlands 49.4V-K2        (high precision code)
      *
-     * @param precision Precision specifier. Range: [0, 2].
+     * @param precision Precision specifier. Range: [0, 8].
      * @param alphabet  Alphabet.
      * @return Full international mapcode.
-     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 2]).
+     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 8]).
      */
     @Nonnull
     public String getCodeWithTerritoryFullname(final int precision, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
@@ -206,10 +210,10 @@ public final class Mapcode {
      * NLD 49.4V                   (regular code)
      * NLD 49.4V-K2                (high-precision code)
      *
-     * @param precision Precision specifier. Range: [0, 2].
+     * @param precision Precision specifier. Range: [0, 8].
      * @param alphabet  Alphabet.
      * @return Short-hand international mapcode.
-     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 2]).
+     * @throws IllegalArgumentException Thrown if precision is out of range (must be in [0, 8]).
      */
     @Nonnull
     public String getCodeWithTerritory(final int precision, @Nullable final Alphabet alphabet) throws IllegalArgumentException {
@@ -248,9 +252,11 @@ public final class Mapcode {
     @Nonnull
     static final String REGEX_TERRITORY = "[\\p{L}\\p{N}]{2,3}+([-_][\\p{L}\\p{N}]{2,3}+)?";
     @Nonnull
-    static final String REGEX_CODE_PART = "[\\p{L}\\p{N}]{2,5}+";
+    static final String REGEX_CODE_PREFIX = "[\\p{L}\\p{N}]{2,5}+";
     @Nonnull
-    static final String REGEX_CODE_PRECISION = "[-][\\p{L}\\p{N}&&[^zZ]]{1,2}+";
+    static final String REGEX_CODE_POSTFIX = "[\\p{L}\\p{N}]{2,4}+";
+    @Nonnull
+    static final String REGEX_CODE_PRECISION = "[-][\\p{L}\\p{N}&&[^zZ]]{1,8}+";
 
     /**
      * This patterns/regular expressions is used for checking mapcode format strings.
@@ -258,7 +264,7 @@ public final class Mapcode {
      */
     @Nonnull
     public static final String REGEX_MAPCODE = '(' + REGEX_TERRITORY + "[ ]+)?" +
-            REGEX_CODE_PART + "[.]" + REGEX_CODE_PART + '(' + REGEX_CODE_PRECISION + ")?";
+            REGEX_CODE_PREFIX + "[.]" + REGEX_CODE_POSTFIX + '(' + REGEX_CODE_PRECISION + ")?";
 
     @Nonnull
     static final Pattern PATTERN_MAPCODE = Pattern.compile('^' + REGEX_MAPCODE + '$');
@@ -273,7 +279,13 @@ public final class Mapcode {
     public enum PrecisionFormat {
         PRECISION_0,
         PRECISION_1,
-        PRECISION_2;
+        PRECISION_2,
+        PRECISION_3,
+        PRECISION_4,
+        PRECISION_5,
+        PRECISION_6,
+        PRECISION_7,
+        PRECISION_8;
 
         public static PrecisionFormat fromNumber(final int number) {
             switch (number) {
@@ -283,8 +295,20 @@ public final class Mapcode {
                     return PRECISION_1;
                 case 2:
                     return PRECISION_2;
+                case 3:
+                    return PRECISION_3;
+                case 4:
+                    return PRECISION_4;
+                case 5:
+                    return PRECISION_5;
+                case 6:
+                    return PRECISION_6;
+                case 7:
+                    return PRECISION_7;
+                case 8:
+                    return PRECISION_8;
                 default:
-                    throw new UnknownPrecisionFormatException("Precision must be in [0, 2], is: " + number, number);
+                    throw new UnknownPrecisionFormatException("Precision must be in [0, 8], is: " + number, number);
             }
         }
     }
@@ -317,12 +341,26 @@ public final class Mapcode {
         if (!matcherPrecision.find()) {
             return PrecisionFormat.PRECISION_0;
         }
-        final int length = matcherPrecision.end() - matcherPrecision.start();
-        assert (2 <= length) && (length <= 3);
-        if (length == 2) {
+        final int length = matcherPrecision.end() - matcherPrecision.start() - 1;
+        assert (1 <= length) && (length <= 8);
+        switch (length) {
+          case 1:
             return PrecisionFormat.PRECISION_1;
+          case 2:
+            return PrecisionFormat.PRECISION_2;
+          case 3:
+            return PrecisionFormat.PRECISION_3;
+          case 4:
+            return PrecisionFormat.PRECISION_4;
+          case 5:
+            return PrecisionFormat.PRECISION_5;
+          case 6:
+            return PrecisionFormat.PRECISION_6;
+          case 7:
+            return PrecisionFormat.PRECISION_7;
+          default:
+            return PrecisionFormat.PRECISION_8;
         }
-        return PrecisionFormat.PRECISION_2;
     }
 
     /**
@@ -360,10 +398,20 @@ public final class Mapcode {
      * This array defines the safe maximum offset between a decoded mapcode and its original
      * location used for encoding the mapcode.
      */
-    private static final double[] PRECISION_0_MAX_OFFSET_METERS = {10.0, 2.0, 0.4};
-        /*
-        8.0 , 1.60 , 0.32, 
-        /* @@@ correct values
+    private static final double[] PRECISION_0_MAX_OFFSET_METERS = { 
+        // @@@ problem: encode() rounds to millionths, introducing a consistent error !
+        7.50,    
+        1.50,    
+        0.365,    
+        0.160,    
+        0.122,   
+        0.113,   
+        0.113, 
+        0.113,
+        0.113,
+        };
+
+        /* @@@ correct values TODO
         7.49,         // PRECISION_0: 7.49 meters or less       7.5 m
         1.45,         // PRECISION_1: 1.45 meters or less       1.5 m
         0.251,        // PRECISION_2: 25.1 cm or less           25 cm
@@ -388,8 +436,8 @@ public final class Mapcode {
      * @return Maximum offset in meters.
      */
     public static double getSafeMaxOffsetInMeters(final int precision) {
-        if ((precision < 0) || (precision > 2)) {
-            throw new IllegalArgumentException("precision must be in [0, 2]");
+        if ((precision < 0) || (precision > 8)) {
+            throw new IllegalArgumentException("precision must be in [0, 8]");
         }
         return PRECISION_0_MAX_OFFSET_METERS[precision];
     }
@@ -433,7 +481,7 @@ public final class Mapcode {
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(new Object[]{codePrecision0, codePrecision1, codePrecision2, territory});
+        return Arrays.deepHashCode(new Object[]{codePrecision8, territory});
     }
 
     @Override
@@ -445,9 +493,7 @@ public final class Mapcode {
             return false;
         }
         final Mapcode that = (Mapcode) obj;
-        return codePrecision0.equals(that.codePrecision0) &&
-                codePrecision1.equals(that.codePrecision1) &&
-                codePrecision2.equals(that.codePrecision2) &&
+        return codePrecision8.equals(that.codePrecision8) &&
                 (this.territory.equals(that.territory));
     }
 }
