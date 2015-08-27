@@ -402,13 +402,13 @@ public final class Mapcode {
         // @@@ problem: encode() rounds to millionths, introducing a consistent error !
         7.50,    
         1.50,    
-        0.365,    
-        0.160,    
-        0.122,   
-        0.113,   
-        0.113, 
-        0.113,
-        0.113,
+        0.39,     
+        0.19,     
+        0.149,   
+        0.14,   
+        0.14, 
+        0.14,
+        0.14,
         };
 
         /* @@@ correct values TODO
