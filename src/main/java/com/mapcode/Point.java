@@ -54,15 +54,27 @@ public class Point {
      */
     @Nonnull
     public static Point fromDeg(final double latDeg, final double lonDeg) {
-        return new Point(latDeg, lonDeg, true);
+        return new Point(latDeg, lonDeg);
+    }
+
+    @Nonnull
+    public static Point fromPoint(@Nonnull final Point point) {
+        Point p = new Point();
+        p.lat32 = point.lat32;
+        p.lon32 = point.lon32;
+        p.fraclat = point.fraclat;
+        p.fraclon = point.fraclon;
+        p.defined = point.defined;
+        return p;
     }
 
     // Constants to handle fractions without floating point error accumulation
     private static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
     public static final double MAX_PRECISION_FACTOR = 810000.0;
-    public static final double FRACLON_PRECISION_FACTOR = 3240000.0;
-    private static final double MICROLAT_MAX_PRECISION_FACTOR = (MICRODEG_TO_DEG_FACTOR*MAX_PRECISION_FACTOR);
-    private static final double MICROLON_MAX_PRECISION_FACTOR = (MICRODEG_TO_DEG_FACTOR*FRACLON_PRECISION_FACTOR);
+    private static final double FRACLON_PRECISION_FACTOR = 3240000.0;
+    private static final double FRACLAT_PRECISION_FACTOR = 810000.0;
+    private static final double MICROLAT_MAX_PRECISION_FACTOR = (MICRODEG_TO_DEG_FACTOR * FRACLAT_PRECISION_FACTOR);
+    private static final double MICROLON_MAX_PRECISION_FACTOR = (MICRODEG_TO_DEG_FACTOR * FRACLON_PRECISION_FACTOR);
 
     /**
      * Get the latitude in degrees.
@@ -217,6 +229,34 @@ public class Point {
     private double fraclat; // whole nr of MICROLAT_MAX_PRECISION_FACTOR, relative to lat32
     private double fraclon; // whole nr of MICROLON_MAX_PRECISION_FACTOR, relative to lon32
 
+    public void setMaxLatToMicroDeg(final int maxMicroLat) {
+        if ( (lat32 > maxMicroLat) || ((lat32 == maxMicroLat) && (fraclat>0)) ) {
+          lat32 = maxMicroLat-1;
+          fraclat = FRACLAT_PRECISION_FACTOR - 1;
+        }
+    }
+
+    public void setMaxLonToMicroDeg(final int maxMicroLon) {
+        if ( (lon32 > maxMicroLon) || ((lon32 == maxMicroLon) && (fraclon>0)) ) {
+          lon32 = maxMicroLon-1;
+          fraclon = FRACLON_PRECISION_FACTOR - 1;
+        }
+    }
+
+    public void setMinLatToMicroDeg(final int minMicroLat) {
+        if (lat32 < minMicroLat) {
+            lat32 = minMicroLat;
+            fraclat = 0;
+        }
+    }
+
+    public void setMinLonToMicroDeg(final int minMicroLon) {
+        if (lon32 < minMicroLon) {
+            lon32 = minMicroLon;
+            fraclon = 0;
+        }
+    }
+
     /**
      * Points can be "undefined" within the mapcode implementation, but never outside of that.
      * Any methods creating or setting undefined points must be package private and external
@@ -231,16 +271,16 @@ public class Point {
         defined = false;
     }
 
-    private Point(final double latDeg, final double lonDeg, final boolean wrap) {
+    private Point(final double latDeg, final double lonDeg) {
 
         double lat = latDeg + 90;
         if (lat < 0) { lat = 0; } else if (lat > 180) { lat = 180; }
         // lat now [0..180]
         lat *= MICROLAT_MAX_PRECISION_FACTOR;
         fraclat  = Math.floor(lat + 0.1);
-        double f = fraclat / MAX_PRECISION_FACTOR;
+        double f = fraclat / FRACLAT_PRECISION_FACTOR;
         lat32 = (int) f;
-        fraclat  -= ((double) lat32 * MAX_PRECISION_FACTOR);
+        fraclat  -= ((double) lat32 * FRACLAT_PRECISION_FACTOR);
         lat32 -= 90000000;
 
         double lon = lonDeg - (360.0 * Math.floor(lonDeg / 360)); // lon now in [0..360>
