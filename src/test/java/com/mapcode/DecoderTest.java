@@ -105,15 +105,12 @@ public class DecoderTest {
         point = MapcodeCodec.decode("NLD P42.NB1-0");
         assertEquals("decode 8-precision latitude", 51999954, point.getLatMicroDeg());
         assertEquals("decode 8-precision longitude", 4999900, point.getLonMicroDeg());
-        LOG.info("NLD P42.NB1-0 = " + point);
         point = MapcodeCodec.decode("NLD P42.NB1-123");
         assertEquals("decode 8-precision latitude", 51999948, point.getLatMicroDeg());
         assertEquals("decode 8-precision longitude", 4999924, point.getLonMicroDeg());
-        LOG.info("NLD P42.NB1-123 = " + point);
         point = MapcodeCodec.decode("NLD P42.NB1-MVRGBD0S");
         assertEquals("decode 8-precision latitude", 51999999, point.getLatMicroDeg());
         assertEquals("decode 8-precision longitude", 5000000, point.getLonMicroDeg());
-        LOG.info("NLD P42.NB1-MVRGBD0S = " + point);
     }
 
     @Test
