@@ -170,6 +170,25 @@ public class EncoderTest {
 
         final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
         assertEquals("NLD 49.4V", result.getCodeWithTerritory());
+
+        // test extremely precise encoding
+        {
+          double lat2 = 52.3, lon2 = 4.908;
+          Mapcode m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
+          assertEquals("NLD GG.NBC-SHR33333", m.getCodeWithTerritory(8));
+          lat2 = 52.3000004; lon2 = 4.9080004;
+          m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
+          assertEquals("NLD GG.NBC-SHSS1010", m.getCodeWithTerritory(8));
+          lat2 = 52.299999999; lon2 = 4.907999999;
+          m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
+          assertEquals("NLD GG.NBC-SHLWXWQB", m.getCodeWithTerritory(8));
+          lat2 = 52.29993200000; lon2 = 4.90786600000;
+          m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
+          assertEquals("NLD GG.NBC-00000000", m.getCodeWithTerritory(8));
+          lat2 = 52.29993200000; lon2 = 4.9078659999999;
+          m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
+          assertEquals("NLD GG.N98-45454545", m.getCodeWithTerritory(8));          
+        }
     }
 
     @Test

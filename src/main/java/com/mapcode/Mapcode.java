@@ -399,19 +399,6 @@ public final class Mapcode {
      * location used for encoding the mapcode.
      */
     private static final double[] PRECISION_0_MAX_OFFSET_METERS = { 
-        // @@@ problem: encode() rounds to millionths, introducing a consistent error !
-        7.50,    
-        1.50,    
-        0.39,     
-        0.19,     
-        0.149,   
-        0.14,   
-        0.14, 
-        0.14,
-        0.14,
-        };
-
-        /* @@@ correct values TODO
         7.49,         // PRECISION_0: 7.49 meters or less       7.5 m
         1.45,         // PRECISION_1: 1.45 meters or less       1.5 m
         0.251,        // PRECISION_2: 25.1 cm or less           25 cm
@@ -421,8 +408,7 @@ public final class Mapcode {
         0.000279,     // PRECISION_6: 279 micrometer or less    1/3 mm
         0.0000514,    // PRECISION_7: 51.4 micrometer or less   1/20 mm
         0.0000093     // PRECISION_8: 9.3 micrometer or less    1/100 mm
-        */
-  
+    };
 
     /**
      * Get a safe maximum for the distance between a decoded mapcode and its original

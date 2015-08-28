@@ -717,11 +717,11 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeExtension(final int y, final int x, final int dividerx4, final int dividery, final String extrapostfix, final int lon_offset4) {
-        final double dividerx = dividerx4 / 4;
+    private static Point decodeExtension(final int y, final int x, final int dividerx4, final int dividery0, final String extrapostfix, final int lon_offset4) {
+        final double dividerx = dividerx4 / 4.0, dividery = (double) dividery0;
         double processor = 1;
-        double lon32 = 0;
-        double lat32 = 0;
+        int lon32 = 0;
+        int lat32 = 0;
         boolean odd = false;
         int idx = 0;
         // decode up to 8 characters

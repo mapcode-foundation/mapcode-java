@@ -71,7 +71,7 @@ public class Point {
      */
     public double getLatDeg() {
         assert defined;
-        return latDeg;
+        return (lat32 / MICRODEG_TO_DEG_FACTOR) + (fraclat / MICROLAT_MAX_PRECISION_FACTOR);
     }
 
     /**
@@ -81,7 +81,7 @@ public class Point {
      */
     public double getLonDeg() {
         assert defined;
-        return lonDeg;
+        return (lon32 / MICRODEG_TO_DEG_FACTOR) + (fraclon / MICROLON_MAX_PRECISION_FACTOR);
     }
 
 
@@ -90,14 +90,14 @@ public class Point {
      */
     public double LonFractions() {
         assert defined;
-        return 0;
+        return fraclon;
     }
     /**
      * Returns "fractions", which is a whole number of 1/MICROLAT_MAX_PRECISION_FACTORth degrees versus the millionths of degrees
      */
     public double LatFractions() {
         assert defined;
-        return 0;
+        return fraclat;
     }
 
 
@@ -146,22 +146,19 @@ public class Point {
         checkNonnull("p1", p1);
         checkNonnull("p2", p2);
 
-        final Point from;
-        final Point to;
-        if (p1.lonDeg <= p2.lonDeg) {
-            from = p1;
-            to = p2;
-        } else {
-            from = p2;
-            to = p1;
-        }
+        final double latDeg1 = p1.getLatDeg();
+        final double latDeg2 = p2.getLatDeg();
+        double lonDeg1 = p1.getLonDeg();
+        double lonDeg2 = p2.getLonDeg();
+
+        if (lonDeg1 < 0 && lonDeg2 > 1) { lonDeg1 += 360; }
+        if (lonDeg2 < 0 && lonDeg1 > 1) { lonDeg2 += 360; }
 
         // Calculate mid point of 2 latitudes.
-        final double avgLat = from.latDeg + ((to.latDeg - from.latDeg) / 2.0);
+        final double avgLat = (p1.getLatDeg() + p2.getLatDeg()) / 2.0;
 
-        final double deltaLonDeg360 = Math.abs(to.lonDeg - from.lonDeg);
-        final double deltaLonDeg = ((deltaLonDeg360 <= 180.0) ? deltaLonDeg360 : (360.0 - deltaLonDeg360));
-        final double deltaLatDeg = Math.abs(to.latDeg - from.latDeg);
+        final double deltaLatDeg = latDeg1 - latDeg2;
+        final double deltaLonDeg = lonDeg1 - lonDeg2;
 
         // Meters per longitude is fixed; per latitude requires * cos(avg(lat)).
         final double deltaXMeters = degreesLonToMetersAtLat(deltaLonDeg, avgLat);
@@ -186,13 +183,13 @@ public class Point {
     @Nonnull
     @Override
     public String toString() {
-        return defined ? ("(" + latDeg + ", " + lonDeg + ')') : "undefined";
+        return defined ? ("(" + getLatDeg() + ", " + getLonDeg() + ')') : "undefined";
     }
 
     @SuppressWarnings("NonFinalFieldReferencedInHashCode")
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[]{latDeg, lonDeg, defined});
+        return Arrays.hashCode(new Object[]{getLatDeg(), getLonDeg(), defined});
     }
 
     @SuppressWarnings("NonFinalFieldReferenceInEquals")
@@ -205,16 +202,20 @@ public class Point {
             return false;
         }
         final Point that = (Point) obj;
-        return (Double.compare(this.latDeg, that.latDeg) == 0) &&
-                (Double.compare(this.lonDeg, that.lonDeg) == 0) &&
-                (this.defined == that.defined);
+        return (this.lat32 == that.lat32) &&
+               (this.lon32 == that.lon32) &&
+               (Double.compare(this.fraclat, that.fraclat) == 0) &&
+               (Double.compare(this.fraclon, that.fraclon) == 0) &&
+               (this.defined == that.defined);
     }
 
     /**
      * Private data.
      */
-    private double latDeg;     // Latitude, normal range -90..90, but not enforced.
-    private double lonDeg;     // Longitude, normal range -180..180, but not enforced.
+    private int lat32;     // whole nr of MICRODEG_TO_DEG_FACTOR
+    private int lon32;     // whole nr of MICRODEG_TO_DEG_FACTOR
+    private double fraclat; // whole nr of MICROLAT_MAX_PRECISION_FACTOR, relative to lat32
+    private double fraclon; // whole nr of MICROLON_MAX_PRECISION_FACTOR, relative to lon32
 
     /**
      * Points can be "undefined" within the mapcode implementation, but never outside of that.
@@ -227,22 +228,30 @@ public class Point {
      * Private constructors.
      */
     private Point() {
-        latDeg = Double.NaN;
-        lonDeg = Double.NaN;
         defined = false;
     }
 
     private Point(final double latDeg, final double lonDeg, final boolean wrap) {
-        if (wrap) {
-            this.latDeg = mapToLat(latDeg);
-            this.lonDeg = mapToLon(lonDeg);
-            assert (LON_DEG_MIN <= this.lonDeg) && (this.lonDeg <= LON_DEG_MAX) : "lon [-180..180]: " + this.lonDeg;
-            assert (LAT_DEG_MIN <= this.latDeg) && (this.latDeg <= LAT_DEG_MAX) : "lat [-90..90]: " + this.latDeg;
-        } else {
-            this.latDeg = latDeg;
-            this.lonDeg = lonDeg;
-        }
-        this.defined = true;
+
+        double lat = latDeg + 90;
+        if (lat < 0) { lat = 0; } else if (lat > 180) { lat = 180; }
+        // lat now [0..180]
+        lat *= MICROLAT_MAX_PRECISION_FACTOR;
+        fraclat  = Math.floor(lat + 0.1);
+        double f = fraclat / MAX_PRECISION_FACTOR;
+        lat32 = (int) f;
+        fraclat  -= ((double) lat32 * MAX_PRECISION_FACTOR);
+        lat32 -= 90000000;
+
+        double lon = lonDeg - (360.0 * Math.floor(lonDeg / 360)); // lon now in [0..360>
+        lon *= MICROLON_MAX_PRECISION_FACTOR;
+        fraclon = Math.floor(lon + 0.1);
+        f = fraclon / FRACLON_PRECISION_FACTOR;
+        lon32 = (int)f;
+        fraclon -= ((double) lon32 * FRACLON_PRECISION_FACTOR);
+        if (lon32 >= 180000000) { lon32 -= 360000000; }
+
+        defined = true;
     }
 
     /**
@@ -255,7 +264,13 @@ public class Point {
 
     @Nonnull
     static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
-        return new Point(microDegToDeg(latMicroDeg), microDegToDeg(lonMicroDeg), false);
+        Point p = new Point();
+        p.lat32 = latMicroDeg;
+        p.lon32 = lonMicroDeg;
+        p.fraclat = 0;
+        p.fraclon = 0;
+        p.defined = true;
+        return p;
     }
 
     /**
@@ -265,7 +280,7 @@ public class Point {
      */
     int getLatMicroDeg() {
         assert defined;
-        return degToMicroDeg(latDeg);
+        return lat32;
     }
 
     /**
@@ -275,12 +290,12 @@ public class Point {
      */
     int getLonMicroDeg() {
         assert defined;
-        return degToMicroDeg(lonDeg);
+        return lon32;
     }
 
     static int degToMicroDeg(final double deg) {
         //noinspection NumericCastThatLosesPrecision
-        return (int) Math.round(deg * MICRODEG_TO_DEG_FACTOR);
+        return (int) Math.floor(deg * MICRODEG_TO_DEG_FACTOR);
     }
 
     static double microDegToDeg(final int microDeg) {
@@ -290,36 +305,16 @@ public class Point {
     @Nonnull
     Point wrap() {
         if (defined) {
-            this.latDeg = mapToLat(latDeg);
-            this.lonDeg = mapToLon(lonDeg);
+            // Cut latitude to [-90, 90].
+            if (lat32 < -90000000) { lat32 = -90000000; fraclat=0; }
+            if (lat32 >  90000000) { lat32 =  90000000; fraclat=0; }
+            // Map longitude to [-180, 180). Values outside this range are wrapped to this range.
+            if (lon32 < -180000000 || lon32 >= 180000000 ) {
+              lon32 -= 360 * (lon32 / 360); // [0..360)
+              if (lon32 >= 180000000) { lon32 -= 360000000; } // [-180,180)
+            }
         }
         return this;
-    }
-
-    /**
-     * Map a longitude to [-90, 90]. Values outside this range are limited to this range.
-     *
-     * @param value Latitude, any range.
-     * @return Limited to [-90, 90].
-     */
-    static double mapToLat(final double value) {
-        return (value < -90.0) ? -90.0 : ((value > 90.0) ? 90.0 : value);
-    }
-
-    /**
-     * Map a longitude to [-180, 180). Values outside this range are wrapped to this range.
-     *
-     * @param value Longitude, any range.
-     * @return Mapped to [-180, 180).
-     */
-    static double mapToLon(final double value) {
-        if ( value > -180 && value < 180 )
-          return value; // already in range
-        double lon = (((((value >= 0) ? value : -value) + 180) % 360) - 180) * ((value >= 0) ? 1.0 : -1.0);
-        if (Double.compare(lon, 180.0) == 0) {
-            return -180;
-        }
-        return lon;
     }
 
     /**
@@ -338,8 +333,6 @@ public class Point {
      * Only within the mapcode implementation points can be undefined, so this methods is package private.
      */
     void setUndefined() {
-        latDeg = Double.NaN;
-        lonDeg = Double.NaN;
         defined = false;
     }
 
