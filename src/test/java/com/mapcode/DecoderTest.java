@@ -103,14 +103,17 @@ public class DecoderTest {
         assertEqualsWithinMillionth("decode hi-precision latitude", 52376512, point.getLatMicroDeg());
         assertEqualsWithinMillionth("decode hi-precision longitude", 4908540, point.getLonMicroDeg());
         point = MapcodeCodec.decode("NLD P42.NB1-0");
-        assertEquals("decode 8-precision latitude", 51999955, point.getLatMicroDeg());
-        assertEquals("decode 8-precision longitude", 4999901, point.getLonMicroDeg());
+        assertEquals("decode 8-precision latitude", 51999954, point.getLatMicroDeg());
+        assertEquals("decode 8-precision longitude", 4999900, point.getLonMicroDeg());
+        LOG.info("NLD P42.NB1-0 = " + point);
         point = MapcodeCodec.decode("NLD P42.NB1-123");
         assertEquals("decode 8-precision latitude", 51999948, point.getLatMicroDeg());
-        assertEquals("decode 8-precision longitude", 4999925, point.getLonMicroDeg());
+        assertEquals("decode 8-precision longitude", 4999924, point.getLonMicroDeg());
+        LOG.info("NLD P42.NB1-123 = " + point);
         point = MapcodeCodec.decode("NLD P42.NB1-MVRGBD0S");
-        assertEquals("decode 8-precision latitude", 52000000, point.getLatMicroDeg());
+        assertEquals("decode 8-precision latitude", 51999999, point.getLatMicroDeg());
         assertEquals("decode 8-precision longitude", 5000000, point.getLonMicroDeg());
+        LOG.info("NLD P42.NB1-MVRGBD0S = " + point);
     }
 
     @Test

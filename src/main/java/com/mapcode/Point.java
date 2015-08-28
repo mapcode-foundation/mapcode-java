@@ -57,6 +57,13 @@ public class Point {
         return new Point(latDeg, lonDeg, true);
     }
 
+    // Constants to handle fractions without floating point error accumulation
+    private static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
+    public static final double MAX_PRECISION_FACTOR = 810000.0;
+    public static final double FRACLON_PRECISION_FACTOR = 3240000.0;
+    private static final double MICROLAT_MAX_PRECISION_FACTOR = (MICRODEG_TO_DEG_FACTOR*MAX_PRECISION_FACTOR);
+    private static final double MICROLON_MAX_PRECISION_FACTOR = (MICRODEG_TO_DEG_FACTOR*FRACLON_PRECISION_FACTOR);
+
     /**
      * Get the latitude in degrees.
      *
@@ -76,6 +83,23 @@ public class Point {
         assert defined;
         return lonDeg;
     }
+
+
+    /**
+     * Returns "fractions", which is a whole number of 1/MICROLON_MAX_PRECISION_FACTORth degrees versus the millionths of degrees
+     */
+    public double LonFractions() {
+        assert defined;
+        return 0;
+    }
+    /**
+     * Returns "fractions", which is a whole number of 1/MICROLAT_MAX_PRECISION_FACTORth degrees versus the millionths of degrees
+     */
+    public double LatFractions() {
+        assert defined;
+        return 0;
+    }
+
 
     /**
      * Create a random point, uniformly distributed over the surface of the Earth.
@@ -224,7 +248,6 @@ public class Point {
     /**
      * Package private methods. Only used in the mapcode implementation modules.
      */
-    static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
     static final int LON_MICRODEG_MIN = degToMicroDeg(LON_DEG_MIN);
     static final int LON_MICRODEG_MAX = degToMicroDeg(LON_DEG_MAX);
     static final int LAT_MICRODEG_MIN = degToMicroDeg(LAT_DEG_MIN);
