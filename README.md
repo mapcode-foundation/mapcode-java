@@ -16,10 +16,13 @@ Mapcode REST API, which can be found on: **https://github.com/mapcode-foundation
 
 # Release notes
 
-**2.1.0. Added micro-meter precision (mapcodes can now have eight precision digits)
-**2.0.1. Allow java 6 (JDK 1.6) compilation
-**2.0.0. Major update (core data checked, some territories updated, for ISO proposal)
-**Further release notes can be found at: http://mapcode-foundation.github.io/mapcode-java/ReleaseNotes.html**
+* 2.1.0. Added micro-meter precision (mapcodes can now have eight precision digits)
+
+* 2.0.1. Allow java 6 (JDK 1.6) compilation
+
+* 2.0.0. Major update (core data checked, some territories updated, for ISO proposal)
+
+* Further release notes can be found at: http://mapcode-foundation.github.io/mapcode-java/ReleaseNotes.html**
 
 # License
 
