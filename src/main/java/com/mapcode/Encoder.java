@@ -143,8 +143,8 @@ class Encoder {
 
         double factorx = Point.MAX_PRECISION_FACTOR * dividerx4;
         double factory = Point.MAX_PRECISION_FACTOR * dividery;
-        double valx = (Point.MAX_PRECISION_FACTOR * extrax4) + pointToEncode.LonFractions();
-        double valy = (Point.MAX_PRECISION_FACTOR * extray ) + (ydirection * pointToEncode.LatFractions());
+        double valx = (Point.MAX_PRECISION_FACTOR * extrax4) + pointToEncode.getLonFractions();
+        double valy = (Point.MAX_PRECISION_FACTOR * extray ) + (ydirection * pointToEncode.getLatFractions());
 
         String s = "-";
 
@@ -310,7 +310,7 @@ class Encoder {
                 int extray = (maxy - pointToEncode.getLatMicroDeg()) % dividery;
 
                 int value = (vx / 168) * (h / 176);
-                if ((extray==0) && (pointToEncode.LatFractions() > 0)) {
+                if ((extray==0) && (pointToEncode.getLatFractions() > 0)) {
                     vy--;
                     extray += dividery;                    
                 }
@@ -377,7 +377,7 @@ class Encoder {
         final int miny = Data.getBoundaries(index).getMinY();
 
         final int dividerx4 = xDivider(miny, maxy);
-        final int xFracture = (int) (pointToEncode.LonFractions() / Point.MAX_PRECISION_FACTOR);
+        final int xFracture = pointToEncode.getLonFractions() / 810000;
         final int dminx = pointToEncode.getLonMicroDeg() - minx;
         final int dx = ((4 * dminx) + xFracture) / dividerx4;
         final int extrax4 = (4 * dminx) - (dx * dividerx4); // like modulus, but with floating point value
@@ -387,7 +387,7 @@ class Encoder {
         int dy = dmaxy / dividery;
         int extray = dmaxy % dividery;
 
-        if ((extray == 0) && (pointToEncode.LatFractions()>0)) {
+        if ((extray == 0) && (pointToEncode.getLatFractions() > 0)) {
             dy--;
             extray += dividery;
         }
