@@ -195,7 +195,7 @@ public class Point {
     @Nonnull
     @Override
     public String toString() {
-        return defined ? ("(" + getLatDeg() + ", " + getLonDeg() + ')') : "undefined";
+        return defined ? ("(" + (lat32/1000000.0)+"|"+(fraclat/810000.0) + ", " + (lon32/1000000.0)+"|"+(fraclon/3240000.0) + ')') : "undefined";
     }
 
     @SuppressWarnings("NonFinalFieldReferencedInHashCode")
@@ -230,15 +230,16 @@ public class Point {
     private double fraclon; // whole nr of MICROLON_MAX_PRECISION_FACTOR, relative to lon32
 
     public void setMaxLatToMicroDeg(final int maxMicroLat) {
-        if ( (lat32 > maxMicroLat) || ((lat32 == maxMicroLat) && (fraclat>0)) ) {
+        if (lat32 >= maxMicroLat) {
           lat32 = maxMicroLat-1;
           fraclat = FRACLAT_PRECISION_FACTOR - 1;
         }
     }
 
     public void setMaxLonToMicroDeg(final int maxMicroLon) {
-        if ( (lon32 > maxMicroLon) || ((lon32 == maxMicroLon) && (fraclon>0)) ) {
-          lon32 = maxMicroLon-1;
+        int max = (maxMicroLon < 0 && lon32 > 0) ? maxMicroLon + 360000000 : maxMicroLon;
+        if (lon32 >= max) {
+          lon32 = max - 1;
           fraclon = FRACLON_PRECISION_FACTOR - 1;
         }
     }
