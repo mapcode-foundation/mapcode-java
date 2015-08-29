@@ -100,14 +100,14 @@ public class Point {
     /**
      * Returns "fractions", which is a whole number of 1/MICROLON_MAX_PRECISION_FACTORth degrees versus the millionths of degrees
      */
-    public double LonFractions() {
+    public int getLonFractions() {
         assert defined;
         return fraclon;
     }
     /**
      * Returns "fractions", which is a whole number of 1/MICROLAT_MAX_PRECISION_FACTORth degrees versus the millionths of degrees
      */
-    public double LatFractions() {
+    public int getLatFractions() {
         assert defined;
         return fraclat;
     }
@@ -195,7 +195,8 @@ public class Point {
     @Nonnull
     @Override
     public String toString() {
-        return defined ? ("(" + (lat32/1000000.0)+"|"+(fraclat/810000.0) + ", " + (lon32/1000000.0)+"|"+(fraclon/3240000.0) + ')') : "undefined";
+        return defined ? ("(" + (lat32/MICRODEG_TO_DEG_FACTOR) + "|" + (fraclat/FRACLAT_PRECISION_FACTOR) + 
+                         ", " + (lon32/MICRODEG_TO_DEG_FACTOR) + "|" + (fraclon/FRACLON_PRECISION_FACTOR) + ')') : "undefined";
     }
 
     @SuppressWarnings("NonFinalFieldReferencedInHashCode")
@@ -216,23 +217,23 @@ public class Point {
         final Point that = (Point) obj;
         return (this.lat32 == that.lat32) &&
                (this.lon32 == that.lon32) &&
-               (Double.compare(this.fraclat, that.fraclat) == 0) &&
-               (Double.compare(this.fraclon, that.fraclon) == 0) &&
+               (this.fraclat == that.fraclat) &&
+               (this.fraclon == that.fraclon) &&
                (this.defined == that.defined);
     }
 
     /**
      * Private data.
      */
-    private int lat32;     // whole nr of MICRODEG_TO_DEG_FACTOR
-    private int lon32;     // whole nr of MICRODEG_TO_DEG_FACTOR
-    private double fraclat; // whole nr of MICROLAT_MAX_PRECISION_FACTOR, relative to lat32
-    private double fraclon; // whole nr of MICROLON_MAX_PRECISION_FACTOR, relative to lon32
+    private int lat32;   // whole nr of MICRODEG_TO_DEG_FACTOR
+    private int lon32;   // whole nr of MICRODEG_TO_DEG_FACTOR
+    private int fraclat; // whole nr of MICROLAT_MAX_PRECISION_FACTOR, relative to lat32
+    private int fraclon; // whole nr of MICROLON_MAX_PRECISION_FACTOR, relative to lon32
 
     public void setMaxLatToMicroDeg(final int maxMicroLat) {
         if (lat32 >= maxMicroLat) {
           lat32 = maxMicroLat-1;
-          fraclat = FRACLAT_PRECISION_FACTOR - 1;
+          fraclat = (int) FRACLAT_PRECISION_FACTOR - 1;
         }
     }
 
@@ -240,7 +241,7 @@ public class Point {
         int max = (maxMicroLon < 0 && lon32 > 0) ? maxMicroLon + 360000000 : maxMicroLon;
         if (lon32 >= max) {
           lon32 = max - 1;
-          fraclon = FRACLON_PRECISION_FACTOR - 1;
+          fraclon = (int) FRACLON_PRECISION_FACTOR - 1;
         }
     }
 
@@ -274,22 +275,23 @@ public class Point {
 
     private Point(final double latDeg, final double lonDeg) {
 
+        double frac;
         double lat = latDeg + 90;
         if (lat < 0) { lat = 0; } else if (lat > 180) { lat = 180; }
         // lat now [0..180]
         lat *= MICROLAT_MAX_PRECISION_FACTOR;
-        fraclat  = Math.floor(lat + 0.1);
-        double f = fraclat / FRACLAT_PRECISION_FACTOR;
-        lat32 = (int) f;
-        fraclat  -= ((double) lat32 * FRACLAT_PRECISION_FACTOR);
+        frac = Math.floor(lat + 0.1);
+        lat32 = (int) (frac / FRACLAT_PRECISION_FACTOR);
+        frac -= ((double) lat32 * FRACLAT_PRECISION_FACTOR);
+        fraclat = (int) frac;
         lat32 -= 90000000;
 
         double lon = lonDeg - (360.0 * Math.floor(lonDeg / 360)); // lon now in [0..360>
         lon *= MICROLON_MAX_PRECISION_FACTOR;
-        fraclon = Math.floor(lon + 0.1);
-        f = fraclon / FRACLON_PRECISION_FACTOR;
-        lon32 = (int)f;
-        fraclon -= ((double) lon32 * FRACLON_PRECISION_FACTOR);
+        frac = Math.floor(lon + 0.1);        
+        lon32 = (int) (frac / FRACLON_PRECISION_FACTOR);
+        frac -= ((double) lon32 * FRACLON_PRECISION_FACTOR);
+        fraclon = (int) frac;
         if (lon32 >= 180000000) { lon32 -= 360000000; }
 
         defined = true;
