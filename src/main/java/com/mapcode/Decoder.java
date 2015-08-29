@@ -237,8 +237,8 @@ class Decoder {
                                     if (maxx >  decodeLimits.getMinX()) { pt.setMaxLonToMicroDeg(maxx); }
                         
                                     // better?
-                                    if ( pt.getLatDeg()*1000000 > decodeLimits.getMinY() && pt.getLatMicroDeg() < decodeLimits.getMaxY() &&
-                                         pt.getLonDeg()*1000000 > decodeLimits.getMinX() && pt.getLonMicroDeg() < decodeLimits.getMaxX() &&
+                                    if ( pt.getLatDeg()*1000000 > decodeLimits.getMinY() && pt.getLatDeg()*1000000 < decodeLimits.getMaxY() &&
+                                         pt.getLonDeg()*1000000 > decodeLimits.getMinX() && pt.getLonDeg()*1000000 < decodeLimits.getMaxX() &&
                                          Data.getBoundaries(j).containsPoint(pt)) 
                                     {
                                         result = Point.fromPoint(pt);
