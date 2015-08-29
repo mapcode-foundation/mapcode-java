@@ -20,6 +20,97 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+class DecodeLimits {
+
+    // construct empty
+    public void DecodeLimits() {
+        defined = false;
+    }
+
+    // generate upper and lower limits based on x and y, and delta's
+    public void setFromDelta(final double y, final double x, final double yDelta, final double xDelta) {
+        if (xDelta < 0) {
+          maxx = x;
+          minx = x + xDelta;
+        }
+        else {
+          minx = x;
+          maxx = x + xDelta;
+        }
+        if (yDelta < 0) {
+          maxy = y;
+          miny = y + yDelta;
+        }
+        else {
+          miny = y;
+          maxy = y + yDelta;
+        }
+        defined = true;
+    }
+
+    // get minimum y (inclusive)
+    public double getMinY() {
+        assert defined;
+        return miny;
+    }
+
+    // get maximum y (exclusive)
+    public double getMaxY() {
+        assert defined;
+        return maxy;
+    }
+
+    // get minimum x (inclusive)
+    public double getMinX() {
+        assert defined;
+        return minx;
+    }
+
+    // get maximum x (exclusive)
+    public double getMaxX() {
+        assert defined;
+        return maxx;
+    }
+
+    // cut X to specified maximum, if necessary. Returns false if cut results in an empty range
+    public boolean cutMaxX(int thatMaxX) {
+        if (maxx >= thatMaxX) { maxx = thatMaxX; }
+        return (maxx > minx);
+    }
+
+    // cut Y to specified maximum, if necessary. Returns false if cut results in an empty range
+    public boolean cutMaxY(int thatMaxY) {
+        if (maxy >= thatMaxY) { maxy = thatMaxY; }
+        return (maxy > miny);
+    }
+
+    // cut Y to specified minimum, if necessary. Returns false if cut results in an empty range
+    public boolean cutMinY(int thatMinY) {
+        if (miny <= thatMinY) { miny = thatMinY; }
+        return (maxy >= miny);
+    }
+
+    // cut X to specified minimum, if necessary. Returns false if cut results in an empty range
+    public boolean cutMinX(int thatMinX) {
+        if (minx <= thatMinX) { minx = thatMinX; }
+        return (maxx >= minx);
+    }
+
+    @Nonnull
+    @Override
+    public String toString() {
+        return defined ? ("(" + miny + ", " + minx + ")-(" + maxy + ", " + maxx + ")") : "undefined";
+    }
+
+    // private parts
+    private boolean defined;
+    private double miny;
+    private double maxy;
+    private double minx;
+    private double maxx;    
+}
 
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
@@ -44,8 +135,6 @@ class Decoder {
         String mapcode = argMapcode;
         Territory territory = argTerritory;
 
-        // In case of error, result.isDefined() is false.
-        Point result = Point.undefined();
         String extrapostfix = "";
 
         final int minpos = mapcode.indexOf('-');
@@ -59,7 +148,8 @@ class Decoder {
 
         mapcode = aeuUnpack(mapcode).trim();
         if (mapcode.isEmpty()) {
-            return result; // failed to decode!
+            LOG.error("Failed to aeuUnpack {}", argMapcode);
+            return Point.undefined(); // failed to aeuUnpack
         }
 
         final int incodexlen = mapcode.length() - 1;
@@ -90,6 +180,9 @@ class Decoder {
         final int incodexhi = mapcode.indexOf('.');
         final int incodex = (incodexhi * 10) + (incodexlen - incodexhi);
 
+        // In case of error, result.isDefined() is false.
+        Point result = Point.undefined();
+
         for (int i = from; i <= upto; i++) {
             final int codexi = Data.calcCodex(i);
             if (Data.recType(i) == 0) {
@@ -104,24 +197,58 @@ class Decoder {
                 } else {
                     // i = grid without headerletter                    
                     if ((codexi == incodex) || ((incodex == 22) && (codexi == 21))) {
+                        DecodeLimits decodeLimits = new DecodeLimits();
                         result = decodeGrid(mapcode, 
                                 Data.getBoundaries(i).getMinX(), Data.getBoundaries(i).getMinY(), 
                                 Data.getBoundaries(i).getMaxX(), Data.getBoundaries(i).getMaxY(),
-                                i, extrapostfix);
+                                i, extrapostfix, decodeLimits);
                 
                         if (Data.isRestricted(i) && result.isDefined()) {
                             boolean fitssomewhere = false;
                             int j;
-                            for (j = upto - 1; j >= from; j--) {
+                            for (j = i - 1; j >= from; j--) {
                                 if (!Data.isRestricted(j)) {
                                   final int xdiv8 = Common.xDivider(Data.getBoundaries(j).getMinY(),
                                           Data.getBoundaries(j).getMaxY()) / 4;
-                                  if (Data.getBoundaries(j).extendBounds(xdiv8, 60).containsPoint(result)) {
+                                  if (Data.getBoundaries(j).containsPoint(result)) {
                                       fitssomewhere = true;
                                       break;
                                   }
                                 }
                             }
+                            
+                            if (!fitssomewhere) { // FORCE_RECODE
+                                for (j = from; j < i; j++) { // try all smaller rectangles j
+                                  if (!Data.isRestricted(j)) {
+                                    int minx = Data.getBoundaries(j).getMinX();
+                                    int maxx = Data.getBoundaries(j).getMaxX();
+                                    if ((maxx < 0) && (result.getLonDeg() > 0)) {
+                                        minx += 360000000;
+                                        maxx += 360000000;
+                                    }
+                                    final int miny = Data.getBoundaries(j).getMinY();
+                                    final int maxy = Data.getBoundaries(j).getMaxY();
+
+                                    // force pt within decodeLimits
+                                    Point pt = Point.fromPoint(result);
+                                    if (miny <= decodeLimits.getMaxY()) { pt.setMinLatToMicroDeg(miny); }
+                                    if (maxy >  decodeLimits.getMinY()) { pt.setMaxLatToMicroDeg(maxy); }
+                                    if (minx <= decodeLimits.getMaxX()) { pt.setMinLonToMicroDeg(minx); }
+                                    if (maxx >  decodeLimits.getMinX()) { pt.setMaxLonToMicroDeg(maxx); }
+                        
+                                    // better?
+                                    if ( pt.getLatDeg() > decodeLimits.getMinY() && pt.getLatMicroDeg() < decodeLimits.getMaxY() &&
+                                         pt.getLonDeg() > decodeLimits.getMinX() && pt.getLonMicroDeg() < decodeLimits.getMaxX() &&
+                                         Data.getBoundaries(j).containsPoint(pt)) 
+                                    {
+                                        result = Point.fromPoint(pt);
+                                        fitssomewhere = true;
+                                        break;                                        
+                                    }                        
+                                  }
+                                }
+                            } //FORCE_RECODE
+
                             if (!fitssomewhere) {
                                 result.setUndefined();
                             }
@@ -135,7 +262,7 @@ class Decoder {
                         result = decodeGrid(mapcode.substring(1), 
                             Data.getBoundaries(i).getMinX(), Data.getBoundaries(i).getMinY(), 
                             Data.getBoundaries(i).getMaxX(), Data.getBoundaries(i).getMaxY(), 
-                            i, extrapostfix);
+                            i, extrapostfix, null);
                     break;
                 }
             }
@@ -158,15 +285,27 @@ class Decoder {
 
             // LIMIT_TO_OUTRECT : make sure it fits the country
             if (ccode != CCODE_EARTH) {
-                final SubArea mapcoderRect = Data.getBoundaries(upto); // find
-                // encompassing
-                // rect
-                final int xdiv8 = Common.xDivider(mapcoderRect.getMinY(), mapcoderRect.getMaxY()) / 4;
+                final SubArea mapcoderRect = Data.getBoundaries(upto);
+                final int miny = mapcoderRect.getMinY();
+                final int maxy = mapcoderRect.getMaxY();
+                final int xdiv8 = Common.xDivider(miny, maxy) / 4;
                 // should be /8 but there's some extra margin
                 if (!mapcoderRect.extendBounds(xdiv8, 60).containsPoint(result)) {
                     result.setUndefined(); // decodes outside the official territory
                     // limit
                 }
+                else { // FORCE_RECODE
+                    result.setMinLatToMicroDeg(miny);
+                    result.setMaxLatToMicroDeg(maxy);
+                    int minx = mapcoderRect.getMinX();
+                    int maxx = mapcoderRect.getMaxX();
+                    if ((minx > 0) && (result.getLonDeg() < 0)) {
+                        minx -= 360000000;
+                        maxx -= 360000000;
+                    }
+                    result.setMinLonToMicroDeg(minx);
+                    result.setMaxLonToMicroDeg(maxx);
+                } // FORCE_RECODE
             }
         }
 
@@ -267,7 +406,7 @@ class Decoder {
 
     @Nonnull
     private static Point decodeGrid(final String str, final int minx, final int miny, final int maxx, final int maxy,
-                                    final int m, final String extrapostfix) {
+                                    final int m, final String extrapostfix, DecodeLimits decodeLimits) {
         // for a well-formed result, and integer variables
         String result = str;
         int relx;
@@ -342,7 +481,16 @@ class Decoder {
         final int cornery = rely + (dify * dividery);
         final int cornerx = relx + (difx * dividerx);
 
-        return decodeExtension(cornery, cornerx, dividerx << 2, dividery, extrapostfix, 0); // grid
+        Point pt = Point.fromMicroDeg(cornery,cornerx);
+        if (!(Data.getBoundaries(m).containsPoint(pt))) {
+            LOG.info("*** decodeGrid({}) : {} not in {}", str, pt, Data.getBoundaries(m));
+            return Point.undefined(); // already out of range
+        } 
+
+        final int decodeMaxx = ((relx + xgridsize) < maxx) ? (relx + xgridsize) : maxx;
+        final int decodeMaxy = ((rely + ygridsize) < maxy) ? (rely + ygridsize) : maxy;
+        return decodeExtension(decodeLimits, cornery, cornerx, dividerx << 2, dividery, extrapostfix, 
+                0, decodeMaxy, decodeMaxx); // grid
     }
 
     @Nonnull
@@ -417,6 +565,7 @@ class Decoder {
         int side = DataAccess.smartDiv(m);
         int xSIDE = side;
 
+        final int maxx = Data.getBoundaries(m).getMaxX();
         final int maxy = Data.getBoundaries(m).getMaxY();
         final int minx = Data.getBoundaries(m).getMinX();
         final int miny = Data.getBoundaries(m).getMinY();
@@ -439,6 +588,7 @@ class Decoder {
 
         if (dx >= xSIDE) // else out-of-range!
         {
+            LOG.error("*** decodeNameless({}) : dx {} > xSIDE {}", str, dx, xSIDE);
             return Point.undefined(); // return undefined (out of range!)
         }
 
@@ -447,7 +597,8 @@ class Decoder {
 
         final int cornerx = minx + ((dx * dividerx4) / 4);
         final int cornery = maxy - (dy * dividery);
-        return decodeExtension(cornery, cornerx, dividerx4, -dividery, extrapostfix, ((dx * dividerx4) % 4) ); // nameless
+        return decodeExtension(null, cornery, cornerx, dividerx4, -dividery, extrapostfix, 
+                ((dx * dividerx4) % 4), miny, maxx); // nameless
     }
 
     @Nonnull
@@ -465,6 +616,7 @@ class Decoder {
         i = m;
         while (true) {
             if ((Data.recType(i)<2) || (Data.calcCodex(i) != codexm)) {
+                LOG.error("*** decodeAutoHeader({}) : out of {} records", input, codexm);
                 return Point.undefined(); // return undefined
             }
 
@@ -503,10 +655,12 @@ class Decoder {
                 final int cornerx = minx + (vx * dividerx);
 
                 if (cornerx < minx || cornerx >= maxx || cornery < miny || cornery > maxy) {
+                    LOG.error("*** decodeAutoHeader({}) : corner {}, {} out of bounds", input, cornery, cornerx);
                     return Point.undefined(); // corner out of bounds
                 }
-
-                return decodeExtension(cornery, cornerx, dividerx << 2, -dividery, extrapostfix, 0); // autoheader
+                
+                return decodeExtension(null, cornery, cornerx, dividerx << 2, -dividery, extrapostfix, 
+                        0, miny, maxx); // autoheader
             }
             storageStart += product;
             i++;
@@ -717,7 +871,9 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeExtension(final int y, final int x, final int dividerx4, final int dividery0, final String extrapostfix, final int lon_offset4) {
+    private static Point decodeExtension(@Nullable DecodeLimits decodeLimits, final int y, final int x, final int dividerx4, final int dividery0, 
+                    final String extrapostfix, final int lon_offset4, final int extremeLat32, final int maxLon32) {
+        if (decodeLimits==null) decodeLimits = new DecodeLimits();
         final double dividerx = dividerx4 / 4.0, dividery = (double) dividery0;
         double processor = 1;
         int lon32 = 0;
@@ -730,6 +886,7 @@ class Decoder {
             int c1 = (int) extrapostfix.charAt(idx++);
             c1 = DECODE_CHARS[c1];
             if (c1 < 0 || c1 == 30) {
+                LOG.error("*** decodeExtension({}) : illegal c1 {}", extrapostfix, c1);
                 return Point.undefined();
             }
             final int y1 = c1 / 5;
@@ -740,6 +897,7 @@ class Decoder {
                 int c2 = (int) extrapostfix.charAt(idx++);
                 c2 = DECODE_CHARS[c2];
                 if (c2 < 0 || c2 == 30) {
+                    LOG.error("*** decodeExtension({}) : illegal c2 {}", extrapostfix, c2);
                     return Point.undefined();
                 }
                 y2 = c2 / 6;
@@ -758,24 +916,32 @@ class Decoder {
         double lat = y + ((lat32 * dividery) / processor);
         double lon = x + ((lon32 * dividerx) / processor) + ( lon_offset4 / 4.0 );
 
-        /* FORCE_RECODE : TO DO!
-        var range = {minlon:lon, maxlon:lon, minlat:lat, maxlat:lat};
-        if (odd) {
-            range.maxlon += (dividerx / (processor / 6));
-            range.maxlat += (dividery / (processor / 5));
-        } else {
-            range.maxlon += (dividerx / processor);
-            range.maxlat += (dividery / processor);
-        } // FORCE_RECODE */
-
-        if (odd) {
-            lon += (dividerx / (2 * (processor / 6)));
-            lat += (dividery / (2 * (processor / 5)));
-        } else {
-            lon += (dividerx / (2 * processor));
-            lat += (dividery / (2 * processor));
+        // determine the range of coordinates that are encode to this mapcode
+        if (odd) { // odd
+            decodeLimits.setFromDelta(lat, lon, (dividery / (processor / 5)), (dividerx / (processor / 6)) );
+        } else { // not odd
+            decodeLimits.setFromDelta(lat, lon, (dividery / processor), (dividerx / processor) );
         } // not odd
 
-        return Point.fromDeg( lat / 1000000.0, lon / 1000000.0 );
+        // FORCE_RECODE - restrict the coordinate range to the extremes that were provided
+        if (decodeLimits.cutMaxX(maxLon32)==false) {
+            LOG.error("*** decodeExtension({}) : cutMaxX {}", extrapostfix, maxLon32);
+            return Point.undefined();
+        }
+        if (dividery >= 0 )
+        {
+            if (decodeLimits.cutMaxY(extremeLat32)==false) {
+                LOG.error("*** decodeExtension({}) : cutMaxY {}", extrapostfix, extremeLat32);
+                return Point.undefined();
+            }
+        } else { // dividery < 0
+            if (decodeLimits.cutMinY(extremeLat32)==false) {
+                LOG.error("*** decodeExtension({}) : cutMinY {}", extrapostfix, extremeLat32);
+                return Point.undefined();
+            }
+        }
+
+        // return a coordinate exactly in the middle of the range
+        return Point.fromDeg( (decodeLimits.getMinY() + decodeLimits.getMaxY()) / 2000000.0, (decodeLimits.getMinX() + decodeLimits.getMaxX()) / 2000000.0 );
     }
 }

@@ -99,15 +99,53 @@ public class EncodeDecodeTest {
                                 // Check if the territory matches.
                                 assertEquals(territory, mapcode.getTerritory());
 
-                                // Check max distance.
-                                final String codePrecision0 = mapcode.getCode(0);
+                                // Check max distance at every nrDigits, and verify encode(decode(m))=m
                                 for (int nrDigits = 0; nrDigits <= 8; nrDigits++) {
                                     final String codePrecision = mapcode.getCode(nrDigits);
-                                    final Point decodeLocationPrecision = MapcodeCodec.decode(codePrecision, territory);
-                                    final double distance = Point.distanceInMeters(encode, decodeLocationPrecision);
+                                    final Point decodeLocation = MapcodeCodec.decode(codePrecision, territory);
+                                    final double distance = Point.distanceInMeters(encode, decodeLocation);
                                     if (distance >= Mapcode.getSafeMaxOffsetInMeters(nrDigits)) {
                                         LOG.error("encodeDecodeTest: " + mapcode + " digits = " + nrDigits + " distance = " + distance + " >= " + Mapcode.getSafeMaxOffsetInMeters(nrDigits));
                                         errors.getAndIncrement();
+                                    }
+                                    else {
+                                        // check that decode can be encoded back to original                                        
+                                        final List<Mapcode> recodedMapcodes = MapcodeCodec.encode(decodeLocation, territory);
+                                        {
+                                            boolean found = false;
+                                            for (final Mapcode candidate : recodedMapcodes) {
+                                                if (codePrecision.equals(candidate.getCode(nrDigits))) {
+                                                    found = true;
+                                                    break;
+                                                }
+                                            }
+                                            if (!found) {
+                                                // perhaps it was inherited from the parent?
+                                                final Territory parentTerritory = territory.getParentTerritory();
+                                                if (parentTerritory != null) {                                                    
+                                                    final List<Mapcode> recodedMapcodesFromParent = MapcodeCodec.encode(decodeLocation,parentTerritory);
+                                                    for (final Mapcode candidate : recodedMapcodesFromParent) {
+                                                        if (codePrecision.equals(candidate.getCode(nrDigits))) {
+                                                            found = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    if (!found) { // provide parent info for error that will fire below
+                                                        LOG.info("Re-encode{} of {} failed for {} {} from ({},{})", nrDigits, decodeLocation, parentTerritory, codePrecision, latDeg, lonDeg);
+                                                        for (final Mapcode candidate : recodedMapcodesFromParent) {
+                                                            LOG.info(" * parent candidate: {}", candidate.getCode(nrDigits));
+                                                        }
+                                                    }
+                                                }
+                                                if (!found) {
+                                                    LOG.error("Re-encode{} of {} failed for {} {} from ({},{})", nrDigits, decodeLocation, territory, codePrecision, latDeg, lonDeg);
+                                                    errors.getAndIncrement();
+                                                    for (final Mapcode candidate : recodedMapcodes) {
+                                                        LOG.info(" * candidate: {}", candidate.getCode(nrDigits));
+                                                    }                                                    
+                                                }
+                                            }
+                                        }
                                     }
                                 }
 
@@ -115,9 +153,10 @@ public class EncodeDecodeTest {
                                 for (final Alphabet alphabet : Alphabet.values()) {
                                     final String mapcodeAlphabet = mapcode.getCode(alphabet);
                                     final String mapcodeAscii = Mapcode.convertStringToPlainAscii(mapcodeAlphabet);
-                                    if (!codePrecision0.equals(mapcodeAscii)) {
-                                        LOG.error("encodeDecodeTest: " + mapcode + " alphabet=" + alphabet + ", original=" + codePrecision0 +
+                                    if (!mapcode.getCode(0).equals(mapcodeAscii)) {
+                                        LOG.error("encodeDecodeTest: " + mapcode + " alphabet=" + alphabet + ", original=" + mapcode.getCode(0) +
                                                 ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii);
+                                        errors.incrementAndGet();
                                     }
                                 }
                             }
