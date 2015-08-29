@@ -19,6 +19,7 @@ package com.mapcode;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({"ProhibitedExceptionDeclared", "OverlyBroadThrowsClause"})
-public class ReferenceFileTest {
+@Ignore public class ReferenceFileTest {
     private static final Logger LOG = LoggerFactory.getLogger(ReferenceFileTest.class);
     private static final Gson GSON = new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
@@ -120,8 +121,6 @@ public class ReferenceFileTest {
         final int threads = Runtime.getRuntime().availableProcessors() * 2;
         LOG.info("checkFile: Starting {} threads...", threads);
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
-
-if (baseFileName!="") return; // @@@ TODO: REFERENCE FILE NEEDS TO BE REBUILT
 
         // Open data file.
         final ChunkedFile chunkedFile = new ChunkedFile(baseFileName);
