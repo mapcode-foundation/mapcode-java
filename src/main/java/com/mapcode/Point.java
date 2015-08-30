@@ -46,7 +46,7 @@ public class Point {
     public static final double METERS_PER_DEGREE_LON_EQUATOR = EARTH_CIRCUMFERENCE_X / 360.0; // * cos(deg(lat)).
 
     /**
-     * Create a point from lat/lon in degrees.
+     * Create a point from lat/lon in degrees (may be precision!)
      *
      * @param latDeg Longitude in degrees.
      * @param lonDeg Latitude in degrees.
@@ -57,6 +57,12 @@ public class Point {
         return new Point(latDeg, lonDeg);
     }
 
+    /**
+     * Create a point from another point (no loss of precision!)
+     *
+     * @param Point
+     * @return An exact copy of 'point'
+     */
     @Nonnull
     public static Point fromPoint(@Nonnull final Point point) {
         Point p = new Point();
@@ -68,50 +74,63 @@ public class Point {
         return p;
     }
 
-    // Constants to handle fractions without floating point error accumulation
+    // Constants to convert between Degrees, MicroDegrees and Fractions
     private static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
     public static final double MAX_PRECISION_FACTOR = 810000.0;
-    private static final double FRACLON_PRECISION_FACTOR = 3240000.0;
-    private static final double FRACLAT_PRECISION_FACTOR = 810000.0;
-    private static final double MICROLAT_MAX_PRECISION_FACTOR = (MICRODEG_TO_DEG_FACTOR * FRACLAT_PRECISION_FACTOR);
-    private static final double MICROLON_MAX_PRECISION_FACTOR = (MICRODEG_TO_DEG_FACTOR * FRACLON_PRECISION_FACTOR);
+    public static final double MICROLAT_TO_FRACTIONS_FACTOR = (MAX_PRECISION_FACTOR);
+    public static final double MICROLON_TO_FRACTIONS_FACTOR = (MAX_PRECISION_FACTOR*4);
+    public static final double LAT_TO_FRACTIONS_FACTOR = (MICRODEG_TO_DEG_FACTOR * MICROLAT_TO_FRACTIONS_FACTOR);
+    public static final double LON_TO_FRACTIONS_FACTOR = (MICRODEG_TO_DEG_FACTOR * MICROLON_TO_FRACTIONS_FACTOR);
 
     /**
-     * Get the latitude in degrees.
+     * Get the latitude in degrees (may lose precision!)
      *
      * @return Latitude in degrees. No range is enforced.
      */
     public double getLatDeg() {
         assert defined;
-        return (lat32 / MICRODEG_TO_DEG_FACTOR) + (fraclat / MICROLAT_MAX_PRECISION_FACTOR);
+        return (lat32 / MICRODEG_TO_DEG_FACTOR) + (fraclat / LAT_TO_FRACTIONS_FACTOR);
     }
 
     /**
-     * Get the longitude in degrees.
+     * Get the longitude in degrees (may lose precision!)
      *
      * @return Longitude in degrees. No range is enforced.
      */
     public double getLonDeg() {
         assert defined;
-        return (lon32 / MICRODEG_TO_DEG_FACTOR) + (fraclon / MICROLON_MAX_PRECISION_FACTOR);
+        return (lon32 / MICRODEG_TO_DEG_FACTOR) + (fraclon / LON_TO_FRACTIONS_FACTOR);
     }
 
-
     /**
-     * Returns "fractions", which is a whole number of 1/MICROLON_MAX_PRECISION_FACTORth degrees versus the millionths of degrees
+     * Get the the longitude "fractions", which is a whole number of 1/LON_TO_FRACTIONS_FACTOR-th degrees versus the millionths of degrees
      */
-    public int getLonFractions() {
+    public int getLonFractionsOnly() {
         assert defined;
         return fraclon;
     }
     /**
-     * Returns "fractions", which is a whole number of 1/MICROLAT_MAX_PRECISION_FACTORth degrees versus the millionths of degrees
+     * Get the the latitude "fractions", which is a whole number of 1/LAT_TO_FRACTIONS_FACTOR-th degrees versus the millionths of degrees
      */
-    public int getLatFractions() {
+    public int getLatFractionsOnly() {
         assert defined;
         return fraclat;
     }
 
+    /**
+     * Get the longitude in "fractions", which is a whole number of 1/LON_TO_FRACTIONS_FACTOR-th degrees
+     */
+    public double getLonFractions() {
+        assert defined;
+        return fraclon + (lon32 * MICROLON_TO_FRACTIONS_FACTOR);
+    }
+    /**
+     * Get the latitude in "fractions", which is a whole number of 1/LAT_TO_FRACTIONS_FACTOR-th latitude degrees
+     */
+    public double getLatFractions() {
+        assert defined;
+        return fraclat + (lat32 * MICROLAT_TO_FRACTIONS_FACTOR);
+    }
 
     /**
      * Create a random point, uniformly distributed over the surface of the Earth.
@@ -195,8 +214,7 @@ public class Point {
     @Nonnull
     @Override
     public String toString() {
-        return defined ? ("(" + (lat32/MICRODEG_TO_DEG_FACTOR) + "|" + (fraclat/FRACLAT_PRECISION_FACTOR) + 
-                         ", " + (lon32/MICRODEG_TO_DEG_FACTOR) + "|" + (fraclon/FRACLON_PRECISION_FACTOR) + ')') : "undefined";
+        return defined ? ("(" + getLatDeg() + ", " + getLonDeg() + ")") : "undefined";
     }
 
     @SuppressWarnings("NonFinalFieldReferencedInHashCode")
@@ -227,13 +245,17 @@ public class Point {
      */
     private int lat32;   // whole nr of MICRODEG_TO_DEG_FACTOR
     private int lon32;   // whole nr of MICRODEG_TO_DEG_FACTOR
-    private int fraclat; // whole nr of MICROLAT_MAX_PRECISION_FACTOR, relative to lat32
-    private int fraclon; // whole nr of MICROLON_MAX_PRECISION_FACTOR, relative to lon32
+    private int fraclat; // whole nr of LAT_TO_FRACTIONS_FACTOR, relative to lat32
+    private int fraclon; // whole nr of LON_TO_FRACTIONS_FACTOR, relative to lon32
+
+    /**
+     * Adjusts coordinates to specified maxima (exclusive) and minima (inclusive)
+     */
 
     public void setMaxLatToMicroDeg(final int maxMicroLat) {
         if (lat32 >= maxMicroLat) {
           lat32 = maxMicroLat-1;
-          fraclat = (int) FRACLAT_PRECISION_FACTOR - 1;
+          fraclat = (int) MICROLAT_TO_FRACTIONS_FACTOR - 1;
         }
     }
 
@@ -241,7 +263,7 @@ public class Point {
         int max = (maxMicroLon < 0 && lon32 > 0) ? maxMicroLon + 360000000 : maxMicroLon;
         if (lon32 >= max) {
           lon32 = max - 1;
-          fraclon = (int) FRACLON_PRECISION_FACTOR - 1;
+          fraclon = (int) MICROLON_TO_FRACTIONS_FACTOR - 1;
         }
     }
 
@@ -273,24 +295,27 @@ public class Point {
         defined = false;
     }
 
+    /**
+     * Public construction, from floating point degrees (potentially LOSSY!)
+     */
     private Point(final double latDeg, final double lonDeg) {
 
         double frac;
         double lat = latDeg + 90;
         if (lat < 0) { lat = 0; } else if (lat > 180) { lat = 180; }
         // lat now [0..180]
-        lat *= MICROLAT_MAX_PRECISION_FACTOR;
+        lat *= LAT_TO_FRACTIONS_FACTOR;
         frac = Math.floor(lat + 0.1);
-        lat32 = (int) (frac / FRACLAT_PRECISION_FACTOR);
-        frac -= ((double) lat32 * FRACLAT_PRECISION_FACTOR);
+        lat32 = (int) (frac / MICROLAT_TO_FRACTIONS_FACTOR);
+        frac -= ((double) lat32 * MICROLAT_TO_FRACTIONS_FACTOR);
         fraclat = (int) frac;
         lat32 -= 90000000;
 
         double lon = lonDeg - (360.0 * Math.floor(lonDeg / 360)); // lon now in [0..360>
-        lon *= MICROLON_MAX_PRECISION_FACTOR;
+        lon *= LON_TO_FRACTIONS_FACTOR;
         frac = Math.floor(lon + 0.1);        
-        lon32 = (int) (frac / FRACLON_PRECISION_FACTOR);
-        frac -= ((double) lon32 * FRACLON_PRECISION_FACTOR);
+        lon32 = (int) (frac / MICROLON_TO_FRACTIONS_FACTOR);
+        frac -= ((double) lon32 * MICROLON_TO_FRACTIONS_FACTOR);
         fraclon = (int) frac;
         if (lon32 >= 180000000) { lon32 -= 360000000; }
 
@@ -305,23 +330,65 @@ public class Point {
     static final int LAT_MICRODEG_MIN = degToMicroDeg(LAT_DEG_MIN);
     static final int LAT_MICRODEG_MAX = degToMicroDeg(LAT_DEG_MAX);
 
+    /**
+     * Set latitude to whole nr of microdegrees (no loss of precision)
+     */
+    public void setLatMicroDeg(final int latMicroDeg) {
+        lat32 = latMicroDeg;
+        fraclat = 0;
+    }
+    /**
+     * Set longitude to whole nr of microdegrees (no loss of precision)
+     */
+    public void setLonMicroDeg(final int lonMicroDeg) {
+        lon32 = lonMicroDeg;
+        fraclon = 0;
+    }
+
+    /**
+     * Public construction, from integer microdegrees (no loss of precision)
+     */
     @Nonnull
-    static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
+    public static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
         Point p = new Point();
-        p.lat32 = latMicroDeg;
-        p.lon32 = lonMicroDeg;
-        p.fraclat = 0;
-        p.fraclon = 0;
+        p.setLatMicroDeg(latMicroDeg);
+        p.setLonMicroDeg(lonMicroDeg);
         p.defined = true;
         return p;
     }
 
     /**
+     * Public construction, from integer fractions (no loss of precision)
+     */
+    @Nonnull
+    public static Point fromFractionDeg(final double latFractionDeg, final double lonFractionDeg) {
+        assert (Double.compare(latFractionDeg,Math.floor(latFractionDeg))==0);
+        assert (Double.compare(lonFractionDeg,Math.floor(lonFractionDeg))==0);
+        Point p = new Point();
+        p.lat32   = (int) Math.floor(latFractionDeg / MICROLAT_TO_FRACTIONS_FACTOR);
+        p.fraclat = (int) (latFractionDeg - (MICROLAT_TO_FRACTIONS_FACTOR * p.lat32));
+        p.lon32   = (int) Math.floor(lonFractionDeg / MICROLON_TO_FRACTIONS_FACTOR);
+        p.fraclon = (int) (lonFractionDeg - (MICROLON_TO_FRACTIONS_FACTOR * p.lon32));
+        p.defined = true;
+        return p;
+    }
+
+    /**
+     * Get the point between this point and another point
+     */
+    @Nonnull
+    public Point getMidPoint(@Nonnull final Point that) {
+        return fromFractionDeg( 
+            Math.floor((this.getLatFractions() + that.getLatFractions()) / 2), 
+            Math.floor((this.getLonFractions() + that.getLonFractions()) / 2));
+    }
+
+    /**
      * Get latitude as micro-degrees. Note that this looses precision beyond microdegrees!
      *
-     * @return Latitude in microdegrees (may loose precision if latitude has higher precision than microdegrees).
+     * @return floor(Latitude in microdegrees)
      */
-    int getLatMicroDeg() {
+    public int getLatMicroDeg() {
         assert defined;
         return lat32;
     }
@@ -329,9 +396,9 @@ public class Point {
     /**
      * Get longitude as micro-degrees. Note that this looses precision beyond microdegrees!
      *
-     * @return Longitude in microdegrees (may loose precision if longitude has higher precision than microdegrees).
+     * @return floor(Longitude in microdegrees)
      */
-    int getLonMicroDeg() {
+    public int getLonMicroDeg() {
         assert defined;
         return lon32;
     }
@@ -353,7 +420,7 @@ public class Point {
             if (lat32 >  90000000) { lat32 =  90000000; fraclat=0; }
             // Map longitude to [-180, 180). Values outside this range are wrapped to this range.
             if (lon32 < -180000000 || lon32 >= 180000000 ) {
-              lon32 -= 360 * (lon32 / 360); // [0..360)
+              lon32 -= 360000000 * (lon32 / 360000000); // [0..360)
               if (lon32 >= 180000000) { lon32 -= 360000000; } // [-180,180)
             }
         }

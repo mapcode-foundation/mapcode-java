@@ -306,7 +306,7 @@ import static org.junit.Assert.assertTrue;
         // Read lat/lon.
         final double latDeg = Double.parseDouble(args[1]);
         final double lonDeg = Double.parseDouble(args[2]);
-        final Point point = Point.fromMicroDeg(Point.degToMicroDeg(latDeg), Point.degToMicroDeg(lonDeg));
+        final Point point = Point.fromDeg(latDeg, lonDeg);
         assertTrue("Latitude must be in [-90, 90]", (-90 <= point.getLatDeg()) && (point.getLatDeg() <= 90));
         assertTrue("Longitude must be in [-180, 180]", (-180 <= point.getLonDeg()) && (point.getLonDeg() <= 180));
 
