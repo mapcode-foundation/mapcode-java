@@ -1,4 +1,4 @@
-Release Notes (Version ${project.version})
+﻿Release Notes (Version ${project.version})
 
     These are the release notes for the Java library for mapcodes.
 
@@ -8,6 +8,17 @@ Release Notes (Version ${project.version})
     Needless to say, never depend on <<<SNAPSHOT>>> versions if you can avoid it.
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
+
+
+* 2.1.0
+
+    * Added micro-meter precision (mapcodes can now have eight precision digits)
+
+    * Assure that encode(decode(m)) delivers m
+
+    * Renames to bring source more in line with other implementations
+
+    []
 
 * 2.0.2
 
