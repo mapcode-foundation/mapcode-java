@@ -57,23 +57,6 @@ public class Point {
         return new Point(latDeg, lonDeg);
     }
 
-    /**
-     * Create a point from another point (no loss of precision!)
-     *
-     * @param Point
-     * @return An exact copy of 'point'
-     */
-    @Nonnull
-    public static Point fromPoint(@Nonnull final Point point) {
-        Point p = new Point();
-        p.lat32 = point.lat32;
-        p.lon32 = point.lon32;
-        p.fraclat = point.fraclat;
-        p.fraclon = point.fraclon;
-        p.defined = point.defined;
-        return p;
-    }
-
     // Constants to convert between Degrees, MicroDegrees and Fractions
     private static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
     public static final double MAX_PRECISION_FACTOR = 810000.0;
@@ -115,21 +98,6 @@ public class Point {
     public int getLatFractionsOnly() {
         assert defined;
         return fraclat;
-    }
-
-    /**
-     * Get the longitude in "fractions", which is a whole number of 1/LON_TO_FRACTIONS_FACTOR-th degrees
-     */
-    public double getLonFractions() {
-        assert defined;
-        return fraclon + (lon32 * MICROLON_TO_FRACTIONS_FACTOR);
-    }
-    /**
-     * Get the latitude in "fractions", which is a whole number of 1/LAT_TO_FRACTIONS_FACTOR-th latitude degrees
-     */
-    public double getLatFractions() {
-        assert defined;
-        return fraclat + (lat32 * MICROLAT_TO_FRACTIONS_FACTOR);
     }
 
     /**
@@ -371,16 +339,6 @@ public class Point {
         p.fraclon = (int) (lonFractionDeg - (MICROLON_TO_FRACTIONS_FACTOR * p.lon32));
         p.defined = true;
         return p;
-    }
-
-    /**
-     * Get the point between this point and another point
-     */
-    @Nonnull
-    public Point getMidPoint(@Nonnull final Point that) {
-        return fromFractionDeg( 
-            Math.floor((this.getLatFractions() + that.getLatFractions()) / 2), 
-            Math.floor((this.getLonFractions() + that.getLonFractions()) / 2));
     }
 
     /**

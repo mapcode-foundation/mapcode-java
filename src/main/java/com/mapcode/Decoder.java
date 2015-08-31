@@ -23,32 +23,115 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 // simple class to represent all the coordinates that would deliver a particular mapcode
-class DecodeLimits {
-    public Point min;
-    public Point max;
+class MapcodeZone {
+    // latitudes in LatFractions ("1/810 billionths")
+    public double fminy; 
+    public double fmaxy;
+    // longitodes in LonFractions ("1/3240 billionths")
+    public double fminx;
+    public double fmaxx;
+    
+    // construct an (empty) zone
+    public MapcodeZone() {
+        setEmpty();
+    }
+
+    // construct an (empty) zone
+    public void setEmpty() {
+        fminy = 0;
+        fmaxy = 0;
+        fminx = 0;
+        fmaxx = 0;
+    }
+
+    // construct a copy of an existing zone
+    public MapcodeZone(@Nonnull final MapcodeZone zone) {
+        fillFrom(zone);
+    }
+
+    // construct a copy of an existing zone
+    public void fillFrom(@Nonnull final MapcodeZone zone) {
+        fminy = zone.fminy;
+        fmaxy = zone.fmaxy;
+        fminx = zone.fminx;
+        fmaxx = zone.fmaxx;
+    }
+
+    static MapcodeZone empty() {
+        return new MapcodeZone();
+    }
 
     // generate upper and lower limits based on x and y, and delta's
     public void setFromFractions(final double y, final double x, final double yDelta, final double xDelta) {
         assert (xDelta >= 0);
+        assert (yDelta != 0);
+        fminx = x;
+        fmaxx = x + xDelta;
         if (yDelta < 0) {
-          min = Point.fromFractionDeg(y + yDelta, x);
-          max = Point.fromFractionDeg(y, x + xDelta);
+            fminy = y + 1 + yDelta; // y+yDelta can NOT be represented
+            fmaxy = y + 1;          // y CAN be represented
         }
         else {
-          min = Point.fromFractionDeg(y, x);
-          max = Point.fromFractionDeg(y + yDelta, x + xDelta);
+            fminy = y;
+            fmaxy = y + yDelta;
         }
+    }
+
+    public boolean isEmpty() {
+        return ((fmaxx <= fminx) || (fmaxy <= fminy));
     }
 
     @Nonnull
     public Point midPoint() {
-        return min.getMidPoint(max);
+        if (isEmpty()) {
+            return Point.undefined();
+        }
+        else {
+            final double lat = Math.floor((fminy + fmaxy) / 2);
+            final double lon = Math.floor((fminx + fmaxx) / 2);
+            return Point.fromFractionDeg(lat,lon);
+        }
+    }
+
+    // returns a non-empty intersection of a mapcode zone and a territory area.
+    // returns null if no such intersection exists
+    @Nonnull
+    public MapcodeZone restrictZoneTo(@Nonnull final SubArea area) {
+        MapcodeZone z = new MapcodeZone(this);
+        final double miny = area.getMinY() * Point.MICROLAT_TO_FRACTIONS_FACTOR;
+        if (z.fminy < miny) {
+            z.fminy = miny;
+        }
+        final double maxy = area.getMaxY() * Point.MICROLAT_TO_FRACTIONS_FACTOR;
+        if (z.fmaxy > maxy) {
+            z.fmaxy = maxy;
+        }
+        if (z.fminy < z.fmaxy) {
+            double minx = area.getMinX() * Point.MICROLON_TO_FRACTIONS_FACTOR;
+            double maxx = area.getMaxX() * Point.MICROLON_TO_FRACTIONS_FACTOR;
+            if ((maxx < 0) && (z.fminx > 0)) {
+                minx += (360000000 * Point.MICROLON_TO_FRACTIONS_FACTOR);
+                maxx += (360000000 * Point.MICROLON_TO_FRACTIONS_FACTOR);
+            }
+            else if ((minx > 1) && (z.fmaxx < 0)) {
+                minx -= (360000000 * Point.MICROLON_TO_FRACTIONS_FACTOR);
+                maxx -= (360000000 * Point.MICROLON_TO_FRACTIONS_FACTOR);
+            }
+            if (z.fminx < minx) {
+                z.fminx = minx; 
+            }
+            if (z.fmaxx > maxx) {
+                z.fmaxx = maxx;
+            }
+        }
+        return z;
     }
 
     @Nonnull
     @Override
     public String toString() {
-        return ("(" + min + ")-(" + max + ")");
+        return isEmpty() ? "empty" : ("[" + (fminy / Point.LAT_TO_FRACTIONS_FACTOR) + ", " + (fmaxy / Point.LAT_TO_FRACTIONS_FACTOR) + 
+                                   "), [" + (fminx / Point.LON_TO_FRACTIONS_FACTOR) + ", " + (fmaxx / Point.LON_TO_FRACTIONS_FACTOR) + ")");
     }
 }
 
@@ -119,9 +202,8 @@ class Decoder {
 
         final int incodexhi = mapcode.indexOf('.');
         final int incodex = (incodexhi * 10) + (incodexlen - incodexhi);
-
-        // In case of error, result.isDefined() is false.
-        Point result = Point.undefined();
+      
+        MapcodeZone mapcodeZone = MapcodeZone.empty();
 
         for (int i = from; i <= upto; i++) {
             final int codexi = Data.calcCodex(i);
@@ -131,21 +213,23 @@ class Decoder {
                     if (((codexi == 21) && (incodex == 22)) ||
                         ((codexi == 22) && (incodex == 32)) || 
                         ((codexi == 13) && (incodex == 23))) {
-                            result = decodeNameless(mapcode, i, extrapostfix);
+                            mapcodeZone = decodeNameless(mapcode, i, extrapostfix);
                             break;
                     }
                 } else {
                     // i = grid without headerletter                    
                     if ((codexi == incodex) || ((incodex == 22) && (codexi == 21))) {
-                        DecodeLimits decodeLimits = new DecodeLimits();
-                        result = decodeGrid(mapcode, 
+                        
+                        mapcodeZone = decodeGrid(mapcode, 
                                 Data.getBoundaries(i).getMinX(), Data.getBoundaries(i).getMinY(), 
                                 Data.getBoundaries(i).getMaxX(), Data.getBoundaries(i).getMaxY(),
-                                i, extrapostfix, decodeLimits);
+                                i, extrapostfix);
 
-                        if (Data.isRestricted(i) && result.isDefined()) {
+                        
+                        if (Data.isRestricted(i) && !mapcodeZone.isEmpty()) {
                             boolean fitssomewhere = false;
                             int j;
+                            Point result = mapcodeZone.midPoint();
                             for (j = i - 1; j >= from; j--) {
                                 if (!Data.isRestricted(j)) {
                                   final int xdiv8 = Common.xDivider(Data.getBoundaries(j).getMinY(),
@@ -160,42 +244,18 @@ class Decoder {
                             if (!fitssomewhere) { // FORCE_RECODE
                                 for (j = from; j < i; j++) { // try all smaller rectangles j
                                   if (!Data.isRestricted(j)) {
-                                    int minx = Data.getBoundaries(j).getMinX();
-                                    int maxx = Data.getBoundaries(j).getMaxX();
-                                    if ((maxx < 0) && (result.getLonMicroDeg() > 1)) {
-                                        minx += 360000000;
-                                        maxx += 360000000;
-                                    }
-                                    else if ((maxx > 1) && (result.getLonMicroDeg() < 0)) {
-                                        minx -= 360000000;
-                                        maxx -= 360000000;
-                                    }
-                                    final int miny = Data.getBoundaries(j).getMinY();
-                                    final int maxy = Data.getBoundaries(j).getMaxY();
-
-                                    // force pt within decodeLimits
-                                    Point pt = Point.fromPoint(result);
-                                    if (miny * Point.MICROLAT_TO_FRACTIONS_FACTOR < decodeLimits.max.getLatFractions()) { pt.setMinLatToMicroDeg(miny); }
-                                    if (maxy * Point.MICROLAT_TO_FRACTIONS_FACTOR > decodeLimits.min.getLatFractions()) { pt.setMaxLatToMicroDeg(maxy); }
-                                    if (minx * Point.MICROLON_TO_FRACTIONS_FACTOR < decodeLimits.max.getLonFractions()) { pt.setMinLonToMicroDeg(minx); }
-                                    if (maxx * Point.MICROLON_TO_FRACTIONS_FACTOR > decodeLimits.min.getLonFractions()) { pt.setMaxLonToMicroDeg(maxx); }
-
-                                    // better?
-                                    if ( pt.getLatFractions() >= decodeLimits.min.getLatFractions() && pt.getLatFractions() < decodeLimits.max.getLatFractions() &&
-                                         pt.getLonFractions() >= decodeLimits.min.getLonFractions() && pt.getLonFractions() < decodeLimits.max.getLonFractions() &&
-                                         Data.getBoundaries(j).containsPoint(pt))
-                                    {
-                                        result = Point.fromPoint(pt);
-                                        fitssomewhere = true;
-                                        break;                                        
-                                    }                        
+                                      MapcodeZone z = mapcodeZone.restrictZoneTo(Data.getBoundaries(j));
+                                      if (!z.isEmpty()) {
+                                          mapcodeZone.fillFrom(z);
+                                          fitssomewhere = true;
+                                          break;
+                                      }
                                   }
                                 }
                             } //FORCE_RECODE
 
                             if (!fitssomewhere) {
-                                LOG.info("FAILED {}-{} decode {} fits no smaller rectangle",mapcode,extrapostfix,result);
-                                result.setUndefined();
+                                mapcodeZone.setEmpty();
                             }
                         }
                         break;
@@ -204,52 +264,30 @@ class Decoder {
             } else if (Data.recType(i) == 1) {
                 // i = grid with headerletter
                 if ((incodex == codexi + 10) && (Data.headerLetter(i).charAt(0) == mapcode.charAt(0))) {
-                        result = decodeGrid(mapcode.substring(1), 
+                        mapcodeZone = decodeGrid(mapcode.substring(1), 
                             Data.getBoundaries(i).getMinX(), Data.getBoundaries(i).getMinY(), 
                             Data.getBoundaries(i).getMaxX(), Data.getBoundaries(i).getMaxY(), 
-                            i, extrapostfix, null);
+                            i, extrapostfix);
                     break;
                 }
             }
             else {
                 // i = autoheader
                 if (((incodex == 23) && (codexi == 22)) || ((incodex == 33) && (codexi == 23))) {
-                    result = decodeAutoHeader(mapcode, i, extrapostfix);
+                    mapcodeZone = decodeAutoHeader(mapcode, i, extrapostfix);
                     break;
                 }
             }
-
         }
 
-        if (result.isDefined()) {
-            
-            result.wrap();
-
-            // LIMIT_TO_OUTRECT : make sure it fits the country
-            if (ccode != CCODE_EARTH) {
-                final SubArea mapcoderRect = Data.getBoundaries(upto);
-                final int miny = mapcoderRect.getMinY();
-                final int maxy = mapcoderRect.getMaxY();
-                final int xdiv8 = Common.xDivider(miny, maxy) / 4;
-                // should be /8 but there's some extra margin
-                if (!mapcoderRect.extendBounds(xdiv8, 60).containsPoint(result)) {
-                    LOG.info("FAILED {}-{}: result {} not in encompassing {}",mapcode,extrapostfix,result,mapcoderRect);
-                    result.setUndefined(); // decodes outside the official territory
-                    // limit
-                }
-                else { // FORCE_RECODE
-                    result.setMinLatToMicroDeg(miny);
-                    result.setMaxLatToMicroDeg(maxy);
-                    int minx = mapcoderRect.getMinX();
-                    int maxx = mapcoderRect.getMaxX();
-                    if ((minx > 0) && (result.getLonDeg() < 0)) {
-                        minx -= 360000000;
-                        maxx -= 360000000;
-                    }
-                    result.setMinLonToMicroDeg(minx);
-                    result.setMaxLonToMicroDeg(maxx);
-                } // FORCE_RECODE
-            }
+        final Point result;
+        if (mapcodeZone.isEmpty()) {
+            result = Point.undefined();
+        } else if (territory == territory.AAA) {
+            result = mapcodeZone.midPoint().wrap();
+        } else {
+            mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
+            result = mapcodeZone.midPoint().wrap();
         }
 
         LOG.trace("decode: result=({}, {})",
@@ -261,8 +299,6 @@ class Decoder {
     // ----------------------------------------------------------------------
     // Private methods.
     // ----------------------------------------------------------------------
-
-    private static final int CCODE_EARTH = 540;
 
     private final static int[] DECODE_CHARS = {
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -348,8 +384,8 @@ class Decoder {
     };
 
     @Nonnull
-    private static Point decodeGrid(final String str, final int minx, final int miny, final int maxx, final int maxy,
-                                    final int m, final String extrapostfix, @Nullable DecodeLimits decodeLimits) {
+    private static MapcodeZone decodeGrid(final String str, final int minx, final int miny, final int maxx, final int maxy,
+                                    final int m, final String extrapostfix) {
         // for a well-formed result, and integer variables
         String result = str;
         int relx;
@@ -426,18 +462,18 @@ class Decoder {
 
         Point pt = Point.fromMicroDeg(cornery,cornerx);
         if (!(Data.getBoundaries(m).containsPoint(pt))) {
-            LOG.info("FAILED decodeGrid({}) : {} not in {}", str, pt, Data.getBoundaries(m));
-            return Point.undefined(); // already out of range
+            LOG.info("FAILED decodeGrid({}) : {} not in {}", str, pt, Data.getBoundaries(m));            
+            return MapcodeZone.empty(); // already out of range
         } 
 
         final int decodeMaxx = ((relx + xgridsize) < maxx) ? (relx + xgridsize) : maxx;
         final int decodeMaxy = ((rely + ygridsize) < maxy) ? (rely + ygridsize) : maxy;
-        return decodeExtension(decodeLimits, cornery, cornerx, dividerx << 2, dividery, extrapostfix, 
+        return decodeExtension(cornery, cornerx, dividerx << 2, dividery, extrapostfix, 
                 0, decodeMaxy, decodeMaxx); // grid
     }
 
     @Nonnull
-    private static Point decodeNameless(final String str, final int firstrec, final String extrapostfix) {
+    private static MapcodeZone decodeNameless(final String str, final int firstrec, final String extrapostfix) {
         String result = str;
         final int codexm = Data.calcCodex(firstrec);
         if (codexm == 22) {
@@ -532,7 +568,7 @@ class Decoder {
         if (dx >= xSIDE) // else out-of-range!
         {
             LOG.error("FAILED decodeNameless({}) : dx {} > xSIDE {}", str, dx, xSIDE);
-            return Point.undefined(); // return undefined (out of range!)
+            return MapcodeZone.empty(); // return undefined (out of range!)
         }
 
         final int dividerx4 = Common.xDivider(miny, maxy); // 4 times too large!
@@ -540,12 +576,12 @@ class Decoder {
 
         final int cornerx = minx + ((dx * dividerx4) / 4);
         final int cornery = maxy - (dy * dividery);
-        return decodeExtension(null, cornery, cornerx, dividerx4, -dividery, extrapostfix, 
+        return decodeExtension(cornery, cornerx, dividerx4, -dividery, extrapostfix, 
                 ((dx * dividerx4) % 4), miny, maxx); // nameless
     }
 
     @Nonnull
-    private static Point decodeAutoHeader(final String input, final int m, final String extrapostfix) {
+    private static MapcodeZone decodeAutoHeader(final String input, final int m, final String extrapostfix) {
         // returns Point.isUndefined() in case or error
         int storageStart = 0;
         final int codexm = Data.calcCodex(m);
@@ -560,7 +596,7 @@ class Decoder {
         while (true) {
             if ((Data.recType(i)<2) || (Data.calcCodex(i) != codexm)) {
                 LOG.error("FAILED decodeAutoHeader({}) : out of {} records", input, codexm);
-                return Point.undefined(); // return undefined
+                return MapcodeZone.empty(); // return undefined
             }
 
             final int maxx = Data.getBoundaries(i).getMaxX();
@@ -599,10 +635,10 @@ class Decoder {
 
                 if (cornerx < minx || cornerx >= maxx || cornery < miny || cornery > maxy) {
                     LOG.error("FAILED decodeAutoHeader({}) : corner {}, {} out of bounds", input, cornery, cornerx);
-                    return Point.undefined(); // corner out of bounds
+                    return MapcodeZone.empty(); // corner out of bounds
                 }
                 
-                return decodeExtension(null, cornery, cornerx, dividerx << 2, -dividery, extrapostfix, 
+                return decodeExtension(cornery, cornerx, dividerx << 2, -dividery, extrapostfix, 
                         0, miny, maxx); // autoheader
             }
             storageStart += product;
@@ -814,9 +850,9 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeExtension(@Nullable DecodeLimits decodeLimits, final int y, final int x, final int dividerx0, final int dividery0, 
+    private static MapcodeZone decodeExtension(final int y, final int x, final int dividerx0, final int dividery0, 
                     final String extrapostfix, final int lon_offset4, final int extremeLatMicroDeg, final int maxLonMicroDeg) {
-        if (decodeLimits == null) { decodeLimits = new DecodeLimits(); }
+        MapcodeZone mapcodeZone = new MapcodeZone();
         double dividerx4 = (double) dividerx0, dividery = (double) dividery0;
         double processor = 1;
         int lon32 = 0;
@@ -830,7 +866,7 @@ class Decoder {
             c1 = DECODE_CHARS[c1];
             if (c1 < 0 || c1 == 30) {
                 LOG.error("FAILED decodeExtension({}) : illegal c1 {}", extrapostfix, c1);
-                return Point.undefined();
+                return MapcodeZone.empty();
             }
             final int y1 = c1 / 5;
             final int x1 = c1 % 5;
@@ -841,7 +877,7 @@ class Decoder {
                 c2 = DECODE_CHARS[c2];
                 if (c2 < 0 || c2 == 30) {
                     LOG.error("FAILED decodeExtension({}) : illegal c2 {}", extrapostfix, c2);
-                    return Point.undefined();
+                    return MapcodeZone.empty();
                 }
                 y2 = c2 / 6;
                 x2 = c2 % 6;
@@ -867,39 +903,26 @@ class Decoder {
 
         // determine the range of coordinates that are encode to this mapcode
         if (odd) { // odd
-            decodeLimits.setFromFractions(lat1, lon4, 5 * dividery, 6 * dividerx4);
+            mapcodeZone.setFromFractions(lat1, lon4, 5 * dividery, 6 * dividerx4);
         } else { // not odd
-            decodeLimits.setFromFractions(lat1, lon4, dividery, dividerx4);
+            mapcodeZone.setFromFractions(lat1, lon4, dividery, dividerx4);
         } // not odd
 
         // FORCE_RECODE - restrict the coordinate range to the extremes that were provided
-        if (decodeLimits.max.getLonFractions() > (maxLonMicroDeg * Point.MICROLON_TO_FRACTIONS_FACTOR)) { 
-            decodeLimits.max.setLonMicroDeg(maxLonMicroDeg);
-            if (decodeLimits.max.getLonFractions() <= decodeLimits.min.getLonFractions()) {
-                LOG.error("FAILED decodeExtension({}) : cutMaxX {}", extrapostfix, maxLonMicroDeg);
-                return Point.undefined();
-            }
+        if (mapcodeZone.fmaxx > (maxLonMicroDeg * Point.MICROLON_TO_FRACTIONS_FACTOR)) { 
+            mapcodeZone.fmaxx = (maxLonMicroDeg * Point.MICROLON_TO_FRACTIONS_FACTOR);
         }
-
         if (dividery >= 0 ) {
-            if (decodeLimits.max.getLatFractions() > (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR)) {
-                decodeLimits.max.setLatMicroDeg(extremeLatMicroDeg);
-                if (decodeLimits.max.getLatFractions() <= decodeLimits.min.getLatFractions()) {
-                    LOG.error("FAILED decodeExtension({}) : cutMaxY {}", extrapostfix, extremeLatMicroDeg);
-                    return Point.undefined();
-                }
+            if (mapcodeZone.fmaxy > (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR)) {
+                mapcodeZone.fmaxy = (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR);
             }
-        } else { // dividery < 0
-            if (decodeLimits.min.getLatFractions() < (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR)) {
-                decodeLimits.min.setLatMicroDeg(extremeLatMicroDeg);
-                if (decodeLimits.max.getLatFractions() < decodeLimits.min.getLatFractions()) {
-                    LOG.error("FAILED decodeExtension({}) : cutMinY {}", extrapostfix, extremeLatMicroDeg);
-                    return Point.undefined();
-                }
+        } else {
+            if (mapcodeZone.fminy < (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR)) {
+                mapcodeZone.fminy = (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR);
             }
         }
 
         // return the coordinate in the center of the mapcode-defined zone
-        return decodeLimits.midPoint();
+        return mapcodeZone;
     }
 }

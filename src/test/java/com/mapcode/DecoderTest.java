@@ -236,6 +236,24 @@ public class DecoderTest {
         MapcodeCodec.decode("494.V49V", Territory.NLD);
     }
 
+    @Test(expected = UnknownMapcodeException.class)
+    public void invalidMapcode2() throws Exception {
+        LOG.info("invalidMapcode2");
+        MapcodeCodec.decode("NLD L333.333", Territory.NLD);
+    }
+
+    @Test(expected = UnknownMapcodeException.class)
+    public void invalidMapcode3() throws Exception {
+        LOG.info("invalidMapcode3");
+        MapcodeCodec.decode("NLD SHH.HHH", Territory.NLD);
+    }
+
+    @Test(expected = UnknownMapcodeException.class)
+    public void invalidMapcode4() throws Exception {
+        LOG.info("invalidMapcode4");
+        MapcodeCodec.decode("NLD V11N.NZZ", Territory.NLD);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void invalidHighPrecisionCharacter() throws Exception {
         LOG.info("invalidHighPrecisionCharacter");

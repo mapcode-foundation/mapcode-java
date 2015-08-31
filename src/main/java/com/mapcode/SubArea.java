@@ -34,7 +34,7 @@ import java.util.Map.Entry;
 class SubArea {
     private static final Logger LOG = LoggerFactory.getLogger(SubArea.class);
 
-    private static final int SUB_AREAS_INITIAL_CAPACITY = 16250;
+    private static final int SUB_AREAS_INITIAL_CAPACITY = 16344;
 
     private static final List<SubArea> SUB_AREAS = new ArrayList<SubArea>(SUB_AREAS_INITIAL_CAPACITY);
     private static final TreeMap<Integer, ArrayList<SubArea>> LON_MAP = new TreeMap<Integer, ArrayList<SubArea>>();
@@ -194,6 +194,10 @@ class SubArea {
 
     int getMaxY() {
         return latRange.getMax();
+    }
+
+    public String toString() {
+        return "(" + getMinY() + ", " + getMinX() + ") - (" + getMaxY() + ", " + getMaxX() + ")";
     }
 
     Territory getParentTerritory() {
