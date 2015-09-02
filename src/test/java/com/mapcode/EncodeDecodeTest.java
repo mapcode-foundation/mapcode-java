@@ -141,6 +141,7 @@ public class EncodeDecodeTest {
                                                     }
                                                 }
                                                 if (!found) {
+                                                    if (!MapcodeCodec.multipleBordersNearby(decodeLocation, territory)) { // but should be found!
                                                         LOG.error("Re-encode{} of {} failed for {} {} from ({},{})", nrDigits, decodeLocation, territory, codePrecision, latDeg, lonDeg);
                                                         errors.getAndIncrement();
                                                         for (final Mapcode candidate : recodedMapcodes) {
