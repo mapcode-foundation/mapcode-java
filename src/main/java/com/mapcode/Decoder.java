@@ -227,34 +227,46 @@ class Decoder {
 
                         
                         if (Data.isRestricted(i) && !mapcodeZone.isEmpty()) {
-                            boolean fitssomewhere = false;
+                            int nrZoneOverlaps = 0;
                             int j;
                             Point result = mapcodeZone.midPoint();
+                            // see if midpoint of mapcode zone is in any sub-area...
                             for (j = i - 1; j >= from; j--) {
                                 if (!Data.isRestricted(j)) {
                                   final int xdiv8 = Common.xDivider(Data.getBoundaries(j).getMinY(),
                                           Data.getBoundaries(j).getMaxY()) / 4;
                                   if (Data.getBoundaries(j).containsPoint(result)) {
-                                      fitssomewhere = true;
+                                      nrZoneOverlaps++;
                                       break;
                                   }
                                 }
                             }
                             
-                            if (!fitssomewhere) { // FORCE_RECODE
+                            if (nrZoneOverlaps == 0) {
+                                // see if mapcode zone OVERLAPS any sub-area...
+                                MapcodeZone zfound = MapcodeZone.empty();
                                 for (j = from; j < i; j++) { // try all smaller rectangles j
-                                  if (!Data.isRestricted(j)) {
-                                      MapcodeZone z = mapcodeZone.restrictZoneTo(Data.getBoundaries(j));
-                                      if (!z.isEmpty()) {
-                                          mapcodeZone.fillFrom(z);
-                                          fitssomewhere = true;
-                                          break;
-                                      }
-                                  }
+                                    if (!Data.isRestricted(j)) {
+                                        MapcodeZone z = mapcodeZone.restrictZoneTo(Data.getBoundaries(j));
+                                        if (!z.isEmpty()) {
+                                            nrZoneOverlaps++;                                            
+                                            if (nrZoneOverlaps == 1) {
+                                                // first fit! remember...
+                                                zfound.fillFrom(z);
+                                            }
+                                            else { // nrZoneOverlaps > 1
+                                                // more than one hit
+                                                break; // give up!
+                                            }
+                                        }
+                                    }
                                 }
-                            } //FORCE_RECODE
+                                if (nrZoneOverlaps == 1) { // intersected exactly ONE sub-area?
+                                    mapcodeZone.fillFrom(zfound); // use the intersection found...
+                                }
+                            }
 
-                            if (!fitssomewhere) {
+                            if (nrZoneOverlaps == 0) {
                                 mapcodeZone.setEmpty();
                             }
                         }
@@ -921,8 +933,6 @@ class Decoder {
                 mapcodeZone.fminy = (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR);
             }
         }
-
-        // return the coordinate in the center of the mapcode-defined zone
         return mapcodeZone;
     }
 }
