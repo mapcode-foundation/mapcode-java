@@ -400,7 +400,7 @@ public final class Mapcode {
      */
     private static final double[] PRECISION_0_MAX_OFFSET_METERS = { 
         7.49,         // PRECISION_0: 7.49 meters or less       7.5 m
-        1.45,         // PRECISION_1: 1.45 meters or less       1.5 m
+        1.39,         // PRECISION_1: 1.39 meters or less       1.4 m
         0.251,        // PRECISION_2: 25.1 cm or less           25 cm
         0.0462,       // PRECISION_3: 4.62 cm or less           5 cm
         0.00837,      // PRECISION_4: 8.37 mm or less           1 cm

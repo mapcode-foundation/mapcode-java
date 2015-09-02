@@ -252,43 +252,43 @@ public final class MapcodeCodec {
     }
 
     /**
-     * Is coordinate within a given territory?
+     * Is coordinate near multiple territory borders?
      *
      * @param point        Latitude/Longitude in degrees
      * @param territory    Territory
-     * @return true iff the coordinate is inside the specified territory.
+     * @return true iff the coordinate is near more than one territory border
+     *         (and thus encode(decode(M)) may not produce M)
      */
-    public static boolean isInsideTerritory(@Nonnull final Point point, @Nonnull final Territory territory) {
-        final int ccode = territory.getNumber();
-        final int from = DataAccess.dataFirstRecord(ccode);
-        final int upto = DataAccess.dataLastRecord(ccode);
-        if (Data.getBoundaries(upto).containsPoint(point)) {
-            for (int m = upto; m >= from; m--) {
-                if (!Data.isRestricted(m)) {
-                    if (Data.getBoundaries(m).containsPoint(point)) {
-                        return true;
+
+    public static boolean multipleBordersNearby(@Nonnull final Point point, @Nonnull final Territory territory) {
+        if (territory != territory.AAA) {
+            final int ccode = territory.getNumber();
+            if (territory.getParentTerritory() != null) {
+                // there is a parent! check its borders as well...
+                if (multipleBordersNearby(point, territory.getParentTerritory())) {
+                    return true;
+                }
+            }
+            {
+                int nrFound = 0;
+                final int from = DataAccess.dataFirstRecord(ccode);
+                final int upto = DataAccess.dataLastRecord(ccode);
+                for (int m = upto; m >= from; m--) {
+                    if (!Data.isRestricted(m)) {
+                        final SubArea boundaries = Data.getBoundaries(m);
+                        final int xdiv8 = Common.xDivider(boundaries.getMinY(),boundaries.getMaxY()) / 4; // @@@
+                        if (boundaries.extendBounds(xdiv8, 60).containsPoint(point)) {
+                            if (!boundaries.extendBounds(-xdiv8, -60).containsPoint(point)) {
+                                nrFound++;
+                                if (nrFound > 1) {
+                                    return true;
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
         return false;
-    }
-
-    /**
-     * Is coordinate "fully within" a given territory?
-     *
-     * @param point        Latitude/Longitude in degrees
-     * @param territory    Territory
-     * @return true iff the coordinate is inside the specified territory, and furthermore,
-     * IF the territory has a perent territory: inside the parent territory.
-     *
-     * Note that for the mapcode system, the following should hold: IF a point p has a 
-     * mapcode M, THEN decode(M) delivers a point q within maxErrorInMeters() of p.
-     * Furthermore, encode(q) must yield back M *unless* point q is not "fully inside"
-     * the mapcode territory.
-     */
-    public static boolean isFullyInsideTerritory(@Nonnull final Point point, @Nonnull final Territory territory) {
-        final Territory parentTerritory = territory.getParentTerritory();
-        return isInsideTerritory(point, territory) && ((parentTerritory == null) || isInsideTerritory(point, parentTerritory));
     }
 }

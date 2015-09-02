@@ -128,20 +128,19 @@ public class EncodeDecodeTest {
                                                     break;
                                                 }
                                             }
-                                            if (!found) { // not found?
-                                                if (MapcodeCodec.isFullyInsideTerritory(decodeLocation, territory)) { // but should be found!
-                                                    // perhaps it was inherited from the parent?
-                                                    final Territory parentTerritory = territory.getParentTerritory();                                                
-                                                    if (parentTerritory != null) {                                                    
-                                                        final List<Mapcode> recodedMapcodesFromParent = MapcodeCodec.encode(decodeLocation,parentTerritory);
-                                                        for (final Mapcode candidate : recodedMapcodesFromParent) {
-                                                            if (codePrecision.equals(candidate.getCode(nrDigits))) {
-                                                                found = true;
-                                                                break;
-                                                            }
+                                            if (!found) {
+                                                // perhaps it was inherited from the parent?
+                                                final Territory parentTerritory = territory.getParentTerritory();                                                
+                                                if (parentTerritory != null) {                                                    
+                                                    final List<Mapcode> recodedMapcodesFromParent = MapcodeCodec.encode(decodeLocation,parentTerritory);
+                                                    for (final Mapcode candidate : recodedMapcodesFromParent) {
+                                                        if (codePrecision.equals(candidate.getCode(nrDigits))) {
+                                                            found = true;
+                                                            break;
                                                         }
                                                     }
-                                                    if (!found) {
+                                                }
+                                                if (!found) {
                                                         LOG.error("Re-encode{} of {} failed for {} {} from ({},{})", nrDigits, decodeLocation, territory, codePrecision, latDeg, lonDeg);
                                                         errors.getAndIncrement();
                                                         for (final Mapcode candidate : recodedMapcodes) {
