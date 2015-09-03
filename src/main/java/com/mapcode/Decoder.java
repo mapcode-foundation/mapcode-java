@@ -225,6 +225,10 @@ class Decoder {
                                 Data.getBoundaries(i).getMaxX(), Data.getBoundaries(i).getMaxY(),
                                 i, extrapostfix);
 
+                        // first of all, make sure the zone fits the country
+                        if (!mapcodeZone.isEmpty() && (territory != territory.AAA)) {
+                            mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
+                        }
                         
                         if (Data.isRestricted(i) && !mapcodeZone.isEmpty()) {
                             int nrZoneOverlaps = 0;
@@ -233,8 +237,6 @@ class Decoder {
                             // see if midpoint of mapcode zone is in any sub-area...
                             for (j = i - 1; j >= from; j--) {
                                 if (!Data.isRestricted(j)) {
-                                  final int xdiv8 = Common.xDivider(Data.getBoundaries(j).getMinY(),
-                                          Data.getBoundaries(j).getMaxY()) / 4;
                                   if (Data.getBoundaries(j).containsPoint(result)) {
                                       nrZoneOverlaps++;
                                       break;
@@ -292,15 +294,10 @@ class Decoder {
             }
         }
 
-        final Point result;
-        if (mapcodeZone.isEmpty()) {
-            result = Point.undefined();
-        } else if (territory == territory.AAA) {
-            result = mapcodeZone.midPoint().wrap();
-        } else {
+        if (territory != territory.AAA) {
             mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
-            result = mapcodeZone.midPoint().wrap();
         }
+        final Point result = mapcodeZone.midPoint().wrap();
 
         LOG.trace("decode: result=({}, {})",
                 result.isDefined() ? result.getLatDeg() : Double.NaN,
@@ -549,6 +546,10 @@ class Decoder {
                 v -= 16 * 961 * 31;
                 nrX++;
             }
+        }
+
+        if (nrX > a) {  // past end!
+            return MapcodeZone.empty();
         }
 
         final int m = firstrec + nrX;
@@ -910,8 +911,8 @@ class Decoder {
             processor *= 30;
         }
 
-        double lon4 = (x * 4 * Point.MAX_PRECISION_FACTOR) + ((lon32 * dividerx4)) + (lon_offset4 * Point.MAX_PRECISION_FACTOR);
-        double lat1 = (y     * Point.MAX_PRECISION_FACTOR) + ((lat32 * dividery ));
+        double lon4 = (x * 4 * Point.MAX_PRECISION_FACTOR) + (lon32 * dividerx4) + (lon_offset4 * Point.MAX_PRECISION_FACTOR);
+        double lat1 = (y     * Point.MAX_PRECISION_FACTOR) + (lat32 * dividery );
 
         // determine the range of coordinates that are encode to this mapcode
         if (odd) { // odd
