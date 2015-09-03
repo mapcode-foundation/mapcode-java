@@ -39,7 +39,7 @@ class DataAccess {
     // Read data only once in static initializer.
     static {
         LOG.info("DataAccess: reading regions from file: {}", FILE_NAME);
-        final int bufferSize = 100000;
+        final int bufferSize = 131072;
         final byte[] readBuffer = new byte[bufferSize];
         int total = 0;
         try {
@@ -57,10 +57,16 @@ class DataAccess {
                     // Copy stream as unsigned bytes (ints).
                     final byte[] bytes = outputStream.toByteArray();
                     assert total == bytes.length;
-                    FILE_DATA = new int[total];
-                    for (int i = 0; i < total; ++i) {
-                        FILE_DATA[i] = (bytes[i] < 0) ? (bytes[i] + 256) : bytes[i];
-
+                    FILE_DATA = new int[total / 4];
+                    for (int i = 0; i < total; i++) {
+                        final int b1 = (bytes[i] < 0) ? (bytes[i] + 256) : bytes[i]; 
+                        i++;
+                        final int b2 = (bytes[i] < 0) ? (bytes[i] + 256) : bytes[i]; 
+                        i++;
+                        final int b3 = (bytes[i] < 0) ? (bytes[i] + 256) : bytes[i]; 
+                        i++;
+                        final int b4 = (bytes[i] < 0) ? (bytes[i] + 256) : bytes[i];
+                        FILE_DATA[i / 4] = b1 + (b2 << 8) + (b3 << 16) + (b4 << 24);
                     }
                 } finally {
                     outputStream.close();
@@ -79,21 +85,28 @@ class DataAccess {
         // Empty.
     }
 
-    static int dataFlags(final int i) {
-        return FILE_DATA[(i * 20) + 16] +
-                (FILE_DATA[(i * 20) + 17] * 256);
+    static int minx(final int i) { 
+        return FILE_DATA[i * 5];
+    }
+    
+    static int miny(final int i) {
+        return FILE_DATA[(i * 5) + 1];
+    }
+    
+    static int maxx(final int i) {
+        return FILE_DATA[(i * 5) + 2];
     }
 
-    static int asLong(final int i) {
-        return FILE_DATA[i] +
-                (FILE_DATA[i + 1] << 8) +
-                (FILE_DATA[i + 2] << 16) +
-                (FILE_DATA[i + 3] << 24);
+    static int maxy(final int i) {
+        return FILE_DATA[(i * 5) + 3];
+    }
+
+    static int dataFlags(final int i) {
+        return FILE_DATA[(i * 5) + 4] & 65535;
     }
 
     static int smartDiv(final int i) {
-        return FILE_DATA[(i * 20) + 18] +
-                (FILE_DATA[(i * 20) + 19] * 256);
+        return FILE_DATA[(i * 5) + 4] >> 16;
     }
 
     private final static int[] DATA_START = {
@@ -160,9 +173,5 @@ class DataAccess {
 
     static int dataLastRecord(final int ccode) {
         return DATA_START[ccode + 1] - 1;
-    }
-
-    static int numberOfSubAreas() {
-        return DATA_START[DATA_START.length - 1];
     }
 }

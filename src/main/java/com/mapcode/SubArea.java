@@ -319,18 +319,10 @@ class SubArea {
     }
 
     private void minMaxSetup(final int arg) {
-        int i = arg * 20;
-        final int minX = DataAccess.asLong(i);
-
-        i += 4;
-        final int minY = DataAccess.asLong(i);
-
-        i += 4;
-        final int maxX = DataAccess.asLong(i);
-
-        i += 4;
-        final int maxY = DataAccess.asLong(i);
-
+        final int minX = DataAccess.minx(arg);
+        final int minY = DataAccess.miny(arg);
+        final int maxX = DataAccess.maxx(arg);
+        final int maxY = DataAccess.maxy(arg);
         latRange = new Range<Integer>(minY, maxY);
         lonRange = new Range<Integer>(minX, maxX);
     }

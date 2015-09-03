@@ -276,7 +276,7 @@ public final class MapcodeCodec {
                 for (int m = upto; m >= from; m--) {
                     if (!Data.isRestricted(m)) {
                         final SubArea boundaries = Data.getBoundaries(m);
-                        final int xdiv8 = Common.xDivider(boundaries.getMinY(),boundaries.getMaxY()) / 4; // @@@
+                        final int xdiv8 = Common.xDivider(boundaries.getMinY(),boundaries.getMaxY()) / 4;
                         if (boundaries.extendBounds(xdiv8, 60).containsPoint(point)) {
                             if (!boundaries.extendBounds(-xdiv8, -60).containsPoint(point)) {
                                 nrFound++;
