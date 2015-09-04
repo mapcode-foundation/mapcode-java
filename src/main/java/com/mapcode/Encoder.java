@@ -42,11 +42,9 @@ class Encoder {
             final double latDeg,
             final double lonDeg,
             @Nullable final Territory territory,
-            final boolean isRecursive,
-            final boolean stopWithOneResult,
-            final boolean allowWorld) {
+            final boolean stopWithOneResult) {
 
-        return encode(latDeg, lonDeg, territory, stopWithOneResult, allowWorld, null);
+        return encode(latDeg, lonDeg, territory, stopWithOneResult, null);
     }
 
     // ----------------------------------------------------------------------
@@ -59,11 +57,10 @@ class Encoder {
     @SuppressWarnings("ConstantConditions")
     @Nonnull
     private static List<Mapcode> encode(final double argLatDeg, final double argLonDeg,
-                                        @Nullable final Territory territory, final boolean limitToOneResult, final boolean allowWorld,
+                                        @Nullable final Territory territory, final boolean limitToOneResult, 
                                         @Nullable final Territory argStateOverride) {
-        LOG.trace("encode: latDeg={}, lonDeg={}, territory={}, limitToOneResult={}, allowWorld={}",
-                argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), limitToOneResult,
-                allowWorld);
+        LOG.trace("encode: latDeg={}, lonDeg={}, territory={}, limitToOneResult={}",
+                argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), limitToOneResult);
 
         final int ccode_earth = Territory.AAA.getNumber();
 
@@ -74,7 +71,7 @@ class Encoder {
         int lastbasesubareaID = -1;
 
         final int firstNr = (territory != null) ? territory.getNumber() : 0;
-        final int lastNr = (territory != null) ? territory.getNumber() : (allowWorld ? ccode_earth : (ccode_earth-1) );
+        final int lastNr = (territory != null) ? territory.getNumber() : ccode_earth;
         for (int ccode = firstNr; ccode <= lastNr; ccode++ ) {
 
             final int upto = DataAccess.dataLastRecord(ccode);
@@ -91,9 +88,9 @@ class Encoder {
                     mapcode = encodeNameless(pointToEncode, i, from);
                 } else if (Data.recType(i) > 1) {
                     mapcode = encodeAutoHeader(pointToEncode, i);
-                } else if ((i == upto) && Data.isRestricted(i) && (currentEncodeTerritory.getParentTerritory() != null)) {
+                } else if ((i == upto) && (currentEncodeTerritory.getParentTerritory() != null)) {
                     results.addAll(encode(argLatDeg, argLonDeg, currentEncodeTerritory.getParentTerritory(), limitToOneResult,
-                            allowWorld, currentEncodeTerritory));
+                            currentEncodeTerritory));
                     continue;
                 } else if (!Data.isRestricted(i) || (lastbasesubareaID == from)) {
                     if (Data.calcCodex(i) < 54) {

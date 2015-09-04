@@ -93,7 +93,7 @@ public final class MapcodeCodec {
     public static List<Mapcode> encode(final double latDeg, final double lonDeg,
                                        @Nullable final Territory restrictToTerritory) throws IllegalArgumentException {
         // Call Mapcode encoder.
-        final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, false, (restrictToTerritory == null));
+        final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, /*shortest*/false);
         assert results != null;
         return results;
     }
@@ -122,7 +122,7 @@ public final class MapcodeCodec {
 
         // Call mapcode encoder.
         @Nonnull final List<Mapcode> results =
-                Encoder.encode(latDeg, lonDeg, restrictToTerritory, false, true, false);
+                Encoder.encode(latDeg, lonDeg, restrictToTerritory, /*shortest*/true);
         assert results != null;
         assert results.size() <= 1;
         if (results.isEmpty()) {
