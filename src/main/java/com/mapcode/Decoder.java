@@ -96,7 +96,7 @@ class MapcodeZone {
     // returns a non-empty intersection of a mapcode zone and a territory area.
     // returns null if no such intersection exists
     @Nonnull
-    public MapcodeZone restrictZoneTo(@Nonnull final SubArea area) {
+    public MapcodeZone restrictZoneTo(@Nonnull final Boundaries area) {
         MapcodeZone z = new MapcodeZone(this);
         final double miny = area.getMinY() * Point.MICROLAT_TO_FRACTIONS_FACTOR;
         if (z.fminy < miny) {
@@ -195,9 +195,6 @@ class Decoder {
         final int ccode = territory.getNumber();
 
         final int from = DataAccess.dataFirstRecord(ccode);
-        if (DataAccess.dataFlags(from) == 0) { // no data for this territory?
-            return Point.undefined(); // this territory is not in the current data
-        }
         final int upto = DataAccess.dataLastRecord(ccode);
 
         final int incodexhi = mapcode.indexOf('.');
@@ -226,7 +223,7 @@ class Decoder {
                                 i, extrapostfix);
 
                         // first of all, make sure the zone fits the country
-                        if (!mapcodeZone.isEmpty() && (territory != territory.AAA)) {
+                        if (!mapcodeZone.isEmpty() && (territory != Territory.AAA)) {
                             mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
                         }
                         
@@ -294,7 +291,7 @@ class Decoder {
             }
         }
 
-        if (territory != territory.AAA) {
+        if (territory != Territory.AAA) {
             mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
         }
         final Point result = mapcodeZone.midPoint().wrap();

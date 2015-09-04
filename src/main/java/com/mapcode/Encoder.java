@@ -65,33 +65,27 @@ class Encoder {
                 argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), limitToOneResult,
                 allowWorld);
 
-        final Point pointToEncode = Point.fromDeg(argLatDeg, argLonDeg);
-        final List<SubArea> areas = SubArea.getAreasForPoint(pointToEncode);
+        final int ccode_earth = Territory.AAA.getNumber();
+
+        final Point pointToEncode = Point.fromDeg(argLatDeg, argLonDeg);      
+
         final List<Mapcode> results = new ArrayList<Mapcode>();
 
         int lastbasesubareaID = -1;
 
-        for (final SubArea subArea : areas) {
-            if ((territory != null) && (subArea.getParentTerritory() != territory)) {
+        final int firstNr = (territory != null) ? territory.getNumber() : 0;
+        final int lastNr = (territory != null) ? territory.getNumber() : (allowWorld ? ccode_earth : (ccode_earth-1) );
+        for (int ccode = firstNr; ccode <= lastNr; ccode++ ) {
+
+            final int upto = DataAccess.dataLastRecord(ccode);
+            if ((ccode != ccode_earth) && !Data.getBoundaries(upto).containsPoint(pointToEncode)) {
                 continue;
             }
+            final int from = DataAccess.dataFirstRecord(ccode);          
+            final Territory currentEncodeTerritory = Territory.fromNumber(ccode);
 
-            final Territory currentEncodeTerritory = subArea.getParentTerritory();
-
-            if ((currentEncodeTerritory == Territory.AAA) && !allowWorld &&
-                    (territory != Territory.AAA)) {
-                continue;
-            }
-
-            final int from = DataAccess.dataFirstRecord(currentEncodeTerritory.getNumber());
-            
-            if (DataAccess.dataFlags(from) == 0) { // no data for this territory?
-                continue;
-            }
-            final int upto = DataAccess.dataLastRecord(currentEncodeTerritory.getNumber());
-
-            final int i = subArea.getSubAreaID();
-            if (Data.getBoundaries(i).containsPoint(pointToEncode)) {
+            for(int i=from; i<=upto; i++) {
+              if (Data.getBoundaries(i).containsPoint(pointToEncode)) {
                 String mapcode = "";
                 if (Data.isNameless(i)) {
                     mapcode = encodeNameless(pointToEncode, i, from);
@@ -131,6 +125,7 @@ class Encoder {
                         return results;
                     }
                 }
+              }
             }
         }
         LOG.trace("encode: results={} items", results.size());

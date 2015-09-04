@@ -63,7 +63,7 @@ class Data {
         return "";
     }
 
-    static SubArea getBoundaries(final int i) {
-        return SubArea.getArea(i);
+    static Boundaries getBoundaries(final int i) {
+        return Boundaries.getBoundaries(i);
     }
 }
