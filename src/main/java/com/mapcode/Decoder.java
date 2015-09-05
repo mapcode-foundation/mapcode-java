@@ -138,8 +138,6 @@ class MapcodeZone {
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
 
-    private static final char GREEK_CAPITAL_ALPHA = 'Α';
-
     private Decoder() {
         // Prevent instantiation.
     }
@@ -223,9 +221,7 @@ class Decoder {
                                 i, extrapostfix);
 
                         // first of all, make sure the zone fits the country
-                        if (!mapcodeZone.isEmpty() && (territory != Territory.AAA)) {
-                            mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
-                        }
+                        mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
                         
                         if (Data.isRestricted(i) && !mapcodeZone.isEmpty()) {
                             int nrZoneOverlaps = 0;
@@ -291,9 +287,8 @@ class Decoder {
             }
         }
 
-        if (territory != Territory.AAA) {
-            mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
-        }
+        mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
+
         final Point result = mapcodeZone.midPoint().wrap();
 
         LOG.trace("decode: result=({}, {})",
@@ -343,7 +338,7 @@ class Decoder {
     private static final char MISSCODE = '?';
 
     private final static char[][] ASCII2LANGUAGE = {
-            // Character:   A       B       C       D       E       F       G       H       I       J      K        L       M       N       O       P       Q       R       S       T       U       V       W       X       Y       Z       0       1       2       3       4       5       6       7       8       9
+            // Character:   A         B         C         D         E         F         G         H         I         J        K          L         M         N         O         P         Q         R         S         T         U         V         W         X         Y         Z         0         1         2         3         4         5         6         7         8         9
             /* Roman    */ {'\u0041', '\u0042', '\u0043', '\u0044', '\u0045', '\u0046', '\u0047', '\u0048', '\u0049', '\u004a', '\u004b', '\u004c', '\u004d', '\u004e', '\u004f', '\u0050', '\u0051', '\u0052', '\u0053', '\u0054', '\u0055', '\u0056', '\u0057', '\u0058', '\u0059', '\u005a', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Roman
             /* Greek    */ {'\u0391', '\u0392', '\u039e', '\u0394', MISSCODE, '\u0395', '\u0393', '\u0397', '\u0399', '\u03a0', '\u039a', '\u039b', '\u039c', '\u039d', '\u039f', '\u03a1', '\u0398', '\u03a8', '\u03a3', '\u03a4', MISSCODE, '\u03a6', '\u03a9', '\u03a7', '\u03a5', '\u0396', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Greek
             /* Cyrillic */ {'\u0410', '\u0412', '\u0421', '\u0414', '\u0415', '\u0416', '\u0413', '\u041d', '\u0418', '\u041f', '\u041a', '\u041b', '\u041c', '\u0417', '\u041e', '\u0420', '\u0424', '\u042f', '\u0426', '\u0422', '\u042d', '\u0427', '\u0428', '\u0425', '\u0423', '\u0411', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Cyrillic
@@ -772,6 +767,7 @@ class Decoder {
         result = asciiBuf.toString();
 
         // Repack if this was a Greek 'alpha' code. This will have been converted to a regular 'A' after one iteration.
+        final char GREEK_CAPITAL_ALPHA = '\u0391';
         if (mapcode.startsWith(String.valueOf(GREEK_CAPITAL_ALPHA))) {
             final String unpacked = aeuUnpack(result);
             if (unpacked.isEmpty()) {

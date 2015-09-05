@@ -62,8 +62,6 @@ class Encoder {
         LOG.trace("encode: latDeg={}, lonDeg={}, territory={}, limitToOneResult={}",
                 argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), limitToOneResult);
 
-        final int ccode_earth = Territory.AAA.getNumber();
-
         final Point pointToEncode = Point.fromDeg(argLatDeg, argLonDeg);      
 
         final List<Mapcode> results = new ArrayList<Mapcode>();
@@ -71,11 +69,11 @@ class Encoder {
         int lastbasesubareaID = -1;
 
         final int firstNr = (territory != null) ? territory.getNumber() : 0;
-        final int lastNr = (territory != null) ? territory.getNumber() : ccode_earth;
+        final int lastNr = (territory != null) ? territory.getNumber() : Territory.AAA.getNumber();
         for (int ccode = firstNr; ccode <= lastNr; ccode++ ) {
 
             final int upto = DataAccess.dataLastRecord(ccode);
-            if ((ccode != ccode_earth) && !Data.getBoundaries(upto).containsPoint(pointToEncode)) {
+            if (!Data.getBoundaries(upto).containsPoint(pointToEncode)) {
                 continue;
             }
             final int from = DataAccess.dataFirstRecord(ccode);          
@@ -413,6 +411,7 @@ class Encoder {
         return result;
     }
 
+    // add vowels to prevent all-digit mapcodes
     static String aeuPack(final String argStr, final boolean argShort) {
         String str = argStr;
         int dotpos = -9;
@@ -436,12 +435,11 @@ class Encoder {
         }
 
         if ((rlen - 2) > dotpos) {
-            // does r have a dot, AND at least 2 chars
-            // after the dot?
-            if (argShort) {
+            // does r have a dot, AND at least 2 chars after the dot?
+            if (argShort) { // use A only
                 final int v = ((((int) str.charAt(0)) - 48) * 100) + ((((int) str.charAt(rlen - 2)) - 48) * 10) + (((int) str.charAt(rlen - 1)) - 48);
                 return 'A' + str.substring(1, rlen - 2) + ENCODE_CHARS[v / 32] + ENCODE_CHARS[v % 32] + rest;
-            } else {
+            } else { // use A, E and U
                 final int v = (((((int) str.charAt(rlen - 2)) - 48) * 10) + ((int) str.charAt(rlen - 1))) - 48;
                 str = str.substring(0, rlen - 2) + ENCODE_CHARS[31 + (v / 34)] + ENCODE_CHARS[v % 34];
             }

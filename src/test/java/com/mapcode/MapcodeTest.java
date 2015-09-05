@@ -30,26 +30,26 @@ public class MapcodeTest {
     public void checkValidPrecisionFormats() {
         LOG.info("checkValidPrecisionFormats");
 
-        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("A1.B1"));
-        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("a1.B1"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("P1.B1"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("p1.B1"));
         assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("00.01"));
-        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("AAA.01"));
-        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("AAA.BBB"));
-        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("AAAA.BBB"));
-        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("AAAA.BBBB"));
-        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("AAAAA.BBBB"));
-        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("AA.AA-0"));
-        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("AA.AA-01"));
-        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("AA.AA-A"));
-        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("AA.AA-AA"));
-        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("AA.AA-Y"));
-        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("AA.AA-1Y"));
-        assertEquals(PrecisionFormat.PRECISION_3, Mapcode.getPrecisionFormat("AA.AA-321"));
-        assertEquals(PrecisionFormat.PRECISION_4, Mapcode.getPrecisionFormat("AA.AA-21PQ"));
-        assertEquals(PrecisionFormat.PRECISION_5, Mapcode.getPrecisionFormat("AA.AA-321PQ"));
-        assertEquals(PrecisionFormat.PRECISION_6, Mapcode.getPrecisionFormat("AA.AA-321PQR"));
-        assertEquals(PrecisionFormat.PRECISION_7, Mapcode.getPrecisionFormat("AA.AA-4321PRS"));
-        assertEquals(PrecisionFormat.PRECISION_8, Mapcode.getPrecisionFormat("AA.AA-4321PQRS"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("PPP.01"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("PPP.BBB"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("PPPP.BBB"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("PPPP.BBBB"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("PPPPP.BBBB"));
+        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("PP.PP-0"));
+        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("PP.PP-01"));
+        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("PP.PP-P"));
+        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("PP.PP-PP"));
+        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("PP.PP-Y"));
+        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("PP.PP-1Y"));
+        assertEquals(PrecisionFormat.PRECISION_3, Mapcode.getPrecisionFormat("PP.PP-321"));
+        assertEquals(PrecisionFormat.PRECISION_4, Mapcode.getPrecisionFormat("PP.PP-21PQ"));
+        assertEquals(PrecisionFormat.PRECISION_5, Mapcode.getPrecisionFormat("PP.PP-321PQ"));
+        assertEquals(PrecisionFormat.PRECISION_6, Mapcode.getPrecisionFormat("PP.PP-321PQR"));
+        assertEquals(PrecisionFormat.PRECISION_7, Mapcode.getPrecisionFormat("PP.PP-4321PRS"));
+        assertEquals(PrecisionFormat.PRECISION_8, Mapcode.getPrecisionFormat("PP.PP-4321PQRS"));
 
         // Mapcode may contain correctly formatted (possible incorrect) territory code.
         assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("NLD XX.XX"));
@@ -69,13 +69,13 @@ public class MapcodeTest {
         assertFalse(Mapcode.isValidMapcodeFormat("US IN XX.XX"));
 
         // Incorrect (nunber of) characters.
-        assertFalse(Mapcode.isValidMapcodeFormat("A"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AB"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AB."));
-        assertFalse(Mapcode.isValidMapcodeFormat(".A"));
-        assertFalse(Mapcode.isValidMapcodeFormat(".AB"));
-        assertFalse(Mapcode.isValidMapcodeFormat("A.B"));
-        assertFalse(Mapcode.isValidMapcodeFormat("a.B"));
+        assertFalse(Mapcode.isValidMapcodeFormat("P"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PQ"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PQ."));
+        assertFalse(Mapcode.isValidMapcodeFormat(".P"));
+        assertFalse(Mapcode.isValidMapcodeFormat(".PQ"));
+        assertFalse(Mapcode.isValidMapcodeFormat("P.Q"));
+        assertFalse(Mapcode.isValidMapcodeFormat("p.Q"));
         assertFalse(Mapcode.isValidMapcodeFormat("0.1"));
         assertFalse(Mapcode.isValidMapcodeFormat("0.1"));
         assertFalse(Mapcode.isValidMapcodeFormat("00.1"));
@@ -85,38 +85,38 @@ public class MapcodeTest {
         assertFalse(Mapcode.isValidMapcodeFormat("00.01.00"));
         assertFalse(Mapcode.isValidMapcodeFormat("00.01-"));
         assertFalse(Mapcode.isValidMapcodeFormat("00.01-"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAAAAA.BBBB"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAAAA.BBBBB"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-1Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-12Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-123Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-1234Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-12345Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-123456Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-1234567Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AA.AA-123456789")); // more than 8 eAtension characters!
-        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A"));
-        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA-1"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A-1"));
-        assertFalse(Mapcode.isValidMapcodeFormat("A.AAA-12"));
-        assertFalse(Mapcode.isValidMapcodeFormat("AAA.A-12"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PPPPPP.QQQQ"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PPPPP.QQQQQ"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-1Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-12Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-123Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-1234Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-12345Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-123456Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-1234567Z"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-123456789")); // more than 8 ePtension characters!
+        assertFalse(Mapcode.isValidMapcodeFormat("P.PPP"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PPP.P"));
+        assertFalse(Mapcode.isValidMapcodeFormat("P.PPP-1"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PPP.P-1"));
+        assertFalse(Mapcode.isValidMapcodeFormat("P.PPP-12"));
+        assertFalse(Mapcode.isValidMapcodeFormat("PPP.P-12"));
     }
 
     @Test
     public void checkPrecisionFormat1() {
         LOG.info("checkPrecisionFormat1");
 
-        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("AA.BB"));
-        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("AA.BB-1"));
-        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("AA.BB-12"));
-        assertEquals(PrecisionFormat.PRECISION_3, Mapcode.getPrecisionFormat("AA.BB-123"));
-        assertEquals(PrecisionFormat.PRECISION_4, Mapcode.getPrecisionFormat("AA.BB-1234"));
-        assertEquals(PrecisionFormat.PRECISION_5, Mapcode.getPrecisionFormat("AA.BB-12345"));
-        assertEquals(PrecisionFormat.PRECISION_6, Mapcode.getPrecisionFormat("AA.BB-123456"));
-        assertEquals(PrecisionFormat.PRECISION_7, Mapcode.getPrecisionFormat("AA.BB-1234567"));
-        assertEquals(PrecisionFormat.PRECISION_8, Mapcode.getPrecisionFormat("AA.BB-12345678"));
+        assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("PP.QQ"));
+        assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("PP.QQ-1"));
+        assertEquals(PrecisionFormat.PRECISION_2, Mapcode.getPrecisionFormat("PP.QQ-12"));
+        assertEquals(PrecisionFormat.PRECISION_3, Mapcode.getPrecisionFormat("PP.QQ-123"));
+        assertEquals(PrecisionFormat.PRECISION_4, Mapcode.getPrecisionFormat("PP.QQ-1234"));
+        assertEquals(PrecisionFormat.PRECISION_5, Mapcode.getPrecisionFormat("PP.QQ-12345"));
+        assertEquals(PrecisionFormat.PRECISION_6, Mapcode.getPrecisionFormat("PP.QQ-123456"));
+        assertEquals(PrecisionFormat.PRECISION_7, Mapcode.getPrecisionFormat("PP.QQ-1234567"));
+        assertEquals(PrecisionFormat.PRECISION_8, Mapcode.getPrecisionFormat("PP.QQ-12345678"));
 
         assertEquals(PrecisionFormat.PRECISION_0, Mapcode.getPrecisionFormat("\u0e9a\u0e97\u0e84 \u0eab\u0ea7\u0e84.\u0ea73\u0eaa"));
         assertEquals(PrecisionFormat.PRECISION_1, Mapcode.getPrecisionFormat("\u0f40\u0f64\u0f4c \u0f535\u0f41\u0f42.5\u0f629-\u0f40"));

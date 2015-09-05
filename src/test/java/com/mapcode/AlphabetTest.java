@@ -36,10 +36,17 @@ public class AlphabetTest {
         convertCodeInAlphabet("\u0397\u03a0.\u03982-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
         convertCodeInAlphabet("GRC \u0397\u03a0.\u03982-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
 
-        final String code = "26.53UK";
-        final String codeGreek = Mapcode.convertStringToAlphabet(code, Alphabet.GREEK);
-        final String codeAscii = Mapcode.convertStringToPlainAscii(codeGreek);
+        String code = "26.53UK";
+        String codeGreek = Mapcode.convertStringToAlphabet(code, Alphabet.GREEK);
+        String codeAscii = Mapcode.convertStringToPlainAscii(codeGreek);
         LOG.info("code = {}, codeGreek = {}, codeAscii = {}", code, codeGreek, codeAscii);
+        assertEquals(code, codeAscii);
+
+        code = "000.EU";
+        codeGreek = Mapcode.convertStringToAlphabet(code, Alphabet.GREEK);
+        codeAscii = Mapcode.convertStringToPlainAscii(codeGreek);
+        LOG.info("code = {}, codeGreek = {}, codeAscii = {}", code, codeGreek, codeAscii);
+        assertEquals(codeGreek, "\u0391\u0030\u0030.23");
         assertEquals(code, codeAscii);
     }
 
