@@ -62,22 +62,25 @@ class DataAccess {
                     final byte[] bytes = outputStream.toByteArray();
                     assert total == bytes.length;
                     
-                    // read array sizes
-                    assert total > 4;
-                    nrTerritoryRecords = (bytes[0] & 255) + ((bytes[1] & 255) << 8);
-                    nrTerritories = (bytes[2] & 255) + ((bytes[3] & 255) << 8);
-                    LOG.info("nrTerritories={} nrTerritoryRecords={}",nrTerritories,nrTerritoryRecords);
-                    assert (2 + 2 + ((nrTerritories + 1) * 2) + (nrTerritoryRecords * 20) == total);
+                    // read 8-byte header: SIGNATURE "MC", VERSION, NR TERRITORIES, NR RECTRANGLE RECORD
+                    assert total > 8;
+                    assert (char) bytes[0] == 'M';
+                    assert (char) bytes[1] == 'C';
+                    final int dataVersion = (bytes[2] & 255) + ((bytes[3] & 255) << 8);
+                    nrTerritoryRecords = (bytes[4] & 255) + ((bytes[5] & 255) << 8);
+                    nrTerritories = (bytes[6] & 255) + ((bytes[7] & 255) << 8);
+                    LOG.info("version={} nrTerritories={} nrTerritoryRecords={}",dataVersion,nrTerritories,nrTerritoryRecords);
+                    assert (8 + ((nrTerritories + 1) * 2) + (nrTerritoryRecords * 20) == total);
 
-                    // read DATA+START array
+                    // read DATA+START array (2 bytes per territory, plus closing record)
                     DATA_START = new int[nrTerritories + 1];
-                    int i = 4;
+                    int i = 8;
                     for (int k=0; k <= nrTerritories; k++) {
                         DATA_START[k] = (bytes[i] & 255) + ((bytes[i + 1] & 255) << 8);
                         i += 2;
                     }
                     
-                    // read territory rectangle data (mminfo)
+                    // read territory rectangle data (5 longs per record)
                     FILE_DATA = new int[nrTerritoryRecords * 5];
                     for (int k=0; k < nrTerritoryRecords * 5; k++) {
                         FILE_DATA[k] = ((bytes[i] & 255)) + 

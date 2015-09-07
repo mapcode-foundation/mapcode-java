@@ -9,6 +9,15 @@
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 2.2.0
+
+    * Solved 1-microdegree gap in a few spots on Earth, noticable now extreme precision is possible;
+
+    * Replaced floating point by fixed point math; Improved speed;
+
+    * Enforce encode(decode(M))=M, except at territory border corners;
+
+    * Cleaned up source; moved hard-coded data into mminfo.dat;
 
 * 2.1.0
 

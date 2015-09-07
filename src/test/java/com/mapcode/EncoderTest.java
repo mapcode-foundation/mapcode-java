@@ -226,7 +226,7 @@ public class EncoderTest {
     @Test
     public void legalArguments() {
         LOG.info("legalArguments");
-        assertEquals(MapcodeCodec.encode(-90, 0).size(), 2); // ATA and AAA
+        assertEquals(MapcodeCodec.encode(-90, 0).size(), 3); // 2 x ATA and AAA
         assertEquals(MapcodeCodec.encode(-60, 0).size(), 2); // ATA and AAA
         assertEquals(MapcodeCodec.encode(90, 0).size(), 1); // AAA only
         assertEquals(MapcodeCodec.encode(0, -180),MapcodeCodec.encode(0, 180));

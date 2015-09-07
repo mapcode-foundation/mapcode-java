@@ -301,7 +301,7 @@ import static org.junit.Assert.assertTrue;
                 (args.length == 3) || (args.length == 6));
 
         final int count = Integer.parseInt(args[0]);
-        assertTrue("Expecting between 1 and 21 mapcodes", (1 <= count) && (count <= 21));
+        assertTrue("Expecting between 1 and 22 mapcodes", (1 <= count) && (count <= 22));
 
         // Read lat/lon.
         final double latDeg = Double.parseDouble(args[1]);
