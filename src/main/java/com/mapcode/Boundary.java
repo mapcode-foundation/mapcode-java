@@ -72,13 +72,12 @@ class Boundaries {
 
     public boolean containsPoint(@Nonnull final Point p) {
         final int y = p.getLatMicroDeg();
-        if ((miny <= y) && (y < maxy)) {
-            int x = p.getLonMicroDeg();
-            if ((minx <= x) && (x < maxx)) { return true; }
-            if (x < minx) { x += 360000000; } else { x -= 360000000; }
-            if ((minx <= x) && (x < maxx)) { return true; }
-        }
-        return false;
+        if ((miny > y) || (y >= maxy)) { return false; }
+        final int x = p.getLonMicroDeg();
+        // longitude boundaries can extend (slightly) outside the [-180,180) range
+        if (x < minx) { return (minx <= x + 360000000) && (x + 360000000 < maxx); } 
+        if (x >= maxx) { return (minx <= x - 360000000) && (x - 360000000 < maxx); }
+        return true;
     }
 
     public String toString() {
