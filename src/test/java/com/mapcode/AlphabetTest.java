@@ -16,7 +16,6 @@
 
 package com.mapcode;
 
-import com.mapcode.Mapcode.PrecisionFormat;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,9 +96,8 @@ public class AlphabetTest {
             final int precision) throws Exception {
 
         // Check type.
-        final PrecisionFormat precisionFormat = PrecisionFormat.fromNumber(precision);
-        final PrecisionFormat type = Mapcode.getPrecisionFormat(code);
-        assertEquals("code = " + code + ", type = " + type, precisionFormat, type);
+        final int type = Mapcode.getPrecisionFormat(code);
+        assertEquals("code = " + code + ", type = " + type, precision, type);
 
         // Check original code and converted to ASCII point at same location.
         final String codeAscii = Mapcode.convertStringToPlainAscii(code);

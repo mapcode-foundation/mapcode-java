@@ -271,47 +271,7 @@ public final class Mapcode {
     @Nonnull
     static final Pattern PATTERN_TERRITORY = Pattern.compile('^' + REGEX_TERRITORY + ' ');
     @Nonnull
-    static final Pattern PATTERN_PRECISION = Pattern.compile(REGEX_CODE_PRECISION + '$');
-
-    /**
-     * This enum describes the types of available mapcodes (as returned by {@link #getPrecisionFormat(String)}.
-     */
-    public enum PrecisionFormat {
-        PRECISION_0,
-        PRECISION_1,
-        PRECISION_2,
-        PRECISION_3,
-        PRECISION_4,
-        PRECISION_5,
-        PRECISION_6,
-        PRECISION_7,
-        PRECISION_8;
-
-        public static PrecisionFormat fromNumber(final int number) {
-            switch (number) {
-                case 0:
-                    return PRECISION_0;
-                case 1:
-                    return PRECISION_1;
-                case 2:
-                    return PRECISION_2;
-                case 3:
-                    return PRECISION_3;
-                case 4:
-                    return PRECISION_4;
-                case 5:
-                    return PRECISION_5;
-                case 6:
-                    return PRECISION_6;
-                case 7:
-                    return PRECISION_7;
-                case 8:
-                    return PRECISION_8;
-                default:
-                    throw new UnknownPrecisionFormatException("Precision must be in [0, 8], is: " + number, number);
-            }
-        }
-    }
+    static final Pattern PATTERN_PRECISION = Pattern.compile(REGEX_CODE_PRECISION + '$');    
 
     /**
      * This method return the mapcode type, given a mapcode string. If the mapcode string has an invalid
@@ -325,7 +285,7 @@ public final class Mapcode {
      * @throws UnknownPrecisionFormatException If precision format is incorrect.
      */
     @Nonnull
-    public static PrecisionFormat getPrecisionFormat(@Nonnull final String mapcode) throws UnknownPrecisionFormatException {
+    public static int getPrecisionFormat(@Nonnull final String mapcode) throws UnknownPrecisionFormatException {
 
         // First, decode to ASCII.
         final String decodedMapcode = convertStringToPlainAscii(mapcode).toUpperCase();
@@ -339,28 +299,11 @@ public final class Mapcode {
         // Precision part should be OK.
         final Matcher matcherPrecision = PATTERN_PRECISION.matcher(decodedMapcode);
         if (!matcherPrecision.find()) {
-            return PrecisionFormat.PRECISION_0;
+            return 0;
         }
         final int length = matcherPrecision.end() - matcherPrecision.start() - 1;
         assert (1 <= length) && (length <= 8);
-        switch (length) {
-          case 1:
-            return PrecisionFormat.PRECISION_1;
-          case 2:
-            return PrecisionFormat.PRECISION_2;
-          case 3:
-            return PrecisionFormat.PRECISION_3;
-          case 4:
-            return PrecisionFormat.PRECISION_4;
-          case 5:
-            return PrecisionFormat.PRECISION_5;
-          case 6:
-            return PrecisionFormat.PRECISION_6;
-          case 7:
-            return PrecisionFormat.PRECISION_7;
-          default:
-            return PrecisionFormat.PRECISION_8;
-        }
+        return length;
     }
 
     /**
