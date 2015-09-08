@@ -289,12 +289,12 @@ class Decoder {
 
         mapcodeZone = mapcodeZone.restrictZoneTo(Data.getBoundaries(upto));
 
-        final Point result = mapcodeZone.midPoint().wrap();
+        final Point result = mapcodeZone.midPoint();
 
         LOG.trace("decode: result=({}, {})",
                 result.isDefined() ? result.getLatDeg() : Double.NaN,
                 result.isDefined() ? result.getLonDeg() : Double.NaN);
-        return result.wrap();
+        return result;
     }
 
     // ----------------------------------------------------------------------

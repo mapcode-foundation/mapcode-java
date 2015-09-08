@@ -24,6 +24,13 @@ import static com.mapcode.CheckArgs.checkNonnull;
 
 /**
  * This class defines a class for lat/lon points.
+ *
+ * Internally, the class implements a fixed-point representation where a coordinate is expressed in
+ * "fractions", of 1/3.240,000,000,000th of a degree. A double (an IEEE 754-1985 binary64) is just
+ * sufficient to represent coordinates between -180 and +180 degrees in such fractions.
+ * However, for applications that use micro-degrees a lot, the implementation below is more efficient.
+ * It represent the fractions in pairs of integers, the first integer
+ * representing 1/1,000,000th of degrees, the second representing the remainder.
  */
 public class Point {
 
@@ -217,39 +224,6 @@ public class Point {
     private int fraclon; // whole nr of LON_TO_FRACTIONS_FACTOR, relative to lon32
 
     /**
-     * Adjusts coordinates to specified maxima (exclusive) and minima (inclusive)
-     */
-
-    public void setMaxLatToMicroDeg(final int maxMicroLat) {
-        if (lat32 >= maxMicroLat) {
-          lat32 = maxMicroLat-1;
-          fraclat = (int) MICROLAT_TO_FRACTIONS_FACTOR - 1;
-        }
-    }
-
-    public void setMaxLonToMicroDeg(final int maxMicroLon) {
-        int max = (maxMicroLon < 0 && lon32 > 0) ? maxMicroLon + 360000000 : maxMicroLon;
-        if (lon32 >= max) {
-          lon32 = max - 1;
-          fraclon = (int) MICROLON_TO_FRACTIONS_FACTOR - 1;
-        }
-    }
-
-    public void setMinLatToMicroDeg(final int minMicroLat) {
-        if (lat32 < minMicroLat) {
-            lat32 = minMicroLat;
-            fraclat = 0;
-        }
-    }
-
-    public void setMinLonToMicroDeg(final int minMicroLon) {
-        if (lon32 < minMicroLon) {
-            lon32 = minMicroLon;
-            fraclon = 0;
-        }
-    }
-
-    /**
      * Points can be "undefined" within the mapcode implementation, but never outside of that.
      * Any methods creating or setting undefined points must be package private and external
      * interfaces must never pass undefined points to callers.
@@ -285,6 +259,7 @@ public class Point {
         lon32 = (int) (frac / MICROLON_TO_FRACTIONS_FACTOR);
         frac -= ((double) lon32 * MICROLON_TO_FRACTIONS_FACTOR);
         fraclon = (int) frac;
+        // wrap lon32 from [0..360> to [-180..180)
         if (lon32 >= 180000000) { lon32 -= 360000000; }
 
         defined = true;
@@ -299,30 +274,17 @@ public class Point {
     static final int LAT_MICRODEG_MAX = degToMicroDeg(LAT_DEG_MAX);
 
     /**
-     * Set latitude to whole nr of microdegrees (no loss of precision)
-     */
-    public void setLatMicroDeg(final int latMicroDeg) {
-        lat32 = latMicroDeg;
-        fraclat = 0;
-    }
-    /**
-     * Set longitude to whole nr of microdegrees (no loss of precision)
-     */
-    public void setLonMicroDeg(final int lonMicroDeg) {
-        lon32 = lonMicroDeg;
-        fraclon = 0;
-    }
-
-    /**
      * Public construction, from integer microdegrees (no loss of precision)
      */
     @Nonnull
     public static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
         Point p = new Point();
-        p.setLatMicroDeg(latMicroDeg);
-        p.setLonMicroDeg(lonMicroDeg);
+        p.lat32 = latMicroDeg;
+        p.fraclat = 0;
+        p.lon32 = lonMicroDeg;
+        p.fraclon = 0;
         p.defined = true;
-        return p;
+        return p.wrap();
     }
 
     /**
@@ -338,7 +300,7 @@ public class Point {
         p.lon32   = (int) Math.floor(lonFractionDeg / MICROLON_TO_FRACTIONS_FACTOR);
         p.fraclon = (int) (lonFractionDeg - (MICROLON_TO_FRACTIONS_FACTOR * p.lon32));
         p.defined = true;
-        return p;
+        return p.wrap();
     }
 
     /**
@@ -371,16 +333,14 @@ public class Point {
     }
 
     @Nonnull
-    Point wrap() {
+    private Point wrap() {
         if (defined) {
             // Cut latitude to [-90, 90].
             if (lat32 < -90000000) { lat32 = -90000000; fraclat=0; }
             if (lat32 >  90000000) { lat32 =  90000000; fraclat=0; }
             // Map longitude to [-180, 180). Values outside this range are wrapped to this range.
-            if (lon32 < -180000000 || lon32 >= 180000000 ) {
-              lon32 -= 360000000 * (lon32 / 360000000); // [0..360)
-              if (lon32 >= 180000000) { lon32 -= 360000000; } // [-180,180)
-            }
+            lon32 %= 360000000;
+            if (lon32 >= 180000000) { lon32 -= 360000000; } else if (lon32 < -180000000) { lon32 += 360000000; }
         }
         return this;
     }
