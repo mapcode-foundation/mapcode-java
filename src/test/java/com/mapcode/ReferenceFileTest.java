@@ -65,8 +65,8 @@ public class ReferenceFileTest {
     public void checkRandomReferenceRecords() throws Exception {
         LOG.info("checkRandomReferenceRecords");
         checkFile(RANDOM_REFERENCE_FILE_1);
-@ignore        checkFile(RANDOM_REFERENCE_FILE_2);
-@ignore        checkFile(RANDOM_REFERENCE_FILE_3);
+        checkFile(RANDOM_REFERENCE_FILE_2);
+        checkFile(RANDOM_REFERENCE_FILE_3);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -74,15 +74,15 @@ public class ReferenceFileTest {
     public void checkGridReferenceRecords() throws Exception {
         LOG.info("checkGridReferenceRecords");
         checkFile(GRID_REFERENCE_FILE_1);
-@ignore        checkFile(GRID_REFERENCE_FILE_2);
-@ignore        checkFile(GRID_REFERENCE_FILE_3);
+        checkFile(GRID_REFERENCE_FILE_2);
+        checkFile(GRID_REFERENCE_FILE_3);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkBoundariesReferenceRecords() throws Exception {
         LOG.info("checkBoundariesReferenceRecords");
-@ignore        checkFile(BOUNDARIES_REFERENCE_FILE);
+        checkFile(BOUNDARIES_REFERENCE_FILE);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -90,8 +90,8 @@ public class ReferenceFileTest {
     public void checkRandomReferenceRecordsPrecision2() throws Exception {
         LOG.info("checkRandomReferenceRecordsPrecision2");
         checkFile(RANDOM_REFERENCE_FILE_1_HP);
-@ignore        checkFile(RANDOM_REFERENCE_FILE_2_HP);
-@ignore        checkFile(RANDOM_REFERENCE_FILE_3_HP);
+        checkFile(RANDOM_REFERENCE_FILE_2_HP);
+        checkFile(RANDOM_REFERENCE_FILE_3_HP);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -99,15 +99,15 @@ public class ReferenceFileTest {
     public void checkGridReferenceRecordsPrecision2() throws Exception {
         LOG.info("checkGridReferenceRecordsPrecision2");
         checkFile(GRID_REFERENCE_FILE_1_HP);
-@ignore        checkFile(GRID_REFERENCE_FILE_2_HP);
-@ignore        checkFile(GRID_REFERENCE_FILE_3_HP);
+        checkFile(GRID_REFERENCE_FILE_2_HP);
+        checkFile(GRID_REFERENCE_FILE_3_HP);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkBoundariesReferenceRecordsPrecision2() throws Exception {
         LOG.info("checkBoundariesReferenceRecordsPrecision2");
-@ignore        checkFile(BOUNDARIES_REFERENCE_FILE_HP);
+        checkFile(BOUNDARIES_REFERENCE_FILE_HP);
     }
 
     @SuppressWarnings("BusyWait")
