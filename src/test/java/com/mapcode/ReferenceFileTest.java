@@ -35,7 +35,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({"ProhibitedExceptionDeclared", "OverlyBroadThrowsClause"})
-@Ignore public class ReferenceFileTest {
+public class ReferenceFileTest {
     private static final Logger LOG = LoggerFactory.getLogger(ReferenceFileTest.class);
     private static final Gson GSON = new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
@@ -65,8 +65,8 @@ import static org.junit.Assert.assertTrue;
     public void checkRandomReferenceRecords() throws Exception {
         LOG.info("checkRandomReferenceRecords");
         checkFile(RANDOM_REFERENCE_FILE_1);
-        checkFile(RANDOM_REFERENCE_FILE_2);
-        checkFile(RANDOM_REFERENCE_FILE_3);
+@ignore        checkFile(RANDOM_REFERENCE_FILE_2);
+@ignore        checkFile(RANDOM_REFERENCE_FILE_3);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -74,15 +74,15 @@ import static org.junit.Assert.assertTrue;
     public void checkGridReferenceRecords() throws Exception {
         LOG.info("checkGridReferenceRecords");
         checkFile(GRID_REFERENCE_FILE_1);
-        checkFile(GRID_REFERENCE_FILE_2);
-        checkFile(GRID_REFERENCE_FILE_3);
+@ignore        checkFile(GRID_REFERENCE_FILE_2);
+@ignore        checkFile(GRID_REFERENCE_FILE_3);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkBoundariesReferenceRecords() throws Exception {
         LOG.info("checkBoundariesReferenceRecords");
-        checkFile(BOUNDARIES_REFERENCE_FILE);
+@ignore        checkFile(BOUNDARIES_REFERENCE_FILE);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -90,8 +90,8 @@ import static org.junit.Assert.assertTrue;
     public void checkRandomReferenceRecordsPrecision2() throws Exception {
         LOG.info("checkRandomReferenceRecordsPrecision2");
         checkFile(RANDOM_REFERENCE_FILE_1_HP);
-        checkFile(RANDOM_REFERENCE_FILE_2_HP);
-        checkFile(RANDOM_REFERENCE_FILE_3_HP);
+@ignore        checkFile(RANDOM_REFERENCE_FILE_2_HP);
+@ignore        checkFile(RANDOM_REFERENCE_FILE_3_HP);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -99,15 +99,15 @@ import static org.junit.Assert.assertTrue;
     public void checkGridReferenceRecordsPrecision2() throws Exception {
         LOG.info("checkGridReferenceRecordsPrecision2");
         checkFile(GRID_REFERENCE_FILE_1_HP);
-        checkFile(GRID_REFERENCE_FILE_2_HP);
-        checkFile(GRID_REFERENCE_FILE_3_HP);
+@ignore        checkFile(GRID_REFERENCE_FILE_2_HP);
+@ignore        checkFile(GRID_REFERENCE_FILE_3_HP);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkBoundariesReferenceRecordsPrecision2() throws Exception {
         LOG.info("checkBoundariesReferenceRecordsPrecision2");
-        checkFile(BOUNDARIES_REFERENCE_FILE_HP);
+@ignore        checkFile(BOUNDARIES_REFERENCE_FILE_HP);
     }
 
     @SuppressWarnings("BusyWait")
