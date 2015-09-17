@@ -70,10 +70,10 @@ public class Point {
     @Nonnull
     public static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
         Point p = new Point();
-        p.latDeg32 = latMicroDeg;
-        p.latDegFrac = 0;
-        p.lonDeg32 = lonMicroDeg;
-        p.lonDegFrac = 0;
+        p.latMicroDeg = latMicroDeg;
+        p.latFractionOnlyDeg = 0;
+        p.lonMicroDeg = lonMicroDeg;
+        p.lonFractionOnlyDeg = 0;
         p.defined = true;
         return p.wrap();
     }
@@ -85,7 +85,7 @@ public class Point {
      */
     public double getLatDeg() {
         assert defined;
-        return (latDeg32 / MICRODEG_TO_DEG_FACTOR) + (latDegFrac / LAT_TO_FRACTIONS_FACTOR);
+        return (latMicroDeg / MICRODEG_TO_DEG_FACTOR) + (latFractionOnlyDeg / LAT_TO_FRACTIONS_FACTOR);
     }
 
     /**
@@ -95,7 +95,7 @@ public class Point {
      */
     public double getLonDeg() {
         assert defined;
-        return (lonDeg32 / MICRODEG_TO_DEG_FACTOR) + (lonDegFrac / LON_TO_FRACTIONS_FACTOR);
+        return (lonMicroDeg / MICRODEG_TO_DEG_FACTOR) + (lonFractionOnlyDeg / LON_TO_FRACTIONS_FACTOR);
     }
 
     /**
@@ -105,7 +105,7 @@ public class Point {
      */
     public int getLatMicroDeg() {
         assert defined;
-        return latDeg32;
+        return latMicroDeg;
     }
 
     /**
@@ -115,7 +115,7 @@ public class Point {
      */
     public int getLonMicroDeg() {
         assert defined;
-        return lonDeg32;
+        return lonMicroDeg;
     }
 
     /**
@@ -223,10 +223,10 @@ public class Point {
             return false;
         }
         final Point that = (Point) o;
-        return (this.latDeg32 == that.latDeg32) &&
-                (this.lonDeg32 == that.lonDeg32) &&
-                (this.latDegFrac == that.latDegFrac) &&
-                (this.lonDegFrac == that.lonDegFrac) &&
+        return (this.latMicroDeg == that.latMicroDeg) &&
+                (this.lonMicroDeg == that.lonMicroDeg) &&
+                (this.latFractionOnlyDeg == that.latFractionOnlyDeg) &&
+                (this.lonFractionOnlyDeg == that.lonFractionOnlyDeg) &&
                 (this.defined == that.defined);
     }
 
@@ -248,10 +248,10 @@ public class Point {
     static final int LAT_MICRODEG_MIN = degToMicroDeg(LAT_DEG_MIN);
     static final int LAT_MICRODEG_MAX = degToMicroDeg(LAT_DEG_MAX);
 
-    private int latDeg32;   // Whole nr of MICRODEG_TO_DEG_FACTOR.
-    private int lonDeg32;   // Whole nr of MICRODEG_TO_DEG_FACTOR.
-    private int latDegFrac; // Whole nr of LAT_TO_FRACTIONS_FACTOR, relative to latDeg32.
-    private int lonDegFrac; // Whole nr of LON_TO_FRACTIONS_FACTOR, relative to lonDeg32.
+    private int latMicroDeg;   // Whole nr of MICRODEG_TO_DEG_FACTOR.
+    private int lonMicroDeg;   // Whole nr of MICRODEG_TO_DEG_FACTOR.
+    private int latFractionOnlyDeg;    // Whole nr of LAT_TO_FRACTIONS_FACTOR, relative to latMicroDeg.
+    private int lonFractionOnlyDeg;    // Whole nr of LON_TO_FRACTIONS_FACTOR, relative to lonMicroDeg.
 
     /**
      * Points can be "undefined" within the mapcode implementation, but never outside of that.
@@ -282,24 +282,24 @@ public class Point {
 
         // Lat now [0..180].
         lat = lat * LAT_TO_FRACTIONS_FACTOR;
-        double latFrac = Math.floor(lat + 0.1);         // TODO: Check the + 0.1! Why?
-        latDeg32 = (int) (latFrac / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
-        latFrac = latFrac - ((double) latDeg32 * LAT_MICRODEG_TO_FRACTIONS_FACTOR);
-        latDegFrac = (int) latFrac;
-        latDeg32 = latDeg32 - 90000000;
+        double latFractionOnly = Math.floor(lat + 0.1);         // TODO: Check the + 0.1! Why?
+        latMicroDeg = (int) (latFractionOnly / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
+        latFractionOnly = latFractionOnly - ((double) latMicroDeg * LAT_MICRODEG_TO_FRACTIONS_FACTOR);
+        latFractionOnlyDeg = (int) latFractionOnly;
+        latMicroDeg = latMicroDeg - 90000000;
 
         double lon = lonDeg - (360.0 * Math.floor(lonDeg / 360));
 
         // Lon now in [0..360>.
         lon = lon * LON_TO_FRACTIONS_FACTOR;
-        double lonFrac = Math.floor(lon + 0.1);         // TODO: Check the + 0.1! Why?
-        lonDeg32 = (int) (lonFrac / LON_MICRODEG_TO_FRACTIONS_FACTOR);
-        lonFrac = lonFrac - ((double) lonDeg32 * LON_MICRODEG_TO_FRACTIONS_FACTOR);
-        lonDegFrac = (int) lonFrac;
+        double lonFractionOnly = Math.floor(lon + 0.1);         // TODO: Check the + 0.1! Why?
+        lonMicroDeg = (int) (lonFractionOnly / LON_MICRODEG_TO_FRACTIONS_FACTOR);
+        lonFractionOnly = lonFractionOnly - ((double) lonMicroDeg * LON_MICRODEG_TO_FRACTIONS_FACTOR);
+        lonFractionOnlyDeg = (int) lonFractionOnly;
 
-        // Wrap lonDeg32 from [0..360> to [-180..180).
-        if (lonDeg32 >= 180000000) {
-            lonDeg32 = lonDeg32 - 360000000;
+        // Wrap lonMicroDeg from [0..360> to [-180..180).
+        if (lonMicroDeg >= 180000000) {
+            lonMicroDeg = lonMicroDeg - 360000000;
         }
 
         defined = true;
@@ -311,7 +311,7 @@ public class Point {
      */
     int getLonFraction() {
         assert defined;
-        return lonDegFrac;
+        return lonFractionOnlyDeg;
     }
 
     /**
@@ -320,22 +320,19 @@ public class Point {
      */
     int getLatFraction() {
         assert defined;
-        return latDegFrac;
+        return latFractionOnlyDeg;
     }
 
     /**
      * Package private construction, from integer fractions (no loss of precision).
      */
-    @SuppressWarnings("NumericCastThatLosesPrecision")
     @Nonnull
-    static Point fromFractionDeg(final double latFractionDeg, final double lonFractionDeg) {
-        assert (Double.compare(latFractionDeg, Math.floor(latFractionDeg)) == 0);
-        assert (Double.compare(lonFractionDeg, Math.floor(lonFractionDeg)) == 0);
+    static Point fromLatLonFractions(final double latFraction, final double lonFraction) {
         Point p = new Point();
-        p.latDeg32 = (int) Math.floor(latFractionDeg / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
-        p.latDegFrac = (int) (latFractionDeg - (LAT_MICRODEG_TO_FRACTIONS_FACTOR * p.latDeg32));
-        p.lonDeg32 = (int) Math.floor(lonFractionDeg / LON_MICRODEG_TO_FRACTIONS_FACTOR);
-        p.lonDegFrac = (int) (lonFractionDeg - (LON_MICRODEG_TO_FRACTIONS_FACTOR * p.lonDeg32));
+        p.latMicroDeg = (int) Math.floor(latFraction / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
+        p.latFractionOnlyDeg = (int) (latFraction - (LAT_MICRODEG_TO_FRACTIONS_FACTOR * p.latMicroDeg));
+        p.lonMicroDeg = (int) Math.floor(lonFraction / LON_MICRODEG_TO_FRACTIONS_FACTOR);
+        p.lonFractionOnlyDeg = (int) (lonFraction - (LON_MICRODEG_TO_FRACTIONS_FACTOR * p.lonMicroDeg));
         p.defined = true;
         return p.wrap();
     }
@@ -353,20 +350,20 @@ public class Point {
     Point wrap() {
         if (defined) {
             // Cut latitude to [-90, 90].
-            if (latDeg32 < -90000000) {
-                latDeg32 = -90000000;
-                latDegFrac = 0;
+            if (latMicroDeg < -90000000) {
+                latMicroDeg = -90000000;
+                latFractionOnlyDeg = 0;
             }
-            if (latDeg32 > 90000000) {
-                latDeg32 = 90000000;
-                latDegFrac = 0;
+            if (latMicroDeg > 90000000) {
+                latMicroDeg = 90000000;
+                latFractionOnlyDeg = 0;
             }
             // Map longitude to [-180, 180). Values outside this range are wrapped to this range.
-            lonDeg32 %= 360000000;
-            if (lonDeg32 >= 180000000) {
-                lonDeg32 -= 360000000;
-            } else if (lonDeg32 < -180000000) {
-                lonDeg32 += 360000000;
+            lonMicroDeg %= 360000000;
+            if (lonMicroDeg >= 180000000) {
+                lonMicroDeg -= 360000000;
+            } else if (lonMicroDeg < -180000000) {
+                lonMicroDeg += 360000000;
             }
         }
         return this;

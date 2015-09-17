@@ -285,9 +285,9 @@ public final class MapcodeCodec {
             for (int territoryRecord = uptoTerritoryRecord; territoryRecord >= fromTerritoryRecord; territoryRecord--) {
                 if (!Data.isRestricted(territoryRecord)) {
                     final Boundary boundary = Boundary.createFromTerritoryRecord(territoryRecord);
-                    final int xdiv8 = Common.xDivider(boundary.getMinY(), boundary.getMaxY()) / 4;
-                    if (boundary.extendBoundary(xdiv8, 60).containsPoint(point)) {
-                        if (!boundary.extendBoundary(-xdiv8, -60).containsPoint(point)) {
+                    final int xdiv8 = Common.xDivider(boundary.getLatMicroDegMin(), boundary.getLatMicroDegMax()) / 4;
+                    if (boundary.extendBoundary(60, xdiv8).containsPoint(point)) {
+                        if (!boundary.extendBoundary(-60, -xdiv8).containsPoint(point)) {
                             nrFound++;
                             if (nrFound > 1) {
                                 return true;

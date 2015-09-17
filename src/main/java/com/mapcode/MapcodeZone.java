@@ -18,41 +18,41 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 
-// simple class to represent all the coordinates that would deliver a particular mapcode
+// Simple class to represent all the coordinates that would deliver a particular mapcode.
 class MapcodeZone {
 
-    // Longitudes in LonFractions ("1/3240 billionths")
-    private double fractionMinX;
-    private double fractionMaxX;
+    // Longitudes in LonFractions ("1/3240 billionths").
+    private double lonFractionMin;
+    private double lonFractionMax;
 
     // Latitudes in LatFractions ("1/810 billionths").
-    private double fractionMinY;
-    private double fractionMaxY;
+    private double latFractionMin;
+    private double latFractionMax;
 
     // Construct an (empty) zone.
-    public MapcodeZone() {
+    MapcodeZone() {
         setEmpty();
     }
 
     // Construct an (empty) zone.
-    public void setEmpty() {
-        fractionMinY = 0;
-        fractionMaxY = 0;
-        fractionMinX = 0;
-        fractionMaxX = 0;
+    void setEmpty() {
+        latFractionMin = 0;
+        latFractionMax = 0;
+        lonFractionMin = 0;
+        lonFractionMax = 0;
     }
 
     // Construct a copy of an existing zone.
-    public MapcodeZone(@Nonnull final MapcodeZone zone) {
+    MapcodeZone(@Nonnull final MapcodeZone zone) {
         copyFrom(zone);
     }
 
     // construct a copy of an existing zone
-    public void copyFrom(@Nonnull final MapcodeZone other) {
-        fractionMinY = other.fractionMinY;
-        fractionMaxY = other.fractionMaxY;
-        fractionMinX = other.fractionMinX;
-        fractionMaxX = other.fractionMaxX;
+    void copyFrom(@Nonnull final MapcodeZone other) {
+        latFractionMin = other.latFractionMin;
+        latFractionMax = other.latFractionMax;
+        lonFractionMin = other.lonFractionMin;
+        lonFractionMax = other.lonFractionMax;
     }
 
     @Nonnull
@@ -60,98 +60,98 @@ class MapcodeZone {
         return new MapcodeZone();
     }
 
-    public double getFractionMinX() {
-        return fractionMinX;
+    double getLonFractionMin() {
+        return lonFractionMin;
     }
 
-    public double getFractionMaxX() {
-        return fractionMaxX;
+    double getLonFractionMax() {
+        return lonFractionMax;
     }
 
-    public double getFractionMinY() {
-        return fractionMinY;
+    double getLatFractionMin() {
+        return latFractionMin;
     }
 
-    public double getFractionMaxY() {
-        return fractionMaxY;
+    double getLatFractionMax() {
+        return latFractionMax;
     }
 
-    public void setFractionMinX(final double fractionMinX) {
-        this.fractionMinX = fractionMinX;
+    void setLonFractionMin(final double lonFractionMin) {
+        this.lonFractionMin = lonFractionMin;
     }
 
-    public void setFractionMaxX(final double fractionMaxX) {
-        this.fractionMaxX = fractionMaxX;
+    void setLonFractionMax(final double lonFractionMax) {
+        this.lonFractionMax = lonFractionMax;
     }
 
-    public void setFractionMinY(final double fractionMinY) {
-        this.fractionMinY = fractionMinY;
+    void setLatFractionMin(final double latFractionMin) {
+        this.latFractionMin = latFractionMin;
     }
 
-    public void setFractionMaxY(final double fractionMaxY) {
-        this.fractionMaxY = fractionMaxY;
+    void setLatFractionMax(final double latFractionMax) {
+        this.latFractionMax = latFractionMax;
     }
 
     // Generate upper and lower limits based on x and y, and delta's.
-    public void setFromFractions(
-            final double fractionY, final double fractionX,
-            final double fractionYDelta, final double fractionXDelta) {
-        assert (fractionXDelta >= 0.0);
-        assert (fractionYDelta != 0.0);
-        fractionMinX = fractionX;
-        fractionMaxX = fractionX + fractionXDelta;
-        if (fractionYDelta < 0) {
-            fractionMinY = fractionY + 1 + fractionYDelta;  // y + yDelta can NOT be represented.
-            fractionMaxY = fractionY + 1;                   // y CAN be represented.
+    void setFromFractions(
+            final double latFraction, final double lonFraction,
+            final double latFractionDelta, final double lonFractionDelta) {
+        assert (lonFractionDelta >= 0.0);
+        assert (latFractionDelta != 0.0);
+        lonFractionMin = lonFraction;
+        lonFractionMax = lonFraction + lonFractionDelta;
+        if (latFractionDelta < 0) {
+            latFractionMin = latFraction + 1 + latFractionDelta;  // y + yDelta can NOT be represented.
+            latFractionMax = latFraction + 1;                   // y CAN be represented.
         } else {
-            fractionMinY = fractionY;
-            fractionMaxY = fractionY + fractionYDelta;
+            latFractionMin = latFraction;
+            latFractionMax = latFraction + latFractionDelta;
         }
     }
 
-    public boolean isEmpty() {
-        return ((fractionMaxX <= fractionMinX) || (fractionMaxY <= fractionMinY));
+    boolean isEmpty() {
+        return ((lonFractionMax <= lonFractionMin) || (latFractionMax <= latFractionMin));
     }
 
     @Nonnull
-    public Point getMidPoint() {
+    Point getMidPoint() {
         if (isEmpty()) {
             return Point.undefined();
         } else {
-            final double lat = Math.floor((fractionMinY + fractionMaxY) / 2);
-            final double lon = Math.floor((fractionMinX + fractionMaxX) / 2);
-            return Point.fromFractionDeg(lat, lon);
+            final double latFrac = Math.floor((latFractionMin + latFractionMax) / 2);
+            final double lonFrac = Math.floor((lonFractionMin + lonFractionMax) / 2);
+            return Point.fromLatLonFractions(latFrac, lonFrac);
         }
     }
 
     // Returns a non-empty intersection of a mapcode zone and a territory area.
     // Returns null if no such intersection exists.
     @Nonnull
-    public MapcodeZone restrictZoneTo(@Nonnull final Boundary area) {
+    MapcodeZone restrictZoneTo(@Nonnull final Boundary area) {
         MapcodeZone z = new MapcodeZone(this);
-        final double miny = area.getMinY() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
-        if (z.fractionMinY < miny) {
-            z.fractionMinY = miny;
+        final double latMin = area.getLatMicroDegMin() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
+        if (z.latFractionMin < latMin) {
+            z.latFractionMin = latMin;
         }
-        final double maxy = area.getMaxY() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
-        if (z.fractionMaxY > maxy) {
-            z.fractionMaxY = maxy;
+        final double latMax = area.getLatMicroDegMax() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
+        if (z.latFractionMax > latMax) {
+            z.latFractionMax = latMax;
         }
-        if (z.fractionMinY < z.fractionMaxY) {
-            double minx = area.getMinX() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
-            double maxx = area.getMaxX() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
-            if ((maxx < 0) && (z.fractionMinX > 0)) {
-                minx += (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
-                maxx += (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
-            } else if ((minx > 1) && (z.fractionMaxX < 0)) {
-                minx -= (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
-                maxx -= (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+        if (z.latFractionMin < z.latFractionMax) {
+            double lonMin = area.getLonMicroDegMin() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
+            double lonMax = area.getLonMicroDegMax() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
+            if ((lonMax < 0) && (z.lonFractionMin > 0)) {
+                lonMin += (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+                lonMax += (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+            } else if ((lonMin > 1) && (z.lonFractionMax < 0)) {
+                lonMin -= (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+                lonMax -= (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
             }
-            if (z.fractionMinX < minx) {
-                z.fractionMinX = minx;
+            if (z.lonFractionMin < lonMin) {
+                z.lonFractionMin = lonMin;
             }
-            if (z.fractionMaxX > maxx) {
-                z.fractionMaxX = maxx;
+            if (z.lonFractionMax > lonMax) {
+                z.lonFractionMax = lonMax;
             }
         }
         return z;
@@ -161,7 +161,7 @@ class MapcodeZone {
     @Override
     public String toString() {
         return isEmpty() ? "empty" :
-                ("[" + (fractionMinY / Point.LAT_TO_FRACTIONS_FACTOR) + ", " + (fractionMaxY / Point.LAT_TO_FRACTIONS_FACTOR) +
-                        "), [" + (fractionMinX / Point.LON_TO_FRACTIONS_FACTOR) + ", " + (fractionMaxX / Point.LON_TO_FRACTIONS_FACTOR) + ')');
+                ("[" + (latFractionMin / Point.LAT_TO_FRACTIONS_FACTOR) + ", " + (latFractionMax / Point.LAT_TO_FRACTIONS_FACTOR) +
+                        "), [" + (lonFractionMin / Point.LON_TO_FRACTIONS_FACTOR) + ", " + (lonFractionMax / Point.LON_TO_FRACTIONS_FACTOR) + ')');
     }
 }

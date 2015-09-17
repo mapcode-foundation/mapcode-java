@@ -186,10 +186,10 @@ class Encoder {
             divx = nc[prelen] / divy;
         }
 
-        final int minx = createFromTerritoryRecord(m).getMinX();
-        final int miny = createFromTerritoryRecord(m).getMinY();
-        final int maxx = createFromTerritoryRecord(m).getMaxX();
-        final int maxy = createFromTerritoryRecord(m).getMaxY();
+        final int minx = createFromTerritoryRecord(m).getLonMicroDegMin();
+        final int miny = createFromTerritoryRecord(m).getLatMicroDegMin();
+        final int maxx = createFromTerritoryRecord(m).getLonMicroDegMax();
+        final int maxy = createFromTerritoryRecord(m).getLatMicroDegMax();
 
         final int ygridsize = (((maxy - miny) + divy) - 1) / divy;
         int rely = pointToEncode.getLatMicroDeg() - miny;
@@ -278,10 +278,10 @@ class Encoder {
         int i = firstindex;
         while (true) {
 
-            final int maxx = createFromTerritoryRecord(i).getMaxX();
-            final int maxy = createFromTerritoryRecord(i).getMaxY();
-            final int minx = createFromTerritoryRecord(i).getMinX();
-            final int miny = createFromTerritoryRecord(i).getMinY();
+            final int maxx = createFromTerritoryRecord(i).getLonMicroDegMax();
+            final int maxy = createFromTerritoryRecord(i).getLatMicroDegMax();
+            final int minx = createFromTerritoryRecord(i).getLonMicroDegMin();
+            final int miny = createFromTerritoryRecord(i).getLatMicroDegMin();
 
             int h = ((maxy - miny) + 89) / 90;
             final int xdiv = xDivider(miny, maxy);
@@ -371,9 +371,9 @@ class Encoder {
         final int orgSide = side;
         int xSide = side;
 
-        final int maxy = createFromTerritoryRecord(index).getMaxY();
-        final int minx = createFromTerritoryRecord(index).getMinX();
-        final int miny = createFromTerritoryRecord(index).getMinY();
+        final int maxy = createFromTerritoryRecord(index).getLatMicroDegMax();
+        final int minx = createFromTerritoryRecord(index).getLonMicroDegMin();
+        final int miny = createFromTerritoryRecord(index).getLatMicroDegMin();
 
         final int dividerx4 = xDivider(miny, maxy);
         final int xFracture = pointToEncode.getLonFraction() / 810000;

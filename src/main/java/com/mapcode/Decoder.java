@@ -106,8 +106,8 @@ class Decoder {
                     if ((codexi == incodex) || ((incodex == 22) && (codexi == 21))) {
 
                         mapcodeZone = decodeGrid(mapcode,
-                                boundary.getMinX(), boundary.getMinY(),
-                                boundary.getMaxX(), boundary.getMaxY(),
+                                boundary.getLonMicroDegMin(), boundary.getLatMicroDegMin(),
+                                boundary.getLonMicroDegMax(), boundary.getLatMicroDegMax(),
                                 territoryRecord, extrapostfix);
 
                         // first of all, make sure the zone fits the country
@@ -161,8 +161,8 @@ class Decoder {
                 // i = grid with headerletter
                 if ((incodex == (codexi + 10)) && (Data.headerLetter(territoryRecord).charAt(0) == mapcode.charAt(0))) {
                     mapcodeZone = decodeGrid(mapcode.substring(1),
-                            boundary.getMinX(), boundary.getMinY(),
-                            boundary.getMaxX(), boundary.getMaxY(),
+                            boundary.getLonMicroDegMin(), boundary.getLatMicroDegMin(),
+                            boundary.getLonMicroDegMax(), boundary.getLatMicroDegMax(),
                             territoryRecord, extrapostfix);
                     break;
                 }
@@ -438,10 +438,10 @@ class Decoder {
         int xSIDE = side;
 
         Boundary boundary = createFromTerritoryRecord(territoryRecord);
-        final int maxx = boundary.getMaxX();
-        final int maxy = boundary.getMaxY();
-        final int minx = boundary.getMinX();
-        final int miny = boundary.getMinY();
+        final int maxx = boundary.getLonMicroDegMax();
+        final int maxy = boundary.getLatMicroDegMax();
+        final int minx = boundary.getLonMicroDegMin();
+        final int miny = boundary.getLatMicroDegMin();
 
         final int dx;
         final int dy;
@@ -493,10 +493,10 @@ class Decoder {
                 return MapcodeZone.empty(); // return undefined
             }
 
-            final int maxx = createFromTerritoryRecord(i).getMaxX();
-            final int maxy = createFromTerritoryRecord(i).getMaxY();
-            final int minx = createFromTerritoryRecord(i).getMinX();
-            final int miny = createFromTerritoryRecord(i).getMinY();
+            final int maxx = createFromTerritoryRecord(i).getLonMicroDegMax();
+            final int maxy = createFromTerritoryRecord(i).getLatMicroDegMax();
+            final int minx = createFromTerritoryRecord(i).getLonMicroDegMin();
+            final int miny = createFromTerritoryRecord(i).getLatMicroDegMin();
 
             int h = ((maxy - miny) + 89) / 90;
             final int xdiv = Common.xDivider(miny, maxy);
@@ -805,16 +805,16 @@ class Decoder {
         } // not odd
 
         // FORCE_RECODE - restrict the coordinate range to the extremes that were provided
-        if (mapcodeZone.getFractionMaxX() > (maxLonMicroDeg * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR)) {
-            mapcodeZone.setFractionMaxX(maxLonMicroDeg * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+        if (mapcodeZone.getLonFractionMax() > (maxLonMicroDeg * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR)) {
+            mapcodeZone.setLonFractionMax(maxLonMicroDeg * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
         }
         if (dividery >= 0) {
-            if (mapcodeZone.getFractionMaxY() > (extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR)) {
-                mapcodeZone.setFractionMaxY(extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR);
+            if (mapcodeZone.getLatFractionMax() > (extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR)) {
+                mapcodeZone.setLatFractionMax(extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR);
             }
         } else {
-            if (mapcodeZone.getFractionMinY() < (extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR)) {
-                mapcodeZone.setFractionMinY(extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR);
+            if (mapcodeZone.getLatFractionMin() < (extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR)) {
+                mapcodeZone.setLatFractionMin(extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR);
             }
         }
         return mapcodeZone;

@@ -111,19 +111,19 @@ class DataAccess {
         // Empty.
     }
 
-    static int getMinX(final int territoryRecord) {
+    static int getLonMicroDegMin(final int territoryRecord) {
         return FILE_DATA[territoryRecord * 5];
     }
 
-    static int getMinY(final int territoryRecord) {
+    static int getLatMicroDegMin(final int territoryRecord) {
         return FILE_DATA[(territoryRecord * 5) + 1];
     }
 
-    static int getMaxX(final int territoryRecord) {
+    static int getLonMicroDegMax(final int territoryRecord) {
         return FILE_DATA[(territoryRecord * 5) + 2];
     }
 
-    static int getMaxY(final int territoryRecord) {
+    static int getLatMicroDegMax(final int territoryRecord) {
         return FILE_DATA[(territoryRecord * 5) + 3];
     }
 

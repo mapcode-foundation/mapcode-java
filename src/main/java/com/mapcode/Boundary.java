@@ -26,10 +26,10 @@ import javax.annotation.Nonnull;
  * This class handles the territory rectangles for mapcodes.
  */
 class Boundary {
-    private int minX;
-    private int maxX;
-    private int minY;
-    private int maxY;
+    private int lonMicroDegMin;
+    private int lonMicroDegMax;
+    private int latMicroDegMin;
+    private int latMicroDegMax;
 
     private Boundary() {
         // Disabled.
@@ -39,35 +39,35 @@ class Boundary {
     @Nonnull
     static Boundary createFromTerritoryRecord(final int territoryRecord) {
         Boundary boundary = new Boundary();
-        boundary.minX = DataAccess.getMinX(territoryRecord);
-        boundary.minY = DataAccess.getMinY(territoryRecord);
-        boundary.maxX = DataAccess.getMaxX(territoryRecord);
-        boundary.maxY = DataAccess.getMaxY(territoryRecord);
+        boundary.lonMicroDegMin = DataAccess.getLonMicroDegMin(territoryRecord);
+        boundary.latMicroDegMin = DataAccess.getLatMicroDegMin(territoryRecord);
+        boundary.lonMicroDegMax = DataAccess.getLonMicroDegMax(territoryRecord);
+        boundary.latMicroDegMax = DataAccess.getLatMicroDegMax(territoryRecord);
         return boundary;
     }
 
-    int getMinX() {
-        return minX;
+    int getLonMicroDegMin() {
+        return lonMicroDegMin;
     }
 
-    int getMinY() {
-        return minY;
+    int getLatMicroDegMin() {
+        return latMicroDegMin;
     }
 
-    int getMaxX() {
-        return maxX;
+    int getLonMicroDegMax() {
+        return lonMicroDegMax;
     }
 
-    int getMaxY() {
-        return maxY;
+    int getLatMicroDegMax() {
+        return latMicroDegMax;
     }
 
     @Nonnull
-    Boundary extendBoundary(final int xExtension, final int yExtension) {
-        minX -= xExtension;
-        minY -= yExtension;
-        maxX += xExtension;
-        maxY += yExtension;
+    Boundary extendBoundary(final int latMicroDegExtension, final int lonMicroDegExtension) {
+        lonMicroDegMin -= lonMicroDegExtension;
+        latMicroDegMin -= latMicroDegExtension;
+        lonMicroDegMax += lonMicroDegExtension;
+        latMicroDegMax += latMicroDegExtension;
         return this;
     }
 
@@ -75,24 +75,24 @@ class Boundary {
         if (!p.isDefined()) {
             return false;
         }
-        final int y = p.getLatMicroDeg();
-        if ((minY > y) || (y >= maxY)) {
+        final int latMicroDeg = p.getLatMicroDeg();
+        if ((latMicroDegMin > latMicroDeg) || (latMicroDeg >= latMicroDegMax)) {
             return false;
         }
-        final int x = p.getLonMicroDeg();
+        final int lonMicroDeg = p.getLonMicroDeg();
         // longitude boundaries can extend (slightly) outside the [-180,180) range
-        if (x < minX) {
-            return (minX <= (x + 360000000)) && ((x + 360000000) < maxX);
+        if (lonMicroDeg < lonMicroDegMin) {
+            return (lonMicroDegMin <= (lonMicroDeg + 360000000)) && ((lonMicroDeg + 360000000) < lonMicroDegMax);
         }
-        if (x >= maxX) {
-            return (minX <= (x - 360000000)) && ((x - 360000000) < maxX);
+        if (lonMicroDeg >= lonMicroDegMax) {
+            return (lonMicroDegMin <= (lonMicroDeg - 360000000)) && ((lonMicroDeg - 360000000) < lonMicroDegMax);
         }
         return true;
     }
 
     @Nonnull
     public String toString() {
-        return "[" + (minY / 1000000.0) + ", " + (maxY / 1000000.0) +
-                "), [" + (minX / 1000000.0) + ", " + (maxX / 1000000.0) + ')';
+        return "[" + (latMicroDegMin / 1000000.0) + ", " + (latMicroDegMax / 1000000.0) +
+                "), [" + (lonMicroDegMin / 1000000.0) + ", " + (lonMicroDegMax / 1000000.0) + ')';
     }
 }

@@ -18,8 +18,8 @@ package com.mapcode;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.junit.Test;
 import org.junit.Ignore;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,9 @@ import javax.annotation.Nonnull;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -43,20 +45,29 @@ public class ReferenceFileTest {
     private static final String RANDOM_REFERENCE_FILE_2 = "/random_10k.txt";
     private static final String RANDOM_REFERENCE_FILE_3 = "/random_100k.txt";
 
-    private static final String RANDOM_REFERENCE_FILE_1_HP = "/random_hp_1k.txt";
-    private static final String RANDOM_REFERENCE_FILE_2_HP = "/random_hp_10k.txt";
-    private static final String RANDOM_REFERENCE_FILE_3_HP = "/random_hp_100k.txt";
+    private static final String RANDOM_REFERENCE_FILE_1_E2 = "/random_e2_1k.txt";
+    private static final String RANDOM_REFERENCE_FILE_2_E2 = "/random_e2_10k.txt";
+    private static final String RANDOM_REFERENCE_FILE_3_E2 = "/random_e2_100k.txt";
+
+    private static final String RANDOM_REFERENCE_FILE_1_E8 = "/random_e8_1k.txt";
+    private static final String RANDOM_REFERENCE_FILE_2_E8 = "/random_e8_10k.txt";
+    private static final String RANDOM_REFERENCE_FILE_3_E8 = "/random_e8_100k.txt";
 
     private static final String GRID_REFERENCE_FILE_1 = "/grid_1k.txt";
     private static final String GRID_REFERENCE_FILE_2 = "/grid_10k.txt";
     private static final String GRID_REFERENCE_FILE_3 = "/grid_100k.txt";
 
-    private static final String GRID_REFERENCE_FILE_1_HP = "/grid_hp_1k.txt";
-    private static final String GRID_REFERENCE_FILE_2_HP = "/grid_hp_10k.txt";
-    private static final String GRID_REFERENCE_FILE_3_HP = "/grid_hp_100k.txt";
+    private static final String GRID_REFERENCE_FILE_1_E2 = "/grid_e2_1k.txt";
+    private static final String GRID_REFERENCE_FILE_2_E2 = "/grid_e2_10k.txt";
+    private static final String GRID_REFERENCE_FILE_3_E2 = "/grid_e2_100k.txt";
+
+    private static final String GRID_REFERENCE_FILE_1_E8 = "/grid_e8_1k.txt";
+    private static final String GRID_REFERENCE_FILE_2_E8 = "/grid_e8_10k.txt";
+    private static final String GRID_REFERENCE_FILE_3_E8 = "/grid_e8_100k.txt";
 
     private static final String BOUNDARIES_REFERENCE_FILE = "/boundaries.txt";
-    private static final String BOUNDARIES_REFERENCE_FILE_HP = "/boundaries_hp.txt";
+    private static final String BOUNDARIES_REFERENCE_FILE_E2 = "/boundaries_e2.txt";
+    private static final String BOUNDARIES_REFERENCE_FILE_E8 = "/boundaries_e8.txt";
 
     private static final int LOG_LINE_EVERY = 10000;
 
@@ -64,57 +75,79 @@ public class ReferenceFileTest {
     @Test
     public void checkRandomReferenceRecords() throws Exception {
         LOG.info("checkRandomReferenceRecords");
-        checkFile(RANDOM_REFERENCE_FILE_1);
-        checkFile(RANDOM_REFERENCE_FILE_2);
-        checkFile(RANDOM_REFERENCE_FILE_3);
+        checkFile(0, RANDOM_REFERENCE_FILE_1);
+        checkFile(0, RANDOM_REFERENCE_FILE_2);
+        checkFile(0, RANDOM_REFERENCE_FILE_3);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkGridReferenceRecords() throws Exception {
         LOG.info("checkGridReferenceRecords");
-        checkFile(GRID_REFERENCE_FILE_1);
-        checkFile(GRID_REFERENCE_FILE_2);
-        checkFile(GRID_REFERENCE_FILE_3);
+        checkFile(0, GRID_REFERENCE_FILE_1);
+        checkFile(0, GRID_REFERENCE_FILE_2);
+        checkFile(0, GRID_REFERENCE_FILE_3);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkBoundariesReferenceRecords() throws Exception {
         LOG.info("checkBoundariesReferenceRecords");
-        checkFile(BOUNDARIES_REFERENCE_FILE);
+        checkFile(0, BOUNDARIES_REFERENCE_FILE);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkRandomReferenceRecordsPrecision2() throws Exception {
         LOG.info("checkRandomReferenceRecordsPrecision2");
-        checkFile(RANDOM_REFERENCE_FILE_1_HP);
-        checkFile(RANDOM_REFERENCE_FILE_2_HP);
-        checkFile(RANDOM_REFERENCE_FILE_3_HP);
+        checkFile(2, RANDOM_REFERENCE_FILE_1_E2);
+        checkFile(2, RANDOM_REFERENCE_FILE_2_E2);
+        checkFile(2, RANDOM_REFERENCE_FILE_3_E2);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
-    public void checkGridReferenceRecordsPrecision2() throws Exception {
-        LOG.info("checkGridReferenceRecordsPrecision2");
-        checkFile(GRID_REFERENCE_FILE_1_HP);
-        checkFile(GRID_REFERENCE_FILE_2_HP);
-        checkFile(GRID_REFERENCE_FILE_3_HP);
+    public void checkGridReferenceRecords2() throws Exception {
+        LOG.info("checkGridReferenceRecords2");
+        checkFile(2, GRID_REFERENCE_FILE_1_E2);
+        checkFile(2, GRID_REFERENCE_FILE_2_E2);
+        checkFile(2, GRID_REFERENCE_FILE_3_E2);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkBoundariesReferenceRecordsPrecision2() throws Exception {
         LOG.info("checkBoundariesReferenceRecordsPrecision2");
-        checkFile(BOUNDARIES_REFERENCE_FILE_HP);
+        checkFile(2, BOUNDARIES_REFERENCE_FILE_E2);
+    }
+
+    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
+    @Test
+    public void checkRandomReferenceRecordsPrecision8() throws Exception {
+        LOG.info("checkRandomReferenceRecordsPrecision8");
+        checkFile(8, RANDOM_REFERENCE_FILE_1_E8);
+        checkFile(8, RANDOM_REFERENCE_FILE_2_E8);
+        checkFile(8, RANDOM_REFERENCE_FILE_3_E8);
+    }
+
+    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
+    @Test
+    public void checkGridReferenceRecordsPrecision8() throws Exception {
+        LOG.info("checkGridReferenceRecordsPrecision8");
+        checkFile(8, GRID_REFERENCE_FILE_1_E8);
+        checkFile(8, GRID_REFERENCE_FILE_2_E8);
+        checkFile(8, GRID_REFERENCE_FILE_3_E8);
+    }
+
+    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
+    @Test
+    public void checkBoundariesReferenceRecordsPrecision8() throws Exception {
+        LOG.info("checkBoundariesReferenceRecordsPrecision8");
+        checkFile(8, BOUNDARIES_REFERENCE_FILE_E8);
     }
 
     @SuppressWarnings("BusyWait")
-    private static void checkFile(@Nonnull final String baseFileName) throws Exception {
-
-        // High-precision means 8 digits.
-        final int highPprecision = 8;
+    private static void checkFile(final int precision, @Nonnull final String baseFileName) throws Exception {
 
         // Reset error count.
         final AtomicLong deltaNm = new AtomicLong(0);
@@ -169,7 +202,7 @@ public class ReferenceFileTest {
                         if (reference.mapcodes.size() != results.size()) {
                             final ArrayList<MapcodeRec> resultsConverted = new ArrayList<MapcodeRec>(results.size());
                             for (final Mapcode mapcode : results) {
-                                resultsConverted.add(new MapcodeRec(mapcode.getCode(highPprecision), mapcode.getTerritory()));
+                                resultsConverted.add(new MapcodeRec(mapcode.getCode(precision), mapcode.getTerritory()));
                             }
                             LOG.error("checkFile: Incorrect number of results:" +
                                             "\n  lat/lon  = {}" +
@@ -184,14 +217,14 @@ public class ReferenceFileTest {
                         }
 
                         // For every mapcode in the result set, check if it is contained in the reference set.
-                        int precision = 0;
+                        int foundPrecision = 0;
                         for (final Mapcode result : results) {
                             boolean found = false;
                             for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
-                                precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? highPprecision : 0;
+                                foundPrecision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? precision : 0;
 
                                 if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
-                                    if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
+                                    if (referenceMapcodeRec.mapcode.equals(result.getCode(foundPrecision))) {
                                         found = true;
                                         break;
                                     }
@@ -202,7 +235,7 @@ public class ReferenceFileTest {
                                 // This does not fail the test, but rather produces an ERROR in the log file.
                                 // It indicates a discrepancy in the C and Java implementations.
                                 LOG.error("checkFile: Created '{}' at {} which is not present in the reference file!\n" +
-                                                "ref={}\n" + "new={}",
+                                                "reference={}\n" + "created={}",
                                         result.getCode(precision), reference.point, GSON.toJson(reference), GSON.toJson(result));
                                 errors.incrementAndGet();
                             }
@@ -210,11 +243,11 @@ public class ReferenceFileTest {
 
                         // For every Mapcode in the reference set, check if it is contained in the result set.
                         for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
-                            precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? highPprecision : 0;
+                            foundPrecision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? precision : 0;
                             boolean found = false;
                             for (final Mapcode result : results) {
                                 if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
-                                    if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
+                                    if (referenceMapcodeRec.mapcode.equals(result.getCode(foundPrecision))) {
                                         found = true;
                                         break;
                                     }
@@ -222,7 +255,7 @@ public class ReferenceFileTest {
                             }
                             if (!found) {
                                 LOG.error("checkFile: Found   '{} {}' at {} in reference file, not produced by new decoder!\n" +
-                                                "ref={}",
+                                                "reference={}",
                                         referenceMapcodeRec.territory, referenceMapcodeRec.mapcode, reference.point,
                                         GSON.toJson(reference));
                                 errors.incrementAndGet();
@@ -240,7 +273,7 @@ public class ReferenceFileTest {
                                 }
 
                                 final long maxDeltaNm = (long) (((mapcodeRec.mapcode.lastIndexOf('-') > 4) ?
-                                        Mapcode.getSafeMaxOffsetInMeters(highPprecision) : Mapcode.getSafeMaxOffsetInMeters(0)) * 1000000.0);
+                                        Mapcode.getSafeMaxOffsetInMeters(precision) : Mapcode.getSafeMaxOffsetInMeters(0)) * 1000000.0);
                                 if (distanceNm > maxDeltaNm) {
                                     LOG.error("Mapcode {} {} was generated for point {}, but decodes to point {} " +
                                                     "which is {} meters from the original point (max is {} meters).",
@@ -320,10 +353,18 @@ public class ReferenceFileTest {
             assertTrue("Line should not be empty", !line.isEmpty());
 
             final String[] mapcodeLine = line.split(" ");
-            assertEquals("Expecting 2 elements, territory and mapcode, got: " + mapcodeLine.length, 2, mapcodeLine.length);
+            assertTrue("Expecting 1 or 2 elements, territory and mapcode, got: " + mapcodeLine.length + ", " + line,
+                    mapcodeLine.length <= 2);
 
-            @Nonnull final Territory territory = Territory.fromString(mapcodeLine[0]);
-            @Nonnull final String mapcode = mapcodeLine[1];
+            @Nonnull final Territory territory;
+            @Nonnull final String mapcode;
+            if (mapcodeLine.length == 1) {
+                territory = Territory.AAA;
+                mapcode = mapcodeLine[0];
+            } else {
+                territory = Territory.fromString(mapcodeLine[0]);
+                mapcode = mapcodeLine[1];
+            }
             final MapcodeRec mapcodeRec = new MapcodeRec(mapcode, territory);
             mapcodeRecs.add(mapcodeRec);
         }
