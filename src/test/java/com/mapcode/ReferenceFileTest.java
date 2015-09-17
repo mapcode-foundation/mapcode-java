@@ -113,6 +113,9 @@ public class ReferenceFileTest {
     @SuppressWarnings("BusyWait")
     private static void checkFile(@Nonnull final String baseFileName) throws Exception {
 
+        // High-precision means 8 digits.
+        final int highPprecision = 8;
+
         // Reset error count.
         final AtomicLong deltaNm = new AtomicLong(0);
         final AtomicInteger errors = new AtomicInteger(0);
@@ -166,7 +169,7 @@ public class ReferenceFileTest {
                         if (reference.mapcodes.size() != results.size()) {
                             final ArrayList<MapcodeRec> resultsConverted = new ArrayList<MapcodeRec>(results.size());
                             for (final Mapcode mapcode : results) {
-                                resultsConverted.add(new MapcodeRec(mapcode.getCode(2), mapcode.getTerritory()));
+                                resultsConverted.add(new MapcodeRec(mapcode.getCode(highPprecision), mapcode.getTerritory()));
                             }
                             LOG.error("checkFile: Incorrect number of results:" +
                                             "\n  lat/lon  = {}" +
@@ -185,7 +188,7 @@ public class ReferenceFileTest {
                         for (final Mapcode result : results) {
                             boolean found = false;
                             for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
-                                precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? 2 : 0;
+                                precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? highPprecision : 0;
 
                                 if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
                                     if (referenceMapcodeRec.mapcode.equals(result.getCode(precision))) {
@@ -207,7 +210,7 @@ public class ReferenceFileTest {
 
                         // For every Mapcode in the reference set, check if it is contained in the result set.
                         for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
-                            precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? 2 : 0;
+                            precision = (referenceMapcodeRec.mapcode.lastIndexOf('-') > 4) ? highPprecision : 0;
                             boolean found = false;
                             for (final Mapcode result : results) {
                                 if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
@@ -237,7 +240,7 @@ public class ReferenceFileTest {
                                 }
 
                                 final long maxDeltaNm = (long) (((mapcodeRec.mapcode.lastIndexOf('-') > 4) ?
-                                        Mapcode.getSafeMaxOffsetInMeters(2) : Mapcode.getSafeMaxOffsetInMeters(0)) * 1000000.0);
+                                        Mapcode.getSafeMaxOffsetInMeters(highPprecision) : Mapcode.getSafeMaxOffsetInMeters(0)) * 1000000.0);
                                 if (distanceNm > maxDeltaNm) {
                                     LOG.error("Mapcode {} {} was generated for point {}, but decodes to point {} " +
                                                     "which is {} meters from the original point (max is {} meters).",

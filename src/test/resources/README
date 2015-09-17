@@ -38,15 +38,15 @@ mapcode --grid   100000  0    > grid_100k.txt
 
 mapcode --boundaries        > boundaries.txt
 
-mapcode --random 1000    2 12 > random_hp_1k.txt
-mapcode --random 10000   2 12 > random_hp_10k.txt
-mapcode --random 100000  2 12 > random_hp_100k.txt
+mapcode --random 1000    8 12 > random_hp_1k.txt
+mapcode --random 10000   8 12 > random_hp_10k.txt
+mapcode --random 100000  8 12 > random_hp_100k.txt
 
-mapcode --grid   1000    2    > grid_hp_1k.txt
-mapcode --grid   10000   2    > grid_hp_10k.txt
-mapcode --grid   100000  2    > grid_hp_100k.txt
+mapcode --grid   1000    8    > grid_hp_1k.txt
+mapcode --grid   10000   8    > grid_hp_10k.txt
+mapcode --grid   100000  8    > grid_hp_100k.txt
 
-mapcode --boundaries     2    > boundaries_hp.txt
+mapcode --boundaries     8    > boundaries_hp.txt
 
 for f in *.txt; do split -l 200000 -a 1 $f $f.; rm $f; done
 +----
