@@ -16,7 +16,6 @@
 
 package com.mapcode;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 

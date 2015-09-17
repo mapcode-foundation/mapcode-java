@@ -129,23 +129,23 @@ class MapcodeZone {
     @Nonnull
     public MapcodeZone restrictZoneTo(@Nonnull final Boundary area) {
         MapcodeZone z = new MapcodeZone(this);
-        final double miny = area.getMinY() * Point.MICROLAT_TO_FRACTIONS_FACTOR;
+        final double miny = area.getMinY() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
         if (z.fractionMinY < miny) {
             z.fractionMinY = miny;
         }
-        final double maxy = area.getMaxY() * Point.MICROLAT_TO_FRACTIONS_FACTOR;
+        final double maxy = area.getMaxY() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
         if (z.fractionMaxY > maxy) {
             z.fractionMaxY = maxy;
         }
         if (z.fractionMinY < z.fractionMaxY) {
-            double minx = area.getMinX() * Point.MICROLON_TO_FRACTIONS_FACTOR;
-            double maxx = area.getMaxX() * Point.MICROLON_TO_FRACTIONS_FACTOR;
+            double minx = area.getMinX() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
+            double maxx = area.getMaxX() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
             if ((maxx < 0) && (z.fractionMinX > 0)) {
-                minx += (360000000 * Point.MICROLON_TO_FRACTIONS_FACTOR);
-                maxx += (360000000 * Point.MICROLON_TO_FRACTIONS_FACTOR);
+                minx += (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+                maxx += (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
             } else if ((minx > 1) && (z.fractionMaxX < 0)) {
-                minx -= (360000000 * Point.MICROLON_TO_FRACTIONS_FACTOR);
-                maxx -= (360000000 * Point.MICROLON_TO_FRACTIONS_FACTOR);
+                minx -= (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+                maxx -= (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
             }
             if (z.fractionMinX < minx) {
                 z.fractionMinX = minx;

@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
 public final class UnknownTerritoryException extends IllegalArgumentException {
     private static final long serialVersionUID = 1L;
 
-    final Integer code;
+    private final Integer code;
 
     public UnknownTerritoryException(@Nonnull final String message) {
         super(message);

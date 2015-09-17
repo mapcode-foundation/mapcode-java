@@ -36,7 +36,6 @@ class Decoder {
     // Method called from public Java API.
     // ----------------------------------------------------------------------
 
-    @SuppressWarnings("ConstantConditions")
     @Nonnull
     static Point decode(@Nonnull final String argMapcode,
                         @Nonnull final Territory argTerritory)
@@ -806,16 +805,16 @@ class Decoder {
         } // not odd
 
         // FORCE_RECODE - restrict the coordinate range to the extremes that were provided
-        if (mapcodeZone.getFractionMaxX() > (maxLonMicroDeg * Point.MICROLON_TO_FRACTIONS_FACTOR)) {
-            mapcodeZone.setFractionMaxX(maxLonMicroDeg * Point.MICROLON_TO_FRACTIONS_FACTOR);
+        if (mapcodeZone.getFractionMaxX() > (maxLonMicroDeg * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR)) {
+            mapcodeZone.setFractionMaxX(maxLonMicroDeg * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
         }
         if (dividery >= 0) {
-            if (mapcodeZone.getFractionMaxY() > (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR)) {
-                mapcodeZone.setFractionMaxY(extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR);
+            if (mapcodeZone.getFractionMaxY() > (extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR)) {
+                mapcodeZone.setFractionMaxY(extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR);
             }
         } else {
-            if (mapcodeZone.getFractionMinY() < (extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR)) {
-                mapcodeZone.setFractionMinY(extremeLatMicroDeg * Point.MICROLAT_TO_FRACTIONS_FACTOR);
+            if (mapcodeZone.getFractionMinY() < (extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR)) {
+                mapcodeZone.setFractionMinY(extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR);
             }
         }
         return mapcodeZone;

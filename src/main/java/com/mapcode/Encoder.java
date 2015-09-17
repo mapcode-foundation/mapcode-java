@@ -142,9 +142,11 @@ class Encoder {
 
         while (true) {
             factorx /= 30;
+            //noinspection NumericCastThatLosesPrecision
             final int gx = (int) (valx / factorx);
 
             factory /= 30;
+            //noinspection NumericCastThatLosesPrecision
             final int gy = (int) (valy / factory);
 
             sb.append(ENCODE_CHARS[((gy / 5) * 5) + (gx / 6)]);

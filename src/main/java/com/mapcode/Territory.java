@@ -926,6 +926,7 @@ public enum Territory {
         // Check for a case such as USA-NLD (=NLD)
         final int dividerLocation = Math.max(trimmed.indexOf('-'), trimmed.indexOf(' '));
         if (dividerLocation >= 0) {
+            //noinspection TailRecursion
             return createFromString(trimmed.substring(dividerLocation + 1), parentTerritory);
         }
         throw new UnknownTerritoryException(trimmed);

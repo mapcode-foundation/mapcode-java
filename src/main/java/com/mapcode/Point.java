@@ -238,10 +238,10 @@ public class Point {
     // Constants to convert between Degrees, MicroDegrees and Fractions
     static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
     static final double MAX_PRECISION_FACTOR = 810000.0;
-    static final double MICROLAT_TO_FRACTIONS_FACTOR = (MAX_PRECISION_FACTOR);
-    static final double MICROLON_TO_FRACTIONS_FACTOR = (MAX_PRECISION_FACTOR * 4);
-    static final double LAT_TO_FRACTIONS_FACTOR = (MICRODEG_TO_DEG_FACTOR * MICROLAT_TO_FRACTIONS_FACTOR);
-    static final double LON_TO_FRACTIONS_FACTOR = (MICRODEG_TO_DEG_FACTOR * MICROLON_TO_FRACTIONS_FACTOR);
+    static final double LAT_MICRODEG_TO_FRACTIONS_FACTOR = MAX_PRECISION_FACTOR;
+    static final double LON_MICRODEG_TO_FRACTIONS_FACTOR = MAX_PRECISION_FACTOR * 4;
+    static final double LAT_TO_FRACTIONS_FACTOR = MICRODEG_TO_DEG_FACTOR * LAT_MICRODEG_TO_FRACTIONS_FACTOR;
+    static final double LON_TO_FRACTIONS_FACTOR = MICRODEG_TO_DEG_FACTOR * LON_MICRODEG_TO_FRACTIONS_FACTOR;
 
     static final int LON_MICRODEG_MIN = degToMicroDeg(LON_DEG_MIN);
     static final int LON_MICRODEG_MAX = degToMicroDeg(LON_DEG_MAX);
@@ -270,6 +270,7 @@ public class Point {
     /**
      * Public construction, from floating point degrees (potentially lossy).
      */
+    @SuppressWarnings("NumericCastThatLosesPrecision")
     private Point(final double latDeg, final double lonDeg) {
 
         double lat = latDeg + 90;
@@ -282,8 +283,8 @@ public class Point {
         // Lat now [0..180].
         lat = lat * LAT_TO_FRACTIONS_FACTOR;
         double latFrac = Math.floor(lat + 0.1);         // TODO: Check the + 0.1! Why?
-        latDeg32 = (int) (latFrac / MICROLAT_TO_FRACTIONS_FACTOR);
-        latFrac = latFrac - ((double) latDeg32 * MICROLAT_TO_FRACTIONS_FACTOR);
+        latDeg32 = (int) (latFrac / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
+        latFrac = latFrac - ((double) latDeg32 * LAT_MICRODEG_TO_FRACTIONS_FACTOR);
         latDegFrac = (int) latFrac;
         latDeg32 = latDeg32 - 90000000;
 
@@ -292,8 +293,8 @@ public class Point {
         // Lon now in [0..360>.
         lon = lon * LON_TO_FRACTIONS_FACTOR;
         double lonFrac = Math.floor(lon + 0.1);         // TODO: Check the + 0.1! Why?
-        lonDeg32 = (int) (lonFrac / MICROLON_TO_FRACTIONS_FACTOR);
-        lonFrac = lonFrac - ((double) lonDeg32 * MICROLON_TO_FRACTIONS_FACTOR);
+        lonDeg32 = (int) (lonFrac / LON_MICRODEG_TO_FRACTIONS_FACTOR);
+        lonFrac = lonFrac - ((double) lonDeg32 * LON_MICRODEG_TO_FRACTIONS_FACTOR);
         lonDegFrac = (int) lonFrac;
 
         // Wrap lonDeg32 from [0..360> to [-180..180).
@@ -325,15 +326,16 @@ public class Point {
     /**
      * Package private construction, from integer fractions (no loss of precision).
      */
+    @SuppressWarnings("NumericCastThatLosesPrecision")
     @Nonnull
     static Point fromFractionDeg(final double latFractionDeg, final double lonFractionDeg) {
         assert (Double.compare(latFractionDeg, Math.floor(latFractionDeg)) == 0);
         assert (Double.compare(lonFractionDeg, Math.floor(lonFractionDeg)) == 0);
         Point p = new Point();
-        p.latDeg32 = (int) Math.floor(latFractionDeg / MICROLAT_TO_FRACTIONS_FACTOR);
-        p.latDegFrac = (int) (latFractionDeg - (MICROLAT_TO_FRACTIONS_FACTOR * p.latDeg32));
-        p.lonDeg32 = (int) Math.floor(lonFractionDeg / MICROLON_TO_FRACTIONS_FACTOR);
-        p.lonDegFrac = (int) (lonFractionDeg - (MICROLON_TO_FRACTIONS_FACTOR * p.lonDeg32));
+        p.latDeg32 = (int) Math.floor(latFractionDeg / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
+        p.latDegFrac = (int) (latFractionDeg - (LAT_MICRODEG_TO_FRACTIONS_FACTOR * p.latDeg32));
+        p.lonDeg32 = (int) Math.floor(lonFractionDeg / LON_MICRODEG_TO_FRACTIONS_FACTOR);
+        p.lonDegFrac = (int) (lonFractionDeg - (LON_MICRODEG_TO_FRACTIONS_FACTOR * p.lonDeg32));
         p.defined = true;
         return p.wrap();
     }
