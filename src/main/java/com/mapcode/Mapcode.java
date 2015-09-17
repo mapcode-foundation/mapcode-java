@@ -28,27 +28,27 @@ import static com.mapcode.CheckArgs.checkNonnull;
 /**
  * This class defines a single mapcode encoding result, including the alphanumeric code and the
  * territory definition.
- *
+ * <p/>
  * On terminology, mapcode territory and mapcode code:
- *
+ * <p/>
  * In written form. a mapcode is defined as an alphanumeric code, optionally preceded by a
  * territory code.
- *
+ * <p/>
  * For example: "NLD 49.4V" is a mapcode, but "49.4V" is a mapcode as well, The latter is called
  * a "local" mapcode, because it is not internationally unambiguous unless preceded by a territory
  * code.
- *
+ * <p/>
  * For "NLD 49.4V" the "NLD"-part is called "the territory" and the "49.4V"-part is called
  * "the code" (which are both part of "the mapcode").
- *
+ * <p/>
  * This distinction between "territory" and "code" in a mapcode is why the interface of this class
  * has been changed from version 1.50.0 to reflect this terminology.
- *
+ * <p/>
  * On alphabets:
- *
+ * <p/>
  * Mapcode codes can be represented in different alphabets. Note that an alphabet is something else
  * than a locale or a language. The supported alphabets for mapcodes are listed in {@link Alphabet}.
- *
+ * <p/>
  * Mapcode objects provide methods to obtain the mapcode code in a specific alphabet. By default,
  * the {@link Alphabet#ROMAN} is used.
  */
@@ -63,10 +63,10 @@ public final class Mapcode {
     /**
      * Create a mapcode object. Normally, mapcodes are created be encoding a lat/lon pair
      * using {@link MapcodeCodec#encode(double, double)} rather than creating them yourself.
-     *
+     * <p/>
      * Note that it is possible to create invalid mapcodes this way, which are syntactically
      * correct.
-     *
+     * <p/>
      * Note that the constructor will throw an {@link IllegalArgumentException} if the syntax of the mapcode
      * is not correct. The mapcode is not checked for validity, other than its syntax.
      *
@@ -85,23 +85,23 @@ public final class Mapcode {
             throw new IllegalArgumentException("Must not contain territory: " + code);
         }
 
-        // Build codeUppercase with EXACTLY eight precision digits
+        // Build codeUppercase with exactly eight precision digits.
         String codeUppercase = ascii.toUpperCase();
-        final int hyphenPos = codeUppercase.indexOf("-");
+        final int hyphenPos = codeUppercase.indexOf('-');
         if (hyphenPos < 0) {
             codeUppercase = codeUppercase + "-K3000000";
-        } 
-        else {
+        } else {
             final int extensionLength = codeUppercase.length() - 1 - hyphenPos;
             if (extensionLength < 8) {
-                if ((extensionLength % 2) == 1) { // odd extension
+                if ((extensionLength % 2) == 1) {
+                    // Odd extension.
                     codeUppercase = codeUppercase + ("HH000000".substring(0, 8 - extensionLength));
-                }
-                else { // even extension
+                } else {
+                    // Even extension.
                     codeUppercase = codeUppercase + ("K3000000".substring(0, 8 - extensionLength));
                 }
-            }
-            else if (extensionLength > 8) { // cut to 8 characters
+            } else if (extensionLength > 8) {
+                // Cut to 8 characters.
                 codeUppercase = codeUppercase.substring(0, hyphenPos + 9);
             }
         }
@@ -113,7 +113,7 @@ public final class Mapcode {
     /**
      * Get the Mapcode string (without territory information) with standard precision.
      * The returned mapcode does not include the '-' separator and additional digits.
-     *
+     * <p/>
      * A mapcode defines an area of approximately 10 x 10 meters (100 m2) and will decode
      * to the center of that area. On average, the original coordinate will be 3.6 meters
      * from this center: the average inaccuracy of a mapcode.
@@ -134,15 +134,15 @@ public final class Mapcode {
     /**
      * Get the mapcode code (without territory information) with a specified precision.
      * The returned mapcode includes a '-' separator and additional digits for precisions 1 to 8.
-     *
+     * <p/>
      * The precision defines the size of a geographical area a single mapcode covers. This means It also defines
      * the maximum distance to the location, a (latitude, longitude) pair, that encoded to this mapcode.
-     *
+     * <p/>
      * Precision 0: area is approx 10 x 10 meters (100 m2); max. distance from original location less than 7.5 meters.
      * Precision 1: area is approx 3.33 m2; max. distance from original location less than 1.5 meters.
      * Precision 1: area is approx 0.11 m2; max. distance from original location less than 0.4 meters.
-     *   etc. (each level reduces the area by a factor of 30)
-     *
+     * etc. (each level reduces the area by a factor of 30)
+     * <p/>
      * The accuracy is slightly better than the figures above, but these figures are safe assumptions.
      *
      * @param precision Precision. Range: 0..8.
@@ -155,7 +155,7 @@ public final class Mapcode {
         if (precision == 0) {
             return convertStringToAlphabet(codePrecision8.substring(0, codePrecision8.length() - 9), alphabet);
         } else if (precision <= 8) {
-            return convertStringToAlphabet(codePrecision8.substring(0, codePrecision8.length() - 8 + precision), alphabet);
+            return convertStringToAlphabet(codePrecision8.substring(0, (codePrecision8.length() - 8) + precision), alphabet);
         } else {
             throw new IllegalArgumentException("getCodePrecision: precision must be in [0, 8]");
         }
@@ -170,7 +170,7 @@ public final class Mapcode {
      * Return the full international mapcode, including the full name of the territory and the mapcode code itself.
      * The format of the string is:
      * full-territory-name cde
-     *
+     * <p/>
      * Example:
      * Netherlands 49.4V           (regular code)
      * Netherlands 49.4V-K2        (high precision code)
@@ -205,7 +205,7 @@ public final class Mapcode {
      * International codes use a territory code "AAA".
      * The format of the code is:
      * short-territory-name mapcode
-     *
+     * <p/>
      * Example:
      * NLD 49.4V                   (regular code)
      * NLD 49.4V-K2                (high-precision code)
@@ -271,12 +271,12 @@ public final class Mapcode {
     @Nonnull
     static final Pattern PATTERN_TERRITORY = Pattern.compile('^' + REGEX_TERRITORY + ' ');
     @Nonnull
-    static final Pattern PATTERN_PRECISION = Pattern.compile(REGEX_CODE_PRECISION + '$');    
+    static final Pattern PATTERN_PRECISION = Pattern.compile(REGEX_CODE_PRECISION + '$');
 
     /**
      * This method return the mapcode type, given a mapcode string. If the mapcode string has an invalid
      * format, an exception is thrown.
-     *
+     * <p/>
      * Note that this method only checks the syntactic validity of the mapcode, the string format. It does not
      * check if the mapcode is really a valid mapcode representing a position on Earth.
      *
@@ -284,7 +284,6 @@ public final class Mapcode {
      * @return Type of mapcode code format.
      * @throws UnknownPrecisionFormatException If precision format is incorrect.
      */
-    @Nonnull
     public static int getPrecisionFormat(@Nonnull final String mapcode) throws UnknownPrecisionFormatException {
 
         // First, decode to ASCII.
@@ -341,23 +340,23 @@ public final class Mapcode {
      * This array defines the safe maximum offset between a decoded mapcode and its original
      * location used for encoding the mapcode.
      */
-    private static final double[] PRECISION_0_MAX_OFFSET_METERS = { 
-        7.49,         // PRECISION_0: 7.49 meters or less       7.5 m
-        1.39,         // PRECISION_1: 1.39 meters or less       1.4 m
-        0.251,        // PRECISION_2: 25.1 cm or less           25 cm
-        0.0462,       // PRECISION_3: 4.62 cm or less           5 cm
-        0.00837,      // PRECISION_4: 8.37 mm or less           1 cm
-        0.00154,      // PRECISION_5: 1.54 mm or less           2 mm
-        0.000279,     // PRECISION_6: 279 micrometer or less    1/3 mm
-        0.0000514,    // PRECISION_7: 51.4 micrometer or less   1/20 mm
-        0.0000093     // PRECISION_8: 9.3 micrometer or less    1/100 mm
+    private static final double[] PRECISION_0_MAX_OFFSET_METERS = {
+            7.49,         // PRECISION_0: 7.49 meters or less       7.5 m
+            1.39,         // PRECISION_1: 1.39 meters or less       1.4 m
+            0.251,        // PRECISION_2: 25.1 cm or less           25 cm
+            0.0462,       // PRECISION_3: 4.62 cm or less           5 cm
+            0.00837,      // PRECISION_4: 8.37 mm or less           1 cm
+            0.00154,      // PRECISION_5: 1.54 mm or less           2 mm
+            0.000279,     // PRECISION_6: 279 micrometer or less    1/3 mm
+            0.0000514,    // PRECISION_7: 51.4 micrometer or less   1/20 mm
+            0.0000093     // PRECISION_8: 9.3 micrometer or less    1/100 mm
     };
 
     /**
      * Get a safe maximum for the distance between a decoded mapcode and its original
      * location used for encoding the mapcode. The actual accuracy (resolution) of mapcodes is
      * better than this, but these are safe values to use under normal circumstances.
-     *
+     * <p/>
      * Do not make any other assumptions on these numbers than that mapcodes are never more off
      * by this distance.
      *
@@ -414,15 +413,15 @@ public final class Mapcode {
     }
 
     @Override
-    public boolean equals(@Nullable final Object obj) {
-        if (this == obj) {
+    public boolean equals(@Nullable final Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(obj instanceof Mapcode)) {
+        if (!(o instanceof Mapcode)) {
             return false;
         }
-        final Mapcode that = (Mapcode) obj;
-        return codePrecision8.equals(that.codePrecision8) &&
+        final Mapcode that = (Mapcode) o;
+        return this.codePrecision8.equals(that.codePrecision8) &&
                 (this.territory.equals(that.territory));
     }
 }

@@ -66,7 +66,6 @@ public class PointTest {
         assertEquals("Lat correct", 2, point.getLatMicroDeg());
     }
 
-
     @Test
     public void testDegreesLatToMeters() {
         LOG.info("testDegreesLatToMeters");
@@ -144,5 +143,29 @@ public class PointTest {
 
         Assert.assertTrue(Point.distanceInMeters(Point.fromDeg(0.0, 180.0), Point.fromDeg(0.0, -179.999977)) < 10.0);
         Assert.assertTrue(Point.distanceInMeters(Point.fromDeg(0.0, -179.999977), Point.fromDeg(0.0, 180.0)) < 10.0);
+    }
+
+    @Test
+    public void testWrap() {
+        LOG.info("testWrap");
+        for (int i = 0; i < 5; ++i) {
+            assertEquals(Point.fromDeg(0.0, (i * 360) + 0.0), Point.fromDeg(0.0, 0.0).wrap());
+
+            assertEquals(Point.fromDeg(-90.0, (i * 360) + 0.0), Point.fromDeg(-90.0, 0.0).wrap());
+            assertEquals(Point.fromDeg(-89.99, (i * 360) + 0.0), Point.fromDeg(-89.99, 0.0).wrap());
+            assertEquals(Point.fromDeg(-90.01, (i * 360) + 0.0), Point.fromDeg(-90.0, 0.0).wrap());
+
+            assertEquals(Point.fromDeg(90.0, (i * 360) + 0.0), Point.fromDeg(90.0, 0.0).wrap());
+            assertEquals(Point.fromDeg(89.99, (i * 360) + 0.0), Point.fromDeg(89.99, 0.0).wrap());
+            assertEquals(Point.fromDeg(90.01, (i * 360) + 0.0), Point.fromDeg(90.0, 0.0).wrap());
+
+            assertEquals(Point.fromDeg(0.0, (i * 360) + -180.0), Point.fromDeg(0.0, -180.0).wrap());
+            assertEquals(Point.fromDeg(0.0, (i * 360) + -179.99), Point.fromDeg(0.0, -179.99).wrap());
+            assertEquals(Point.fromDeg(0.0, (i * 360) + -180.01), Point.fromDeg(0.0, 179.99).wrap());
+
+            assertEquals(Point.fromDeg(0.0, (i * 360) + 180.0), Point.fromDeg(0.0, -180.0).wrap());
+            assertEquals(Point.fromDeg(0.0, (i * 360) + 179.99), Point.fromDeg(0.0, 179.99).wrap());
+            assertEquals(Point.fromDeg(0.0, (i * 360) + 180.01), Point.fromDeg(0.0, -179.99).wrap());
+        }
     }
 }

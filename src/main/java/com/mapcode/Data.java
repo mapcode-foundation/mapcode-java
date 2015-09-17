@@ -17,13 +17,12 @@
 package com.mapcode;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class the data class for Mapcode codex items.
  */
 class Data {
@@ -34,36 +33,42 @@ class Data {
             'A', 'E', 'U'
     };
 
-    static boolean isNameless(final int i) {
-        return (DataAccess.dataFlags(i) & 64) != 0;
+    private Data() {
+        // Disabled.
     }
 
-    static boolean isSpecialShape(final int i) {
-        return (DataAccess.dataFlags(i) & 1024) != 0;
+    static boolean isNameless(final int territoryRecord) {
+        return (DataAccess.getDataFlags(territoryRecord) & 64) != 0;
     }
 
-    static int recType(final int i) {
-        return (DataAccess.dataFlags(i) >> 7) & 3; // 1=pipe 2=plus 3=star
+    static boolean isSpecialShape(final int territoryRecord) {
+        return (DataAccess.getDataFlags(territoryRecord) & 1024) != 0;
     }
 
-    static boolean isRestricted(final int i) {
-        return (DataAccess.dataFlags(i) & 512) != 0;
+    static int getTerritoryRecordType(final int territoryRecord) {
+        return (DataAccess.getDataFlags(territoryRecord) >> 7) & 3; // 1=pipe 2=plus 3=star
     }
 
-    static int calcCodex(final int i) {
-        final int codexflags = DataAccess.dataFlags(i) & 31;
+    static boolean isRestricted(final int territoryRecord) {
+        return (DataAccess.getDataFlags(territoryRecord) & 512) != 0;
+    }
+
+    static int getCodex(final int territoryRecord) {
+        final int codexflags = DataAccess.getDataFlags(territoryRecord) & 31;
         return (10 * (codexflags / 5)) + (codexflags % 5) + 1;
     }
 
+    @Nonnull
     static String headerLetter(final int i) {
-        final int flags = DataAccess.dataFlags(i);
+        final int flags = DataAccess.getDataFlags(i);
         if (((flags >> 7) & 3) == 1) {
             return Character.toString(ENCODE_CHARS[(flags >> 11) & 31]);
         }
         return "";
     }
 
-    static Boundaries getBoundaries(final int i) {
-        return Boundaries.getBoundaries(i);
+    @Nonnull
+    static Boundary getBoundary(final int territoryRecord) {
+        return Boundary.createFromTerritoryRecord(territoryRecord);
     }
 }

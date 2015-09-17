@@ -20,7 +20,7 @@ package com.mapcode;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class contains common data structures and methods used by the Mapcode implementation.
  */
 class Common {
@@ -81,7 +81,7 @@ class Common {
     static int countCityCoordinatesForCountry(final int sameCodex, final int index, final int firstCode) {
         final int i = getFirstNamelessRecord(sameCodex, index, firstCode);
         int e = index;
-        while (Data.calcCodex(e) == sameCodex) {
+        while (Data.getCodex(e) == sameCodex) {
             e++;
         }
         return e - i;
@@ -89,7 +89,7 @@ class Common {
 
     static int getFirstNamelessRecord(final int sameCodex, final int index, final int firstCode) {
         int i = index;
-        while ((i >= firstCode) && Data.isNameless(i) && (Data.calcCodex(i) == sameCodex)) {
+        while ((i >= firstCode) && Data.isNameless(i) && (Data.getCodex(i) == sameCodex)) {
             i--;
         }
         i++;

@@ -27,18 +27,19 @@ import java.io.InputStream;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class contains the module that reads the Mapcode areas into memory and processes them.
  */
 class DataAccess {
     private static final Logger LOG = LoggerFactory.getLogger(DataAccess.class);
 
-    private static final int nrTerritories;
-    private static final int nrTerritoryRecords;
+    private static final int NR_TERRITORIES;
+    private static final int NR_TERRITORY_RECORDS;
     private static final int[] DATA_START;
     private static final int[] FILE_DATA;
 
     private static final String FILE_NAME = "/com/mapcode/mminfo.dat";
+    private static final int HEADER_SIZE = 8;
 
     // Read data only once in static initializer.
     static {
@@ -58,40 +59,39 @@ class DataAccess {
                         nrBytes = inputStream.read(readBuffer);
                     }
 
-                    // Copy stream into data
+                    // Copy stream into data.
                     final byte[] bytes = outputStream.toByteArray();
                     assert total == bytes.length;
-                    
-                    // read SIGNATURE "MC", VERSION
+
+                    // Read SIGNATURE "MC", VERSION.
                     assert total > 12;
                     assert (char) bytes[0] == 'M';
                     assert (char) bytes[1] == 'C';
                     final int dataVersion = (bytes[2] & 255) + ((bytes[3] & 255) << 8);
                     assert (dataVersion >= 220);
-                    final int HEADER_SIZE = 8;
 
-                    // read header: NR TERRITORIES, NR RECTRANGLE RECORD
-                    nrTerritoryRecords = (bytes[4] & 255) + ((bytes[5] & 255) << 8);
-                    nrTerritories = (bytes[6] & 255) + ((bytes[7] & 255) << 8);
-                    LOG.info("version={} nrTerritories={} nrTerritoryRecords={}",dataVersion,nrTerritories,nrTerritoryRecords);
-                    final int expectedsize = HEADER_SIZE + ((nrTerritories + 1) * 2) + (nrTerritoryRecords * 20);
+                    // Read header: NR TERRITORIES, NR RECTANGLE RECORD.
+                    NR_TERRITORY_RECORDS = (bytes[4] & 255) + ((bytes[5] & 255) << 8);
+                    NR_TERRITORIES = (bytes[6] & 255) + ((bytes[7] & 255) << 8);
+                    LOG.info("version={} NR_TERRITORIES={} NR_TERRITORY_RECORDS={}", dataVersion, NR_TERRITORIES, NR_TERRITORY_RECORDS);
+                    final int expectedsize = HEADER_SIZE + ((NR_TERRITORIES + 1) * 2) + (NR_TERRITORY_RECORDS * 20);
                     assert (expectedsize == total);
 
-                    // read DATA+START array (2 bytes per territory, plus closing record)
-                    DATA_START = new int[nrTerritories + 1];
+                    // Read DATA+START array (2 bytes per territory, plus closing record).
+                    DATA_START = new int[NR_TERRITORIES + 1];
                     int i = HEADER_SIZE;
-                    for (int k=0; k <= nrTerritories; k++) {
+                    for (int k = 0; k <= NR_TERRITORIES; k++) {
                         DATA_START[k] = (bytes[i] & 255) + ((bytes[i + 1] & 255) << 8);
                         i += 2;
                     }
-                    
-                    // read territory rectangle data (5 longs per record)
-                    FILE_DATA = new int[nrTerritoryRecords * 5];
-                    for (int k=0; k < nrTerritoryRecords * 5; k++) {
-                        FILE_DATA[k] = ((bytes[i] & 255)) + 
-                                       ((bytes[i + 1] & 255) << 8) + 
-                                       ((bytes[i + 2] & 255) << 16) + 
-                                       ((bytes[i + 3] & 255) << 24);
+
+                    // Read territory rectangle data (5 longs per record).
+                    FILE_DATA = new int[NR_TERRITORY_RECORDS * 5];
+                    for (int k = 0; k < (NR_TERRITORY_RECORDS * 5); k++) {
+                        FILE_DATA[k] = ((bytes[i] & 255)) +
+                                ((bytes[i + 1] & 255) << 8) +
+                                ((bytes[i + 2] & 255) << 16) +
+                                ((bytes[i + 3] & 255) << 24);
                         i += 4;
                     }
                 } finally {
@@ -111,36 +111,36 @@ class DataAccess {
         // Empty.
     }
 
-    static int minx(final int i) { 
-        return FILE_DATA[i * 5];
-    }
-    
-    static int miny(final int i) {
-        return FILE_DATA[(i * 5) + 1];
-    }
-    
-    static int maxx(final int i) {
-        return FILE_DATA[(i * 5) + 2];
+    static int getMinX(final int territoryRecord) {
+        return FILE_DATA[territoryRecord * 5];
     }
 
-    static int maxy(final int i) {
-        return FILE_DATA[(i * 5) + 3];
+    static int getMinY(final int territoryRecord) {
+        return FILE_DATA[(territoryRecord * 5) + 1];
     }
 
-    static int dataFlags(final int i) {
-        return FILE_DATA[(i * 5) + 4] & 65535;
+    static int getMaxX(final int territoryRecord) {
+        return FILE_DATA[(territoryRecord * 5) + 2];
     }
 
-    static int smartDiv(final int i) {
-        return FILE_DATA[(i * 5) + 4] >> 16;
+    static int getMaxY(final int territoryRecord) {
+        return FILE_DATA[(territoryRecord * 5) + 3];
+    }
+
+    static int getDataFlags(final int territoryRecord) {
+        return FILE_DATA[(territoryRecord * 5) + 4] & 65535;
+    }
+
+    static int getSmartDiv(final int territoryRecord) {
+        return FILE_DATA[(territoryRecord * 5) + 4] >> 16;
     }
 
     // / low-level routines for data access
-    static int dataFirstRecord(final int ccode) {
-        return DATA_START[ccode];
+    static int getDataFirstRecord(final int territoryNumber) {
+        return DATA_START[territoryNumber];
     }
 
-    static int dataLastRecord(final int ccode) {
-        return DATA_START[ccode + 1] - 1;
+    static int getDataLastRecord(final int territoryNumber) {
+        return DATA_START[territoryNumber + 1] - 1;
     }
 }

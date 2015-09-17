@@ -16,6 +16,7 @@
 
 package com.mapcode;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -26,6 +27,7 @@ import static com.mapcode.Mapcode.getPrecisionFormat;
  * Package private implementation class. For internal use within the Mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
  */
+@SuppressWarnings("OverlyBroadThrowsClause")
 class CheckArgs {
 
     private CheckArgs() {
@@ -36,6 +38,14 @@ class CheckArgs {
             throws IllegalArgumentException {
         if (obj == null) {
             throw new IllegalArgumentException("Parameter " + param + " should not be null");
+        }
+    }
+
+    static void checkDefined(@Nonnull final String param, @Nonnull final Point point)
+            throws IllegalArgumentException {
+        checkNonnull(param, point);
+        if (!point.isDefined()) {
+            throw new IllegalArgumentException("Parameter " + param + " must be defined");
         }
     }
 

@@ -11,21 +11,25 @@
 
 * 2.2.0
 
-    * Solved 1-microdegree gap in a few spots on Earth, noticable now extreme precision is possible;
+    * Solved 1-microdegree gap in a few spots on Earth, noticable now extreme precision is possible.
 
-    * Replaced floating point by fixed point math; Improved speed;
+    * Replaced floating point by fixed point math.
 
-    * Enforce encode(decode(M))=M, except at territory border corners;
+    * Improved speed.
 
-    * Cleaned up source; moved hard-coded data into mminfo.dat;
+    * Enforce <<<Mencode(decode(M)) == M>>>, except at territory border corners.
+
+    * Cleaned up source; moved hard-coded data into <<<mminfo.dat>>>.
+
+    []
 
 * 2.1.0
 
-    * Added micro-meter precision (mapcodes can now have eight precision digits)
+    * Added micro-meter precision (mapcodes can now have eight precision digits).
 
-    * Assure that encode(decode(m)) delivers m
+    * Assure that encode(decode(m)) delivers m.
 
-    * Renames to bring source more in line with other implementations
+    * Renames to bring source more in line with other implementations.
 
     []
 

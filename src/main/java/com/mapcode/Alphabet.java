@@ -23,7 +23,7 @@ import static com.mapcode.CheckArgs.checkNonnull;
 /**
  * This enum defines all alphabets supported for mapcodes. Note that an alphabet is different from a
  * language or locale. An alternative name for an alphabet is "script".
- *
+ * <p/>
  * Mapcodes can be safely converted between alphabets and fed to the mapcode decoder in the regular
  * ASCII Roman alphabet or any other.
  */

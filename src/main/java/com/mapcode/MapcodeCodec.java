@@ -21,6 +21,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import static com.mapcode.CheckArgs.checkDefined;
 import static com.mapcode.CheckArgs.checkNonnull;
 import static com.mapcode.Mapcode.getPrecisionFormat;
 
@@ -28,7 +29,7 @@ import static com.mapcode.Mapcode.getPrecisionFormat;
  * ----------------------------------------------------------------------------------------------
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
- *
+ * <p/>
  * This class is the external Java interface for encoding and decoding mapcodes.
  */
 public final class MapcodeCodec {
@@ -46,13 +47,13 @@ public final class MapcodeCodec {
     /**
      * Encode a lat/lon pair to a mapcode with territory information. This produces a non-empty list of mapcode,
      * with at the very least 1 mapcodes for the lat/lon, which is the "International" mapcode.
-     *
+     * <p/>
      * The returned result list will always contain at least 1 mapcode, because every lat/lon pair can be encoded.
-     *
+     * <p/>
      * The list is ordered in such a way that the last result is the international code. However, you cannot assume
      * that the first result is the shortest mapcode. If you want to use the shortest mapcode, use
      * {@link #encodeToShortest(double, double, Territory)}.
-     *
+     * <p/>
      * The international code can be obtained from the list by using: "results.get(results.size() - 1)", or
      * you can use {@link #encodeToInternational(double, double)}, which is faster.
      *
@@ -62,22 +63,24 @@ public final class MapcodeCodec {
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
      */
     @Nonnull
-    public static List<Mapcode> encode(final double latDeg, final double lonDeg) throws IllegalArgumentException {
+    public static List<Mapcode> encode(final double latDeg, final double lonDeg)
+            throws IllegalArgumentException {
         return encode(latDeg, lonDeg, null);
     }
 
     @Nonnull
-    public static List<Mapcode> encode(@Nonnull final Point point) throws IllegalArgumentException {
-        checkNonnull("point", point);
+    public static List<Mapcode> encode(@Nonnull final Point point)
+            throws IllegalArgumentException {
+        checkDefined("point", point);
         return encode(point.getLatDeg(), point.getLonDeg());
     }
 
     /**
      * Encode a lat/lon pair to a mapcode with territory information, for a specific territory. This produces a
      * potentially empty list of mapcodes (empty if the lat/lon does not fall within the territory for mapcodes).
-     *
+     * <p/>
      * The returned result list will always contain at least 1 mapcode, because every lat/lon pair can be encoded.
-     *
+     * <p/>
      * The list is ordered in such a way that the last result is the international code. However, you cannot assume
      * that the first result is the shortest mapcode. If you want to use the shortest mapcode, use
      * {@link #encodeToShortest(double, double, Territory)}.
@@ -91,16 +94,18 @@ public final class MapcodeCodec {
      */
     @Nonnull
     public static List<Mapcode> encode(final double latDeg, final double lonDeg,
-                                       @Nullable final Territory restrictToTerritory) throws IllegalArgumentException {
+                                       @Nullable final Territory restrictToTerritory)
+            throws IllegalArgumentException {
         // Call Mapcode encoder.
-        final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, /*shortest*/false);
+        final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, /* Stop with one result: */ false);
         assert results != null;
         return results;
     }
 
     @Nonnull
     public static List<Mapcode> encode(@Nonnull final Point point,
-                                       @Nullable final Territory restrictToTerritory) throws IllegalArgumentException {
+                                       @Nullable final Territory restrictToTerritory)
+            throws IllegalArgumentException {
         checkNonnull("point", point);
         return encode(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
     }
@@ -117,12 +122,13 @@ public final class MapcodeCodec {
      */
     @Nonnull
     public static Mapcode encodeToShortest(final double latDeg, final double lonDeg,
-                                           @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
+                                           @Nonnull final Territory restrictToTerritory)
+            throws IllegalArgumentException, UnknownMapcodeException {
         checkNonnull("restrictToTerritory", restrictToTerritory);
 
         // Call mapcode encoder.
         @Nonnull final List<Mapcode> results =
-                Encoder.encode(latDeg, lonDeg, restrictToTerritory, /*shortest*/true);
+                Encoder.encode(latDeg, lonDeg, restrictToTerritory, /* Stop with one result: */ true);
         assert results != null;
         assert results.size() <= 1;
         if (results.isEmpty()) {
@@ -134,8 +140,9 @@ public final class MapcodeCodec {
 
     @Nonnull
     public static Mapcode encodeToShortest(@Nonnull final Point point,
-                                           @Nonnull final Territory restrictToTerritory) throws IllegalArgumentException, UnknownMapcodeException {
-        checkNonnull("point", point);
+                                           @Nonnull final Territory restrictToTerritory)
+            throws IllegalArgumentException, UnknownMapcodeException {
+        checkDefined("point", point);
         return encodeToShortest(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
     }
 
@@ -148,7 +155,8 @@ public final class MapcodeCodec {
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
      */
     @Nonnull
-    public static Mapcode encodeToInternational(final double latDeg, final double lonDeg) throws IllegalArgumentException {
+    public static Mapcode encodeToInternational(final double latDeg, final double lonDeg)
+            throws IllegalArgumentException {
 
         // Call mapcode encoder.
         @Nonnull final List<Mapcode> results = encode(latDeg, lonDeg, Territory.AAA);
@@ -158,8 +166,9 @@ public final class MapcodeCodec {
     }
 
     @Nonnull
-    public static Mapcode encodeToInternational(@Nonnull final Point point) throws IllegalArgumentException {
-        checkNonnull("point", point);
+    public static Mapcode encodeToInternational(@Nonnull final Point point)
+            throws IllegalArgumentException {
+        checkDefined("point", point);
         return encodeToInternational(point.getLatDeg(), point.getLonDeg());
     }
 
@@ -172,7 +181,7 @@ public final class MapcodeCodec {
     /**
      * Decode a mapcode to a Point. The decoding process may fail for local mapcodes,
      * because no territory context is supplied (world-wide).
-     *
+     * <p/>
      * The accepted format is:
      * {mapcode}
      * {territory-code} {mapcode}
@@ -186,17 +195,18 @@ public final class MapcodeCodec {
      */
     @SuppressWarnings("DuplicateThrows")
     @Nonnull
-    public static Point decode(@Nonnull final String mapcode) throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+    public static Point decode(@Nonnull final String mapcode)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
         return decode(mapcode, Territory.AAA);
     }
 
     /**
      * Decode a mapcode to a Point. A reference territory is supplied for disambiguation (only used if applicable).
-     *
+     * <p/>
      * The accepted format is:
      * {mapcode}
      * {territory-code} {mapcode}
-     *
+     * <p/>
      * Note that if a territory-code is supplied in the string, it takes preferences over the parameter.
      *
      * @param mapcode                 Mapcode.
@@ -210,7 +220,8 @@ public final class MapcodeCodec {
     @Nonnull
     public static Point decode(
             @Nonnull final String mapcode,
-            @Nullable final Territory defaultTerritoryContext) throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+            @Nullable final Territory defaultTerritoryContext)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
         checkNonnull("mapcode", mapcode);
 
         // Clean up mapcode.
@@ -254,35 +265,32 @@ public final class MapcodeCodec {
     /**
      * Is coordinate near multiple territory borders?
      *
-     * @param point        Latitude/Longitude in degrees
-     * @param territory    Territory
-     * @return true iff the coordinate is near more than one territory border
-     *         (and thus encode(decode(M)) may not produce M)
+     * @param point     Latitude/Longitude in degrees.
+     * @param territory Territory.
+     * @return true Iff the coordinate is near more than one territory border (and thus encode(decode(M)) may not produce M).
      */
-
-    public static boolean multipleBordersNearby(@Nonnull final Point point, @Nonnull final Territory territory) {
+    public static boolean isNearMultipleBorders(@Nonnull final Point point, @Nonnull final Territory territory) {
+        checkDefined("point", point);
         if (territory != Territory.AAA) {
             final int ccode = territory.getNumber();
             if (territory.getParentTerritory() != null) {
-                // there is a parent! check its borders as well...
-                if (multipleBordersNearby(point, territory.getParentTerritory())) {
+                // There is a parent! check its borders as well...
+                if (isNearMultipleBorders(point, territory.getParentTerritory())) {
                     return true;
                 }
             }
-            {
-                int nrFound = 0;
-                final int from = DataAccess.dataFirstRecord(ccode);
-                final int upto = DataAccess.dataLastRecord(ccode);
-                for (int m = upto; m >= from; m--) {
-                    if (!Data.isRestricted(m)) {
-                        final Boundaries boundaries = Boundaries.getBoundaries(m);
-                        final int xdiv8 = Common.xDivider(boundaries.getMinY(),boundaries.getMaxY()) / 4;
-                        if (boundaries.extendBounds(xdiv8, 60).containsPoint(point)) {
-                            if (!boundaries.extendBounds(-xdiv8, -60).containsPoint(point)) {
-                                nrFound++;
-                                if (nrFound > 1) {
-                                    return true;
-                                }
+            int nrFound = 0;
+            final int fromTerritoryRecord = DataAccess.getDataFirstRecord(ccode);
+            final int uptoTerritoryRecord = DataAccess.getDataLastRecord(ccode);
+            for (int territoryRecord = uptoTerritoryRecord; territoryRecord >= fromTerritoryRecord; territoryRecord--) {
+                if (!Data.isRestricted(territoryRecord)) {
+                    final Boundary boundary = Boundary.createFromTerritoryRecord(territoryRecord);
+                    final int xdiv8 = Common.xDivider(boundary.getMinY(), boundary.getMaxY()) / 4;
+                    if (boundary.extendBoundary(xdiv8, 60).containsPoint(point)) {
+                        if (!boundary.extendBoundary(-xdiv8, -60).containsPoint(point)) {
+                            nrFound++;
+                            if (nrFound > 1) {
+                                return true;
                             }
                         }
                     }

@@ -16,72 +16,83 @@
 
 package com.mapcode;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- *
- * This class handles the territory ractangles for mapcodes. 
+ * <p/>
+ * This class handles the territory rectangles for mapcodes.
  */
-class Boundaries {
-    private int minx, maxx, miny, maxy;
+class Boundary {
+    private int minX;
+    private int maxX;
+    private int minY;
+    private int maxY;
 
-    /**
-     * Public interface
-     * Note that after construction, all calls are safe.
-     */
-
-    public static Boundaries getBoundaries(final int m) {
-        Boundaries b = new Boundaries();
-        b.minx = DataAccess.minx(m);
-        b.miny = DataAccess.miny(m);
-        b.maxx = DataAccess.maxx(m);
-        b.maxy = DataAccess.maxy(m);
-        return b;
+    private Boundary() {
+        // Disabled.
     }
 
-    public int getMinX() {
-        return minx;
+    // You have to use this factory method instead of a ctor.
+    @Nonnull
+    static Boundary createFromTerritoryRecord(final int territoryRecord) {
+        Boundary boundary = new Boundary();
+        boundary.minX = DataAccess.getMinX(territoryRecord);
+        boundary.minY = DataAccess.getMinY(territoryRecord);
+        boundary.maxX = DataAccess.getMaxX(territoryRecord);
+        boundary.maxY = DataAccess.getMaxY(territoryRecord);
+        return boundary;
     }
 
-    public int getMinY() {
-        return miny;
+    int getMinX() {
+        return minX;
     }
 
-    public int getMaxX() {
-        return maxx;
+    int getMinY() {
+        return minY;
     }
 
-    public int getMaxY() {
-        return maxy;
+    int getMaxX() {
+        return maxX;
     }
 
-    public Boundaries extendBounds(final int xExtension, final int yExtension) {
-        minx -= xExtension;
-        miny -= yExtension;
-        maxx += xExtension;
-        maxy += yExtension;
+    int getMaxY() {
+        return maxY;
+    }
+
+    @Nonnull
+    Boundary extendBoundary(final int xExtension, final int yExtension) {
+        minX -= xExtension;
+        minY -= yExtension;
+        maxX += xExtension;
+        maxY += yExtension;
         return this;
     }
 
-    public boolean containsPoint(@Nonnull final Point p) {
+    boolean containsPoint(@Nonnull final Point p) {
+        if (!p.isDefined()) {
+            return false;
+        }
         final int y = p.getLatMicroDeg();
-        if ((miny > y) || (y >= maxy)) { return false; }
+        if ((minY > y) || (y >= maxY)) {
+            return false;
+        }
         final int x = p.getLonMicroDeg();
         // longitude boundaries can extend (slightly) outside the [-180,180) range
-        if (x < minx) { return (minx <= x + 360000000) && (x + 360000000 < maxx); } 
-        if (x >= maxx) { return (minx <= x - 360000000) && (x - 360000000 < maxx); }
+        if (x < minX) {
+            return (minX <= (x + 360000000)) && ((x + 360000000) < maxX);
+        }
+        if (x >= maxX) {
+            return (minX <= (x - 360000000)) && ((x - 360000000) < maxX);
+        }
         return true;
     }
 
+    @Nonnull
     public String toString() {
-        return "[" + (miny / 1000000.0) + ", " + (maxy / 1000000.0) + 
-            "), [" + (minx / 1000000.0) + ", " + (maxx / 1000000.0) + ")";
+        return "[" + (minY / 1000000.0) + ", " + (maxY / 1000000.0) +
+                "), [" + (minX / 1000000.0) + ", " + (maxX / 1000000.0) + ')';
     }
 }
