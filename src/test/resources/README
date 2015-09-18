@@ -24,38 +24,23 @@ Note: The syntax of the 'mapcode' command is:
       mapcode --grid   nrOfPoints [extraDigits]
       mapcode --boundaries        [extraDigits]
 
-The parameters extraDigits is 0 for normal precision and 1 or 2 for higher and
-highest precision codes.
+The parameters extraDigits is 8 means the highest precision codes are generated.
+The unit tests will use cut-off version of these codes to check lower precisions
+as well.
 
 +----
-mapcode --random 1000    0 12 > random_1k.txt
-mapcode --random 10000   0 12 > random_10k.txt
-mapcode --random 100000  0 12 > random_100k.txt
-mapcode --grid   1000    0    > grid_1k.txt
-mapcode --grid   10000   0    > grid_10k.txt
-mapcode --grid   100000  0    > grid_100k.txt
-mapcode --boundaries          > boundaries.txt
-
-mapcode --random 1000    2 12 > random_e2_1k.txt
-mapcode --random 10000   2 12 > random_e2_10k.txt
-mapcode --random 100000  2 12 > random_e2_100k.txt
-mapcode --grid   1000    2    > grid_e2_1k.txt
-mapcode --grid   10000   2    > grid_e2_10k.txt
-mapcode --grid   100000  2    > grid_e2_100k.txt
-mapcode --boundaries     2    > boundaries_e2.txt
-
-mapcode --random 1000    8 12 > random_e8_1k.txt
-mapcode --random 10000   8 12 > random_e8_10k.txt
-mapcode --random 100000  8 12 > random_e8_100k.txt
-mapcode --grid   1000    8    > grid_e8_1k.txt
-mapcode --grid   10000   8    > grid_e8_10k.txt
-mapcode --grid   100000  8    > grid_e8_100k.txt
-mapcode --boundaries     8    > boundaries_e8.txt
+mapcode --random 1000    8 1234 > random_e8_1k.txt
+mapcode --random 10000   8 1234 > random_e8_10k.txt
+mapcode --random 100000  8 1234 > random_e8_100k.txt
+mapcode --grid   1000    8      > grid_e8_1k.txt
+mapcode --grid   10000   8      > grid_e8_10k.txt
+mapcode --grid   100000  8      > grid_e8_100k.txt
+mapcode --boundaries     8      > boundaries_e8.txt
 
 for f in *.txt; do split -l 200000 -a 1 $f $f.; rm $f; done
 +----
 
-IMPORTANT: Please note that an explicit seed (12) is used for the generation of
+IMPORTANT: Please note that an explicit seed 1234 is used for the generation of
 random data sets, so they can be compared across different version of the software.
 
 After generating the files, they must be split into smaller pieces (in this case
@@ -81,12 +66,16 @@ The reference files are the following format:
 Example:
 
 +----
-1 -14.103223 -133.860523 -0.672020 -0.699296 -0.243670
-AAA D3ZFY.3HP5
+1 0.043244999999998867679 0.057660000000000266596
+HHHH1.CXRC-MMLH2S9M
 
-2 40.203512 26.190811 0.685341 0.337093 0.645505
-TUR 0W6P.PVC
-AAA SKR23.PH6G
+6 41.851944000000003143 12.433113999999999777
+ITA 0Z.0Z-00000000
+ITA G5.20M-X0230000
+ITA 2MC.29K-JVDRH4CV
+ITA 65C.X5QK-CPNRRNPN
+ITA J0QN.7X4-B1R2S4P3
+TJKM1.D2Z6-L1N8FHY0
 +----
 
 You can use the tool Processing (http://processing.org) with the application
