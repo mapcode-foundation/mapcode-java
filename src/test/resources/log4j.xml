@@ -27,7 +27,7 @@
 
     <!-- Make sure we get all messages from our own domain. -->
     <logger name="com.mapcode">
-        <level value="info"/>
+        <level value="debug"/>
     </logger>
 
     <!--

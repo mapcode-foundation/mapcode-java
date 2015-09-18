@@ -38,7 +38,7 @@ class Boundary {
     // You have to use this factory method instead of a ctor.
     @Nonnull
     static Boundary createFromTerritoryRecord(final int territoryRecord) {
-        Boundary boundary = new Boundary();
+        final Boundary boundary = new Boundary();
         boundary.lonMicroDegMin = DataAccess.getLonMicroDegMin(territoryRecord);
         boundary.latMicroDegMin = DataAccess.getLatMicroDegMin(territoryRecord);
         boundary.lonMicroDegMax = DataAccess.getLonMicroDegMax(territoryRecord);

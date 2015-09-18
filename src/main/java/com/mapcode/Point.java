@@ -49,7 +49,7 @@ public class Point {
     public static final double EARTH_CIRCUMFERENCE_Y = EARTH_RADIUS_Y_METERS * 2.0 * Math.PI;
 
     // Meters per degree latitude is fixed. For longitude: use factor * cos(midpoint of two degree latitudes).
-    public static final double METERS_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE_Y / 360.0;
+    public static final double METERS_PER_DEGREE_LAT         = EARTH_CIRCUMFERENCE_Y / 360.0;
     public static final double METERS_PER_DEGREE_LON_EQUATOR = EARTH_CIRCUMFERENCE_X / 360.0; // * cos(deg(lat)).
 
     /**
@@ -69,7 +69,7 @@ public class Point {
      */
     @Nonnull
     public static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
-        Point p = new Point();
+        final Point p = new Point();
         p.latMicroDeg = latMicroDeg;
         p.latFractionOnlyDeg = 0;
         p.lonMicroDeg = lonMicroDeg;
@@ -163,27 +163,28 @@ public class Point {
         checkNonnull("p1", p1);
         checkNonnull("p2", p2);
 
-        final double latDeg1 = p1.getLatDeg();
-        final double latDeg2 = p2.getLatDeg();
-        double lonDeg1 = p1.getLonDeg();
-        double lonDeg2 = p2.getLonDeg();
-
-        if ((lonDeg1 < 0) && (lonDeg2 > 1)) {
-            lonDeg1 += 360;
+        final Point from;
+        final Point to;
+        if (p1.getLonDeg() <= p2.getLonDeg()) {
+            from = p1;
+            to = p2;
         }
-        if ((lonDeg2 < 0) && (lonDeg1 > 1)) {
-            lonDeg2 += 360;
+        else {
+            from = p2;
+            to = p1;
         }
 
         // Calculate mid point of 2 latitudes.
-        final double avgLat = (p1.getLatDeg() + p2.getLatDeg()) / 2.0;
+        final double avgLat = (from.getLatDeg() + to.getLatDeg()) / 2.0;
 
-        final double deltaLatDeg = latDeg1 - latDeg2;
-        final double deltaLonDeg = lonDeg1 - lonDeg2;
+        final double deltaLatDeg = Math.abs(to.getLatDeg() - from.getLatDeg());
+        final double deltaLonDeg360 = Math.abs(to.getLonDeg() - from.getLonDeg());
+        final double deltaLonDeg = ((deltaLonDeg360 <= 180.0) ? deltaLonDeg360 : (360.0 - deltaLonDeg360));
 
         // Meters per longitude is fixed; per latitude requires * cos(avg(lat)).
         final double deltaXMeters = degreesLonToMetersAtLat(deltaLonDeg, avgLat);
         final double deltaYMeters = degreesLatToMeters(deltaLatDeg);
+
 
         // Calculate length through Earth. This is an approximation, but works fine for short distances.
         return Math.sqrt((deltaXMeters * deltaXMeters) + (deltaYMeters * deltaYMeters));
@@ -215,19 +216,19 @@ public class Point {
 
     @SuppressWarnings("NonFinalFieldReferenceInEquals")
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof Point)) {
+        if (!(obj instanceof Point)) {
             return false;
         }
-        final Point that = (Point) o;
+        final Point that = (Point) obj;
         return (this.latMicroDeg == that.latMicroDeg) &&
-                (this.lonMicroDeg == that.lonMicroDeg) &&
-                (this.latFractionOnlyDeg == that.latFractionOnlyDeg) &&
-                (this.lonFractionOnlyDeg == that.lonFractionOnlyDeg) &&
-                (this.defined == that.defined);
+            (this.lonMicroDeg == that.lonMicroDeg) &&
+            (this.latFractionOnlyDeg == that.latFractionOnlyDeg) &&
+            (this.lonFractionOnlyDeg == that.lonFractionOnlyDeg) &&
+            (this.defined == that.defined);
     }
 
     /**
@@ -236,22 +237,17 @@ public class Point {
      * -----------------------------------------------------------------------
      */
     // Constants to convert between Degrees, MicroDegrees and Fractions
-    static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
-    static final double MAX_PRECISION_FACTOR = 810000.0;
+    static final double MICRODEG_TO_DEG_FACTOR           = 1000000.0;
+    static final double MAX_PRECISION_FACTOR             = 810000.0;
     static final double LAT_MICRODEG_TO_FRACTIONS_FACTOR = MAX_PRECISION_FACTOR;
     static final double LON_MICRODEG_TO_FRACTIONS_FACTOR = MAX_PRECISION_FACTOR * 4;
-    static final double LAT_TO_FRACTIONS_FACTOR = MICRODEG_TO_DEG_FACTOR * LAT_MICRODEG_TO_FRACTIONS_FACTOR;
-    static final double LON_TO_FRACTIONS_FACTOR = MICRODEG_TO_DEG_FACTOR * LON_MICRODEG_TO_FRACTIONS_FACTOR;
+    static final double LAT_TO_FRACTIONS_FACTOR          = MICRODEG_TO_DEG_FACTOR * LAT_MICRODEG_TO_FRACTIONS_FACTOR;
+    static final double LON_TO_FRACTIONS_FACTOR          = MICRODEG_TO_DEG_FACTOR * LON_MICRODEG_TO_FRACTIONS_FACTOR;
 
-    static final int LON_MICRODEG_MIN = degToMicroDeg(LON_DEG_MIN);
-    static final int LON_MICRODEG_MAX = degToMicroDeg(LON_DEG_MAX);
-    static final int LAT_MICRODEG_MIN = degToMicroDeg(LAT_DEG_MIN);
-    static final int LAT_MICRODEG_MAX = degToMicroDeg(LAT_DEG_MAX);
-
-    private int latMicroDeg;   // Whole nr of MICRODEG_TO_DEG_FACTOR.
-    private int lonMicroDeg;   // Whole nr of MICRODEG_TO_DEG_FACTOR.
-    private int latFractionOnlyDeg;    // Whole nr of LAT_TO_FRACTIONS_FACTOR, relative to latMicroDeg.
-    private int lonFractionOnlyDeg;    // Whole nr of LON_TO_FRACTIONS_FACTOR, relative to lonMicroDeg.
+    private int latMicroDeg;            // Whole nr of MICRODEG_TO_DEG_FACTOR.
+    private int lonMicroDeg;            // Whole nr of MICRODEG_TO_DEG_FACTOR.
+    private int latFractionOnlyDeg;     // Whole nr of LAT_TO_FRACTIONS_FACTOR, relative to latMicroDeg.
+    private int lonFractionOnlyDeg;     // Whole nr of LON_TO_FRACTIONS_FACTOR, relative to lonMicroDeg.
 
     /**
      * Points can be "undefined" within the mapcode implementation, but never outside of that.
@@ -276,7 +272,8 @@ public class Point {
         double lat = latDeg + 90;
         if (lat < 0) {
             lat = 0;
-        } else if (lat > 180) {
+        }
+        else if (lat > 180) {
             lat = 180;
         }
 
@@ -328,7 +325,7 @@ public class Point {
      */
     @Nonnull
     static Point fromLatLonFractions(final double latFraction, final double lonFraction) {
-        Point p = new Point();
+        final Point p = new Point();
         p.latMicroDeg = (int) Math.floor(latFraction / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
         p.latFractionOnlyDeg = (int) (latFraction - (LAT_MICRODEG_TO_FRACTIONS_FACTOR * p.latMicroDeg));
         p.lonMicroDeg = (int) Math.floor(lonFraction / LON_MICRODEG_TO_FRACTIONS_FACTOR);
@@ -362,7 +359,8 @@ public class Point {
             lonMicroDeg %= 360000000;
             if (lonMicroDeg >= 180000000) {
                 lonMicroDeg -= 360000000;
-            } else if (lonMicroDeg < -180000000) {
+            }
+            else if (lonMicroDeg < -180000000) {
                 lonMicroDeg += 360000000;
             }
         }
