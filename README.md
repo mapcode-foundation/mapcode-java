@@ -31,7 +31,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 Original C library created by Pieter Geelen. Work on Java version
-of the mapcode library by Rijn Buve and Matthew Lowden.
+of the mapcode library by Rijn Buve. Initial port by Matthew Lowden.
 
 # Coding Formatting Style
 
@@ -57,7 +57,7 @@ If you're using IntelliJ IDEA, filter:
 If you're using Eclips, filter:
 `.classpath .project .settings .cache`
 
-If you're using NetBeans, filter: 
+If you're using NetBeans, filter:
 `nb-configuration.xml *.orig`
 
 The local `.gitignore` file in the Git repository itself to reflect those file only that are produced by executing
@@ -67,4 +67,4 @@ regular compile, build or release commands, such as:
 # Bug Reports and New Feature Requests
 
 If you encounter any problems with this library, don't hesitate to use the `Issues` session to file your issues.
-Normally, one of our developers should be able to comment on them and fix. 
+Normally, one of our developers should be able to comment on them and fix.
