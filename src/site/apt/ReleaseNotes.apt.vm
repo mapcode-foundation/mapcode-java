@@ -9,6 +9,11 @@
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 2.2.2
+    * Fixed error in <<<Point>>> which in rare cases would allow longitudes outside proper range.
+
+    []
+
 * 2.2.1
 
     * Fixed unit test. Reduced size of files for unit tests considerably. Improved unit test speed.

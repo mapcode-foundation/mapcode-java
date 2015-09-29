@@ -16,15 +16,17 @@
 
 package com.mapcode;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Random;
+
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class PointTest {
-    private static final Logger LOG   = LoggerFactory.getLogger(PointTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PointTest.class);
     private static final double DELTA = 0.000001;
 
     @Test
@@ -83,17 +85,17 @@ public class PointTest {
 
         assertEquals(0, Double.compare(0, Point.degreesLonToMetersAtLat(0, 0)));
         assertEquals(0,
-            Double.compare(Point.METERS_PER_DEGREE_LON_EQUATOR / 2.0, Point.degreesLonToMetersAtLat(0.5, 0)));
+                Double.compare(Point.METERS_PER_DEGREE_LON_EQUATOR / 2.0, Point.degreesLonToMetersAtLat(0.5, 0)));
         assertEquals(0,
-            Double.compare(Point.METERS_PER_DEGREE_LON_EQUATOR, Point.degreesLonToMetersAtLat(1, 0)));
+                Double.compare(Point.METERS_PER_DEGREE_LON_EQUATOR, Point.degreesLonToMetersAtLat(1, 0)));
         assertEquals(0,
-            Double.compare(Point.METERS_PER_DEGREE_LON_EQUATOR * 180, Point.degreesLonToMetersAtLat(180, 0)));
+                Double.compare(Point.METERS_PER_DEGREE_LON_EQUATOR * 180, Point.degreesLonToMetersAtLat(180, 0)));
         assertEquals(0,
-            Double.compare(-Point.METERS_PER_DEGREE_LON_EQUATOR * 180, Point.degreesLonToMetersAtLat(-180, 0)));
-        Assert.assertTrue(Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR / 2.0) -
-            Point.degreesLonToMetersAtLat(1, 60)) < DELTA);
-        Assert.assertTrue(Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR / 2.0) -
-            Point.degreesLonToMetersAtLat(1, -60)) < DELTA);
+                Double.compare(-Point.METERS_PER_DEGREE_LON_EQUATOR * 180, Point.degreesLonToMetersAtLat(-180, 0)));
+        assertTrue(Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR / 2.0) -
+                Point.degreesLonToMetersAtLat(1, 60)) < DELTA);
+        assertTrue(Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR / 2.0) -
+                Point.degreesLonToMetersAtLat(1, -60)) < DELTA);
     }
 
     @Test
@@ -102,17 +104,17 @@ public class PointTest {
 
         assertEquals(0, Double.compare(0, Point.metersToDegreesLonAtLat(0, 0)));
         assertEquals(0,
-            Double.compare(0.5, Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR / 2, 0)));
+                Double.compare(0.5, Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR / 2, 0)));
         assertEquals(0,
-            Double.compare(1, Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR, 0)));
+                Double.compare(1, Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR, 0)));
         assertEquals(0,
-            Double.compare(180, Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR * 180, 0)));
+                Double.compare(180, Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR * 180, 0)));
         assertEquals(0, Double.compare(-180,
-            Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR * -180, 0)));
-        Assert.assertTrue(
-            Math.abs(2.0 - Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR, 60)) < DELTA);
-        Assert.assertTrue(
-            Math.abs(2.0 - Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR, -60)) < DELTA);
+                Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR * -180, 0)));
+        assertTrue(
+                Math.abs(2.0 - Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR, 60)) < DELTA);
+        assertTrue(
+                Math.abs(2.0 - Point.metersToDegreesLonAtLat(Point.METERS_PER_DEGREE_LON_EQUATOR, -60)) < DELTA);
     }
 
     @Test
@@ -120,121 +122,121 @@ public class PointTest {
         LOG.info("testDistanceInMeters");
 
         double d = Point.distanceInMeters(
-            Point.fromMicroDeg(-500000, 0), Point.fromMicroDeg(500000, 0));
+                Point.fromMicroDeg(-500000, 0), Point.fromMicroDeg(500000, 0));
         double delta = Math.abs(Point.METERS_PER_DEGREE_LAT - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(80000000, 0), Point.fromMicroDeg(81000000, 0));
+                Point.fromMicroDeg(80000000, 0), Point.fromMicroDeg(81000000, 0));
         delta = Math.abs(Point.METERS_PER_DEGREE_LAT - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(59000000, 0), Point.fromMicroDeg(61000000, 0));
+                Point.fromMicroDeg(59000000, 0), Point.fromMicroDeg(61000000, 0));
         delta = Math.abs((Point.METERS_PER_DEGREE_LAT * 2) - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, 1000000), Point.fromMicroDeg(0, 0));
+                Point.fromMicroDeg(0, 1000000), Point.fromMicroDeg(0, 0));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, 2000000), Point.fromMicroDeg(0, 0));
+                Point.fromMicroDeg(0, 2000000), Point.fromMicroDeg(0, 0));
         delta = Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR * 2) - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, 2000000), Point.fromMicroDeg(0, -1000000));
+                Point.fromMicroDeg(0, 2000000), Point.fromMicroDeg(0, -1000000));
         delta = Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR * 3) - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, -1000000), Point.fromMicroDeg(0, 0));
+                Point.fromMicroDeg(0, -1000000), Point.fromMicroDeg(0, 0));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, -1000000), Point.fromMicroDeg(0, 1000000));
+                Point.fromMicroDeg(0, -1000000), Point.fromMicroDeg(0, 1000000));
         delta = Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR * 2) - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, -1000000), Point.fromMicroDeg(0, 2000000));
+                Point.fromMicroDeg(0, -1000000), Point.fromMicroDeg(0, 2000000));
         delta = Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR * 3) - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, -500000), Point.fromMicroDeg(0, 500000));
+                Point.fromMicroDeg(0, -500000), Point.fromMicroDeg(0, 500000));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, 80000000), Point.fromMicroDeg(0, 81000000));
+                Point.fromMicroDeg(0, 80000000), Point.fromMicroDeg(0, 81000000));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(60000000, 80000000), Point.fromMicroDeg(60000000, 81000000));
+                Point.fromMicroDeg(60000000, 80000000), Point.fromMicroDeg(60000000, 81000000));
         delta = Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR / 2.0) - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, -1000000), Point.fromMicroDeg(0, 1000000));
+                Point.fromMicroDeg(0, -1000000), Point.fromMicroDeg(0, 1000000));
         delta = Math.abs((Point.METERS_PER_DEGREE_LON_EQUATOR * 2) - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, 1000000), Point.fromMicroDeg(0, 2000000));
+                Point.fromMicroDeg(0, 1000000), Point.fromMicroDeg(0, 2000000));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, 178000000), Point.fromMicroDeg(0, 179000000));
+                Point.fromMicroDeg(0, 178000000), Point.fromMicroDeg(0, 179000000));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, 179000000), Point.fromMicroDeg(0, 180000000));
+                Point.fromMicroDeg(0, 179000000), Point.fromMicroDeg(0, 180000000));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, 179500000), Point.fromMicroDeg(0, -179500000));
+                Point.fromMicroDeg(0, 179500000), Point.fromMicroDeg(0, -179500000));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, -179500000), Point.fromMicroDeg(0, 179500000));
+                Point.fromMicroDeg(0, -179500000), Point.fromMicroDeg(0, 179500000));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-            Point.fromMicroDeg(0, -179000000), Point.fromMicroDeg(0, -180000000));
+                Point.fromMicroDeg(0, -179000000), Point.fromMicroDeg(0, -180000000));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
-        Assert.assertTrue(delta <= DELTA);
+        assertTrue(delta <= DELTA);
 
-        Assert.assertTrue(Point.distanceInMeters(Point.fromDeg(0.0, 180.0), Point.fromDeg(0.0, -179.999977)) < 10.0);
-        Assert.assertTrue(Point.distanceInMeters(Point.fromDeg(0.0, -179.999977), Point.fromDeg(0.0, 180.0)) < 10.0);
+        assertTrue(Point.distanceInMeters(Point.fromDeg(0.0, 180.0), Point.fromDeg(0.0, -179.999977)) < 10.0);
+        assertTrue(Point.distanceInMeters(Point.fromDeg(0.0, -179.999977), Point.fromDeg(0.0, 180.0)) < 10.0);
     }
 
     @Test
@@ -259,5 +261,18 @@ public class PointTest {
             assertEquals(Point.fromDeg(0.0, (i * 360) + 179.99), Point.fromDeg(0.0, 179.99).wrap());
             assertEquals(Point.fromDeg(0.0, (i * 360) + 180.01), Point.fromDeg(0.0, -179.99).wrap());
         }
+
+        // Has caused a failure once:
+        assertPointOK(Point.fromDeg(1.0e307, 1.0e307));
+        assertPointOK(Point.fromDeg(Double.MIN_VALUE, Double.MIN_VALUE));
+        assertPointOK(Point.fromDeg(Double.MAX_VALUE, Double.MAX_VALUE));
+        assertPointOK(Point.fromDeg(8.988465674311579e307, 6.964924833637635e307));
+    }
+
+    private static void assertPointOK(final Point p) {
+        assertTrue("Lat = " + p.getLatDeg(), p.getLatDeg() >= -90);
+        assertTrue("Lat = " + p.getLatDeg(), p.getLatDeg() <= 90);
+        assertTrue("Lon = " + p.getLonDeg(), p.getLonDeg() >= -180);
+        assertTrue("Lon = " + p.getLonDeg(), p.getLonDeg() < 180);
     }
 }

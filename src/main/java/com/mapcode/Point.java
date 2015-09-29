@@ -55,8 +55,8 @@ public class Point {
     /**
      * Create a point from lat/lon in degrees (may be precision!)
      *
-     * @param latDeg Longitude in degrees.
-     * @param lonDeg Latitude in degrees.
+     * @param latDeg Latitude in degrees. Range: [-90, 90].
+     * @param lonDeg Longitude in degrees. Range: [-180, 180).
      * @return A defined point.
      */
     @Nonnull
@@ -285,7 +285,11 @@ public class Point {
         latFractionOnlyDeg = (int) latFractionOnly;
         latMicroDeg = latMicroDeg - 90000000;
 
-        double lon = lonDeg - (360.0 * Math.floor(lonDeg / 360));
+        // Math.floor has limited precision for really large values, so we need to limit the lon explicitly.
+        double lon = Math.min(360.0, Math.max(0.0, lonDeg - (360.0 * Math.floor(lonDeg / 360.0))));
+        if (Double.compare(lon, 360.0) == 0) {
+            lon = 0.0;
+        }
 
         // Lon now in [0..360>.
         lon = lon * LON_TO_FRACTIONS_FACTOR;
