@@ -9,6 +9,16 @@
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 2.2.1
+
+    * Fixed unit test. Reduced size of files for unit tests considerably. Improved unit test speed.
+
+    * Fixed <<<Point>>> interface.
+
+    * Cleaned up <<<Boundary>>> and <<<DataAccess>>>.
+
+    []
+
 * 2.2.0
 
     * Solved 1-microdegree gap in a few spots on Earth, noticable now extreme precision is possible.

@@ -35,17 +35,43 @@ class DataAccess {
 
     private static final int NR_TERRITORIES;
     private static final int NR_TERRITORY_RECORDS;
-    private static final int[] DATA_START;
-    private static final int[] FILE_DATA;
+
+    private static final int[] INDEX;
+    private static final int[] DATA;
+
+    private static final int HEADER_ID_1 = 0;
+    private static final int HEADER_ID_2 = 1;
+    private static final int HEADER_VERSION_LO = 2;
+    private static final int HEADER_VERSION_HI = 3;
+    private static final int HEADER_NR_TERRITORIES_RECS_LO = 4;
+    private static final int HEADER_NR_TERRITORIES_RECS_HI = 5;
+    private static final int HEADER_NR_TERRITORIES_LO = 6;
+    private static final int HEADER_NR_TERRITORIES_HI = 7;
+    private static final int HEADER_SIZE = HEADER_NR_TERRITORIES_HI + 1;
+
+    private static final int BYTES_PER_INT = 2;
+    private static final int BYTES_PER_LONG = 4;
+
+    private static final int POS_DATA_LON_MICRO_DEG_MIN = 0;
+    private static final int POS_DATA_LAT_MICRO_DEG_MIN = 1;
+    private static final int POS_DATA_LON_MICRO_DEG_MAX = 2;
+    private static final int POS_DATA_LAT_MICRO_DEG_MAX = 3;
+    private static final int POS_DATA_DATA_FLAGS = 4;
+    private static final int DATA_FIELDS_PER_REC = 5;
+
+    private static final int MASK_DATA_DATA_FLAGS = 0xffff;
+    private static final int SHIFT_POS_DATA_SMART_DIV = 16;
+
+    private static final int POS_INDEX_FIRST_RECORD = 0;
+    private static final int POS_INDEX_LAST_RECORD = 1;
 
     private static final String FILE_NAME = "/com/mapcode/mminfo.dat";
-    private static final int HEADER_SIZE = 8;
+    private static final int FILE_BUFFER_SIZE = 50000;
 
     // Read data only once in static initializer.
     static {
         LOG.info("DataAccess: reading regions from file: {}", FILE_NAME);
-        final int bufferSize = 131072;
-        final byte[] readBuffer = new byte[bufferSize];
+        final byte[] readBuffer = new byte[FILE_BUFFER_SIZE];
         int total = 0;
         try {
             final InputStream inputStream = DataAccess.class.getResourceAsStream(FILE_NAME);
@@ -53,7 +79,7 @@ class DataAccess {
                 final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 try {
                     int nrBytes = inputStream.read(readBuffer);
-                    while (nrBytes >= 0) {
+                    while (nrBytes > 0) {
                         total += nrBytes;
                         outputStream.write(readBuffer, 0, nrBytes);
                         nrBytes = inputStream.read(readBuffer);
@@ -65,33 +91,36 @@ class DataAccess {
 
                     // Read SIGNATURE "MC", VERSION.
                     assert total > 12;
-                    assert (char) bytes[0] == 'M';
-                    assert (char) bytes[1] == 'C';
-                    final int dataVersion = (bytes[2] & 255) + ((bytes[3] & 255) << 8);
+                    assert (char) bytes[HEADER_ID_1] == 'M';
+                    assert (char) bytes[HEADER_ID_2] == 'C';
+                    final int dataVersion = readIntLoHi(bytes[HEADER_VERSION_LO], bytes[HEADER_VERSION_HI]);
                     assert (dataVersion >= 220);
 
                     // Read header: NR TERRITORIES, NR RECTANGLE RECORD.
-                    NR_TERRITORY_RECORDS = (bytes[4] & 255) + ((bytes[5] & 255) << 8);
-                    NR_TERRITORIES = (bytes[6] & 255) + ((bytes[7] & 255) << 8);
-                    LOG.info("version={} NR_TERRITORIES={} NR_TERRITORY_RECORDS={}", dataVersion, NR_TERRITORIES, NR_TERRITORY_RECORDS);
-                    final int expectedsize = HEADER_SIZE + ((NR_TERRITORIES + 1) * 2) + (NR_TERRITORY_RECORDS * 20);
-                    assert (expectedsize == total);
+                    NR_TERRITORY_RECORDS = readIntLoHi(bytes[HEADER_NR_TERRITORIES_RECS_LO], bytes[HEADER_NR_TERRITORIES_RECS_HI]);
+                    NR_TERRITORIES = readIntLoHi(bytes[HEADER_NR_TERRITORIES_LO], bytes[HEADER_NR_TERRITORIES_HI]);
+                    final int expectedSize = HEADER_SIZE +
+                            ((NR_TERRITORIES + 1) * BYTES_PER_INT) +
+                            (NR_TERRITORY_RECORDS * (DATA_FIELDS_PER_REC * BYTES_PER_LONG));
+
+                    if (expectedSize != total) {
+                        LOG.error("DataAccess: expected {} territories, got {}", expectedSize, total);
+                        throw new IllegalStateException("Data file corrupt: " + FILE_NAME);
+                    }
+                    LOG.debug("DataAccess: version={} territories={} territory records={}", dataVersion, NR_TERRITORIES, NR_TERRITORY_RECORDS);
 
                     // Read DATA+START array (2 bytes per territory, plus closing record).
-                    DATA_START = new int[NR_TERRITORIES + 1];
+                    INDEX = new int[NR_TERRITORIES + 1];
                     int i = HEADER_SIZE;
                     for (int k = 0; k <= NR_TERRITORIES; k++) {
-                        DATA_START[k] = (bytes[i] & 255) + ((bytes[i + 1] & 255) << 8);
+                        INDEX[k] = readIntLoHi(bytes[i], bytes[i + 1]);
                         i += 2;
                     }
 
-                    // Read territory rectangle data (5 longs per record).
-                    FILE_DATA = new int[NR_TERRITORY_RECORDS * 5];
-                    for (int k = 0; k < (NR_TERRITORY_RECORDS * 5); k++) {
-                        FILE_DATA[k] = ((bytes[i] & 255)) +
-                                ((bytes[i + 1] & 255) << 8) +
-                                ((bytes[i + 2] & 255) << 16) +
-                                ((bytes[i + 3] & 255) << 24);
+                    // Read territory rectangle data (DATA_FIELDS_PER_REC longs per record).
+                    DATA = new int[NR_TERRITORY_RECORDS * DATA_FIELDS_PER_REC];
+                    for (int k = 0; k < (NR_TERRITORY_RECORDS * DATA_FIELDS_PER_REC); k++) {
+                        DATA[k] = readLongLoHi(bytes[i], bytes[i + 1], bytes[i + 2], bytes[i + 3]);
                         i += 4;
                     }
                 } finally {
@@ -107,40 +136,51 @@ class DataAccess {
         LOG.info("DataAccess: regions initialized, read {} bytes", total);
     }
 
+    private static int readIntLoHi(final int lo, final int hi) {
+        return (lo & 0xff) + ((hi & 0xff) << 8);
+    }
+
+    private static int readLongLoHi(final int lo, final int mid1, final int mid2, final int hi) {
+        return ((lo & 0xff)) + ((mid1 & 0xff) << 8) + ((mid2 & 0xff) << 16) + ((hi & 0xff) << 24);
+    }
+
     private DataAccess() {
         // Empty.
     }
 
+    @SuppressWarnings("PointlessArithmeticExpression")
     static int getLonMicroDegMin(final int territoryRecord) {
-        return FILE_DATA[territoryRecord * 5];
+        return DATA[((territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LON_MICRO_DEG_MIN)];
     }
 
     static int getLatMicroDegMin(final int territoryRecord) {
-        return FILE_DATA[(territoryRecord * 5) + 1];
+        return DATA[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LAT_MICRO_DEG_MIN];
     }
 
     static int getLonMicroDegMax(final int territoryRecord) {
-        return FILE_DATA[(territoryRecord * 5) + 2];
+        return DATA[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LON_MICRO_DEG_MAX];
     }
 
     static int getLatMicroDegMax(final int territoryRecord) {
-        return FILE_DATA[(territoryRecord * 5) + 3];
+        return DATA[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LAT_MICRO_DEG_MAX];
     }
 
     static int getDataFlags(final int territoryRecord) {
-        return FILE_DATA[(territoryRecord * 5) + 4] & 65535;
+        return DATA[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_DATA_FLAGS] & MASK_DATA_DATA_FLAGS;
     }
 
     static int getSmartDiv(final int territoryRecord) {
-        return FILE_DATA[(territoryRecord * 5) + 4] >> 16;
+        return DATA[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_DATA_FLAGS] >> SHIFT_POS_DATA_SMART_DIV;
     }
 
-    // / low-level routines for data access
+    // Low-level routines for data access.
+    @SuppressWarnings("PointlessArithmeticExpression")
     static int getDataFirstRecord(final int territoryNumber) {
-        return DATA_START[territoryNumber];
+        return INDEX[territoryNumber + POS_INDEX_FIRST_RECORD];
     }
 
     static int getDataLastRecord(final int territoryNumber) {
-        return DATA_START[territoryNumber + 1] - 1;
+        return INDEX[territoryNumber + POS_INDEX_LAST_RECORD] - 1;
     }
 }
+

@@ -53,7 +53,7 @@ public enum Alphabet {
      *
      * @param number Alphabet number, for internal use only.
      */
-    private Alphabet(final int number) {
+    Alphabet(final int number) {
         this.number = number;
     }
 

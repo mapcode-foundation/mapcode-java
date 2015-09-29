@@ -23,39 +23,48 @@ import javax.annotation.Nonnull;
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
  * <p/>
- * This class handles the territory rectangles for mapcodes.
+ * This class handles territory rectangles for mapcodes.
  */
 class Boundary {
-    private int lonMicroDegMin;
-    private int lonMicroDegMax;
-    private int latMicroDegMin;
-    private int latMicroDegMax;
+    private int lonMicroDegMin;     // Minimum longitude (in microdegrees). Inclusive.
+    private int lonMicroDegMax;     // Maximum longitude (in microdegrees). Exclusive.
+    private int latMicroDegMin;     // Minimum latitude (in microdegrees). Inclusive.
+    private int latMicroDegMax;     // Minimum latitude (in microdegrees). Exclusive.
 
-    private Boundary() {
-        // Disabled.
+    static final int MICRO_DEG_360 = 360000000;
+    static final double DEG_TO_MICRO_DEG = 1000000.0;
+
+    private Boundary(
+            final int lonMicroDegMin,
+            final int lonMicroDegMax,
+            final int latMicroDegMin,
+            final int latMicroDegMax) {
+        this.lonMicroDegMin = lonMicroDegMin;
+        this.latMicroDegMin = latMicroDegMin;
+        this.lonMicroDegMax = lonMicroDegMax;
+        this.latMicroDegMax = latMicroDegMax;
     }
 
     // You have to use this factory method instead of a ctor.
     @Nonnull
     static Boundary createFromTerritoryRecord(final int territoryRecord) {
-        final Boundary boundary = new Boundary();
-        boundary.lonMicroDegMin = DataAccess.getLonMicroDegMin(territoryRecord);
-        boundary.latMicroDegMin = DataAccess.getLatMicroDegMin(territoryRecord);
-        boundary.lonMicroDegMax = DataAccess.getLonMicroDegMax(territoryRecord);
-        boundary.latMicroDegMax = DataAccess.getLatMicroDegMax(territoryRecord);
-        return boundary;
+        return new Boundary(
+                DataAccess.getLonMicroDegMin(territoryRecord),
+                DataAccess.getLonMicroDegMax(territoryRecord),
+                DataAccess.getLatMicroDegMin(territoryRecord),
+                DataAccess.getLatMicroDegMax(territoryRecord));
     }
 
     int getLonMicroDegMin() {
         return lonMicroDegMin;
     }
 
-    int getLatMicroDegMin() {
-        return latMicroDegMin;
-    }
-
     int getLonMicroDegMax() {
         return lonMicroDegMax;
+    }
+
+    int getLatMicroDegMin() {
+        return latMicroDegMin;
     }
 
     int getLatMicroDegMax() {
@@ -71,6 +80,15 @@ class Boundary {
         return this;
     }
 
+    /**
+     * Check if a point falls within a boundary. Note that the "min" values are inclusive for a boundary and
+     * the "max" values are exclusive.\
+     * <p/>
+     * Note: Points at the exact North pole with latitude 90 are never part of a boundary.
+     *
+     * @param p Point to check.
+     * @return True if the points falls within the boudary.
+     */
     boolean containsPoint(@Nonnull final Point p) {
         if (!p.isDefined()) {
             return false;
@@ -80,19 +98,20 @@ class Boundary {
             return false;
         }
         final int lonMicroDeg = p.getLonMicroDeg();
-        // longitude boundaries can extend (slightly) outside the [-180,180) range
+
+        // Longitude boundaries can extend (slightly) outside the [-180,180) range
         if (lonMicroDeg < lonMicroDegMin) {
-            return (lonMicroDegMin <= (lonMicroDeg + 360000000)) && ((lonMicroDeg + 360000000) < lonMicroDegMax);
+            return (lonMicroDegMin <= (lonMicroDeg + MICRO_DEG_360)) && ((lonMicroDeg + MICRO_DEG_360) < lonMicroDegMax);
+        } else if (lonMicroDeg >= lonMicroDegMax) {
+            return (lonMicroDegMin <= (lonMicroDeg - MICRO_DEG_360)) && ((lonMicroDeg - MICRO_DEG_360) < lonMicroDegMax);
+        } else {
+            return true;
         }
-        if (lonMicroDeg >= lonMicroDegMax) {
-            return (lonMicroDegMin <= (lonMicroDeg - 360000000)) && ((lonMicroDeg - 360000000) < lonMicroDegMax);
-        }
-        return true;
     }
 
     @Nonnull
     public String toString() {
-        return "[" + (latMicroDegMin / 1000000.0) + ", " + (latMicroDegMax / 1000000.0) +
-                "), [" + (lonMicroDegMin / 1000000.0) + ", " + (lonMicroDegMax / 1000000.0) + ')';
+        return "[" + (latMicroDegMin / DEG_TO_MICRO_DEG) + ", " + (latMicroDegMax / DEG_TO_MICRO_DEG) +
+                "), [" + (lonMicroDegMin / DEG_TO_MICRO_DEG) + ", " + (lonMicroDegMax / DEG_TO_MICRO_DEG) + ')';
     }
 }

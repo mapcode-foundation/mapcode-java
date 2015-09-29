@@ -57,12 +57,12 @@ public class ReferenceFileTest {
     public void checkRandomReferenceRecords() throws Exception {
         LOG.info("checkRandomReferenceRecords");
         for (int i = 0; i < 8; ++i) {
-            checkFile(i, RANDOM_REFERENCE_FILE_1);
+            checkFile(i, RANDOM_REFERENCE_FILE_1, false);
         }
-        checkFile(0, RANDOM_REFERENCE_FILE_2);
-        checkFile(0, RANDOM_REFERENCE_FILE_3);
-        checkFile(8, RANDOM_REFERENCE_FILE_2);
-        checkFile(8, RANDOM_REFERENCE_FILE_3);
+        checkFile(0, RANDOM_REFERENCE_FILE_2, false);
+        checkFile(0, RANDOM_REFERENCE_FILE_3, false);
+        checkFile(8, RANDOM_REFERENCE_FILE_2, false);
+        checkFile(8, RANDOM_REFERENCE_FILE_3, false);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
@@ -70,24 +70,27 @@ public class ReferenceFileTest {
     public void checkGridReferenceRecords() throws Exception {
         LOG.info("checkGridReferenceRecords");
         for (int i = 0; i < 8; ++i) {
-            checkFile(i, GRID_REFERENCE_FILE_1);
+            checkFile(i, GRID_REFERENCE_FILE_1, false);
         }
-        checkFile(0, GRID_REFERENCE_FILE_2);
-        checkFile(0, GRID_REFERENCE_FILE_3);
-        checkFile(8, GRID_REFERENCE_FILE_2);
-        checkFile(8, GRID_REFERENCE_FILE_3);
+        checkFile(0, GRID_REFERENCE_FILE_2, false);
+        checkFile(0, GRID_REFERENCE_FILE_3, false);
+        checkFile(8, GRID_REFERENCE_FILE_2, false);
+        checkFile(8, GRID_REFERENCE_FILE_3, false);
     }
 
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkBoundariesReferenceRecords() throws Exception {
         LOG.info("checkBoundariesReferenceRecords");
-        checkFile(0, BOUNDARIES_REFERENCE_FILE);
-        checkFile(8, BOUNDARIES_REFERENCE_FILE);
+        checkFile(0, BOUNDARIES_REFERENCE_FILE, false);
+        checkFile(8, BOUNDARIES_REFERENCE_FILE, true);
     }
 
     @SuppressWarnings("BusyWait")
-    private static void checkFile(final int precision, @Nonnull final String baseFileName) throws Exception {
+    private static void checkFile(
+            final int precision,
+            @Nonnull final String baseFileName,
+            final boolean checkAllDistances) throws Exception {
         assert (0 <= precision) && (precision <= PRECISION_MAX);
 
         // Reset error count.
@@ -236,7 +239,7 @@ public class ReferenceFileTest {
                             for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
                                 final int indexOfDash = referenceMapcodeRec.mapcode.lastIndexOf('-');
 
-                                for (int precision = 0; precision < PRECISION_MAX; ++precision) {
+                                for (int precision = (checkAllDistances ? 0 : PRECISION_MAX); precision < PRECISION_MAX; ++precision) {
                                     final int endOfMapcode = indexOfDash + ((precision > 0) ? (precision + 1) : 0);
                                     assert referenceMapcodeRec.mapcode.length() >= endOfMapcode;
                                     final String cutOffReferenceMapcode =
@@ -251,8 +254,8 @@ public class ReferenceFileTest {
 
                                     // Keep distance. This is a multi-threaded get/set; requires synchronized.
                                     synchronized (deltaNm) {
-                                        deltaNm[precision].set(
-                                                Math.max(deltaNm[precision].get(), (long) (distanceM * 1000000.0)));
+                                        deltaNm[precision].set(Math.max(deltaNm[precision].get(),
+                                                (long) (distanceM * 1.0e6)));
                                     }
 
                                     // Check if the distance is no greater than the safe maximum specified.
@@ -287,11 +290,12 @@ public class ReferenceFileTest {
         assertEquals("Found errors", 0, errors.get());
         LOG.info("checkFile: Total tasks executed: {}", tasks);
         LOG.info("checkFile: Maximum deltas for this testset:");
-        for (int p = 0; p < PRECISION_MAX; ++p) {
-            final double m = ((double) deltaNm[p].get()) / 1000000.0;
+        for (int p = (checkAllDistances ? 0 : PRECISION_MAX); p < PRECISION_MAX; ++p) {
+            final double maxDeltaFoundMeters = ((double) deltaNm[p].get()) / 1.0e6;
             final double safeMaxOffsetInMeters = Mapcode.getSafeMaxOffsetInMeters(p);
+            assertTrue("Max delta is expected to be > 0", maxDeltaFoundMeters > 0.0);
             LOG.info("checkFile: Precision {}: max found is {} meters (absolute max is {} meters, delta is {} meters}",
-                    p, m, safeMaxOffsetInMeters, safeMaxOffsetInMeters - m);
+                    p, maxDeltaFoundMeters, safeMaxOffsetInMeters, safeMaxOffsetInMeters - maxDeltaFoundMeters);
         }
     }
 

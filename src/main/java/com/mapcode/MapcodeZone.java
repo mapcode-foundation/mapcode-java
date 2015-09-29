@@ -18,7 +18,12 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 
-// Simple class to represent all the coordinates that would deliver a particular mapcode.
+/**
+ * ----------------------------------------------------------------------------------------------
+ * Package private implementation class. For internal use within the Mapcode implementation only.
+ * ----------------------------------------------------------------------------------------------
+ * Simple class to represent all the coordinates that would deliver a particular mapcode.
+ */
 class MapcodeZone {
 
     // Longitudes in LonFractions ("1/3240 billionths").
