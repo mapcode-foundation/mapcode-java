@@ -9,7 +9,14 @@
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 2.2.3
+
+    * To do.
+
+    []
+
 * 2.2.2
+
     * Fixed error in <<<Point>>> which in rare cases would allow longitudes outside proper range.
 
     []
