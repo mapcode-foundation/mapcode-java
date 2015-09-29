@@ -20,8 +20,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -267,6 +265,7 @@ public class PointTest {
         assertPointOK(Point.fromDeg(Double.MIN_VALUE, Double.MIN_VALUE));
         assertPointOK(Point.fromDeg(Double.MAX_VALUE, Double.MAX_VALUE));
         assertPointOK(Point.fromDeg(8.988465674311579e307, 6.964924833637635e307));
+        assertPointOK(Point.fromDeg(-8.139756926185767E307, 8.15622502365209E307));
     }
 
     private static void assertPointOK(final Point p) {

@@ -26,6 +26,25 @@ public class MapcodeTest {
     private static final Logger LOG = LoggerFactory.getLogger(MapcodeTest.class);
 
     @Test
+    public void checkValidMapcodeFormat() {
+        LOG.info("checkValidMapcodeFormat");
+        assertTrue(Mapcode.isValidMapcodeFormat("A1.B1"));
+        assertTrue(Mapcode.isValidMapcodeFormat("a1.B1"));
+        assertTrue(Mapcode.isValidMapcodeFormat("00.01"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AAA.01"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AAA.BBB"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AAAA.BBB"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AAAA.BBBB"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AAAAA.BBBB"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-0"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-01"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-A"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-AA"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-Y"));
+        assertTrue(Mapcode.isValidMapcodeFormat("AA.AA-1Y"));
+    }
+
+    @Test
     public void checkValidPrecisionFormats() {
         LOG.info("checkValidPrecisionFormats");
 
@@ -123,10 +142,15 @@ public class MapcodeTest {
     }
 
     @Test(expected = UnknownPrecisionFormatException.class)
-    public void checkPrecisionFormat2() {
-        LOG.info("checkPrecisionFormat2");
-
+    public void checkUnknownPrecisionFormatException1() {
+        LOG.info("checkUnknownPrecisionFormatException1");
         Mapcode.getPrecisionFormat("ABC");
+    }
+
+    @Test(expected = UnknownPrecisionFormatException.class)
+    public void checkUnknownPrecisionFormatException2() {
+        LOG.info("checkUnknownPrecisionFormatException2");
+        Mapcode.getPrecisionFormat("494.V494V");
     }
 
     @Test
