@@ -24,7 +24,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
+@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared", "ValueOfIncrementOrDecrementUsed"})
 public class EncoderTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncoderTest.class);
 
@@ -173,21 +173,26 @@ public class EncoderTest {
 
         // test extremely precise encoding
         {
-          double lat2 = 52.3, lon2 = 4.908;
-          Mapcode m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
-          assertEquals("NLD GG.NBC-SHR33333", m.getCodeWithTerritory(8));
-          lat2 = 52.3000004; lon2 = 4.9080004;
-          m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
-          assertEquals("NLD GG.NBC-SHSS1010", m.getCodeWithTerritory(8));
-          lat2 = 52.299999999; lon2 = 4.907999999;
-          m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
-          assertEquals("NLD GG.NBC-SHLWXWQB", m.getCodeWithTerritory(8));
-          lat2 = 52.29993200000; lon2 = 4.90786600000;
-          m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
-          assertEquals("NLD GG.NBC-00000000", m.getCodeWithTerritory(8));
-          lat2 = 52.29993200000; lon2 = 4.9078659999999;
-          m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD") );
-          assertEquals("NLD GG.N98-45454545", m.getCodeWithTerritory(8));          
+            double lat2 = 52.3;
+            double lon2 = 4.908;
+            Mapcode m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD"));
+            assertEquals("NLD GG.NBC-SHR33333", m.getCodeWithTerritory(8));
+            lat2 = 52.3000004;
+            lon2 = 4.9080004;
+            m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD"));
+            assertEquals("NLD GG.NBC-SHSS1010", m.getCodeWithTerritory(8));
+            lat2 = 52.299999999;
+            lon2 = 4.907999999;
+            m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD"));
+            assertEquals("NLD GG.NBC-SHLWXWQB", m.getCodeWithTerritory(8));
+            lat2 = 52.29993200000;
+            lon2 = 4.90786600000;
+            m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD"));
+            assertEquals("NLD GG.NBC-00000000", m.getCodeWithTerritory(8));
+            lat2 = 52.29993200000;
+            lon2 = 4.9078659999999;
+            m = MapcodeCodec.encodeToShortest(lat2, lon2, Territory.fromString("NLD"));
+            assertEquals("NLD GG.N98-45454545", m.getCodeWithTerritory(8));
         }
     }
 
@@ -223,13 +228,14 @@ public class EncoderTest {
         MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
     }
 
+    @SuppressWarnings("MisorderedAssertEqualsArguments")
     @Test
     public void legalArguments() {
         LOG.info("legalArguments");
         assertEquals(MapcodeCodec.encode(-90, 0).size(), 3); // 2 x ATA and AAA
         assertEquals(MapcodeCodec.encode(-60, 0).size(), 2); // ATA and AAA
         assertEquals(MapcodeCodec.encode(90, 0).size(), 1); // AAA only
-        assertEquals(MapcodeCodec.encode(0, -180),MapcodeCodec.encode(0, 180));
+        assertEquals(MapcodeCodec.encode(0, -180), MapcodeCodec.encode(0, 180));
         assertEquals(MapcodeCodec.encode(-91, 0), MapcodeCodec.encode(-90, 0));
         assertEquals(MapcodeCodec.encode(91, 0), MapcodeCodec.encode(90, 0));
         assertEquals(MapcodeCodec.encode(0, -181), MapcodeCodec.encode(0, 179));

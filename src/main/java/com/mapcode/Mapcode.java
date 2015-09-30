@@ -421,14 +421,14 @@ public final class Mapcode {
     }
 
     @Override
-    public boolean equals(@Nullable final Object o) {
-        if (this == o) {
+    public boolean equals(@Nullable final Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof Mapcode)) {
+        if (!(obj instanceof Mapcode)) {
             return false;
         }
-        final Mapcode that = (Mapcode) o;
+        final Mapcode that = (Mapcode) obj;
         return this.territory.equals(that.territory) &&
             this.codePrecision8.equals(that.codePrecision8);
     }

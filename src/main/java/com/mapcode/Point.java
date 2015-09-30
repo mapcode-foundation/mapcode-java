@@ -277,9 +277,12 @@ public class Point {
             lat = 180;
         }
 
+        // Rounding factor.
+        final double fractionRounding = 0.1;
+
         // Lat now [0..180].
         lat = lat * LAT_TO_FRACTIONS_FACTOR;
-        double latFractionOnly = Math.floor(lat + 0.1);         // TODO: Check the + 0.1! Why?
+        double latFractionOnly = Math.floor(lat + fractionRounding);
         latMicroDeg = (int) (latFractionOnly / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
         latFractionOnly = latFractionOnly - ((double) latMicroDeg * LAT_MICRODEG_TO_FRACTIONS_FACTOR);
         latFractionOnlyDeg = (int) latFractionOnly;
@@ -293,7 +296,7 @@ public class Point {
 
         // Lon now in [0..360>.
         lon = lon * LON_TO_FRACTIONS_FACTOR;
-        double lonFractionOnly = Math.floor(lon + 0.1);         // TODO: Check the + 0.1! Why?
+        double lonFractionOnly = Math.floor(lon + fractionRounding);
         lonMicroDeg = (int) (lonFractionOnly / LON_MICRODEG_TO_FRACTIONS_FACTOR);
         lonFractionOnly = lonFractionOnly - ((double) lonMicroDeg * LON_MICRODEG_TO_FRACTIONS_FACTOR);
         lonFractionOnlyDeg = (int) lonFractionOnly;
@@ -327,6 +330,7 @@ public class Point {
     /**
      * Package private construction, from integer fractions (no loss of precision).
      */
+    @SuppressWarnings("NumericCastThatLosesPrecision")
     @Nonnull
     static Point fromLatLonFractions(final double latFraction, final double lonFraction) {
         final Point p = new Point();
