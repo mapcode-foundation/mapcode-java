@@ -17,6 +17,7 @@
 package com.mapcode;
 
 import com.mapcode.Territory.AlphaCodeFormat;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,10 @@ public class TerritoryTest {
         assertEquals(Territory.IN_MN, Territory.fromString("IND_MN"));
         assertEquals(Territory.US_MN, Territory.fromString("USA-MN"));
         assertEquals(Territory.US_MN, Territory.fromString("USA_MN"));
+
+        assertEquals(Territory.COD, Territory.fromString("Congo-Kinshasa"));
+        assertEquals(Territory.US_IN, Territory.fromString("United States of America-IN"));
+        assertEquals(Territory.US_IN, Territory.fromString("United States of America IN"));
     }
 
     @Test
@@ -101,9 +106,25 @@ public class TerritoryTest {
     }
 
     @Test(expected = UnknownTerritoryException.class)
+    public void testTerritoryFromStringIncorrectDash1() throws Exception {
+        LOG.info("testTerritoryFromStringIncorrectDash1");
+
+        // Issue: https://github.com/mapcode-foundation/mapcode-java/issues/23
+        assertEquals(Territory.AAA, Territory.fromString("CHE-GR"));    // Exception must be thrown.
+    }
+
+    @Test(expected = UnknownTerritoryException.class)
+    public void testTerritoryFromStringIncorrectDash2() throws Exception {
+        LOG.info("testTerritoryFromStringIncorrectDash2");
+        assertEquals(Territory.AAA, Territory.fromString("USA-NLD"));    // Exception must be thrown.
+    }
+
+    @Test(expected = UnknownTerritoryException.class)
     public void testTerritoryFromStringNumeric() throws Exception {
         LOG.info("testTerritoryFromStringNumeric");
-        assertEquals(Territory.VAT, Territory.fromString("0"));
+
+        // No longer support: numeric codes.
+        assertEquals(Territory.AAA, Territory.fromString("0"));         // Exception must be thrown.
     }
 
     @Test

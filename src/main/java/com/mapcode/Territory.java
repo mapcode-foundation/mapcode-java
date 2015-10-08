@@ -739,7 +739,7 @@ public enum Territory {
         checkNonnull("format", format);
         String result = name().replace('_', '-');
         if (format != AlphaCodeFormat.INTERNATIONAL) {
-            final int index = name().indexOf('_');
+            final int index = name().lastIndexOf('_');
             if (index != -1) {
                 assert name().length() > (index + 1);
                 final String shortName = name().substring(index + 1);
@@ -903,11 +903,15 @@ public enum Territory {
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if the territory is not found.
      */
+    @SuppressWarnings("TailRecursion")
     @Nonnull
     private static Territory createFromString(
             @Nonnull final String alphaCode,
             @Nullable final Territory parentTerritory) throws UnknownTerritoryException {
-        final String trimmed = Mapcode.convertStringToPlainAscii(alphaCode.trim().replace('_', '-')).toUpperCase();
+
+        // Replace '_' with '-', but leave spaces alone (may be part of the name).
+        final String trimmed = Mapcode.convertStringToPlainAscii(
+                alphaCode.trim().replace('_', '-')).toUpperCase();
 
         // Try as alpha code.
         final List<Territory> territories = nameMap.get(trimmed);
@@ -920,14 +924,23 @@ public enum Territory {
                     return territory;
                 }
             }
-            throw new UnknownTerritoryException(trimmed);
-        }
+        } else {
 
-        // Check for a case such as USA-NLD (=NLD)
-        final int dividerLocation = Math.max(trimmed.indexOf('-'), trimmed.indexOf(' '));
-        if (dividerLocation >= 0) {
-            //noinspection TailRecursion
-            return createFromString(trimmed.substring(dividerLocation + 1), parentTerritory);
+            // Check for a case such as "United States of America-IN".
+            final int lastSeparator = Math.max(     // Find last separator.
+                    trimmed.lastIndexOf('-'),       // Allow '-'.
+                    trimmed.lastIndexOf(' '));      // And ' '.
+            if (lastSeparator >= 0) {
+                final String prefix = trimmed.substring(0, lastSeparator);
+                final Territory parent = createFromString(prefix, parentTerritory);
+                if (PARENT_TERRITORIES.contains(parent)) {
+                    final String postfix = trimmed.substring(lastSeparator + 1);
+                    final Territory child = createFromString(postfix, parentTerritory);
+                    if (child.parentTerritory == parent) {
+                        return child;
+                    }
+                }
+            }
         }
         throw new UnknownTerritoryException(trimmed);
     }
@@ -946,7 +959,7 @@ public enum Territory {
         addNameWithSeperatorVariants(name, territory);
 
         if (name.contains("-")) {
-            final String childTerritoryName = name.substring(name.indexOf('-') + 1);
+            final String childTerritoryName = name.substring(name.lastIndexOf('-') + 1);
 
             // Tolerate a child territory specified without the parent.
             // (e.g. "CA" rather than "US-CA")

@@ -11,7 +11,9 @@
 
 * 2.2.3
 
-    * To do.
+    * Issue #23: Fixed <<<Territory.fromString>>> to make sure the parent territory is valid for
+      input like "CHE-GR". This returned "MX-GRO" instead of throwing <<<UnknownTerritoryException>>>.
+      Added unit test for this type of case.
 
     []
 
