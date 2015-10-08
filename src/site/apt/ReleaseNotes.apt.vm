@@ -9,6 +9,12 @@
     In any case, never depend on them for your own non-<<<SNAPSHOT>>> releases.
 #end
 
+* 2.2.4
+
+    * To do.
+
+    []
+
 * 2.2.3
 
     * Issue #23: Fixed <<<Territory.fromString>>> to make sure the parent territory is valid for
