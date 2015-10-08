@@ -26,7 +26,7 @@ import static com.mapcode.CheckArgs.checkNonnull;
  * ----------------------------------------------------------------------------------------------
  * Mapcode public interface.
  * ----------------------------------------------------------------------------------------------
- * <p/>
+ *
  * This class defines the available territory codes as used by mapcode.
  */
 public enum Territory {
@@ -654,13 +654,13 @@ public enum Territory {
      * Get a territory from a mapcode territory abbreviation (or a territory name). Note that the provided abbreviation is NOT an
      * ISO code: it's a mapcode prefix. As local mapcodes for subdivisions have been optimized to prefer to use 2-character
      * subdivisions codes in local codes, subdivisions are preferred over countries in this case.
-     * <p/>
+     *
      * For example, fromString("AS") returns {@link Territory#IN_AS} rather than {@link Territory#ASM} and
      * fromString("BR") returns {@link Territory#IN_BR} rather than {@link Territory#BRA}.
-     * <p/>
+     *
      * This behavior is intentional as local mapcodes are designed to be as short as possible. A mapcode within
      * the Indian state Bihar should therefore be able to specified as "BR 49.46M3" rather "IN-BR 49.46M3".
-     * <p/>
+     *
      * Brazilian mapcodes, on the other hand, would be specified as "BRA BDHP.JK39-1D", using the ISO 3 letter code.
      *
      * @param alphaCode Territory name or alphanumeric code.

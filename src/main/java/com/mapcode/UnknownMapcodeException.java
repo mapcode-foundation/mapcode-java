@@ -20,7 +20,7 @@ import javax.annotation.Nonnull;
 
 /**
  * This checked exception is thrown for invalid mapcodes (which have the right syntax, are correctly formatted).
- * <p/>
+ *
  * Note that for syntactically incorrect mapcodes, normally {@link IllegalArgumentException}s are thrown,
  * not {@link UnknownMapcodeException}.
  */

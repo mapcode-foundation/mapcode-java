@@ -24,7 +24,7 @@ import static com.mapcode.CheckArgs.checkNonnull;
 
 /**
  * This class defines a class for lat/lon points.
- * <p/>
+ *
  * Internally, the class implements a fixed-point representation where a coordinate is expressed in
  * "fractions", of 1/3.240,000,000,000th of a degree. A double (an IEEE 754-1985 binary64) is just
  * sufficient to represent coordinates between -180 and +180 degrees in such fractions.
@@ -49,7 +49,7 @@ public class Point {
     public static final double EARTH_CIRCUMFERENCE_Y = EARTH_RADIUS_Y_METERS * 2.0 * Math.PI;
 
     // Meters per degree latitude is fixed. For longitude: use factor * cos(midpoint of two degree latitudes).
-    public static final double METERS_PER_DEGREE_LAT         = EARTH_CIRCUMFERENCE_Y / 360.0;
+    public static final double METERS_PER_DEGREE_LAT = EARTH_CIRCUMFERENCE_Y / 360.0;
     public static final double METERS_PER_DEGREE_LON_EQUATOR = EARTH_CIRCUMFERENCE_X / 360.0; // * cos(deg(lat)).
 
     /**
@@ -66,6 +66,10 @@ public class Point {
 
     /**
      * Public construction, from integer microdegrees (no loss of precision).
+     *
+     * @param latMicroDeg Latitude, in microdegrees.
+     * @param lonMicroDeg Longitude, in microdegrees.
+     * @return A defined point.
      */
     @Nonnull
     public static Point fromMicroDeg(final int latMicroDeg, final int lonMicroDeg) {
@@ -168,8 +172,7 @@ public class Point {
         if (p1.getLonDeg() <= p2.getLonDeg()) {
             from = p1;
             to = p2;
-        }
-        else {
+        } else {
             from = p2;
             to = p1;
         }
@@ -225,10 +228,10 @@ public class Point {
         }
         final Point that = (Point) obj;
         return (this.latMicroDeg == that.latMicroDeg) &&
-            (this.lonMicroDeg == that.lonMicroDeg) &&
-            (this.latFractionOnlyDeg == that.latFractionOnlyDeg) &&
-            (this.lonFractionOnlyDeg == that.lonFractionOnlyDeg) &&
-            (this.defined == that.defined);
+                (this.lonMicroDeg == that.lonMicroDeg) &&
+                (this.latFractionOnlyDeg == that.latFractionOnlyDeg) &&
+                (this.lonFractionOnlyDeg == that.lonFractionOnlyDeg) &&
+                (this.defined == that.defined);
     }
 
     /**
@@ -237,12 +240,12 @@ public class Point {
      * -----------------------------------------------------------------------
      */
     // Constants to convert between Degrees, MicroDegrees and Fractions
-    static final double MICRODEG_TO_DEG_FACTOR           = 1000000.0;
-    static final double MAX_PRECISION_FACTOR             = 810000.0;
+    static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
+    static final double MAX_PRECISION_FACTOR = 810000.0;
     static final double LAT_MICRODEG_TO_FRACTIONS_FACTOR = MAX_PRECISION_FACTOR;
     static final double LON_MICRODEG_TO_FRACTIONS_FACTOR = MAX_PRECISION_FACTOR * 4;
-    static final double LAT_TO_FRACTIONS_FACTOR          = MICRODEG_TO_DEG_FACTOR * LAT_MICRODEG_TO_FRACTIONS_FACTOR;
-    static final double LON_TO_FRACTIONS_FACTOR          = MICRODEG_TO_DEG_FACTOR * LON_MICRODEG_TO_FRACTIONS_FACTOR;
+    static final double LAT_TO_FRACTIONS_FACTOR = MICRODEG_TO_DEG_FACTOR * LAT_MICRODEG_TO_FRACTIONS_FACTOR;
+    static final double LON_TO_FRACTIONS_FACTOR = MICRODEG_TO_DEG_FACTOR * LON_MICRODEG_TO_FRACTIONS_FACTOR;
 
     private int latMicroDeg;            // Whole nr of MICRODEG_TO_DEG_FACTOR.
     private int lonMicroDeg;            // Whole nr of MICRODEG_TO_DEG_FACTOR.
@@ -272,8 +275,7 @@ public class Point {
         double lat = latDeg + 90;
         if (lat < 0) {
             lat = 0;
-        }
-        else if (lat > 180) {
+        } else if (lat > 180) {
             lat = 180;
         }
 
@@ -367,8 +369,7 @@ public class Point {
             lonMicroDeg %= 360000000;
             if (lonMicroDeg >= 180000000) {
                 lonMicroDeg -= 360000000;
-            }
-            else if (lonMicroDeg < -180000000) {
+            } else if (lonMicroDeg < -180000000) {
                 lonMicroDeg += 360000000;
             }
         }

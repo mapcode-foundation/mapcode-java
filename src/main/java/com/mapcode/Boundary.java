@@ -22,7 +22,7 @@ import javax.annotation.Nonnull;
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the mapcode implementation only.
  * ----------------------------------------------------------------------------------------------
- * <p/>
+ *
  * This class handles territory rectangles for mapcodes.
  */
 class Boundary {
@@ -83,7 +83,7 @@ class Boundary {
     /**
      * Check if a point falls within a boundary. Note that the "min" values are inclusive for a boundary and
      * the "max" values are exclusive.\
-     * <p/>
+     *
      * Note: Points at the exact North pole with latitude 90 are never part of a boundary.
      *
      * @param p Point to check.
