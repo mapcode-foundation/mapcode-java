@@ -58,7 +58,7 @@ class Decoder {
 
         mapcode = aeuUnpack(mapcode).trim();
         if (mapcode.isEmpty()) {
-            LOG.error("decode: Failed to aeuUnpack {}", argMapcode);
+            LOG.info("decode: Failed to aeuUnpack {}", argMapcode);
             return Point.undefined(); // failed to aeuUnpack
         }
 
