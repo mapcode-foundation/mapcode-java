@@ -7,13 +7,13 @@ Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
 This Java project contains a library to encode latitude/longitude pairs to mapcodes
 and to decode mapcodes back to latitude/longitude pairs.
 
-**Release notes can be found at: http://mapcode-foundation.github.io/mapcode-java/ReleaseNotes.html**
+**Release notes: http://mapcode-foundation.github.io/mapcode-java/ReleaseNotes.html**
 
-**Online documentation can be found at: http://mapcode-foundation.github.io/mapcode-java/**
+**Online documentation: http://mapcode-foundation.github.io/mapcode-java/**
 
-**An example of how to use this library can be found at: https://github.com/mapcode-foundation/mapcode-java-example**
+**Latest stable release: https://github.com/mapcode-foundation/mapcode-java/releases**
 
-**The latest stable release can be found at: https://github.com/mapcode-foundation/mapcode-java/releases**
+**Example: https://github.com/mapcode-foundation/mapcode-java-example**
 
 If you wish to use mapcodes in your own application landscape, consider using running an instance of the
 Mapcode REST API, which can be found on: **https://github.com/mapcode-foundation/mapcode-rest-service**
