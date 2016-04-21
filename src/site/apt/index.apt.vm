@@ -3,7 +3,7 @@
     -----------
 
     Welcome to the Java library to handle mapcodes. The original C library was created by Pieter Geelen. Work
-    on the Java version of the Mapcode library was done by Rijn Buve and Matthew Lowden.
+    on the Java version of the Mapcode library was done by Rijn Buve, initial port by Matthew Lowden.
 
 Release Notes
 

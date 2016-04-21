@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,12 @@ public class Point {
     public static final double LON_DEG_MAX = 180.0;
     public static final double LAT_DEG_MIN = -90.0;
     public static final double LAT_DEG_MAX = 90.0;
+
+    // Conversion constants.
+    public static final int DEG_TO_MICRO_DEG = 1000000;
+    public static final int MICRO_DEG_90 = 90 * DEG_TO_MICRO_DEG;
+    public static final int MICRO_DEG_180 = 180 * DEG_TO_MICRO_DEG;
+    public static final int MICRO_DEG_360 = 360 * DEG_TO_MICRO_DEG;
 
     // Radius of Earth.
     public static final double EARTH_RADIUS_X_METERS = 6378137.0;
@@ -219,14 +225,14 @@ public class Point {
 
     @SuppressWarnings("NonFinalFieldReferenceInEquals")
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
+    public boolean equals(final Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(obj instanceof Point)) {
+        if (!(o instanceof Point)) {
             return false;
         }
-        final Point that = (Point) obj;
+        final Point that = (Point) o;
         return (this.latMicroDeg == that.latMicroDeg) &&
                 (this.lonMicroDeg == that.lonMicroDeg) &&
                 (this.latFractionOnlyDeg == that.latFractionOnlyDeg) &&
@@ -288,7 +294,7 @@ public class Point {
         latMicroDeg = (int) (latFractionOnly / LAT_MICRODEG_TO_FRACTIONS_FACTOR);
         latFractionOnly = latFractionOnly - ((double) latMicroDeg * LAT_MICRODEG_TO_FRACTIONS_FACTOR);
         latFractionOnlyDeg = (int) latFractionOnly;
-        latMicroDeg = latMicroDeg - 90000000;
+        latMicroDeg = latMicroDeg - MICRO_DEG_90;
 
         // Math.floor has limited precision for really large values, so we need to limit the lon explicitly.
         double lon = Math.min(360.0, Math.max(0.0, lonDeg - (360.0 * Math.floor(lonDeg / 360.0))));
@@ -304,8 +310,8 @@ public class Point {
         lonFractionOnlyDeg = (int) lonFractionOnly;
 
         // Wrap lonMicroDeg from [0..360> to [-180..180).
-        if (lonMicroDeg >= 180000000) {
-            lonMicroDeg = lonMicroDeg - 360000000;
+        if (lonMicroDeg >= MICRO_DEG_180) {
+            lonMicroDeg = lonMicroDeg - MICRO_DEG_360;
         }
 
         defined = true;
@@ -357,20 +363,20 @@ public class Point {
     Point wrap() {
         if (defined) {
             // Cut latitude to [-90, 90].
-            if (latMicroDeg < -90000000) {
-                latMicroDeg = -90000000;
+            if (latMicroDeg < -MICRO_DEG_90) {
+                latMicroDeg = -MICRO_DEG_90;
                 latFractionOnlyDeg = 0;
             }
-            if (latMicroDeg > 90000000) {
-                latMicroDeg = 90000000;
+            if (latMicroDeg > MICRO_DEG_90) {
+                latMicroDeg = MICRO_DEG_90;
                 latFractionOnlyDeg = 0;
             }
             // Map longitude to [-180, 180). Values outside this range are wrapped to this range.
-            lonMicroDeg %= 360000000;
-            if (lonMicroDeg >= 180000000) {
-                lonMicroDeg -= 360000000;
-            } else if (lonMicroDeg < -180000000) {
-                lonMicroDeg += 360000000;
+            lonMicroDeg %= MICRO_DEG_360;
+            if (lonMicroDeg >= MICRO_DEG_180) {
+                lonMicroDeg -= MICRO_DEG_360;
+            } else if (lonMicroDeg < -MICRO_DEG_180) {
+                lonMicroDeg += MICRO_DEG_360;
             }
         }
         return this;

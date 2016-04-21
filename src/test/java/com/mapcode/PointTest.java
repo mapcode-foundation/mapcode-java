@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,11 +43,11 @@ public class PointTest {
         assertEquals(0, Point.fromDeg(0, 0).getLatMicroDeg());
         assertEquals(0, Point.fromDeg(0, 0).getLonMicroDeg());
 
-        assertEquals(90000000, Point.fromDeg(90, 0).getLatMicroDeg());
-        assertEquals(-90000000, Point.fromDeg(-90, 0).getLatMicroDeg());
+        assertEquals(Point.MICRO_DEG_90, Point.fromDeg(90, 0).getLatMicroDeg());
+        assertEquals(-Point.MICRO_DEG_90, Point.fromDeg(-90, 0).getLatMicroDeg());
 
-        assertEquals(-180000000, Point.fromDeg(0, 180).getLonMicroDeg());
-        assertEquals(-180000000, Point.fromDeg(0, 180).getLonMicroDeg());
+        assertEquals(-Point.MICRO_DEG_180, Point.fromDeg(0, 180).getLonMicroDeg());
+        assertEquals(-Point.MICRO_DEG_180, Point.fromDeg(0, 180).getLonMicroDeg());
     }
 
     @Test
@@ -210,7 +210,7 @@ public class PointTest {
         assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-                Point.fromMicroDeg(0, 179000000), Point.fromMicroDeg(0, 180000000));
+                Point.fromMicroDeg(0, 179000000), Point.fromMicroDeg(0, Point.MICRO_DEG_180));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
         assertTrue(delta <= DELTA);
@@ -228,7 +228,7 @@ public class PointTest {
         assertTrue(delta <= DELTA);
 
         d = Point.distanceInMeters(
-                Point.fromMicroDeg(0, -179000000), Point.fromMicroDeg(0, -180000000));
+                Point.fromMicroDeg(0, -179000000), Point.fromMicroDeg(0, -Point.MICRO_DEG_180));
         delta = Math.abs(Point.METERS_PER_DEGREE_LON_EQUATOR - d);
         LOG.debug("testDistanceInMeters: d={}, delta={}", d, delta);
         assertTrue(delta <= DELTA);

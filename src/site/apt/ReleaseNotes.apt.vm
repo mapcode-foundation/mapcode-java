@@ -13,6 +13,10 @@
 
     * Fix error to info logging in <<<aeuUnpack>>>.
 
+    * Updated all POM dependencies.
+
+    * Updated copyright messages.
+
     []
 
 * 2.2.3

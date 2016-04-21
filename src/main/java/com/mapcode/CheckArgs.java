@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import static com.mapcode.Mapcode.getPrecisionFormat;
 /**
  * ----------------------------------------------------------------------------------------------
  * Package private implementation class. For internal use within the Mapcode implementation only.
+ *
+ * This class provides a number of helper methods to check (runtime) arguments.
  * ----------------------------------------------------------------------------------------------
  */
 @SuppressWarnings("OverlyBroadThrowsClause")

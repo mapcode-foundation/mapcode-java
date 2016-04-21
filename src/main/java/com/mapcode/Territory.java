@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -811,6 +811,7 @@ public enum Territory {
             @Nullable final Territory parentTerritory,
             @Nullable final String[] aliases,
             @Nullable final String[] fullNameAliases) {
+        assert number >= 0;
         this.number = number;
         this.fullName = fullName;
         this.parentTerritory = parentTerritory;
@@ -840,10 +841,14 @@ public enum Territory {
 
         for (final Territory territory : Territory.values()) {
             final int territoryNumber = territory.getNumber();
+
+            // Check if territory code is within range.
             if ((territoryNumber < 0) || (territoryNumber >= Territory.values().length)) {
                 throw new ExceptionInInitializerError(errorPrefix + "territory number out of range: " + territoryNumber);
 
             }
+
+            // Check if territory code was already used.
             if (territoryCodes.contains(territoryNumber)) {
                 throw new ExceptionInInitializerError(errorPrefix + "non-unique territory number: " + territoryNumber);
             }
@@ -858,13 +863,15 @@ public enum Territory {
                 parentList.add(territory.parentTerritory);
             }
 
-            // Add territory codes and alias codes.
+            // Check if territory name is unique.
             if (namesSet.contains(territory.toString())) {
-                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory: " + territory.toString());
+                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory name: " + territory.toString());
             }
             namesSet.add(territory.toString());
             addNameWithParentVariants(territory.toString(), territory);
             for (final String alias : territory.aliases) {
+
+                // Check if alias is unique.
                 if (namesSet.contains(alias)) {
                     throw new ExceptionInInitializerError(errorPrefix + "non-unique alias: " + alias);
                 }
@@ -872,14 +879,16 @@ public enum Territory {
                 addNameWithParentVariants(alias, territory);
             }
 
-            // Add territory fullnames and aliases as well. Skip special case: territory name == territory code (e.g. USA).
+            // Check if fullname is unique. Skip special case where territory name == territory code (e.g. USA).
             if (namesSet.contains(territory.fullName.toUpperCase()) && !territory.toString().equals(territory.fullName.toUpperCase())) {
-                throw new ExceptionInInitializerError(errorPrefix + "non-unique fullName: " + territory.fullName.toUpperCase());
+                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory fullName: " + territory.fullName.toUpperCase());
             }
             addNameWithParentVariants(territory.fullName.toUpperCase(), territory);
             for (final String fullNameAlias : territory.fullNameAliases) {
+
+                // Check if fullname alias is unique.
                 if (namesSet.contains(fullNameAlias.toUpperCase())) {
-                    throw new ExceptionInInitializerError(errorPrefix + "non-unique fullName alias: " + fullNameAlias);
+                    throw new ExceptionInInitializerError(errorPrefix + "non-unique territory fullName alias: " + fullNameAlias);
                 }
                 namesSet.add(fullNameAlias.toUpperCase());
                 addNameWithParentVariants(fullNameAlias.toUpperCase(), territory);
@@ -889,9 +898,9 @@ public enum Territory {
         }
         assert territoryCodes.size() == Territory.values().length;
 
-        // Check for missing codes.
+        // Check for missing codes; minimum code must be 0, maximum code must be last code of enum.
         if (!((min == 0) && (max == (Territory.values().length - 1)))) {
-            throw new ExceptionInInitializerError(errorPrefix + "incorrect min/max: " + min + '/' + max);
+            throw new ExceptionInInitializerError(errorPrefix + "incorrect min/max territory number: " + min + '/' + max);
         }
     }
 

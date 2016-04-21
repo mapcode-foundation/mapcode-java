@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ class Decoder {
         for (int territoryRecord = fromTerritoryRecord; territoryRecord <= uptoTerritoryRecord; territoryRecord++) {
             final int codexi = Data.getCodex(territoryRecord);
             Boundary boundary = createFromTerritoryRecord(territoryRecord);
-            if (Data.getTerritoryRecordType(territoryRecord) == 0) {
+            if (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_NONE) {
                 if (Data.isNameless(territoryRecord)) {
                     // i = nameless
                     if (((codexi == 21) && (incodex == 22)) ||
@@ -157,7 +157,7 @@ class Decoder {
                         break;
                     }
                 }
-            } else if (Data.getTerritoryRecordType(territoryRecord) == 1) {
+            } else if (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_PIPE) {
                 // i = grid with headerletter
                 if ((incodex == (codexi + 10)) && (Data.headerLetter(territoryRecord).charAt(0) == mapcode.charAt(0))) {
                     mapcodeZone = decodeGrid(mapcode.substring(1),
@@ -488,7 +488,7 @@ class Decoder {
         int i;
         i = m;
         while (true) {
-            if ((Data.getTerritoryRecordType(i) < 2) || (Data.getCodex(i) != codexm)) {
+            if ((Data.getTerritoryRecordType(i) < Data.TERRITORY_RECORD_TYPE_PLUS) || (Data.getCodex(i) != codexm)) {
                 LOG.error("decodeGrid: Failed, decodeAutoHeader({}): out of {} records", input, codexm);
                 return MapcodeZone.empty(); // return undefined
             }
@@ -507,7 +507,7 @@ class Decoder {
 
             int product = (w / 168) * (h / 176) * 961 * 31;
 
-            if (Data.getTerritoryRecordType(i) == 2) {
+            if (Data.getTerritoryRecordType(i) == Data.TERRITORY_RECORD_TYPE_PLUS) {
                 final int goodRounder = (codexm >= 23) ? (961 * 961 * 31) : (961 * 961);
                 product = ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
             }

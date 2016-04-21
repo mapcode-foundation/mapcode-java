@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,8 +106,8 @@ class MapcodeZone {
         lonFractionMin = lonFraction;
         lonFractionMax = lonFraction + lonFractionDelta;
         if (latFractionDelta < 0) {
-            latFractionMin = latFraction + 1 + latFractionDelta;  // y + yDelta can NOT be represented.
-            latFractionMax = latFraction + 1;                   // y CAN be represented.
+            latFractionMin = latFraction + 1 + latFractionDelta;    // y + yDelta can NOT be represented.
+            latFractionMax = latFraction + 1;                       // y CAN be represented.
         } else {
             latFractionMin = latFraction;
             latFractionMax = latFraction + latFractionDelta;
@@ -146,11 +146,11 @@ class MapcodeZone {
             double lonMin = area.getLonMicroDegMin() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
             double lonMax = area.getLonMicroDegMax() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
             if ((lonMax < 0) && (z.lonFractionMin > 0)) {
-                lonMin += (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
-                lonMax += (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+                lonMin += (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+                lonMax += (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
             } else if ((lonMin > 1) && (z.lonFractionMax < 0)) {
-                lonMin -= (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
-                lonMax -= (360000000 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+                lonMin -= (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
+                lonMax -= (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
             }
             if (z.lonFractionMin < lonMin) {
                 z.lonFractionMin = lonMin;

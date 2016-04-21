@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,15 @@ import javax.annotation.Nonnull;
 import static com.mapcode.CheckArgs.checkNonnull;
 
 /**
- * This enum defines all alphabets supported for mapcodes. Note that an alphabet is different from a
- * language or locale. An alternative name for an alphabet is "script".
+ * This enum defines all alphabets supported for mapcodes. Note that an alphabet is different
+ * from a language or locale. Note that the term alphabet was historically chosen. Script is a
+ * more precise term.
  *
- * Mapcodes can be safely converted between alphabets and fed to the mapcode decoder in the regular
- * ASCII Roman alphabet or any other.
+ * Mapcodes can be safely converted between alphabets/scripts and fed to the mapcode decoder
+ * in the regular ASCII Roman alphabet or any other.
+ *
+ * The characters within an alphabet/script have been carefully chosen to resemble each other
+ * as much as possible.
  */
 public enum Alphabet {
     ROMAN(0),               // The numeric codes for alphabets are used by the implementation

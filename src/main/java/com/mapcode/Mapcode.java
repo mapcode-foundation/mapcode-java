@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -421,14 +421,14 @@ public final class Mapcode {
     }
 
     @Override
-    public boolean equals(@Nullable final Object obj) {
-        if (this == obj) {
+    public boolean equals(@Nullable final Object o) {
+        if (this == o) {
             return true;
         }
-        if (!(obj instanceof Mapcode)) {
+        if (!(o instanceof Mapcode)) {
             return false;
         }
-        final Mapcode that = (Mapcode) obj;
+        final Mapcode that = (Mapcode) o;
         return this.territory.equals(that.territory) &&
             this.codePrecision8.equals(that.codePrecision8);
     }

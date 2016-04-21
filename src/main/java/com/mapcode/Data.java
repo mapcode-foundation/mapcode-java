@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,10 @@ import javax.annotation.Nonnull;
  */
 class Data {
     static final char[] ENCODE_CHARS = {
-            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-            'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',           // Numerals.
+            'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',           // Consonants.
             'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z',
-            'A', 'E', 'U'
+            'A', 'E', 'U'                                               // Vowels.
     };
 
     private Data() {
@@ -38,22 +38,32 @@ class Data {
     }
 
     static boolean isNameless(final int territoryRecord) {
+        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
         return (DataAccess.getDataFlags(territoryRecord) & 64) != 0;
     }
 
     static boolean isSpecialShape(final int territoryRecord) {
+        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
         return (DataAccess.getDataFlags(territoryRecord) & 1024) != 0;
     }
 
+    static final int TERRITORY_RECORD_TYPE_NONE = 0;
+    static final int TERRITORY_RECORD_TYPE_PIPE = 1;
+    static final int TERRITORY_RECORD_TYPE_PLUS = 2;
+    static final int TERRITORY_RECORD_TYPE_STAR = 3;
+
     static int getTerritoryRecordType(final int territoryRecord) {
+        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
         return (DataAccess.getDataFlags(territoryRecord) >> 7) & 3; // 1=pipe 2=plus 3=star
     }
 
     static boolean isRestricted(final int territoryRecord) {
+        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
         return (DataAccess.getDataFlags(territoryRecord) & 512) != 0;
     }
 
     static int getCodex(final int territoryRecord) {
+        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
         final int codexflags = DataAccess.getDataFlags(territoryRecord) & 31;
         return (10 * (codexflags / 5)) + (codexflags % 5) + 1;
     }

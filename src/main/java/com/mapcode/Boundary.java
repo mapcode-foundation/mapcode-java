@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,6 @@ class Boundary {
     private int lonMicroDegMax;     // Maximum longitude (in microdegrees). Exclusive.
     private int latMicroDegMin;     // Minimum latitude (in microdegrees). Inclusive.
     private int latMicroDegMax;     // Minimum latitude (in microdegrees). Exclusive.
-
-    static final int MICRO_DEG_360 = 360000000;
-    static final double DEG_TO_MICRO_DEG = 1000000.0;
 
     private Boundary(
             final int lonMicroDegMin,
@@ -101,9 +98,9 @@ class Boundary {
 
         // Longitude boundaries can extend (slightly) outside the [-180,180) range
         if (lonMicroDeg < lonMicroDegMin) {
-            return (lonMicroDegMin <= (lonMicroDeg + MICRO_DEG_360)) && ((lonMicroDeg + MICRO_DEG_360) < lonMicroDegMax);
+            return (lonMicroDegMin <= (lonMicroDeg + Point.MICRO_DEG_360)) && ((lonMicroDeg + Point.MICRO_DEG_360) < lonMicroDegMax);
         } else if (lonMicroDeg >= lonMicroDegMax) {
-            return (lonMicroDegMin <= (lonMicroDeg - MICRO_DEG_360)) && ((lonMicroDeg - MICRO_DEG_360) < lonMicroDegMax);
+            return (lonMicroDegMin <= (lonMicroDeg - Point.MICRO_DEG_360)) && ((lonMicroDeg - Point.MICRO_DEG_360) < lonMicroDegMax);
         } else {
             return true;
         }
@@ -111,7 +108,7 @@ class Boundary {
 
     @Nonnull
     public String toString() {
-        return "[" + (latMicroDegMin / DEG_TO_MICRO_DEG) + ", " + (latMicroDegMax / DEG_TO_MICRO_DEG) +
-                "), [" + (lonMicroDegMin / DEG_TO_MICRO_DEG) + ", " + (lonMicroDegMax / DEG_TO_MICRO_DEG) + ')';
+        return "[" + (latMicroDegMin / Point.DEG_TO_MICRO_DEG) + ", " + (latMicroDegMax / Point.DEG_TO_MICRO_DEG) +
+                "), [" + (lonMicroDegMin / Point.DEG_TO_MICRO_DEG) + ", " + (lonMicroDegMax / Point.DEG_TO_MICRO_DEG) + ')';
     }
 }

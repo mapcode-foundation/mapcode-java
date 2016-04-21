@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,8 @@ class DataAccess {
     private static final String FILE_NAME = "/com/mapcode/mminfo.dat";
     private static final int FILE_BUFFER_SIZE = 50000;
 
+    private static final int DATA_VERSION_MIN = 220;
+
     // Read data only once in static initializer.
     static {
         LOG.info("DataAccess: reading regions from file: {}", FILE_NAME);
@@ -78,6 +80,8 @@ class DataAccess {
             try {
                 final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
                 try {
+
+                    // Read the input stream, copy to memory buffer.
                     int nrBytes = inputStream.read(readBuffer);
                     while (nrBytes > 0) {
                         total += nrBytes;
@@ -88,23 +92,35 @@ class DataAccess {
                     // Copy stream into data.
                     final byte[] bytes = outputStream.toByteArray();
                     assert total == bytes.length;
+                    if (total < 12) {
+                        LOG.error("DataAccess: expected more than {} bytes", total);
+                        throw new IllegalStateException("Data file corrupt: " + FILE_NAME);
+                    }
 
-                    // Read SIGNATURE "MC", VERSION.
-                    assert total > 12;
+                    // Read "MC", VERSION.
+                    assert total > 8;  // "MC" (2) + VERSION (2) + NR TERRITORIES (2) + NR TERRITORY RECORDS (2).
                     assert (char) bytes[HEADER_ID_1] == 'M';
                     assert (char) bytes[HEADER_ID_2] == 'C';
                     final int dataVersion = readIntLoHi(bytes[HEADER_VERSION_LO], bytes[HEADER_VERSION_HI]);
-                    assert (dataVersion >= 220);
+                    assert dataVersion >= DATA_VERSION_MIN;
 
-                    // Read header: NR TERRITORIES, NR RECTANGLE RECORD.
+                    // Read header: NR TERRITORIES, NR RECTANGLE RECORDS.
                     NR_TERRITORY_RECORDS = readIntLoHi(bytes[HEADER_NR_TERRITORIES_RECS_LO], bytes[HEADER_NR_TERRITORIES_RECS_HI]);
                     NR_TERRITORIES = readIntLoHi(bytes[HEADER_NR_TERRITORIES_LO], bytes[HEADER_NR_TERRITORIES_HI]);
+
+                    // Check if the number of territories matches the enumeration in Territory.
+                    if (NR_TERRITORIES != Territory.values().length) {
+                        LOG.error("DataAccess: expected {} territories, got {}", Territory.values().length, NR_TERRITORIES);
+                        throw new IllegalStateException("Data file corrupt: " + FILE_NAME);
+                    }
+
+                    // Check if the expected file size matched what we found.
                     final int expectedSize = HEADER_SIZE +
                             ((NR_TERRITORIES + 1) * BYTES_PER_INT) +
                             (NR_TERRITORY_RECORDS * (DATA_FIELDS_PER_REC * BYTES_PER_LONG));
 
                     if (expectedSize != total) {
-                        LOG.error("DataAccess: expected {} territories, got {}", expectedSize, total);
+                        LOG.error("DataAccess: expected {} bytes, got {}", expectedSize, total);
                         throw new IllegalStateException("Data file corrupt: " + FILE_NAME);
                     }
                     LOG.debug("DataAccess: version={} territories={} territory records={}", dataVersion, NR_TERRITORIES, NR_TERRITORY_RECORDS);
@@ -124,9 +140,11 @@ class DataAccess {
                         i += 4;
                     }
                 } finally {
+                    //noinspection ThrowFromFinallyBlock
                     outputStream.close();
                 }
             } finally {
+                //noinspection ThrowFromFinallyBlock
                 inputStream.close();
             }
         } catch (final IOException e) {
@@ -146,6 +164,24 @@ class DataAccess {
 
     private DataAccess() {
         // Empty.
+    }
+
+    /**
+     * Get number of territories.
+     *
+     * @return Number of territories.
+     */
+    static int getNrTerritories() {
+        return NR_TERRITORIES;
+    }
+
+    /**
+     * Get number of territory records (rectangles per territory).
+     *
+     * @return Number of rectangles per territory.
+     */
+    static int getNrTerritoryRecords() {
+        return NR_TERRITORY_RECORDS;
     }
 
     @SuppressWarnings("PointlessArithmeticExpression")
@@ -183,4 +219,3 @@ class DataAccess {
         return INDEX[territoryNumber + POS_INDEX_LAST_RECORD] - 1;
     }
 }
-

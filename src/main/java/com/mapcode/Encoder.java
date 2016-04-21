@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -85,7 +85,7 @@ class Encoder {
                     String mapcode = "";
                     if (Data.isNameless(territoryRecord)) {
                         mapcode = encodeNameless(pointToEncode, territoryRecord, fromTerritoryRecord);
-                    } else if (Data.getTerritoryRecordType(territoryRecord) > 1) {
+                    } else if (Data.getTerritoryRecordType(territoryRecord) > Data.TERRITORY_RECORD_TYPE_PIPE) {
                         mapcode = encodeAutoHeader(pointToEncode, territoryRecord);
                     } else if ((territoryRecord == uptoTerritoryRecord) && (currentEncodeTerritory.getParentTerritory() != null)) {
                         results.addAll(encode(argLatDeg, argLonDeg, currentEncodeTerritory.getParentTerritory(), limitToOneResult,
@@ -199,11 +199,11 @@ class Encoder {
         int x = pointToEncode.getLonMicroDeg();
         int relx = x - minx;
         if (relx < 0) {
-            x += 360000000;
-            relx += 360000000;
-        } else if (relx >= 360000000) {
-            x -= 360000000;
-            relx -= 360000000;
+            x += Point.MICRO_DEG_360;
+            relx += Point.MICRO_DEG_360;
+        } else if (relx >= Point.MICRO_DEG_360) {
+            x -= Point.MICRO_DEG_360;
+            relx -= Point.MICRO_DEG_360;
         }
         if (relx < 0) {
             return "";
@@ -271,7 +271,7 @@ class Encoder {
 
         // search back to first pipe star
         int firstindex = thisindex;
-        while ((Data.getTerritoryRecordType(firstindex - 1) > 1) && (Data.getCodex(firstindex - 1) == codexm)) {
+        while ((Data.getTerritoryRecordType(firstindex - 1) > Data.TERRITORY_RECORD_TYPE_PIPE) && (Data.getCodex(firstindex - 1) == codexm)) {
             firstindex--;
         }
 
@@ -292,7 +292,7 @@ class Encoder {
 
             int product = (w / 168) * (h / 176) * 961 * 31;
 
-            if (Data.getTerritoryRecordType(i) == 2) // plus pipe
+            if (Data.getTerritoryRecordType(i) == Data.TERRITORY_RECORD_TYPE_PLUS) // plus pipe
             {
                 final int goodRounder = (codexm >= 23) ? (961 * 961 * 31) : (961 * 961);
                 product =
