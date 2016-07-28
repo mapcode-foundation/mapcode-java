@@ -101,7 +101,7 @@ public class ReferenceFileTest {
         final AtomicInteger errors = new AtomicInteger(0);
         final AtomicInteger tasks = new AtomicInteger(0);
 
-        final int threads = Math.min(8, Runtime.getRuntime().availableProcessors() * 2);
+        final int threads = Math.min(1, Runtime.getRuntime().availableProcessors() * 2);
         LOG.info("checkFile: Starting {} threads...", threads);
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
