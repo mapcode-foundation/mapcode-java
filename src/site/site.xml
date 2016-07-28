@@ -25,7 +25,8 @@
 
     <body>
         <menu name="Mapcode">
-            <item name="Home"          href="/index.html"/>
+            <item name="Home" href="/index.html"/>
+            <item name="API Documentation" href="/apidocs/index.html"/>
             <item name="Release Notes" href="/ReleaseNotes.html"/>
         </menu>
 

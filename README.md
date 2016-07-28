@@ -1,8 +1,11 @@
 # Mapcode Library for Java
 
-Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
+[![Build Status](https://img.shields.io/travis/mapcode-foundation/mapcode-java.svg)](https://travis-ci.org/mapcode-foundation/mapcode-java)
+[![Coverage Status](https://coveralls.io/repos/github/mapcode-foundation/mapcode-java/badge.svg)](https://coveralls.io/github/mapcode-foundation/mapcode-java)
+[![Release](https://img.shields.io/github/release/mapcode-foundation/mapcode-java.svg)](https://github.com/mapcode-foundation/mapcode-java/releases)
+[![Maven Central](https://img.shields.io/maven-central/v/com.mapcode/mapcode-java.svg)](https://maven-badges.herokuapp.com/maven-central/com.mapcode/mapcode-java)
 
-----
+**Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)**
 
 This Java project contains a library to encode latitude/longitude pairs to mapcodes
 and to decode mapcodes back to latitude/longitude pairs.
