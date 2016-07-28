@@ -156,6 +156,9 @@
                 <configuration>
                     <source>${jdk.version}</source>
                     <target>${jdk.version}</target>
+                    <fork>true</fork>
+                    <meminitial>256m</meminitial>
+                    <maxmem>512m</maxmem>
                 </configuration>
             </plugin>
         </plugins>
