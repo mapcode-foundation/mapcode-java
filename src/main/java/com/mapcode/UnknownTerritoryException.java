@@ -33,12 +33,6 @@ public final class UnknownTerritoryException extends IllegalArgumentException {
         this.code = null;
     }
 
-    public UnknownTerritoryException(@Nonnull final String message, final int code) {
-        super(message);
-        assert message != null;
-        this.code = code;
-    }
-
     public UnknownTerritoryException(final int code) {
         super();
         this.code = code;

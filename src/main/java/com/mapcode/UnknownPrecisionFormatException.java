@@ -32,15 +32,4 @@ public final class UnknownPrecisionFormatException extends IllegalArgumentExcept
         assert message != null;
         this.precision = null;
     }
-
-    public UnknownPrecisionFormatException(@Nonnull final String message, final int precision) {
-        super(message);
-        assert message != null;
-        this.precision = precision;
-    }
-
-    public UnknownPrecisionFormatException(final int precision) {
-        super();
-        this.precision = precision;
-    }
 }

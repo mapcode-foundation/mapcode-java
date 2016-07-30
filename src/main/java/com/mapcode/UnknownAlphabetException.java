@@ -32,15 +32,4 @@ public final class UnknownAlphabetException extends IllegalArgumentException {
         assert message != null;
         this.code = null;
     }
-
-    public UnknownAlphabetException(@Nonnull final String message, final int code) {
-        super(message);
-        assert message != null;
-        this.code = code;
-    }
-
-    public UnknownAlphabetException(final int code) {
-        super();
-        this.code = code;
-    }
 }
