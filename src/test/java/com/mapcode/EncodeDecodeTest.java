@@ -60,7 +60,7 @@ public class EncodeDecodeTest {
         final AtomicInteger errors = new AtomicInteger(0);
         final AtomicInteger tasks = new AtomicInteger(0);
 
-        final int threads = Runtime.getRuntime().availableProcessors() * 2;
+        final int threads = Math.min(Runtime.getRuntime().availableProcessors() * 2, 8);
         LOG.info("encodeDecodeTest: Starting {} threads...", threads);
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
