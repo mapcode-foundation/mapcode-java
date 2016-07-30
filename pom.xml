@@ -71,7 +71,7 @@
         <jdk.version>1.6</jdk.version>
 
         <!-- Repo token for Coveralls. -->
-        <coveralls-maven-plugin.repoToken>RLwZjbGmKFYBnpizVNbcqYxTQsxpZVe2i</coveralls-maven-plugin.repoToken>
+        <coveralls-maven-plugin.repoToken>lq77rzORtJmhhqs4MWED6qPzVi0IEqrf9</coveralls-maven-plugin.repoToken>
 
         <!-- Modules. -->
         <coveralls-maven-plugin.version>4.2.0</coveralls-maven-plugin.version>
