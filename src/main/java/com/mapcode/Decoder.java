@@ -28,6 +28,8 @@ class Decoder {
 
     private static final char GREEK_CAPITAL_ALPHA = '\u0391';
 
+    private static final DataModel dataModel = DataModel.getInstance();
+
     private Decoder() {
         // Prevent instantiation.
     }
@@ -81,8 +83,8 @@ class Decoder {
 
         final int ccode = territory.getNumber();
 
-        final int fromTerritoryRecord = DataAccess.getDataFirstRecord(ccode);
-        final int uptoTerritoryRecord = DataAccess.getDataLastRecord(ccode);
+        final int fromTerritoryRecord = dataModel.getDataFirstRecord(ccode);
+        final int uptoTerritoryRecord = dataModel.getDataLastRecord(ccode);
 
         final int incodexhi = mapcode.indexOf('.');
         final int incodex = (incodexhi * 10) + (incodexlen - incodexhi);
@@ -290,7 +292,7 @@ class Decoder {
 
         final int divx;
         int divy;
-        divy = DataAccess.getSmartDiv(m);
+        divy = dataModel.getSmartDiv(m);
         if (divy == 1) {
             divx = Common.xSide[prelen];
             divy = Common.ySide[prelen];
@@ -434,7 +436,7 @@ class Decoder {
 
         final int territoryRecord = firstrec + nrX;
 
-        int side = DataAccess.getSmartDiv(territoryRecord);
+        int side = dataModel.getSmartDiv(territoryRecord);
         int xSIDE = side;
 
         Boundary boundary = createFromTerritoryRecord(territoryRecord);

@@ -30,6 +30,8 @@ import static com.mapcode.Common.*;
 class Encoder {
     private static final Logger LOG = LoggerFactory.getLogger(Encoder.class);
 
+    private static final DataModel dataModel = DataModel.getInstance();
+
     private Encoder() {
         // Prevent instantiation.
     }
@@ -73,11 +75,11 @@ class Encoder {
         final int lastNr = (territory != null) ? territory.getNumber() : Territory.AAA.getNumber();
         for (int ccode = firstNr; ccode <= lastNr; ccode++) {
 
-            final int uptoTerritoryRecord = DataAccess.getDataLastRecord(ccode);
+            final int uptoTerritoryRecord = dataModel.getDataLastRecord(ccode);
             if (!createFromTerritoryRecord(uptoTerritoryRecord).containsPoint(pointToEncode)) {
                 continue;
             }
-            final int fromTerritoryRecord = DataAccess.getDataFirstRecord(ccode);
+            final int fromTerritoryRecord = dataModel.getDataFirstRecord(ccode);
             final Territory currentEncodeTerritory = Territory.fromNumber(ccode);
 
             for (int territoryRecord = fromTerritoryRecord; territoryRecord <= uptoTerritoryRecord; territoryRecord++) {
@@ -178,7 +180,7 @@ class Encoder {
         final int prelen = codexm / 10;
         final int postlen = codexm % 10;
         final int divx;
-        int divy = DataAccess.getSmartDiv(m);
+        int divy = dataModel.getSmartDiv(m);
         if (divy == 1) {
             divx = xSide[prelen];
             divy = ySide[prelen];
@@ -367,7 +369,7 @@ class Encoder {
             storage_offset = nrX * basePowerA;
         }
 
-        int side = DataAccess.getSmartDiv(index);
+        int side = dataModel.getSmartDiv(index);
         final int orgSide = side;
         int xSide = side;
 

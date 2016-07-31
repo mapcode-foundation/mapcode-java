@@ -34,6 +34,8 @@ import static com.mapcode.Mapcode.getPrecisionFormat;
  */
 public final class MapcodeCodec {
 
+    private static final DataModel dataModel = DataModel.getInstance();
+
     private MapcodeCodec() {
         // Prevent instantiation.
     }
@@ -280,8 +282,8 @@ public final class MapcodeCodec {
                 }
             }
             int nrFound = 0;
-            final int fromTerritoryRecord = DataAccess.getDataFirstRecord(ccode);
-            final int uptoTerritoryRecord = DataAccess.getDataLastRecord(ccode);
+            final int fromTerritoryRecord = dataModel.getDataFirstRecord(ccode);
+            final int uptoTerritoryRecord = dataModel.getDataLastRecord(ccode);
             for (int territoryRecord = uptoTerritoryRecord; territoryRecord >= fromTerritoryRecord; territoryRecord--) {
                 if (!Data.isRestricted(territoryRecord)) {
                     final Boundary boundary = Boundary.createFromTerritoryRecord(territoryRecord);

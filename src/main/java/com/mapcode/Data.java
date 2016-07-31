@@ -33,18 +33,20 @@ class Data {
             'A', 'E', 'U'                                               // Vowels.
     };
 
+    private static final DataModel DATA_MODEL = DataModel.getInstance();
+
     private Data() {
         // Disabled.
     }
 
     static boolean isNameless(final int territoryRecord) {
-        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
-        return (DataAccess.getDataFlags(territoryRecord) & 64) != 0;
+        assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
+        return (DATA_MODEL.getDataFlags(territoryRecord) & 64) != 0;
     }
 
     static boolean isSpecialShape(final int territoryRecord) {
-        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
-        return (DataAccess.getDataFlags(territoryRecord) & 1024) != 0;
+        assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
+        return (DATA_MODEL.getDataFlags(territoryRecord) & 1024) != 0;
     }
 
     static final int TERRITORY_RECORD_TYPE_NONE = 0;
@@ -53,24 +55,24 @@ class Data {
     static final int TERRITORY_RECORD_TYPE_STAR = 3;
 
     static int getTerritoryRecordType(final int territoryRecord) {
-        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
-        return (DataAccess.getDataFlags(territoryRecord) >> 7) & 3; // 1=pipe 2=plus 3=star
+        assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
+        return (DATA_MODEL.getDataFlags(territoryRecord) >> 7) & 3; // 1=pipe 2=plus 3=star
     }
 
     static boolean isRestricted(final int territoryRecord) {
-        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
-        return (DataAccess.getDataFlags(territoryRecord) & 512) != 0;
+        assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
+        return (DATA_MODEL.getDataFlags(territoryRecord) & 512) != 0;
     }
 
     static int getCodex(final int territoryRecord) {
-        assert (0 <= territoryRecord) && (territoryRecord < DataAccess.getNrTerritoryRecords());
-        final int codexflags = DataAccess.getDataFlags(territoryRecord) & 31;
+        assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
+        final int codexflags = DATA_MODEL.getDataFlags(territoryRecord) & 31;
         return (10 * (codexflags / 5)) + (codexflags % 5) + 1;
     }
 
     @Nonnull
     static String headerLetter(final int i) {
-        final int flags = DataAccess.getDataFlags(i);
+        final int flags = DATA_MODEL.getDataFlags(i);
         if (((flags >> 7) & 3) == 1) {
             return Character.toString(ENCODE_CHARS[(flags >> 11) & 31]);
         }

@@ -4,6 +4,13 @@ These are the release notes for the Java library for mapcodes.
 
 ### 2.2.4
 
+* Added Travis CI and Coveralls badges to `README.md`. 
+
+* Replaces static `DataAccess` class with singleton `DataModel` to allow testing
+of incorrect data model files.
+
+* Fixed error handling for incorrect data model files.
+ 
 * Fix error to info logging in `aeuUnpack`.
 
 * Updated all POM dependencies.

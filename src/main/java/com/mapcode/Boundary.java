@@ -31,6 +31,8 @@ class Boundary {
     private int latMicroDegMin;     // Minimum latitude (in microdegrees). Inclusive.
     private int latMicroDegMax;     // Minimum latitude (in microdegrees). Exclusive.
 
+    private static final DataModel DATA_MODEL = DataModel.getInstance();
+
     private Boundary(
             final int lonMicroDegMin,
             final int lonMicroDegMax,
@@ -46,10 +48,10 @@ class Boundary {
     @Nonnull
     static Boundary createFromTerritoryRecord(final int territoryRecord) {
         return new Boundary(
-                DataAccess.getLonMicroDegMin(territoryRecord),
-                DataAccess.getLonMicroDegMax(territoryRecord),
-                DataAccess.getLatMicroDegMin(territoryRecord),
-                DataAccess.getLatMicroDegMax(territoryRecord));
+                DATA_MODEL.getLonMicroDegMin(territoryRecord),
+                DATA_MODEL.getLonMicroDegMax(territoryRecord),
+                DATA_MODEL.getLatMicroDegMin(territoryRecord),
+                DATA_MODEL.getLatMicroDegMax(territoryRecord));
     }
 
     int getLonMicroDegMin() {
