@@ -21,12 +21,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared", "ValueOfIncrementOrDecrementUsed"})
 public class EncoderTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncoderTest.class);
+
+    @Test
+    public void encodePoint() {
+        LOG.info("encodeMostResults");
+        assertEquals(MapcodeCodec.encode(52.5, 5.2), MapcodeCodec.encode(Point.fromDeg(52.5, 5.2)));
+    }
+
+    @Test
+    public void encodeToInterInternationalnational() {
+        LOG.info("encodeToInternational");
+        assertEquals("VHYCC.2FWB", MapcodeCodec.encodeToInternational(52.5, 5.2).getCode());
+        assertEquals("VHYCC.2FWB", MapcodeCodec.encodeToInternational(Point.fromDeg(52.5, 5.2)).getCode());
+    }
+
+    @Test
+    public void nearMultipleBorders() {
+        LOG.info("nearMultipleBorders");
+        assertFalse(MapcodeCodec.isNearMultipleBorders(Point.fromDeg(52.175616, 4.577179), Territory.NLD));
+    }
 
     @Test
     public void encodeMostResults() {

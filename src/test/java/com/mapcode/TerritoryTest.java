@@ -17,7 +17,6 @@
 package com.mapcode;
 
 import com.mapcode.Territory.AlphaCodeFormat;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,21 +140,38 @@ public class TerritoryTest {
         assertEquals("\u0393\u03a8\u039e", Territory.GRC.toAlphaCode(AlphaCodeFormat.INTERNATIONAL, Alphabet.GREEK));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = UnknownTerritoryException.class)
     public void testFromStringError1() {
         LOG.info("testFromStringError1");
         Territory.fromString("");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = UnknownTerritoryException.class)
     public void testFromStringError2() {
         LOG.info("testFromStringError2");
         Territory.fromString("1A");
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = UnknownTerritoryException.class)
     public void testFromStringError3() {
         LOG.info("testFromStringError3");
         Territory.fromString("999");
+    }
+
+    public void testFromNumberOK() {
+        LOG.info("testFromNumberOK");
+        Territory.fromNumber(0);
+    }
+
+    @Test(expected = UnknownTerritoryException.class)
+    public void testFromNumberError1() {
+        LOG.info("testFromNumberError1");
+        Territory.fromNumber(-1);
+    }
+
+    @Test(expected = UnknownTerritoryException.class)
+    public void testFromNumberError2() {
+        LOG.info("testFromNumberError2");
+        Territory.fromNumber(99999);
     }
 }
