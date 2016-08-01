@@ -17,6 +17,8 @@ of incorrect data model files.
 
 * Updated copyright messages.
 
+* Improved test coverage of unit tests.
+
 ### 2.2.3
 
 * Issue #23: Fixed `Territory.fromString` to make sure the parent territory is valid for
