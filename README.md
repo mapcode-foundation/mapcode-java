@@ -1,10 +1,10 @@
 # Mapcode Library for Java
 
-[![Build Status](https://img.shields.io/travis/mapcode-foundation/mapcode-java.svg)](https://travis-ci.org/mapcode-foundation/mapcode-java)
-[![Coverage Status](https://coveralls.io/repos/github/mapcode-foundation/mapcode-java/badge.svg?branch=master)](https://coveralls.io/github/mapcode-foundation/mapcode-java?branch=master)
+[![Build Status](https://img.shields.io/travis/mapcode-foundation/mapcode-java.svg?maxAge=86400)](https://travis-ci.org/mapcode-foundation/mapcode-java)
+[![Coverage Status](https://coveralls.io/repos/github/mapcode-foundation/mapcode-java/badge.svg?branch=master&maxAge=86400)](https://coveralls.io/github/mapcode-foundation/mapcode-java?branch=master)
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)]()
-[![Release](https://img.shields.io/github/release/mapcode-foundation/mapcode-java.svg?maxAge=2592000)](https://github.com/mapcode-foundation/mapcode-java/releases)
-[![Maven Central](https://img.shields.io/maven-central/v/com.mapcode/mapcode.svg?maxAge=2592000)](https://maven-badges.herokuapp.com/maven-central/com.mapcode/mapcode)
+[![Release](https://img.shields.io/github/release/mapcode-foundation/mapcode-java.svg?maxAge=86400)](https://github.com/mapcode-foundation/mapcode-java/releases)
+[![Maven Central](https://img.shields.io/maven-central/v/com.mapcode/mapcode.svg?maxAge=86400)](https://maven-badges.herokuapp.com/maven-central/com.mapcode/mapcode)
 
 **Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)**
 
