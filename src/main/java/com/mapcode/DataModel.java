@@ -98,7 +98,7 @@ class DataModel {
 
     DataModel(@Nonnull final String fileName) throws IncorrectDataModelException {
         // Read data only once in static initializer.
-        LOG.info("DataAccess: reading regions from file: {}", fileName);
+        LOG.info("DataModel: reading regions from file: {}", fileName);
         final byte[] readBuffer = new byte[FILE_BUFFER_SIZE];
         int total = 0;
         try {
@@ -119,7 +119,7 @@ class DataModel {
                     final byte[] bytes = outputStream.toByteArray();
                     assert total == bytes.length;
                     if (total < 12) {
-                        LOG.error("DataAccess: expected more than {} bytes", total);
+                        LOG.error("DataModel: expected more than {} bytes", total);
                         throw new IncorrectDataModelException("Data file corrupt: " + fileName);
                     }
 
@@ -140,7 +140,7 @@ class DataModel {
 
                     // Check if the number of territories matches the enumeration in Territory.
                     if (nrTerritories != Territory.values().length) {
-                        LOG.error("DataAccess: expected {} territories, got {}", Territory.values().length, nrTerritories);
+                        LOG.error("DataModel: expected {} territories, got {}", Territory.values().length, nrTerritories);
                         throw new IncorrectDataModelException("Data file corrupt: " + fileName);
                     }
 
@@ -150,10 +150,10 @@ class DataModel {
                             (nrTerritoryRecords * (DATA_FIELDS_PER_REC * BYTES_PER_LONG));
 
                     if (expectedSize != total) {
-                        LOG.error("DataAccess: expected {} bytes, got {}", expectedSize, total);
+                        LOG.error("DataModel: expected {} bytes, got {}", expectedSize, total);
                         throw new IncorrectDataModelException("Data file corrupt: " + fileName);
                     }
-                    LOG.debug("DataAccess: version={} territories={} territory records={}", dataVersion, nrTerritories, nrTerritoryRecords);
+                    LOG.debug("DataModel: version={} territories={} territory records={}", dataVersion, nrTerritories, nrTerritoryRecords);
 
                     // Read DATA+START array (2 bytes per territory, plus closing record).
                     index = new int[nrTerritories + 1];
@@ -181,7 +181,7 @@ class DataModel {
             throw new IncorrectDataModelException("Cannot initialize static data structure from: " +
                     fileName + ", exception=" + e);
         }
-        LOG.info("DataAccess: regions initialized, read {} bytes", total);
+        LOG.info("DataModel: regions initialized, read {} bytes", total);
     }
 
     /**
