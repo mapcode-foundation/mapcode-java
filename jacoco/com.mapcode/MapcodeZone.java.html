@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapcodeZone.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">MapcodeZone.java</span></div><h1>MapcodeZone.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import javax.annotation.Nonnull;
+
+/**
+ * ----------------------------------------------------------------------------------------------
+ * Package private implementation class. For internal use within the Mapcode implementation only.
+ * ----------------------------------------------------------------------------------------------
+ * Simple class to represent all the coordinates that would deliver a particular mapcode.
+ */
+<span class="pc bpc" id="L27" title="1 of 2 branches missed.">class MapcodeZone {</span>
+
+    // Longitudes in LonFractions (&quot;1/3240 billionths&quot;).
+    private double lonFractionMin;
+    private double lonFractionMax;
+
+    // Latitudes in LatFractions (&quot;1/810 billionths&quot;).
+    private double latFractionMin;
+    private double latFractionMax;
+
+    // Construct an (empty) zone.
+<span class="fc" id="L38">    MapcodeZone() {</span>
+<span class="fc" id="L39">        setEmpty();</span>
+<span class="fc" id="L40">    }</span>
+
+    // Construct an (empty) zone.
+    void setEmpty() {
+<span class="fc" id="L44">        latFractionMin = 0;</span>
+<span class="fc" id="L45">        latFractionMax = 0;</span>
+<span class="fc" id="L46">        lonFractionMin = 0;</span>
+<span class="fc" id="L47">        lonFractionMax = 0;</span>
+<span class="fc" id="L48">    }</span>
+
+    // Construct a copy of an existing zone.
+<span class="fc" id="L51">    MapcodeZone(@Nonnull final MapcodeZone zone) {</span>
+<span class="fc" id="L52">        copyFrom(zone);</span>
+<span class="fc" id="L53">    }</span>
+
+    // construct a copy of an existing zone
+    void copyFrom(@Nonnull final MapcodeZone other) {
+<span class="fc" id="L57">        latFractionMin = other.latFractionMin;</span>
+<span class="fc" id="L58">        latFractionMax = other.latFractionMax;</span>
+<span class="fc" id="L59">        lonFractionMin = other.lonFractionMin;</span>
+<span class="fc" id="L60">        lonFractionMax = other.lonFractionMax;</span>
+<span class="fc" id="L61">    }</span>
+
+    @Nonnull
+    static MapcodeZone empty() {
+<span class="fc" id="L65">        return new MapcodeZone();</span>
+    }
+
+    double getLonFractionMin() {
+<span class="nc" id="L69">        return lonFractionMin;</span>
+    }
+
+    double getLonFractionMax() {
+<span class="fc" id="L73">        return lonFractionMax;</span>
+    }
+
+    double getLatFractionMin() {
+<span class="fc" id="L77">        return latFractionMin;</span>
+    }
+
+    double getLatFractionMax() {
+<span class="fc" id="L81">        return latFractionMax;</span>
+    }
+
+    void setLonFractionMin(final double lonFractionMin) {
+<span class="nc" id="L85">        this.lonFractionMin = lonFractionMin;</span>
+<span class="nc" id="L86">    }</span>
+
+    void setLonFractionMax(final double lonFractionMax) {
+<span class="fc" id="L89">        this.lonFractionMax = lonFractionMax;</span>
+<span class="fc" id="L90">    }</span>
+
+    void setLatFractionMin(final double latFractionMin) {
+<span class="fc" id="L93">        this.latFractionMin = latFractionMin;</span>
+<span class="fc" id="L94">    }</span>
+
+    void setLatFractionMax(final double latFractionMax) {
+<span class="fc" id="L97">        this.latFractionMax = latFractionMax;</span>
+<span class="fc" id="L98">    }</span>
+
+    // Generate upper and lower limits based on x and y, and delta's.
+    void setFromFractions(
+            final double latFraction, final double lonFraction,
+            final double latFractionDelta, final double lonFractionDelta) {
+<span class="pc bpc" id="L104" title="2 of 4 branches missed.">        assert (lonFractionDelta &gt;= 0.0);</span>
+<span class="pc bpc" id="L105" title="2 of 4 branches missed.">        assert (latFractionDelta != 0.0);</span>
+<span class="fc" id="L106">        lonFractionMin = lonFraction;</span>
+<span class="fc" id="L107">        lonFractionMax = lonFraction + lonFractionDelta;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        if (latFractionDelta &lt; 0) {</span>
+<span class="fc" id="L109">            latFractionMin = latFraction + 1 + latFractionDelta;    // y + yDelta can NOT be represented.</span>
+<span class="fc" id="L110">            latFractionMax = latFraction + 1;                       // y CAN be represented.</span>
+        } else {
+<span class="fc" id="L112">            latFractionMin = latFraction;</span>
+<span class="fc" id="L113">            latFractionMax = latFraction + latFractionDelta;</span>
+        }
+<span class="fc" id="L115">    }</span>
+
+    boolean isEmpty() {
+<span class="fc bfc" id="L118" title="All 4 branches covered.">        return ((lonFractionMax &lt;= lonFractionMin) || (latFractionMax &lt;= latFractionMin));</span>
+    }
+
+    @Nonnull
+    Point getMidPoint() {
+<span class="fc bfc" id="L123" title="All 2 branches covered.">        if (isEmpty()) {</span>
+<span class="fc" id="L124">            return Point.undefined();</span>
+        } else {
+<span class="fc" id="L126">            final double latFrac = Math.floor((latFractionMin + latFractionMax) / 2);</span>
+<span class="fc" id="L127">            final double lonFrac = Math.floor((lonFractionMin + lonFractionMax) / 2);</span>
+<span class="fc" id="L128">            return Point.fromLatLonFractions(latFrac, lonFrac);</span>
+        }
+    }
+
+    // Returns a non-empty intersection of a mapcode zone and a territory area.
+    // Returns null if no such intersection exists.
+    @Nonnull
+    MapcodeZone restrictZoneTo(@Nonnull final Boundary area) {
+<span class="fc" id="L136">        MapcodeZone z = new MapcodeZone(this);</span>
+<span class="fc" id="L137">        final double latMin = area.getLatMicroDegMin() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        if (z.latFractionMin &lt; latMin) {</span>
+<span class="fc" id="L139">            z.latFractionMin = latMin;</span>
+        }
+<span class="fc" id="L141">        final double latMax = area.getLatMicroDegMax() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;</span>
+<span class="fc bfc" id="L142" title="All 2 branches covered.">        if (z.latFractionMax &gt; latMax) {</span>
+<span class="fc" id="L143">            z.latFractionMax = latMax;</span>
+        }
+<span class="fc bfc" id="L145" title="All 2 branches covered.">        if (z.latFractionMin &lt; z.latFractionMax) {</span>
+<span class="fc" id="L146">            double lonMin = area.getLonMicroDegMin() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;</span>
+<span class="fc" id="L147">            double lonMax = area.getLonMicroDegMax() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;</span>
+<span class="fc bfc" id="L148" title="All 4 branches covered.">            if ((lonMax &lt; 0) &amp;&amp; (z.lonFractionMin &gt; 0)) {</span>
+<span class="fc" id="L149">                lonMin += (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);</span>
+<span class="fc" id="L150">                lonMax += (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);</span>
+<span class="fc bfc" id="L151" title="All 4 branches covered.">            } else if ((lonMin &gt; 1) &amp;&amp; (z.lonFractionMax &lt; 0)) {</span>
+<span class="fc" id="L152">                lonMin -= (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);</span>
+<span class="fc" id="L153">                lonMax -= (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);</span>
+            }
+<span class="fc bfc" id="L155" title="All 2 branches covered.">            if (z.lonFractionMin &lt; lonMin) {</span>
+<span class="fc" id="L156">                z.lonFractionMin = lonMin;</span>
+            }
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            if (z.lonFractionMax &gt; lonMax) {</span>
+<span class="fc" id="L159">                z.lonFractionMax = lonMax;</span>
+            }
+        }
+<span class="fc" id="L162">        return z;</span>
+    }
+
+    @Nonnull
+    @Override
+    public String toString() {
+<span class="nc bnc" id="L168" title="All 2 branches missed.">        return isEmpty() ? &quot;empty&quot; :</span>
+                (&quot;[&quot; + (latFractionMin / Point.LAT_TO_FRACTIONS_FACTOR) + &quot;, &quot; + (latFractionMax / Point.LAT_TO_FRACTIONS_FACTOR) +
+                        &quot;), [&quot; + (lonFractionMin / Point.LON_TO_FRACTIONS_FACTOR) + &quot;, &quot; + (lonFractionMax / Point.LON_TO_FRACTIONS_FACTOR) + ')');
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

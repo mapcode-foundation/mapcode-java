@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Common.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">Common.java</span></div><h1>Common.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * ----------------------------------------------------------------------------------------------
+ * Package private implementation class. For internal use within the Mapcode implementation only.
+ * ----------------------------------------------------------------------------------------------
+ *
+ * This class contains common data structures and methods used by the Mapcode implementation.
+ */
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">class Common {</span>
+<span class="fc" id="L30">    private static final Logger LOG = LoggerFactory.getLogger(Common.class);</span>
+
+<span class="fc" id="L32">    static final int[] nc = {</span>
+            1, 31, 961, 29791, 923521, 28629151, 887503681
+    };
+<span class="fc" id="L35">    static final int[] xSide = {</span>
+            0, 5, 31, 168, 961, 5208, 29791, 165869, 923521, 5141947
+    };
+<span class="fc" id="L38">    static final int[] ySide = {</span>
+            0, 6, 31, 176, 961, 5456, 29791, 165869, 923521, 5141947
+    };
+<span class="fc" id="L41">    private static final int[] xDivider19 = {</span>
+            360, 360, 360, 360, 360, 360, 361, 361, 361, 361,
+            362, 362, 362, 363, 363, 363, 364, 364, 365, 366,
+            366, 367, 367, 368, 369, 370, 370, 371, 372, 373,
+            374, 375, 376, 377, 378, 379, 380, 382, 383, 384,
+            386, 387, 388, 390, 391, 393, 394, 396, 398, 399,
+            401, 403, 405, 407, 409, 411, 413, 415, 417, 420,
+            422, 424, 427, 429, 432, 435, 437, 440, 443, 446,
+            449, 452, 455, 459, 462, 465, 469, 473, 476, 480,
+            484, 488, 492, 496, 501, 505, 510, 515, 520, 525,
+            530, 535, 540, 546, 552, 558, 564, 570, 577, 583,
+            590, 598, 605, 612, 620, 628, 637, 645, 654, 664,
+            673, 683, 693, 704, 715, 726, 738, 751, 763, 777,
+            791, 805, 820, 836, 852, 869, 887, 906, 925, 946,
+            968, 990, 1014, 1039, 1066, 1094, 1123, 1154, 1187, 1223,
+            1260, 1300, 1343, 1389, 1438, 1490, 1547, 1609, 1676, 1749,
+            1828, 1916, 2012, 2118, 2237, 2370, 2521, 2691, 2887, 3114,
+            3380, 3696, 4077, 4547, 5139, 5910, 6952, 8443, 10747, 14784,
+            23681, 59485
+    };
+
+<span class="nc" id="L62">    private Common() {</span>
+        // Prevent instantiation.
+<span class="nc" id="L64">    }</span>
+
+    static {
+
+        // This code shows a message when assertions are active or disabled. It (ab)uses assert for that...
+        //noinspection UnusedAssignment
+<span class="fc" id="L70">        boolean debug = false;</span>
+        //noinspection AssertWithSideEffects
+<span class="pc bpc" id="L72" title="2 of 4 branches missed.">        assert debug = true;</span>
+        //noinspection ConstantConditions
+<span class="pc bpc" id="L74" title="1 of 2 branches missed.">        if (debug) {</span>
+<span class="fc" id="L75">            LOG.info(&quot;Common: assertions are active (JVM runtime option '-ea')&quot;);</span>
+        }
+        else {
+<span class="nc" id="L78">            LOG.debug(&quot;Common: assertions are not active, they are bypassed&quot;);</span>
+        }
+<span class="fc" id="L80">    }</span>
+
+    /**
+     * This method returns a divider for longitude (multiplied by 4), for a given latitude.
+     *
+     * @param minY Latitude.
+     * @param maxY Longitude.
+     * @return Divider.
+     */
+    static int xDivider(final int minY, final int maxY) {
+<span class="pc bpc" id="L90" title="2 of 4 branches missed.">        assert minY &lt; maxY;</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (minY &gt;= 0) {</span>
+            // maxY &gt; minY &gt; 0
+<span class="pc bpc" id="L93" title="3 of 6 branches missed.">            assert (maxY &gt; minY) &amp;&amp; (minY &gt; 0);</span>
+<span class="fc" id="L94">            return xDivider19[minY &gt;&gt; 19];</span>
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        } else if (maxY &gt;= 0) {</span>
+            // maxY &gt; 0 &gt; minY
+<span class="pc bpc" id="L97" title="3 of 6 branches missed.">            assert (maxY &gt; 0) &amp;&amp; (0 &gt; minY);</span>
+<span class="fc" id="L98">            return xDivider19[0];</span>
+        } else {
+            // 0 &gt; maxY &gt; minY
+<span class="pc bpc" id="L101" title="3 of 6 branches missed.">            assert (0 &gt; maxY) &amp;&amp; (maxY &gt; minY);</span>
+<span class="fc" id="L102">            return xDivider19[(-maxY) &gt;&gt; 19];</span>
+        }
+    }
+
+    static int countCityCoordinatesForCountry(final int codex, final int territoryRecord, final int firstTerritoryRecord) {
+<span class="pc bpc" id="L107" title="2 of 4 branches missed.">        assert codex &gt;= 0;</span>
+<span class="pc bpc" id="L108" title="2 of 4 branches missed.">        assert territoryRecord &gt;= 0;</span>
+<span class="pc bpc" id="L109" title="2 of 4 branches missed.">        assert firstTerritoryRecord &gt;= 0;</span>
+<span class="fc" id="L110">        final int i = getFirstNamelessRecord(codex, territoryRecord, firstTerritoryRecord);</span>
+<span class="fc" id="L111">        int e = territoryRecord;</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        while (Data.getCodex(e) == codex) {</span>
+<span class="fc" id="L113">            e++;</span>
+        }
+<span class="pc bpc" id="L115" title="2 of 4 branches missed.">        assert i &lt;= e;</span>
+<span class="fc" id="L116">        return e - i;</span>
+    }
+
+    static int getFirstNamelessRecord(final int codex, final int territoryRecord, final int firstTerritoryRecord) {
+<span class="pc bpc" id="L120" title="2 of 4 branches missed.">        assert codex &gt;= 0;</span>
+<span class="pc bpc" id="L121" title="2 of 4 branches missed.">        assert territoryRecord &gt;= 0;</span>
+<span class="pc bpc" id="L122" title="2 of 4 branches missed.">        assert firstTerritoryRecord &gt;= 0;</span>
+<span class="fc" id="L123">        int i = territoryRecord;</span>
+<span class="fc bfc" id="L124" title="All 6 branches covered.">        while ((i &gt;= firstTerritoryRecord) &amp;&amp; Data.isNameless(i) &amp;&amp; (Data.getCodex(i) == codex)) {</span>
+<span class="fc" id="L125">            i--;</span>
+        }
+<span class="fc" id="L127">        i++;</span>
+<span class="pc bpc" id="L128" title="2 of 4 branches missed.">        assert i &lt;= territoryRecord;</span>
+<span class="fc" id="L129">        return i;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

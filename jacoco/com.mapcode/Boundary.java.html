@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Boundary.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">Boundary.java</span></div><h1>Boundary.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import javax.annotation.Nonnull;
+
+/**
+ * ----------------------------------------------------------------------------------------------
+ * Package private implementation class. For internal use within the mapcode implementation only.
+ * ----------------------------------------------------------------------------------------------
+ *
+ * This class handles territory rectangles for mapcodes.
+ */
+class Boundary {
+    private int lonMicroDegMin;     // Minimum longitude (in microdegrees). Inclusive.
+    private int lonMicroDegMax;     // Maximum longitude (in microdegrees). Exclusive.
+    private int latMicroDegMin;     // Minimum latitude (in microdegrees). Inclusive.
+    private int latMicroDegMax;     // Minimum latitude (in microdegrees). Exclusive.
+
+<span class="fc" id="L34">    private static final DataModel DATA_MODEL = DataModel.getInstance();</span>
+
+    private Boundary(
+            final int lonMicroDegMin,
+            final int lonMicroDegMax,
+            final int latMicroDegMin,
+<span class="fc" id="L40">            final int latMicroDegMax) {</span>
+<span class="fc" id="L41">        this.lonMicroDegMin = lonMicroDegMin;</span>
+<span class="fc" id="L42">        this.latMicroDegMin = latMicroDegMin;</span>
+<span class="fc" id="L43">        this.lonMicroDegMax = lonMicroDegMax;</span>
+<span class="fc" id="L44">        this.latMicroDegMax = latMicroDegMax;</span>
+<span class="fc" id="L45">    }</span>
+
+    // You have to use this factory method instead of a ctor.
+    @Nonnull
+    static Boundary createFromTerritoryRecord(final int territoryRecord) {
+<span class="fc" id="L50">        return new Boundary(</span>
+<span class="fc" id="L51">                DATA_MODEL.getLonMicroDegMin(territoryRecord),</span>
+<span class="fc" id="L52">                DATA_MODEL.getLonMicroDegMax(territoryRecord),</span>
+<span class="fc" id="L53">                DATA_MODEL.getLatMicroDegMin(territoryRecord),</span>
+<span class="fc" id="L54">                DATA_MODEL.getLatMicroDegMax(territoryRecord));</span>
+    }
+
+    int getLonMicroDegMin() {
+<span class="fc" id="L58">        return lonMicroDegMin;</span>
+    }
+
+    int getLonMicroDegMax() {
+<span class="fc" id="L62">        return lonMicroDegMax;</span>
+    }
+
+    int getLatMicroDegMin() {
+<span class="fc" id="L66">        return latMicroDegMin;</span>
+    }
+
+    int getLatMicroDegMax() {
+<span class="fc" id="L70">        return latMicroDegMax;</span>
+    }
+
+    @Nonnull
+    Boundary extendBoundary(final int latMicroDegExtension, final int lonMicroDegExtension) {
+<span class="fc" id="L75">        lonMicroDegMin -= lonMicroDegExtension;</span>
+<span class="fc" id="L76">        latMicroDegMin -= latMicroDegExtension;</span>
+<span class="fc" id="L77">        lonMicroDegMax += lonMicroDegExtension;</span>
+<span class="fc" id="L78">        latMicroDegMax += latMicroDegExtension;</span>
+<span class="fc" id="L79">        return this;</span>
+    }
+
+    /**
+     * Check if a point falls within a boundary. Note that the &quot;min&quot; values are inclusive for a boundary and
+     * the &quot;max&quot; values are exclusive.\
+     *
+     * Note: Points at the exact North pole with latitude 90 are never part of a boundary.
+     *
+     * @param p Point to check.
+     * @return True if the points falls within the boudary.
+     */
+    boolean containsPoint(@Nonnull final Point p) {
+<span class="pc bpc" id="L92" title="1 of 2 branches missed.">        if (!p.isDefined()) {</span>
+<span class="nc" id="L93">            return false;</span>
+        }
+<span class="fc" id="L95">        final int latMicroDeg = p.getLatMicroDeg();</span>
+<span class="fc bfc" id="L96" title="All 4 branches covered.">        if ((latMicroDegMin &gt; latMicroDeg) || (latMicroDeg &gt;= latMicroDegMax)) {</span>
+<span class="fc" id="L97">            return false;</span>
+        }
+<span class="fc" id="L99">        final int lonMicroDeg = p.getLonMicroDeg();</span>
+
+        // Longitude boundaries can extend (slightly) outside the [-180,180) range
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (lonMicroDeg &lt; lonMicroDegMin) {</span>
+<span class="fc bfc" id="L103" title="All 4 branches covered.">            return (lonMicroDegMin &lt;= (lonMicroDeg + Point.MICRO_DEG_360)) &amp;&amp; ((lonMicroDeg + Point.MICRO_DEG_360) &lt; lonMicroDegMax);</span>
+<span class="fc bfc" id="L104" title="All 2 branches covered.">        } else if (lonMicroDeg &gt;= lonMicroDegMax) {</span>
+<span class="pc bpc" id="L105" title="1 of 4 branches missed.">            return (lonMicroDegMin &lt;= (lonMicroDeg - Point.MICRO_DEG_360)) &amp;&amp; ((lonMicroDeg - Point.MICRO_DEG_360) &lt; lonMicroDegMax);</span>
+        } else {
+<span class="fc" id="L107">            return true;</span>
+        }
+    }
+
+    @Nonnull
+    public String toString() {
+<span class="nc" id="L113">        return &quot;[&quot; + (latMicroDegMin / Point.DEG_TO_MICRO_DEG) + &quot;, &quot; + (latMicroDegMax / Point.DEG_TO_MICRO_DEG) +</span>
+                &quot;), [&quot; + (lonMicroDegMin / Point.DEG_TO_MICRO_DEG) + &quot;, &quot; + (lonMicroDegMax / Point.DEG_TO_MICRO_DEG) + ')';
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

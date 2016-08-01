@@ -1,0 +1,825 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Decoder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">Decoder.java</span></div><h1>Decoder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+
+import static com.mapcode.Boundary.createFromTerritoryRecord;
+
+class Decoder {
+<span class="fc" id="L27">    private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);</span>
+
+    private static final char GREEK_CAPITAL_ALPHA = '\u0391';
+
+<span class="fc" id="L31">    private static final DataModel dataModel = DataModel.getInstance();</span>
+
+<span class="nc" id="L33">    private Decoder() {</span>
+        // Prevent instantiation.
+<span class="nc" id="L35">    }</span>
+
+    // ----------------------------------------------------------------------
+    // Method called from public Java API.
+    // ----------------------------------------------------------------------
+
+    @Nonnull
+    static Point decode(@Nonnull final String argMapcode,
+                        @Nonnull final Territory argTerritory)
+            throws UnknownMapcodeException {
+<span class="fc" id="L45">        LOG.trace(&quot;decode: mapcode={}, territory={}&quot;, argMapcode, argTerritory.name());</span>
+
+<span class="fc" id="L47">        String mapcode = argMapcode;</span>
+<span class="fc" id="L48">        Territory territory = argTerritory;</span>
+
+<span class="fc" id="L50">        String extrapostfix = &quot;&quot;;</span>
+
+<span class="fc" id="L52">        final int minpos = mapcode.indexOf('-');</span>
+<span class="fc bfc" id="L53" title="All 2 branches covered.">        if (minpos &gt; 0) {</span>
+<span class="fc" id="L54">            extrapostfix = decodeUTF16(mapcode.substring(minpos + 1).trim());</span>
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">            if (extrapostfix.contains(&quot;Z&quot;)) {</span>
+<span class="nc" id="L56">                throw new UnknownMapcodeException(&quot;Invalid character Z&quot;);</span>
+            }
+<span class="fc" id="L58">            mapcode = mapcode.substring(0, minpos);</span>
+        }
+
+<span class="fc" id="L61">        mapcode = aeuUnpack(mapcode).trim();</span>
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (mapcode.isEmpty()) {</span>
+<span class="nc" id="L63">            LOG.info(&quot;decode: Failed to aeuUnpack {}&quot;, argMapcode);</span>
+<span class="nc" id="L64">            return Point.undefined(); // failed to aeuUnpack</span>
+        }
+
+<span class="fc" id="L67">        final int incodexlen = mapcode.length() - 1;</span>
+
+        // *** long codes in states are handled by the country
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (incodexlen &gt;= 9) {</span>
+<span class="fc" id="L71">            territory = Territory.AAA;</span>
+        } else {
+<span class="fc" id="L73">            final Territory parentTerritory = territory.getParentTerritory();</span>
+<span class="fc bfc" id="L74" title="All 20 branches covered.">            if (((incodexlen &gt;= 8) &amp;&amp; ((parentTerritory == Territory.USA) || (parentTerritory == Territory.CAN)</span>
+                    || (parentTerritory == Territory.AUS) || (parentTerritory == Territory.BRA)
+                    || (parentTerritory == Territory.CHN) || (parentTerritory == Territory.RUS)))
+                    || ((incodexlen &gt;= 7) &amp;&amp;
+                    ((parentTerritory == Territory.IND) || (parentTerritory == Territory.MEX)))) {
+
+<span class="fc" id="L80">                territory = parentTerritory;</span>
+            }
+        }
+
+<span class="fc" id="L84">        final int ccode = territory.getNumber();</span>
+
+<span class="fc" id="L86">        final int fromTerritoryRecord = dataModel.getDataFirstRecord(ccode);</span>
+<span class="fc" id="L87">        final int uptoTerritoryRecord = dataModel.getDataLastRecord(ccode);</span>
+
+<span class="fc" id="L89">        final int incodexhi = mapcode.indexOf('.');</span>
+<span class="fc" id="L90">        final int incodex = (incodexhi * 10) + (incodexlen - incodexhi);</span>
+
+<span class="fc" id="L92">        MapcodeZone mapcodeZone = MapcodeZone.empty();</span>
+
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        for (int territoryRecord = fromTerritoryRecord; territoryRecord &lt;= uptoTerritoryRecord; territoryRecord++) {</span>
+<span class="fc" id="L95">            final int codexi = Data.getCodex(territoryRecord);</span>
+<span class="fc" id="L96">            Boundary boundary = createFromTerritoryRecord(territoryRecord);</span>
+<span class="fc bfc" id="L97" title="All 2 branches covered.">            if (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_NONE) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">                if (Data.isNameless(territoryRecord)) {</span>
+                    // i = nameless
+<span class="fc bfc" id="L100" title="All 12 branches covered.">                    if (((codexi == 21) &amp;&amp; (incodex == 22)) ||</span>
+                            ((codexi == 22) &amp;&amp; (incodex == 32)) ||
+                            ((codexi == 13) &amp;&amp; (incodex == 23))) {
+<span class="fc" id="L103">                        mapcodeZone = decodeNameless(mapcode, territoryRecord, extrapostfix);</span>
+<span class="fc" id="L104">                        break;</span>
+                    }
+                } else {
+                    // i = grid without headerletter
+<span class="pc bpc" id="L108" title="1 of 6 branches missed.">                    if ((codexi == incodex) || ((incodex == 22) &amp;&amp; (codexi == 21))) {</span>
+
+<span class="fc" id="L110">                        mapcodeZone = decodeGrid(mapcode,</span>
+<span class="fc" id="L111">                                boundary.getLonMicroDegMin(), boundary.getLatMicroDegMin(),</span>
+<span class="fc" id="L112">                                boundary.getLonMicroDegMax(), boundary.getLatMicroDegMax(),</span>
+                                territoryRecord, extrapostfix);
+
+                        // first of all, make sure the zone fits the country
+<span class="fc" id="L116">                        mapcodeZone = mapcodeZone.restrictZoneTo(createFromTerritoryRecord(uptoTerritoryRecord));</span>
+
+<span class="fc bfc" id="L118" title="All 4 branches covered.">                        if (Data.isRestricted(territoryRecord) &amp;&amp; !mapcodeZone.isEmpty()) {</span>
+<span class="fc" id="L119">                            int nrZoneOverlaps = 0;</span>
+                            int j;
+<span class="fc" id="L121">                            Point result = mapcodeZone.getMidPoint();</span>
+                            // see if midpoint of mapcode zone is in any sub-area...
+<span class="fc bfc" id="L123" title="All 2 branches covered.">                            for (j = territoryRecord - 1; j &gt;= fromTerritoryRecord; j--) {</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">                                if (!Data.isRestricted(j)) {</span>
+<span class="fc bfc" id="L125" title="All 2 branches covered.">                                    if (createFromTerritoryRecord(j).containsPoint(result)) {</span>
+<span class="fc" id="L126">                                        nrZoneOverlaps++;</span>
+<span class="fc" id="L127">                                        break;</span>
+                                    }
+                                }
+                            }
+
+<span class="fc bfc" id="L132" title="All 2 branches covered.">                            if (nrZoneOverlaps == 0) {</span>
+                                // see if mapcode zone OVERLAPS any sub-area...
+<span class="fc" id="L134">                                MapcodeZone zfound = MapcodeZone.empty();</span>
+<span class="fc bfc" id="L135" title="All 2 branches covered.">                                for (j = fromTerritoryRecord; j &lt; territoryRecord; j++) { // try all smaller rectangles j</span>
+<span class="pc bpc" id="L136" title="1 of 2 branches missed.">                                    if (!Data.isRestricted(j)) {</span>
+<span class="fc" id="L137">                                        MapcodeZone z = mapcodeZone.restrictZoneTo(createFromTerritoryRecord(j));</span>
+<span class="fc bfc" id="L138" title="All 2 branches covered.">                                        if (!z.isEmpty()) {</span>
+<span class="fc" id="L139">                                            nrZoneOverlaps++;</span>
+<span class="fc bfc" id="L140" title="All 2 branches covered.">                                            if (nrZoneOverlaps == 1) {</span>
+                                                // first fit! remember...
+<span class="fc" id="L142">                                                zfound.copyFrom(z);</span>
+                                            } else { // nrZoneOverlaps &gt; 1
+                                                // more than one hit
+                                                break; // give up!
+                                            }
+                                        }
+                                    }
+                                }
+<span class="fc bfc" id="L150" title="All 2 branches covered.">                                if (nrZoneOverlaps == 1) { // intersected exactly ONE sub-area?</span>
+<span class="fc" id="L151">                                    mapcodeZone.copyFrom(zfound); // use the intersection found...</span>
+                                }
+                            }
+
+<span class="fc bfc" id="L155" title="All 2 branches covered.">                            if (nrZoneOverlaps == 0) {</span>
+<span class="fc" id="L156">                                mapcodeZone.setEmpty();</span>
+                            }
+<span class="fc" id="L158">                        }</span>
+                        break;
+                    }
+                }
+<span class="fc bfc" id="L162" title="All 2 branches covered.">            } else if (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_PIPE) {</span>
+                // i = grid with headerletter
+<span class="fc bfc" id="L164" title="All 4 branches covered.">                if ((incodex == (codexi + 10)) &amp;&amp; (Data.headerLetter(territoryRecord).charAt(0) == mapcode.charAt(0))) {</span>
+<span class="fc" id="L165">                    mapcodeZone = decodeGrid(mapcode.substring(1),</span>
+<span class="fc" id="L166">                            boundary.getLonMicroDegMin(), boundary.getLatMicroDegMin(),</span>
+<span class="fc" id="L167">                            boundary.getLonMicroDegMax(), boundary.getLatMicroDegMax(),</span>
+                            territoryRecord, extrapostfix);
+<span class="fc" id="L169">                    break;</span>
+                }
+            } else {
+                // i = autoheader
+<span class="pc bpc" id="L173" title="1 of 8 branches missed.">                if (((incodex == 23) &amp;&amp; (codexi == 22)) || ((incodex == 33) &amp;&amp; (codexi == 23))) {</span>
+<span class="fc" id="L174">                    mapcodeZone = decodeAutoHeader(mapcode, territoryRecord, extrapostfix);</span>
+<span class="fc" id="L175">                    break;</span>
+                }
+            }
+        }
+
+<span class="fc" id="L180">        mapcodeZone = mapcodeZone.restrictZoneTo(createFromTerritoryRecord(uptoTerritoryRecord));</span>
+
+<span class="fc" id="L182">        final Point result = mapcodeZone.getMidPoint();</span>
+
+<span class="fc" id="L184">        LOG.trace(&quot;decode: result=({}, {})&quot;,</span>
+<span class="fc bfc" id="L185" title="All 2 branches covered.">                result.isDefined() ? result.getLatDeg() : Double.NaN,</span>
+<span class="fc bfc" id="L186" title="All 2 branches covered.">                result.isDefined() ? result.getLonDeg() : Double.NaN);</span>
+<span class="fc" id="L187">        return result;</span>
+    }
+
+    // ----------------------------------------------------------------------
+    // Private methods.
+    // ----------------------------------------------------------------------
+
+<span class="fc" id="L194">    private final static int[] DECODE_CHARS = {</span>
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1, -1, -1, -1, -1, -1,
+            -1, -2, 10, 11, 12, -3, 13, 14, 15, 1, 16, 17, 18, 19, 20, 0,
+            21, 22, 23, 24, 25, -4, 26, 27, 28, 29, 30, -1, -1, -1, -1, -1,
+            -1, -2, 10, 11, 12, -3, 13, 14, 15, 1, 16, 17, 18, 19, 20, 0,
+            21, 22, 23, 24, 25, -4, 26, 27, 28, 29, 30, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
+    };
+
+    private static class Unicode2Ascii {
+
+        public final char min;
+        public final char max;
+        @Nonnull
+        public final String convert;
+
+<span class="fc" id="L220">        public Unicode2Ascii(final char min, final char max, @Nonnull final String convert) {</span>
+<span class="fc" id="L221">            this.min = min;</span>
+<span class="fc" id="L222">            this.max = max;</span>
+<span class="fc" id="L223">            this.convert = convert;</span>
+<span class="fc" id="L224">        }</span>
+    }
+
+    // Special character '?' indicating missing character in alphabet.
+    private static final char MISSCODE = '?';
+
+<span class="fc" id="L230">    private final static char[][] ASCII2LANGUAGE = {</span>
+            // Character:   A         B         C         D         E         F         G         H         I         J        K          L         M         N         O         P         Q         R         S         T         U         V         W         X         Y         Z         0         1         2         3         4         5         6         7         8         9
+            /* Roman    */ {'\u0041', '\u0042', '\u0043', '\u0044', '\u0045', '\u0046', '\u0047', '\u0048', '\u0049', '\u004a', '\u004b', '\u004c', '\u004d', '\u004e', '\u004f', '\u0050', '\u0051', '\u0052', '\u0053', '\u0054', '\u0055', '\u0056', '\u0057', '\u0058', '\u0059', '\u005a', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Roman
+            /* Greek    */ {'\u0391', '\u0392', '\u039e', '\u0394', MISSCODE, '\u0395', '\u0393', '\u0397', '\u0399', '\u03a0', '\u039a', '\u039b', '\u039c', '\u039d', '\u039f', '\u03a1', '\u0398', '\u03a8', '\u03a3', '\u03a4', MISSCODE, '\u03a6', '\u03a9', '\u03a7', '\u03a5', '\u0396', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Greek
+            /* Cyrillic */ {'\u0410', '\u0412', '\u0421', '\u0414', '\u0415', '\u0416', '\u0413', '\u041d', '\u0418', '\u041f', '\u041a', '\u041b', '\u041c', '\u0417', '\u041e', '\u0420', '\u0424', '\u042f', '\u0426', '\u0422', '\u042d', '\u0427', '\u0428', '\u0425', '\u0423', '\u0411', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Cyrillic
+            /* Hebrew   */ {'\u05d0', '\u05d1', '\u05d2', '\u05d3', '\u05e3', '\u05d4', '\u05d6', '\u05d7', '\u05d5', '\u05d8', '\u05d9', '\u05da', '\u05db', '\u05dc', '\u05e1', '\u05dd', '\u05de', '\u05e0', '\u05e2', '\u05e4', '\u05e5', '\u05e6', '\u05e7', '\u05e8', '\u05e9', '\u05ea', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Hebrew
+            /* Hindi    */ {'\u0905', '\u0915', '\u0917', '\u0918', '\u090f', '\u091a', '\u091c', '\u091f', MISSCODE, '\u0920', '\u0923', '\u0924', '\u0926', '\u0927', MISSCODE, '\u0928', '\u092a', '\u092d', '\u092e', '\u0930', '\u092b', '\u0932', '\u0935', '\u0938', '\u0939', '\u0921', '\u0966', '\u0967', '\u0968', '\u0969', '\u096a', '\u096b', '\u096c', '\u096d', '\u096e', '\u096f'}, // Hindi
+            /* Malay    */ {'\u0d12', '\u0d15', '\u0d16', '\u0d17', '\u0d0b', '\u0d1a', '\u0d1c', '\u0d1f', '\u0d07', '\u0d21', '\u0d24', '\u0d25', '\u0d26', '\u0d27', '\u0d20', '\u0d28', '\u0d2e', '\u0d30', '\u0d31', '\u0d32', '\u0d09', '\u0d34', '\u0d35', '\u0d36', '\u0d38', '\u0d39', '\u0d66', '\u0d67', '\u0d68', '\u0d69', '\u0d6a', '\u0d6b', '\u0d6c', '\u0d6d', '\u0d6e', '\u0d6f'}, // Malay
+            /* Georgian */ {'\u10a0', '\u10a1', '\u10a3', '\u10a6', '\u10a4', '\u10a9', '\u10ab', '\u10ac', '\u10b3', '\u10ae', '\u10b0', '\u10b1', '\u10b2', '\u10b4', '\u10ad', '\u10b5', '\u10b6', '\u10b7', '\u10b8', '\u10b9', '\u10a8', '\u10ba', '\u10bb', '\u10bd', '\u10be', '\u10bf', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Georgian
+            /* Katakana */ {'\u30a2', '\u30ab', '\u30ad', '\u30af', '\u30aa', '\u30b1', '\u30b3', '\u30b5', '\u30a4', '\u30b9', '\u30c1', '\u30c8', '\u30ca', '\u30cc', '\u30a6', '\u30d2', '\u30d5', '\u30d8', '\u30db', '\u30e1', '\u30a8', '\u30e2', '\u30e8', '\u30e9', '\u30ed', '\u30f2', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Katakana
+            /* Thai     */ {'\u0e30', '\u0e01', '\u0e02', '\u0e04', '\u0e32', '\u0e07', '\u0e08', '\u0e09', '\u0e31', '\u0e0a', '\u0e11', '\u0e14', '\u0e16', '\u0e17', '\u0e0d', '\u0e18', '\u0e1a', '\u0e1c', '\u0e21', '\u0e23', '\u0e2c', '\u0e25', '\u0e27', '\u0e2d', '\u0e2e', '\u0e2f', '\u0e50', '\u0e51', '\u0e52', '\u0e53', '\u0e54', '\u0e55', '\u0e56', '\u0e57', '\u0e58', '\u0e59'}, // Thai
+            /* Laos     */ {'\u0eb0', '\u0e81', '\u0e82', '\u0e84', '\u0ec3', '\u0e87', '\u0e88', '\u0e8a', '\u0ec4', '\u0e8d', '\u0e94', '\u0e97', '\u0e99', '\u0e9a', '\u0ec6', '\u0e9c', '\u0e9e', '\u0ea1', '\u0ea2', '\u0ea3', '\u0ebd', '\u0ea7', '\u0eaa', '\u0eab', '\u0ead', '\u0eaf', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Laos
+            /* Armenian */ {'\u0556', '\u0532', '\u0533', '\u0534', '\u0535', '\u0538', '\u0539', '\u053a', '\u053b', '\u053d', '\u053f', '\u0540', '\u0541', '\u0543', '\u0555', '\u0547', '\u0548', '\u054a', '\u054d', '\u054e', '\u0545', '\u054f', '\u0550', '\u0551', '\u0552', '\u0553', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Armenian
+            /* Bengali  */ {'\u0985', '\u098c', '\u0995', '\u0996', '\u098f', '\u0997', '\u0999', '\u099a', MISSCODE, '\u099d', '\u09a0', '\u09a1', '\u09a2', '\u09a3', MISSCODE, '\u09a4', '\u09a5', '\u09a6', '\u09a8', '\u09aa', '\u0993', '\u09ac', '\u09ad', '\u09af', '\u09b2', '\u09b9', '\u09e6', '\u09e7', '\u09e8', '\u09e9', '\u09ea', '\u09eb', '\u09ec', '\u09ed', '\u09ee', '\u09ef'}, // Bengali
+            /* Gurmukhi */ {'\u0a05', '\u0a15', '\u0a17', '\u0a18', '\u0a0f', '\u0a1a', '\u0a1c', '\u0a1f', MISSCODE, '\u0a20', '\u0a23', '\u0a24', '\u0a26', '\u0a27', MISSCODE, '\u0a28', '\u0a2a', '\u0a2d', '\u0a2e', '\u0a30', '\u0a2b', '\u0a32', '\u0a35', '\u0a38', '\u0a39', '\u0a21', '\u0a66', '\u0a67', '\u0a68', '\u0a69', '\u0a6a', '\u0a6b', '\u0a6c', '\u0a6d', '\u0a6e', '\u0a6f'}, // Gurmukhi
+            /* Tibetan  */ {'\u0f58', '\u0f40', '\u0f41', '\u0f42', '\u0f64', '\u0f44', '\u0f45', '\u0f46', MISSCODE, '\u0f47', '\u0f4a', '\u0f4c', '\u0f4e', '\u0f4f', MISSCODE, '\u0f51', '\u0f53', '\u0f54', '\u0f56', '\u0f5e', '\u0f65', '\u0f5f', '\u0f61', '\u0f62', '\u0f63', '\u0f66', '\u0f20', '\u0f21', '\u0f22', '\u0f23', '\u0f24', '\u0f25', '\u0f26', '\u0f27', '\u0f28', '\u0f29'}, // Tibetan
+    };
+
+<span class="fc" id="L248">    private final static Unicode2Ascii[] UNICODE2ASCII = {</span>
+            /* Roman    */ new Unicode2Ascii('\u0041', '\u005a', &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;),                                                        // Roman
+            /* Greek    */ new Unicode2Ascii('\u0391', '\u03a9', &quot;ABGDFZHQIKLMNCOJP?STYVXRW&quot;),                                                         // Greek
+            /* Cyrillic */ new Unicode2Ascii('\u0410', '\u042f', &quot;AZBGDEFNI?KLMHOJPCTYQXSVW????U?R&quot;),                                                  // Cyrillic
+            /* Hebrew   */ new Unicode2Ascii('\u05d0', '\u05ea', &quot;ABCDFIGHJKLMNPQ?ROSETUVWXYZ&quot;),                                                       // Hebrew
+            /* Hindi    */ new Unicode2Ascii('\u0905', '\u0939', &quot;A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY&quot;),                             // Hindi
+            /* Malay    */ new Unicode2Ascii('\u0d07', '\u0d39', &quot;I?U?E??????A??BCD??F?G??HOJ??KLMNP?????Q?RST?VWX?YZ&quot;),                               // Malai
+            /* Georgian */ new Unicode2Ascii('\u10a0', '\u10bf', &quot;AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ&quot;),                                                  // Georgian
+            /* Katakana */ new Unicode2Ascii('\u30a2', '\u30f2', &quot;A?I?O?U?EB?C?D?F?G?H???J???????K??????L?M?N?????P??Q??R??S?????TV?????WX???Y????Z&quot;), // Katakana
+            /* Thai     */ new Unicode2Ascii('\u0e01', '\u0e32', &quot;BC?D??FGHJ??O???K??L?MNP?Q?R????S?T?V?W????UXYZAIE&quot;),                                // Thai
+            /* Laos     */ new Unicode2Ascii('\u0e81', '\u0ec6', &quot;BC?D??FG?H??J??????K??L?MN?P?Q??RST???V??WX?Y?ZA????????????U?????EI?O&quot;),            // Lao
+            /* Armenian */ new Unicode2Ascii('\u0532', '\u0556', &quot;BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA&quot;),                                             // Armenian
+            /* Bengali  */ new Unicode2Ascii('\u0985', '\u09b9', &quot;A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z&quot;),                             // Bengali
+            /* Gurmukhi */ new Unicode2Ascii('\u0a05', '\u0a39', &quot;A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY&quot;),                             // Gurmukhi
+            /* Tibetan  */ new Unicode2Ascii('\u0f40', '\u0f66', &quot;BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ&quot;),                                           // Tibetan
+
+            /* Hindi    */ new Unicode2Ascii('\u0966', '\u096f', &quot;&quot;),
+            /* Malai    */ new Unicode2Ascii('\u0d66', '\u0d6f', &quot;&quot;),
+            /* Thai     */ new Unicode2Ascii('\u0e50', '\u0e59', &quot;&quot;),
+            /* Bengali  */ new Unicode2Ascii('\u09e6', '\u09ef', &quot;&quot;),
+            /* Gurmukhi */ new Unicode2Ascii('\u0a66', '\u0a6f', &quot;&quot;),
+            /* Tibetan  */ new Unicode2Ascii('\u0f20', '\u0f29', &quot;&quot;),
+
+            // Lowercase variants:
+            /* Greek    */ new Unicode2Ascii('\u03B1', '\u03c9', &quot;ABGDFZHQIKLMNCOJP?STYVXRW&quot;),
+            /* Georgian */ new Unicode2Ascii('\u10d0', '\u10ef', &quot;AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ&quot;),
+            /* Armenian */ new Unicode2Ascii('\u0562', '\u0586', &quot;BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA&quot;)
+    };
+
+    @Nonnull
+    private static MapcodeZone decodeGrid(final String str, final int minx, final int miny, final int maxx, final int maxy,
+                                          final int m, final String extrapostfix) {
+        // for a well-formed result, and integer variables
+<span class="fc" id="L281">        String result = str;</span>
+        int relx;
+        int rely;
+<span class="fc" id="L284">        final int codexlen = result.length() - 1; // length ex dot</span>
+<span class="fc" id="L285">        int prelen = result.indexOf('.'); // dotposition</span>
+
+<span class="pc bpc" id="L287" title="1 of 4 branches missed.">        if ((prelen == 1) &amp;&amp; (codexlen == 5)) {</span>
+<span class="fc" id="L288">            prelen++;</span>
+<span class="fc" id="L289">            result = result.substring(0, 1) + result.charAt(2) + '.' + result.substring(3);</span>
+        }
+<span class="fc" id="L291">        final int postlen = codexlen - prelen;</span>
+
+        final int divx;
+        int divy;
+<span class="fc" id="L295">        divy = dataModel.getSmartDiv(m);</span>
+<span class="fc bfc" id="L296" title="All 2 branches covered.">        if (divy == 1) {</span>
+<span class="fc" id="L297">            divx = Common.xSide[prelen];</span>
+<span class="fc" id="L298">            divy = Common.ySide[prelen];</span>
+        } else {
+<span class="fc" id="L300">            divx = Common.nc[prelen] / divy;</span>
+        }
+
+<span class="pc bpc" id="L303" title="1 of 6 branches missed.">        if ((prelen == 4) &amp;&amp; (divx == 961) &amp;&amp; (divy == 961)) {</span>
+<span class="fc" id="L304">            result = result.substring(0, 1) + result.charAt(2) + result.charAt(1) + result.substring(3);</span>
+        }
+
+<span class="fc" id="L307">        int v = decodeBase31(result);</span>
+
+<span class="fc bfc" id="L309" title="All 4 branches covered.">        if ((divx != divy) &amp;&amp; (prelen &gt; 2)) // D==6</span>
+        {
+<span class="fc" id="L311">            final Point d = decodeSixWide(v, divx, divy);</span>
+<span class="fc" id="L312">            relx = d.getLonMicroDeg();</span>
+<span class="fc" id="L313">            rely = d.getLatMicroDeg();</span>
+<span class="fc" id="L314">        } else {</span>
+<span class="fc" id="L315">            relx = v / divy;</span>
+<span class="fc" id="L316">            rely = divy - 1 - (v % divy);</span>
+        }
+
+<span class="fc" id="L319">        final int ygridsize = (((maxy - miny) + divy) - 1) / divy;</span>
+<span class="fc" id="L320">        final int xgridsize = (((maxx - minx) + divx) - 1) / divx;</span>
+
+<span class="fc" id="L322">        rely = miny + (rely * ygridsize);</span>
+<span class="fc" id="L323">        relx = minx + (relx * xgridsize);</span>
+
+<span class="fc" id="L325">        final int yp = Common.ySide[postlen];</span>
+<span class="fc" id="L326">        final int dividery = ((ygridsize + yp) - 1) / yp;</span>
+<span class="fc" id="L327">        final int xp = Common.xSide[postlen];</span>
+<span class="fc" id="L328">        final int dividerx = ((xgridsize + xp) - 1) / xp;</span>
+
+<span class="fc" id="L330">        String rest = result.substring(prelen + 1);</span>
+
+        // decoderelative (postfix vs rely,relx)
+        final int difx;
+        int dify;
+
+<span class="fc bfc" id="L336" title="All 2 branches covered.">        if (postlen == 3) {</span>
+<span class="fc" id="L337">            final Point d = decodeTriple(rest);</span>
+<span class="fc" id="L338">            difx = d.getLonMicroDeg();</span>
+<span class="fc" id="L339">            dify = d.getLatMicroDeg();</span>
+<span class="fc" id="L340">        } else {</span>
+<span class="fc bfc" id="L341" title="All 2 branches covered.">            if (postlen == 4) {</span>
+<span class="fc" id="L342">                rest = String.valueOf(rest.charAt(0)) + rest.charAt(2) + rest.charAt(1) + rest.charAt(3);</span>
+            }
+<span class="fc" id="L344">            v = decodeBase31(rest);</span>
+<span class="fc" id="L345">            difx = v / yp;</span>
+<span class="fc" id="L346">            dify = v % yp;</span>
+        }
+
+<span class="fc" id="L349">        dify = yp - 1 - dify;</span>
+
+<span class="fc" id="L351">        final int cornery = rely + (dify * dividery);</span>
+<span class="fc" id="L352">        final int cornerx = relx + (difx * dividerx);</span>
+
+<span class="fc" id="L354">        Point pt = Point.fromMicroDeg(cornery, cornerx);</span>
+<span class="pc bpc" id="L355" title="1 of 2 branches missed.">        if (!(createFromTerritoryRecord(m).containsPoint(pt))) {</span>
+<span class="nc" id="L356">            LOG.info(&quot;decodeGrid: Failed decodeGrid({}): {} not in {}&quot;, str, pt, createFromTerritoryRecord(m));</span>
+<span class="nc" id="L357">            return MapcodeZone.empty(); // already out of range</span>
+        }
+
+<span class="fc bfc" id="L360" title="All 2 branches covered.">        final int decodeMaxx = ((relx + xgridsize) &lt; maxx) ? (relx + xgridsize) : maxx;</span>
+<span class="fc bfc" id="L361" title="All 2 branches covered.">        final int decodeMaxy = ((rely + ygridsize) &lt; maxy) ? (rely + ygridsize) : maxy;</span>
+<span class="fc" id="L362">        return decodeExtension(cornery, cornerx, dividerx &lt;&lt; 2, dividery, extrapostfix,</span>
+                0, decodeMaxy, decodeMaxx); // grid
+    }
+
+    @Nonnull
+    private static MapcodeZone decodeNameless(final String str, final int firstrec, final String extrapostfix) {
+<span class="fc" id="L368">        String result = str;</span>
+<span class="fc" id="L369">        final int codexm = Data.getCodex(firstrec);</span>
+<span class="fc bfc" id="L370" title="All 2 branches covered.">        if (codexm == 22) {</span>
+<span class="fc" id="L371">            result = result.substring(0, 3) + result.substring(4);</span>
+        } else {
+<span class="fc" id="L373">            result = result.substring(0, 2) + result.substring(3);</span>
+        }
+
+<span class="fc" id="L376">        int a = Common.countCityCoordinatesForCountry(codexm, firstrec, firstrec);</span>
+
+<span class="fc" id="L378">        final int p = 31 / a;</span>
+<span class="fc" id="L379">        final int r = 31 % a;</span>
+<span class="fc" id="L380">        int v = 0;</span>
+        int nrX;
+<span class="fc" id="L382">        boolean swapletters = false;</span>
+
+<span class="fc bfc" id="L384" title="All 4 branches covered.">        if ((codexm != 21) &amp;&amp; (a &lt;= 31)) {</span>
+<span class="fc" id="L385">            final int offset = DECODE_CHARS[(int) result.charAt(0)];</span>
+
+<span class="fc bfc" id="L387" title="All 2 branches covered.">            if (offset &lt; (r * (p + 1))) {</span>
+<span class="fc" id="L388">                nrX = offset / (p + 1);</span>
+            } else {
+<span class="fc bfc" id="L390" title="All 4 branches covered.">                swapletters = (p == 1) &amp;&amp; (codexm == 22);</span>
+<span class="fc" id="L391">                nrX = r + ((offset - (r * (p + 1))) / p);</span>
+            }
+<span class="fc bfc" id="L393" title="All 4 branches covered.">        } else if ((codexm != 21) &amp;&amp; (a &lt; 62)) {</span>
+<span class="fc" id="L394">            nrX = DECODE_CHARS[(int) result.charAt(0)];</span>
+<span class="fc bfc" id="L395" title="All 2 branches covered.">            if (nrX &lt; (62 - a)) {</span>
+<span class="pc bpc" id="L396" title="1 of 2 branches missed.">                swapletters = codexm == 22;</span>
+            } else {
+<span class="fc" id="L398">                nrX = ((nrX + nrX) - 62) + a;</span>
+            }
+        } else {
+            // codex==21 || A&gt;=62
+<span class="fc bfc" id="L402" title="All 2 branches covered.">            final int basePower = (codexm == 21) ? (961 * 961) : (961 * 961 * 31);</span>
+<span class="fc" id="L403">            int basePowerA = basePower / a;</span>
+<span class="pc bpc" id="L404" title="1 of 2 branches missed.">            if (a == 62) {</span>
+<span class="nc" id="L405">                basePowerA++;</span>
+            } else {
+<span class="fc" id="L407">                basePowerA = 961 * (basePowerA / 961);</span>
+            }
+
+            // decode and determine x
+<span class="fc" id="L411">            v = decodeBase31(result);</span>
+<span class="fc" id="L412">            nrX = v / basePowerA;</span>
+<span class="fc" id="L413">            v %= basePowerA;</span>
+        }
+
+<span class="fc bfc" id="L416" title="All 4 branches covered.">        if (swapletters &amp;&amp; !Data.isSpecialShape(firstrec + nrX)) {</span>
+<span class="fc" id="L417">            result = result.substring(0, 2) + result.charAt(3) + result.charAt(2) + result.charAt(4);</span>
+        }
+
+<span class="fc bfc" id="L420" title="All 4 branches covered.">        if ((codexm != 21) &amp;&amp; (a &lt;= 31)) {</span>
+<span class="fc" id="L421">            v = decodeBase31(result);</span>
+<span class="fc bfc" id="L422" title="All 2 branches covered.">            if (nrX &gt; 0) {</span>
+<span class="fc bfc" id="L423" title="All 2 branches covered.">                v -= ((nrX * p) + ((nrX &lt; r) ? nrX : r)) * 961 * 961;</span>
+            }
+<span class="fc bfc" id="L425" title="All 4 branches covered.">        } else if ((codexm != 21) &amp;&amp; (a &lt; 62)) {</span>
+<span class="fc" id="L426">            v = decodeBase31(result.substring(1));</span>
+<span class="fc bfc" id="L427" title="All 4 branches covered.">            if ((nrX &gt;= (62 - a)) &amp;&amp; (v &gt;= (16 * 961 * 31))) {</span>
+<span class="fc" id="L428">                v -= 16 * 961 * 31;</span>
+<span class="fc" id="L429">                nrX++;</span>
+            }
+        }
+
+<span class="pc bpc" id="L433" title="1 of 2 branches missed.">        if (nrX &gt; a) {  // past end!</span>
+<span class="nc" id="L434">            return MapcodeZone.empty();</span>
+        }
+
+<span class="fc" id="L437">        final int territoryRecord = firstrec + nrX;</span>
+
+<span class="fc" id="L439">        int side = dataModel.getSmartDiv(territoryRecord);</span>
+<span class="fc" id="L440">        int xSIDE = side;</span>
+
+<span class="fc" id="L442">        Boundary boundary = createFromTerritoryRecord(territoryRecord);</span>
+<span class="fc" id="L443">        final int maxx = boundary.getLonMicroDegMax();</span>
+<span class="fc" id="L444">        final int maxy = boundary.getLatMicroDegMax();</span>
+<span class="fc" id="L445">        final int minx = boundary.getLonMicroDegMin();</span>
+<span class="fc" id="L446">        final int miny = boundary.getLatMicroDegMin();</span>
+
+        final int dx;
+        final int dy;
+
+<span class="fc bfc" id="L451" title="All 2 branches covered.">        if (Data.isSpecialShape(territoryRecord)) {</span>
+<span class="fc" id="L452">            xSIDE *= side;</span>
+<span class="fc" id="L453">            side = 1 + ((maxy - miny) / 90);</span>
+<span class="fc" id="L454">            xSIDE = xSIDE / side;</span>
+
+<span class="fc" id="L456">            final Point d = decodeSixWide(v, xSIDE, side);</span>
+<span class="fc" id="L457">            dx = d.getLonMicroDeg();</span>
+<span class="fc" id="L458">            dy = side - 1 - d.getLatMicroDeg();</span>
+<span class="fc" id="L459">        } else {</span>
+<span class="fc" id="L460">            dy = v % side;</span>
+<span class="fc" id="L461">            dx = v / side;</span>
+        }
+
+<span class="pc bpc" id="L464" title="1 of 2 branches missed.">        if (dx &gt;= xSIDE) // else out-of-range!</span>
+        {
+<span class="nc" id="L466">            LOG.error(&quot;decodeGrid: Failed, decodeNameless({}): dx {} &gt; xSIDE {}&quot;, str, dx, xSIDE);</span>
+<span class="nc" id="L467">            return MapcodeZone.empty(); // return undefined (out of range!)</span>
+        }
+
+<span class="fc" id="L470">        final int dividerx4 = Common.xDivider(miny, maxy); // 4 times too large!</span>
+<span class="fc" id="L471">        final int dividery = 90;</span>
+
+<span class="fc" id="L473">        final int cornerx = minx + ((dx * dividerx4) / 4);</span>
+<span class="fc" id="L474">        final int cornery = maxy - (dy * dividery);</span>
+<span class="fc" id="L475">        return decodeExtension(cornery, cornerx, dividerx4, -dividery, extrapostfix,</span>
+                ((dx * dividerx4) % 4), miny, maxx); // nameless
+    }
+
+    @Nonnull
+    private static MapcodeZone decodeAutoHeader(final String input, final int m, final String extrapostfix) {
+        // returns Point.isUndefined() in case or error
+<span class="fc" id="L482">        int storageStart = 0;</span>
+<span class="fc" id="L483">        final int codexm = Data.getCodex(m);</span>
+
+<span class="fc" id="L485">        int value = decodeBase31(input); // decode top (before dot)</span>
+<span class="fc" id="L486">        value *= 961 * 31;</span>
+<span class="fc" id="L487">        final Point triple = decodeTriple(input.substring(input.length() - 3));</span>
+        // decode bottom 3 chars
+
+        int i;
+<span class="fc" id="L491">        i = m;</span>
+        while (true) {
+<span class="pc bpc" id="L493" title="2 of 4 branches missed.">            if ((Data.getTerritoryRecordType(i) &lt; Data.TERRITORY_RECORD_TYPE_PLUS) || (Data.getCodex(i) != codexm)) {</span>
+<span class="nc" id="L494">                LOG.error(&quot;decodeGrid: Failed, decodeAutoHeader({}): out of {} records&quot;, input, codexm);</span>
+<span class="nc" id="L495">                return MapcodeZone.empty(); // return undefined</span>
+            }
+
+<span class="fc" id="L498">            final int maxx = createFromTerritoryRecord(i).getLonMicroDegMax();</span>
+<span class="fc" id="L499">            final int maxy = createFromTerritoryRecord(i).getLatMicroDegMax();</span>
+<span class="fc" id="L500">            final int minx = createFromTerritoryRecord(i).getLonMicroDegMin();</span>
+<span class="fc" id="L501">            final int miny = createFromTerritoryRecord(i).getLatMicroDegMin();</span>
+
+<span class="fc" id="L503">            int h = ((maxy - miny) + 89) / 90;</span>
+<span class="fc" id="L504">            final int xdiv = Common.xDivider(miny, maxy);</span>
+<span class="fc" id="L505">            int w = ((((maxx - minx) * 4) + xdiv) - 1) / xdiv;</span>
+
+<span class="fc" id="L507">            h = 176 * (((h + 176) - 1) / 176);</span>
+<span class="fc" id="L508">            w = 168 * (((w + 168) - 1) / 168);</span>
+
+<span class="fc" id="L510">            int product = (w / 168) * (h / 176) * 961 * 31;</span>
+
+<span class="fc bfc" id="L512" title="All 2 branches covered.">            if (Data.getTerritoryRecordType(i) == Data.TERRITORY_RECORD_TYPE_PLUS) {</span>
+<span class="fc bfc" id="L513" title="All 2 branches covered.">                final int goodRounder = (codexm &gt;= 23) ? (961 * 961 * 31) : (961 * 961);</span>
+<span class="fc" id="L514">                product = ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;</span>
+            }
+
+<span class="pc bpc" id="L517" title="1 of 4 branches missed.">            if ((value &gt;= storageStart) &amp;&amp; (value &lt; (storageStart + product))) {</span>
+                // code belongs here?
+<span class="fc" id="L519">                final int dividerx = (((maxx - minx) + w) - 1) / w;</span>
+<span class="fc" id="L520">                final int dividery = (((maxy - miny) + h) - 1) / h;</span>
+
+<span class="fc" id="L522">                value -= storageStart;</span>
+<span class="fc" id="L523">                value = value / (961 * 31);</span>
+
+<span class="fc" id="L525">                int vx = value / (h / 176);</span>
+<span class="fc" id="L526">                vx = (vx * 168) + triple.getLonMicroDeg();</span>
+<span class="fc" id="L527">                final int vy = ((value % (h / 176)) * 176) + triple.getLatMicroDeg();</span>
+
+<span class="fc" id="L529">                final int cornery = maxy - (vy * dividery);</span>
+<span class="fc" id="L530">                final int cornerx = minx + (vx * dividerx);</span>
+
+<span class="pc bpc" id="L532" title="4 of 8 branches missed.">                if ((cornerx &lt; minx) || (cornerx &gt;= maxx) || (cornery &lt; miny) || (cornery &gt; maxy)) {</span>
+<span class="nc" id="L533">                    LOG.error(&quot;decodeGrid: Failed, decodeAutoHeader({}): corner {}, {} out of bounds&quot;, input, cornery, cornerx);</span>
+<span class="nc" id="L534">                    return MapcodeZone.empty(); // corner out of bounds</span>
+                }
+
+<span class="fc" id="L537">                return decodeExtension(cornery, cornerx, dividerx &lt;&lt; 2, -dividery, extrapostfix,</span>
+                        0, miny, maxx); // autoheader
+            }
+<span class="fc" id="L540">            storageStart += product;</span>
+<span class="fc" id="L541">            i++;</span>
+<span class="fc" id="L542">        }</span>
+    }
+
+    @Nonnull
+    private static String aeuUnpack(final String argStr) {
+        // unpack encoded into all-digit
+        // (assume str already uppercase!), returns &quot;&quot; in case of error
+<span class="fc" id="L549">        String str = decodeUTF16(argStr);</span>
+<span class="fc" id="L550">        boolean voweled = false;</span>
+<span class="fc" id="L551">        final int lastpos = str.length() - 1;</span>
+<span class="fc" id="L552">        int dotpos = str.indexOf('.');</span>
+<span class="pc bpc" id="L553" title="2 of 4 branches missed.">        if ((dotpos &lt; 2) || (lastpos &lt; (dotpos + 2))) {</span>
+<span class="nc" id="L554">            return &quot;&quot;; // Error: no dot, or less than 2 letters before dot, or</span>
+        }
+        // less than 2 letters after dot
+
+<span class="fc bfc" id="L558" title="All 2 branches covered.">        if (str.charAt(0) == 'A') { // v1.50</span>
+<span class="fc" id="L559">            int v1 = DECODE_CHARS[(int) str.charAt(lastpos)];</span>
+<span class="pc bpc" id="L560" title="1 of 2 branches missed.">            if (v1 &lt; 0) {</span>
+<span class="nc" id="L561">                v1 = 31;</span>
+            }
+<span class="fc" id="L563">            int v2 = DECODE_CHARS[(int) str.charAt(lastpos - 1)];</span>
+<span class="pc bpc" id="L564" title="1 of 2 branches missed.">            if (v2 &lt; 0) {</span>
+<span class="nc" id="L565">                v2 = 31;</span>
+            }
+<span class="fc" id="L567">            final String s = String.valueOf(1000 + v1 + (32 * v2));</span>
+<span class="fc" id="L568">            str = s.charAt(1) + str.substring(1, lastpos - 1) + s.charAt(2) + s.charAt(3);</span>
+<span class="fc" id="L569">            voweled = true;</span>
+<span class="pc bpc" id="L570" title="1 of 2 branches missed.">        } else if (str.charAt(0) == 'U') { // v.1.50 debug decoding of U+alldigitmapcode</span>
+<span class="nc" id="L571">            voweled = true;</span>
+<span class="nc" id="L572">            str = str.substring(1);</span>
+<span class="nc" id="L573">            dotpos--;</span>
+        } else {
+<span class="fc" id="L575">            int v = str.charAt(lastpos - 1);</span>
+<span class="fc bfc" id="L576" title="All 2 branches covered.">            if (v == 'A') {</span>
+<span class="fc" id="L577">                v = 0;</span>
+<span class="fc bfc" id="L578" title="All 2 branches covered.">            } else if (v == 'E') {</span>
+<span class="fc" id="L579">                v = 34;</span>
+<span class="fc bfc" id="L580" title="All 2 branches covered.">            } else if (v == 'U') {</span>
+<span class="fc" id="L581">                v = 68;</span>
+            } else {
+<span class="fc" id="L583">                v = -1;</span>
+            }
+<span class="fc bfc" id="L585" title="All 2 branches covered.">            if (v &gt;= 0) {</span>
+<span class="fc" id="L586">                final char e = str.charAt(lastpos);</span>
+<span class="pc bpc" id="L587" title="1 of 2 branches missed.">                if (e == 'A') {</span>
+<span class="nc" id="L588">                    v += 31;</span>
+<span class="fc bfc" id="L589" title="All 2 branches covered.">                } else if (e == 'E') {</span>
+<span class="fc" id="L590">                    v += 32;</span>
+<span class="fc bfc" id="L591" title="All 2 branches covered.">                } else if (e == 'U') {</span>
+<span class="fc" id="L592">                    v += 33;</span>
+                } else {
+<span class="fc" id="L594">                    final int ve = DECODE_CHARS[(int) str.charAt(lastpos)];</span>
+<span class="pc bpc" id="L595" title="1 of 2 branches missed.">                    if (ve &lt; 0) {</span>
+<span class="nc" id="L596">                        return &quot;&quot;;</span>
+                    }
+<span class="fc" id="L598">                    v += ve;</span>
+                }
+<span class="pc bpc" id="L600" title="1 of 2 branches missed.">                if (v &gt;= 100) {</span>
+<span class="nc" id="L601">                    return &quot;&quot;;</span>
+                }
+<span class="fc" id="L603">                voweled = true;</span>
+<span class="fc" id="L604">                str = str.substring(0, lastpos - 1) + Data.ENCODE_CHARS[v / 10]</span>
+                        + Data.ENCODE_CHARS[v % 10];
+            }
+        }
+
+<span class="pc bpc" id="L609" title="2 of 4 branches missed.">        if ((dotpos &lt; 2) || (dotpos &gt; 5)) {</span>
+<span class="nc" id="L610">            return &quot;&quot;;</span>
+        }
+
+<span class="fc bfc" id="L613" title="All 2 branches covered.">        for (int v = 0; v &lt;= lastpos; v++) {</span>
+<span class="fc bfc" id="L614" title="All 2 branches covered.">            if (v != dotpos) {</span>
+<span class="fc" id="L615">                final int i = (int) str.charAt(v);</span>
+<span class="pc bpc" id="L616" title="1 of 2 branches missed.">                if (DECODE_CHARS[i] &lt; 0) {</span>
+<span class="nc" id="L617">                    return &quot;&quot;; // bad char!</span>
+<span class="pc bpc" id="L618" title="1 of 4 branches missed.">                } else if (voweled &amp;&amp; (DECODE_CHARS[(int) str.charAt(v)] &gt; 9)) {</span>
+<span class="nc" id="L619">                    return &quot;&quot;; // nonodigit!</span>
+                }
+            }
+        }
+
+<span class="fc" id="L624">        return str;</span>
+    }
+
+    /**
+     * This method decodes a Unicode string to ASCII. Package private for access by other modules.
+     *
+     * @param mapcode Unicode string.
+     * @return ASCII string.
+     */
+    static String decodeUTF16(final String mapcode) {
+        String result;
+<span class="fc" id="L635">        final StringBuilder asciiBuf = new StringBuilder();</span>
+<span class="fc bfc" id="L636" title="All 2 branches covered.">        for (final char ch : mapcode.toCharArray()) {</span>
+<span class="fc bfc" id="L637" title="All 2 branches covered.">            if (ch == '.') {</span>
+<span class="fc" id="L638">                asciiBuf.append(ch);</span>
+<span class="pc bpc" id="L639" title="1 of 4 branches missed.">            } else if ((ch &gt;= 1) &amp;&amp; (ch &lt;= 'z')) {</span>
+                // normal ascii
+<span class="fc" id="L641">                asciiBuf.append(ch);</span>
+            } else {
+<span class="fc" id="L643">                boolean found = false;</span>
+<span class="pc bpc" id="L644" title="1 of 2 branches missed.">                for (final Unicode2Ascii unicode2Ascii : UNICODE2ASCII) {</span>
+<span class="fc bfc" id="L645" title="All 4 branches covered.">                    if ((ch &gt;= unicode2Ascii.min) &amp;&amp; (ch &lt;= unicode2Ascii.max)) {</span>
+<span class="fc" id="L646">                        final int pos = ((int) ch) - (int) unicode2Ascii.min;</span>
+<span class="fc" id="L647">                        asciiBuf.append(unicode2Ascii.convert.charAt(pos));</span>
+<span class="fc" id="L648">                        found = true;</span>
+<span class="fc" id="L649">                        break;</span>
+                    }
+                }
+<span class="pc bpc" id="L652" title="1 of 2 branches missed.">                if (!found) {</span>
+<span class="nc" id="L653">                    asciiBuf.append('?');</span>
+<span class="nc" id="L654">                    break;</span>
+                }
+            }
+        }
+<span class="fc" id="L658">        result = asciiBuf.toString();</span>
+
+        // Repack if this was a Greek 'alpha' code. This will have been converted to a regular 'A' after one iteration.
+<span class="fc bfc" id="L661" title="All 2 branches covered.">        if (mapcode.startsWith(String.valueOf(GREEK_CAPITAL_ALPHA))) {</span>
+<span class="fc" id="L662">            final String unpacked = aeuUnpack(result);</span>
+<span class="pc bpc" id="L663" title="1 of 2 branches missed.">            if (unpacked.isEmpty()) {</span>
+<span class="nc" id="L664">                throw new AssertionError(&quot;decodeUTF16: cannot decode &quot; + mapcode);</span>
+            }
+<span class="fc" id="L666">            result = Encoder.aeuPack(unpacked, false);</span>
+        }
+<span class="fc" id="L668">        return result;</span>
+    }
+
+    static String encodeUTF16(final String mapcode, final int alphabetCode) throws IllegalArgumentException {
+        final String mapcodeToEncode;
+<span class="fc bfc" id="L673" title="All 2 branches covered.">        if (ASCII2LANGUAGE[alphabetCode][4] == MISSCODE) {</span>
+
+            // Alphabet does not contain 'E' (Greek).
+<span class="fc bfc" id="L676" title="All 2 branches covered.">            if (mapcode.matches(&quot;^.*[EU].*&quot;)) {</span>
+<span class="fc" id="L677">                final String unpacked = aeuUnpack(mapcode);</span>
+<span class="pc bpc" id="L678" title="1 of 2 branches missed.">                if (unpacked.isEmpty()) {</span>
+<span class="nc" id="L679">                    throw new IllegalArgumentException(&quot;encodeToAlphabetCode: cannot encode '&quot; + mapcode +</span>
+                            &quot;' to alphabet &quot; + alphabetCode);
+                }
+<span class="fc" id="L682">                mapcodeToEncode = Encoder.aeuPack(unpacked, true);</span>
+<span class="fc" id="L683">            } else {</span>
+<span class="fc" id="L684">                mapcodeToEncode = mapcode;</span>
+            }
+        } else {
+<span class="fc" id="L687">            mapcodeToEncode = mapcode;</span>
+        }
+<span class="fc" id="L689">        final StringBuilder sb = new StringBuilder();</span>
+<span class="fc bfc" id="L690" title="All 2 branches covered.">        for (char ch : mapcodeToEncode.toCharArray()) {</span>
+<span class="fc" id="L691">            ch = Character.toUpperCase(ch);</span>
+<span class="pc bpc" id="L692" title="1 of 2 branches missed.">            if (ch &gt; 'Z') {</span>
+                // Not in any valid range?
+<span class="nc" id="L694">                sb.append('?');</span>
+<span class="fc bfc" id="L695" title="All 2 branches covered.">            } else if (ch &lt; 'A') {</span>
+                // Valid but not a letter (e.g. a dot, a space...). Leave untranslated.
+<span class="fc" id="L697">                sb.append(ch);</span>
+            } else {
+<span class="fc" id="L699">                sb.append(ASCII2LANGUAGE[alphabetCode][(int) ch - (int) 'A']);</span>
+            }
+        }
+<span class="fc" id="L702">        return sb.toString();</span>
+    }
+
+    @Nonnull
+    private static Point decodeTriple(final String str) {
+<span class="fc" id="L707">        final int c1 = DECODE_CHARS[(int) str.charAt(0)];</span>
+<span class="fc" id="L708">        final int x = decodeBase31(str.substring(1));</span>
+<span class="fc bfc" id="L709" title="All 2 branches covered.">        if (c1 &lt; 24) {</span>
+<span class="fc" id="L710">            return Point.fromMicroDeg(((c1 / 6) * 34) + (x % 34), ((c1 % 6) * 28) + (x / 34));</span>
+        }
+<span class="fc" id="L712">        return Point.fromMicroDeg((x % 40) + 136, (x / 40) + (24 * (c1 - 24)));</span>
+    }
+
+    @Nonnull
+    private static Point decodeSixWide(final int v, final int width, final int height) {
+        int d;
+<span class="fc" id="L718">        int col = v / (height * 6);</span>
+<span class="fc" id="L719">        final int maxcol = (width - 4) / 6;</span>
+<span class="fc bfc" id="L720" title="All 2 branches covered.">        if (col &gt;= maxcol) {</span>
+<span class="fc" id="L721">            col = maxcol;</span>
+<span class="fc" id="L722">            d = width - (maxcol * 6);</span>
+        } else {
+<span class="fc" id="L724">            d = 6;</span>
+        }
+<span class="fc" id="L726">        final int w = v - (col * height * 6);</span>
+<span class="fc" id="L727">        return Point.fromMicroDeg(height - 1 - (w / d), (col * 6) + (w % d));</span>
+    }
+
+    // / lowest level encode/decode routines
+    // decode up to dot or EOS;
+    // returns negative in case of error
+    private static int decodeBase31(final String code) {
+<span class="fc" id="L734">        int value = 0;</span>
+<span class="fc bfc" id="L735" title="All 2 branches covered.">        for (final char c : code.toCharArray()) {</span>
+<span class="fc bfc" id="L736" title="All 2 branches covered.">            if (c == '.') {</span>
+<span class="fc" id="L737">                return value;</span>
+            }
+<span class="pc bpc" id="L739" title="1 of 2 branches missed.">            if (DECODE_CHARS[c] &lt; 0) {</span>
+<span class="nc" id="L740">                return -1;</span>
+            }
+<span class="fc" id="L742">            value = (value * 31) + DECODE_CHARS[c];</span>
+        }
+<span class="fc" id="L744">        return value;</span>
+    }
+
+    @Nonnull
+    private static MapcodeZone decodeExtension(final int y, final int x, final int dividerx0, final int dividery0,
+                                               final String extrapostfix, final int lon_offset4, final int extremeLatMicroDeg, final int maxLonMicroDeg) {
+<span class="fc" id="L750">        MapcodeZone mapcodeZone = new MapcodeZone();</span>
+<span class="fc" id="L751">        double dividerx4 = (double) dividerx0;</span>
+<span class="fc" id="L752">        double dividery = (double) dividery0;</span>
+<span class="fc" id="L753">        double processor = 1;</span>
+<span class="fc" id="L754">        int lon32 = 0;</span>
+<span class="fc" id="L755">        int lat32 = 0;</span>
+<span class="fc" id="L756">        boolean odd = false;</span>
+<span class="fc" id="L757">        int idx = 0;</span>
+        // decode up to 8 characters
+<span class="pc bpc" id="L759" title="1 of 2 branches missed.">        final int len = (extrapostfix.length() &gt; 8) ? 8 : extrapostfix.length();</span>
+<span class="fc bfc" id="L760" title="All 2 branches covered.">        while (idx &lt; len) {</span>
+<span class="fc" id="L761">            int c1 = (int) extrapostfix.charAt(idx);</span>
+<span class="fc" id="L762">            idx++;</span>
+<span class="fc" id="L763">            c1 = DECODE_CHARS[c1];</span>
+<span class="pc bpc" id="L764" title="2 of 4 branches missed.">            if ((c1 &lt; 0) || (c1 == 30)) {</span>
+<span class="nc" id="L765">                LOG.error(&quot;decodeGrid; Failed, decodeExtension({}): illegal c1 {}&quot;, extrapostfix, c1);</span>
+<span class="nc" id="L766">                return MapcodeZone.empty();</span>
+            }
+<span class="fc" id="L768">            final int y1 = c1 / 5;</span>
+<span class="fc" id="L769">            final int x1 = c1 % 5;</span>
+            final int y2;
+            final int x2;
+<span class="fc bfc" id="L772" title="All 2 branches covered.">            if (idx &lt; len) {</span>
+<span class="fc" id="L773">                int c2 = (int) extrapostfix.charAt(idx);</span>
+<span class="fc" id="L774">                idx++;</span>
+<span class="fc" id="L775">                c2 = DECODE_CHARS[c2];</span>
+<span class="pc bpc" id="L776" title="2 of 4 branches missed.">                if ((c2 &lt; 0) || (c2 == 30)) {</span>
+<span class="nc" id="L777">                    LOG.error(&quot;decodeGrid: Failed, decodeExtension({}): illegal c2 {}&quot;, extrapostfix, c2);</span>
+<span class="nc" id="L778">                    return MapcodeZone.empty();</span>
+                }
+<span class="fc" id="L780">                y2 = c2 / 6;</span>
+<span class="fc" id="L781">                x2 = c2 % 6;</span>
+<span class="fc" id="L782">            } else {</span>
+<span class="fc" id="L783">                odd = true;</span>
+<span class="fc" id="L784">                y2 = 0;</span>
+<span class="fc" id="L785">                x2 = 0;</span>
+            }
+
+<span class="fc" id="L788">            processor *= 30;</span>
+<span class="fc" id="L789">            lon32 = (lon32 * 30) + (x1 * 6) + x2;</span>
+<span class="fc" id="L790">            lat32 = (lat32 * 30) + (y1 * 5) + y2;</span>
+<span class="fc" id="L791">        }</span>
+
+<span class="fc bfc" id="L793" title="All 2 branches covered.">        while (processor &lt; Point.MAX_PRECISION_FACTOR) {</span>
+<span class="fc" id="L794">            dividerx4 *= 30;</span>
+<span class="fc" id="L795">            dividery *= 30;</span>
+<span class="fc" id="L796">            processor *= 30;</span>
+        }
+
+<span class="fc" id="L799">        double lon4 = (x * 4 * Point.MAX_PRECISION_FACTOR) + (lon32 * dividerx4) + (lon_offset4 * Point.MAX_PRECISION_FACTOR);</span>
+<span class="fc" id="L800">        double lat1 = (y * Point.MAX_PRECISION_FACTOR) + (lat32 * dividery);</span>
+
+        // determine the range of coordinates that are encode to this mapcode
+<span class="fc bfc" id="L803" title="All 2 branches covered.">        if (odd) { // odd</span>
+<span class="fc" id="L804">            mapcodeZone.setFromFractions(lat1, lon4, 5 * dividery, 6 * dividerx4);</span>
+        } else { // not odd
+<span class="fc" id="L806">            mapcodeZone.setFromFractions(lat1, lon4, dividery, dividerx4);</span>
+        } // not odd
+
+        // FORCE_RECODE - restrict the coordinate range to the extremes that were provided
+<span class="fc bfc" id="L810" title="All 2 branches covered.">        if (mapcodeZone.getLonFractionMax() &gt; (maxLonMicroDeg * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR)) {</span>
+<span class="fc" id="L811">            mapcodeZone.setLonFractionMax(maxLonMicroDeg * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);</span>
+        }
+<span class="fc bfc" id="L813" title="All 2 branches covered.">        if (dividery &gt;= 0) {</span>
+<span class="fc bfc" id="L814" title="All 2 branches covered.">            if (mapcodeZone.getLatFractionMax() &gt; (extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR)) {</span>
+<span class="fc" id="L815">                mapcodeZone.setLatFractionMax(extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR);</span>
+            }
+        } else {
+<span class="fc bfc" id="L818" title="All 2 branches covered.">            if (mapcodeZone.getLatFractionMin() &lt; (extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR)) {</span>
+<span class="fc" id="L819">                mapcodeZone.setLatFractionMin(extremeLatMicroDeg * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR);</span>
+            }
+        }
+<span class="fc" id="L822">        return mapcodeZone;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>
