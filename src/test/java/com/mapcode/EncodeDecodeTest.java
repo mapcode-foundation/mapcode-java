@@ -33,8 +33,6 @@ import static org.junit.Assert.assertTrue;
 @SuppressWarnings({"JUnitTestMethodWithNoAssertions", "OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
 public class EncodeDecodeTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncodeDecodeTest.class);
-    private static final Gson GSON =
-            new GsonBuilder().serializeSpecialFloatingPointValues().create();
 
     private static final int NUMBER_OF_POINTS = 5000;
     private static final int LOG_LINE_EVERY = 500;
