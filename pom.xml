@@ -13,7 +13,7 @@
     <name>Mapcode Java Library</name>
     <description>
         This library offers Java support for mapcodes.
-        For more info: http://www.mapcode.com
+        For more info: http://mapcode.com
     </description>
 
     <organization>
@@ -25,7 +25,7 @@
         <developer>
             <id>pieter</id>
             <name>Pieter Geelen</name>
-            <organization>Mapcode</organization>
+            <organization>Mapcode Foundation</organization>
             <roles>
                 <role>Founder</role>
             </roles>
@@ -34,18 +34,17 @@
         <developer>
             <id>rijn</id>
             <name>Rijn Buve</name>
-            <organization>Mapcode</organization>
+            <organization>Mapcode Foundation</organization>
             <roles>
-                <role>Developer</role>
+                <role>Managing Director, development</role>
             </roles>
         </developer>
 
         <developer>
             <id>matthew</id>
             <name>Matthew Lowden</name>
-            <organization>Mapcode</organization>
             <roles>
-                <role>Original Port</role>
+                <role>Original Java port</role>
             </roles>
         </developer>
     </developers>
@@ -101,6 +100,19 @@
 
     <build>
         <plugins>
+
+            <!-- Java compiler. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compiler-plugin.version}</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Code coverage using JaCoCo. -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
@@ -124,6 +136,7 @@
                 </executions>
             </plugin>
 
+            <!-- Code coverage collection using Coveralls.io. -->
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
@@ -133,6 +146,7 @@
                 </configuration>
             </plugin>
 
+            <!-- Unit tests using SureFire. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -141,30 +155,18 @@
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
                     <!--suppress MavenModelInspection -->
-                    <argLine>${argLine} -Xmx1024m</argLine>
+                    <argLine>${argLine} -Xmx1024m -ea</argLine>
                 </configuration>
             </plugin>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>${maven-source-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
+            <!-- Project reports. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
                 <version>${maven-project-info-reports-plugin.version}</version>
             </plugin>
 
+            <!-- JavaDoc generation. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
@@ -179,6 +181,22 @@
                 </executions>
             </plugin>
 
+            <!-- Attach source in JAR. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven-source-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Staging for Maven Central. -->
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -191,6 +209,7 @@
                 </configuration>
             </plugin>
 
+            <!-- GPG signatures, required for Maven Central. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
@@ -205,43 +224,64 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin.version}</version>
-                <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
 
     <reporting>
         <plugins>
+
+            <!-- JaCoCo coverage reports. -->
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco-maven-plugin.version}</version>
             </plugin>
 
+            <!-- Project info reports. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
+                <version>${maven-project-info-reports-plugin.version}</version>
                 <configuration>
                     <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
                 </configuration>
             </plugin>
 
+            <!-- JavaDoc reports. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
+                <version>${maven-javadoc-plugin.version}</version>
             </plugin>
         </plugins>
     </reporting>
 
     <dependencies>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>${jsr305.version}</version>
+            <type>jar</type>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+
+            <!-- GSON is only used in unit test. Not part of production code. -->
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
@@ -258,29 +298,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>jsr305</artifactId>
-            <version>${jsr305.version}</version>
-            <type>jar</type>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>${gson.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

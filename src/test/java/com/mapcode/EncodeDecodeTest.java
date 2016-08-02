@@ -16,15 +16,15 @@
 
 package com.mapcode;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -58,8 +58,9 @@ public class EncodeDecodeTest {
         final AtomicInteger errors = new AtomicInteger(0);
         final AtomicInteger tasks = new AtomicInteger(0);
 
-        final int threads = Math.min(Runtime.getRuntime().availableProcessors() * 2, 8);
-        LOG.info("encodeDecodeTest: Starting {} threads...", threads);
+        final int cores = Runtime.getRuntime().availableProcessors();
+        final int threads = Math.min(cores * 2, 16);
+        LOG.info("encodeDecodeTest: Starting {} threads on {} (hyperthreaded) cores...", threads, cores);
         final ExecutorService executor = Executors.newFixedThreadPool(threads);
 
         final Random randomGenerator = new Random(seed);
@@ -88,79 +89,76 @@ public class EncodeDecodeTest {
                         LOG.info("encodeDecodeTest: #{}/{}", count, NUMBER_OF_POINTS);
                     }
 
-                    {
-                        // Walk through the list in reverse order to get International first.
-                        for (final Territory territory : Territory.values()) {
-                            final List<Mapcode> resultsLimited = MapcodeCodec.encode(latDeg, lonDeg, territory);
-                            for (final Mapcode mapcode : resultsLimited) {
+                    // Walk through the list in reverse order to get International first.
+                    for (final Territory territory : Territory.values()) {
+                        final List<Mapcode> resultsLimited = MapcodeCodec.encode(latDeg, lonDeg, territory);
+                        for (final Mapcode mapcode : resultsLimited) {
 
-                                // Check if the territory matches.
-                                assertEquals(territory, mapcode.getTerritory());
+                            // Check if the territory matches.
+                            assertEquals(territory, mapcode.getTerritory());
 
-                                // Check max distance at every nrDigits, and verify encode(decode(m))=m
-                                for (int nrDigits = 0; nrDigits <= 8; nrDigits++) {
-                                    final String codePrecision = mapcode.getCode(nrDigits);
-                                    final Point decodeLocation;
-                                    try {
-                                        decodeLocation = MapcodeCodec.decode(codePrecision, territory);
-                                    } catch (final UnknownMapcodeException e) {
-                                        LOG.error("FAILED {} Decode({} {}) generated from ({}, {}) in {}", count, territory, codePrecision, latDeg, lonDeg );
-                                        LOG.error("encodeDecodeTest: Unknown mapcode exception", e);
-                                        errors.getAndIncrement();
-                                        continue;
-                                    }
+                            // Check max distance at every nrDigits, and verify encode(decode(m))=m
+                            for (int nrDigits = 0; nrDigits <= 8; nrDigits++) {
+                                final String codePrecision = mapcode.getCode(nrDigits);
+                                final Point decodeLocation;
+                                try {
+                                    decodeLocation = MapcodeCodec.decode(codePrecision, territory);
+                                } catch (final UnknownMapcodeException e) {
+                                    LOG.error("FAILED {} Decode({} {}) generated from ({}, {}) in {}", count, territory, codePrecision, latDeg, lonDeg);
+                                    LOG.error("encodeDecodeTest: Unknown mapcode exception", e);
+                                    errors.getAndIncrement();
+                                    continue;
+                                }
 
-                                    final double distance = Point.distanceInMeters(encode, decodeLocation);
-                                    if (distance >= Mapcode.getSafeMaxOffsetInMeters(nrDigits)) {
-                                        LOG.error("encodeDecodeTest: " + mapcode + " digits = " + nrDigits + " distance = " + distance + " >= " + Mapcode.getSafeMaxOffsetInMeters(nrDigits));
-                                        errors.getAndIncrement();
-                                    }
-                                    else {
-                                        // check that decode can be encoded back to original
-                                        final List<Mapcode> recodedMapcodes = MapcodeCodec.encode(decodeLocation, territory);
-                                        {
-                                            boolean found = false;
-                                            for (final Mapcode candidate : recodedMapcodes) {
-                                                if (codePrecision.equals(candidate.getCode(nrDigits))) {
-                                                    found = true;
-                                                    break;
+                                final double distance = Point.distanceInMeters(encode, decodeLocation);
+                                if (distance >= Mapcode.getSafeMaxOffsetInMeters(nrDigits)) {
+                                    LOG.error("encodeDecodeTest: " + mapcode + " digits = " + nrDigits + " distance = " + distance + " >= " + Mapcode.getSafeMaxOffsetInMeters(nrDigits));
+                                    errors.getAndIncrement();
+                                } else {
+                                    // check that decode can be encoded back to original
+                                    final List<Mapcode> recodedMapcodes = MapcodeCodec.encode(decodeLocation, territory);
+                                    {
+                                        boolean found = false;
+                                        for (final Mapcode candidate : recodedMapcodes) {
+                                            if (codePrecision.equals(candidate.getCode(nrDigits))) {
+                                                found = true;
+                                                break;
+                                            }
+                                        }
+                                        if (!found) {
+                                            // perhaps it was inherited from the parent?
+                                            final Territory parentTerritory = territory.getParentTerritory();
+                                            if (parentTerritory != null) {
+                                                final List<Mapcode> recodedMapcodesFromParent = MapcodeCodec.encode(decodeLocation, parentTerritory);
+                                                for (final Mapcode candidate : recodedMapcodesFromParent) {
+                                                    if (codePrecision.equals(candidate.getCode(nrDigits))) {
+                                                        found = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
                                             if (!found) {
-                                                // perhaps it was inherited from the parent?
-                                                final Territory parentTerritory = territory.getParentTerritory();
-                                                if (parentTerritory != null) {
-                                                    final List<Mapcode> recodedMapcodesFromParent = MapcodeCodec.encode(decodeLocation,parentTerritory);
-                                                    for (final Mapcode candidate : recodedMapcodesFromParent) {
-                                                        if (codePrecision.equals(candidate.getCode(nrDigits))) {
-                                                            found = true;
-                                                            break;
-                                                        }
-                                                    }
-                                                }
-                                                if (!found) {
-                                                    if (!MapcodeCodec.isNearMultipleBorders(decodeLocation, territory)) { // but should be found!
-                                                        LOG.error("Re-encode{} of {} failed for {} {} from ({},{})", nrDigits, decodeLocation, territory, codePrecision, latDeg, lonDeg);
-                                                        errors.getAndIncrement();
-                                                        for (final Mapcode candidate : recodedMapcodes) {
-                                                            LOG.info(" * candidate: {}", candidate.getCode(nrDigits));
-                                                        }
+                                                if (!MapcodeCodec.isNearMultipleBorders(decodeLocation, territory)) { // but should be found!
+                                                    LOG.error("Re-encode{} of {} failed for {} {} from ({},{})", nrDigits, decodeLocation, territory, codePrecision, latDeg, lonDeg);
+                                                    errors.getAndIncrement();
+                                                    for (final Mapcode candidate : recodedMapcodes) {
+                                                        LOG.info(" * candidate: {}", candidate.getCode(nrDigits));
                                                     }
                                                 }
                                             }
                                         }
                                     }
                                 }
+                            }
 
-                                // Check conversion from/to alphabets.
-                                for (final Alphabet alphabet : Alphabet.values()) {
-                                    final String mapcodeAlphabet = mapcode.getCode(alphabet);
-                                    final String mapcodeAscii = Mapcode.convertStringToPlainAscii(mapcodeAlphabet);
-                                    if (!mapcode.getCode(0).equals(mapcodeAscii)) {
-                                        LOG.error("encodeDecodeTest: " + mapcode + " alphabet=" + alphabet + ", original=" + mapcode.getCode(0) +
-                                                ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii);
-                                        errors.incrementAndGet();
-                                    }
+                            // Check conversion from/to alphabets.
+                            for (final Alphabet alphabet : Alphabet.values()) {
+                                final String mapcodeAlphabet = mapcode.getCode(alphabet);
+                                final String mapcodeAscii = Mapcode.convertStringToPlainAscii(mapcodeAlphabet);
+                                if (!mapcode.getCode(0).equals(mapcodeAscii)) {
+                                    LOG.error("encodeDecodeTest: " + mapcode + " alphabet=" + alphabet + ", original=" + mapcode.getCode(0) +
+                                            ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii);
+                                    errors.incrementAndGet();
                                 }
                             }
                         }

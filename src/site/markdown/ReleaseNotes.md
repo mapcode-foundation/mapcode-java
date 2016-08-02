@@ -2,6 +2,12 @@
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.2.5
+
+* Updated documentation.
+
+* Cleaned up POM, sorted dependencies.
+
 ### 2.2.4
 
 * Added Travis CI and Coveralls badges to `README.md`. 

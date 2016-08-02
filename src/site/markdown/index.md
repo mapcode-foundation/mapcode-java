@@ -1,7 +1,8 @@
 # Mapcode Library for Java
 
-Welcome to the Java library to handle mapcodes. The original C library was created by Pieter Geelen. Work
-on the Java version of the Mapcode library was done by Rijn Buve, initial port by Matthew Lowden.
+Welcome to the Java library to handle mapcodes. The original C library was created by Pieter Geelen. 
+The initial port to Java and considerable speed-ups were done by Matthew Lowden. 
+Rijn Buve has further developed and maintained the Java version of the Mapcode library since. 
 
 ## Release Notes
 
@@ -9,9 +10,11 @@ You can find the release notes for this library at: **[Release Notes](./ReleaseN
 
 ## Code Style Settings for IntelliJ IDEA
 
-The Java code uses the default IntelliJ IDEA code style settings for Java.
+The Java code uses the *default* [JetBrains IntelliJ IDEA](https://www.jetbrains.com/idea) 
+code style settings for Java, with one exception:
+code blocks are always surround by `{...}` and on separate lines.
 
-How To Build The Mapcode Library JAR File
+### How To Build The Mapcode Library JAR File
 
 The sources for the Mapcode Library for Java contain everything to build the Mapcode JAR file as well
 as a significant number of unit tests to verify the correctness of the implementation against the
@@ -22,15 +25,16 @@ with JDK 1.6, JDK 1.7 and JDK 1.8.
 
 To build the library:
 
-    cd **MAPCODE-HOME**
+    cd <MAPCODE-HOME>
     mvn clean install
 
-This produces a JAR file in your local Maven repository at `~/.m2/repository/com/mapcode/mapcode/x.y/`
+This produces a JAR file in your local Maven repository at `~/.m2/repository/com/mapcode/mapcode/<version>/`
 You can include this JAR in your project, or store it in your local Nexus repository, for example.
 
-If you creating a Maven project, you can see how to include the JAR in your project in the menu
+If you create a Maven project, you can see how to include the JAR in your project in the menu
 item `Dependency Information` in the menu on this page.
 
+The latest official version of the libray on Maven Central can be found [**here**](http://search.maven.org/#search%7Cga%7C1%7Cmapcode).
 
 ## How To Use This Library In Your Application
 
@@ -62,9 +66,9 @@ original input.
 
 Example:
 
-    final double lat = 52.376514;
-    final double lon = 4.908542;
-    final List**Mapcode** results = MapcodeCodec.encode(lat, lon);
+    double lat = 52.376514;
+    double lon = 4.908542;
+    List**Mapcode** results = MapcodeCodec.encode(lat, lon); 
     // Returns a non-empty list of results.
 
 This produces a non-empty list of resulting mapcodes. The shortest (potentially local) mapcodes is always
@@ -76,8 +80,8 @@ longitude) pair, where encoding is restricted to a specific territory.
     
 Example:
 
-    final List**Mapcode** results = MapcodeCodec.encode(lat, lon, Territory.NLD);
-    // Returns an empty list of results if the location is not within the territory.
+    List**Mapcode** results = MapcodeCodec.encode(lat, lon, Territory.NLD);
+    // Returns an empty list of results if the location is not within territory NLD.
 
 This resticts encoding to a specific territory and produces a potentially empty list of results.
 Again, if encoding succeeded, the first mapcode is the shortest one and the last mapcode in the list is the
@@ -86,26 +90,27 @@ globally unique international mapcode.
 Both `encode()` methods are also offered as a `encodeToShortest()` method, which essentially
 returns only the first result of the previous methods (if there are any results).
 
-    final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon);
-    // Always returns a mapcode.
+    Mapcode result = MapcodeCodec.encodeToShortest(lat, lon);
+    // Always returns a mapcode (or valid lat and lon values).
 
     try {
-        final Mapcode result = MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
+        Mapcode result = MapcodeCodec.encodeToShortest(lat, lon, Territory.NLD);
+        // This may fail.
     }
-    catch (final UnknownMapcodeException e) {
+    catch (UnknownMapcodeException e) {
         // If the location is not within the territory, this exception is thrown.
     }
 
 **`Point decode(String mapcode)`** decodes a mapcode to a `Point` which contains a location. Example:
 
-    final Point p = MapcodeCodec.decode("NLD 49.4V");
+    Point p = MapcodeCodec.decode("NLD 49.4V");
 
 **`Point decode(String mapcode, Territory territory)`** decodes a mapcode to a `Point` which contains a
 location, where the mapcode must be located within a specific territory.
 
 Examples of usage:
 
-    final Point p = MapcodeCodec.decode("49.4V", Territory.NLD);
+    Point p = MapcodeCodec.decode("49.4V", Territory.NLD);
 
 
 ## Class `Mapcode.java`
@@ -125,11 +130,15 @@ The default precision offered by `getCode()` is approximately 10m (maximum dista
 longitude the mapcode decodes to). This corresponds to an area of 20m x 20m (400m2). These mapcodes include
 no additional precision digits.
 
-The precision offered by `getMapcodePrecision1()` is approximately 2m.
+The precision offered by `getCode(1)` is approximately 2m.
 This corresponds to an area of 4m x 4m (16m2). These mapcodes include 1 additional precision digit.
 
-The precision offered by `getMapcodePrecision2()` is approximately 0.40m. This corresponds to an area
+The precision offered by `getCode(2)` is approximately 0.40m. This corresponds to an area
 of 0.80m x 0.80m (0.64m2). These mapcodes include 2 additional precision digits.
+
+This goes up to `getCode(8)`, which provides nanometer accuracy. (Please note one of the main advantages
+of mapcodes over WGS84 coordinates is their simplicity and short size, so try to use as little precision 
+as required for your application...) 
 
 **`Territory getTerritory()`** returns the territory information.
 
@@ -144,8 +153,9 @@ degrees.
 
 **`Point fromDeg(double latitude, double longitude)`** returns a `Point` for a given (latitude, longitude)
 pair. Note that latitudes are always between **-90** and **90**, and longitudes are 
-always between **-180** and **180** (non-inclusive). Values outside these range are correctly limited 
-(latitude) or wrapped (longitude) to these ranges.
+always between **-180** and **180** (non-inclusive) whenreturned. 
+However, values outside these range are correctly limited (latitude) or wrapped (longitude) to these ranges
+when supplied to the class.
 
 The methods **`double getLat()`** and **`getLon()`** return the latitude and longitude respectively, in degrees.
 
