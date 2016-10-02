@@ -912,7 +912,6 @@ public enum Territory {
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if the territory is not found.
      */
-    @SuppressWarnings("TailRecursion")
     @Nonnull
     private static Territory createFromString(
             @Nonnull final String alphaCode,

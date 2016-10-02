@@ -29,13 +29,13 @@ public class TerritoryTest {
     private static final Logger LOG = LoggerFactory.getLogger(TerritoryTest.class);
 
     @Test(expected = UnknownTerritoryException.class)
-    public void emptyTerritoryCodeTest() throws Exception {
+    public void emptyTerritoryCodeTest() {
         LOG.info("emptyCodeTest");
         Territory.fromString("");
     }
 
     @Test
-    public void checkFullName() throws Exception {
+    public void checkFullName() {
         LOG.info("checkFullName");
         assertEquals(Territory.AAA, Territory.fromString("International"));
         assertEquals(Territory.AAA, Territory.fromString("Worldwide"));
@@ -46,7 +46,7 @@ public class TerritoryTest {
     }
 
     @Test
-    public void checkDash() throws Exception {
+    public void checkDash() {
         LOG.info("checkDash");
         assertEquals(Territory.IN_MN, Territory.fromString("IND-MN"));
         assertEquals(Territory.IN_MN, Territory.fromString("IND_MN"));
@@ -59,7 +59,7 @@ public class TerritoryTest {
     }
 
     @Test
-    public void disambiguateMNTest1() throws Exception {
+    public void disambiguateMNTest1() {
         LOG.info("disambiguateMNTest2");
         final Territory territory0 = Territory.fromString("IND-MN");
         final Territory territory1 = Territory.fromString("IN-MN");
@@ -71,7 +71,7 @@ public class TerritoryTest {
     }
 
     @Test(expected = UnknownTerritoryException.class)
-    public void disambiguateMNTest2() throws Exception {
+    public void disambiguateMNTest2() {
         LOG.info("disambiguateMNTest2");
         Territory.fromString("MN", Territory.RUS);
     }
@@ -127,7 +127,7 @@ public class TerritoryTest {
     }
 
     @Test
-    public void checkAlphabet() throws Exception {
+    public void checkAlphabet() {
         LOG.info("checkAlphabet");
         assertEquals(Territory.NLD, Territory.fromString("NLD"));
         assertEquals(Territory.NLD, Territory.fromString("\u039d\u039b\u0394"));

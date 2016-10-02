@@ -170,11 +170,9 @@ class DataModel {
                         i += 4;
                     }
                 } finally {
-                    //noinspection ThrowFromFinallyBlock
                     outputStream.close();
                 }
             } finally {
-                //noinspection ThrowFromFinallyBlock
                 inputStream.close();
             }
         } catch (final IOException e) {

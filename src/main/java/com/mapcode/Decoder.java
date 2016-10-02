@@ -925,6 +925,7 @@ class Decoder {
         return prefix + Encoder.aeuPack(newstr, false) + postfix;
     }
 
+    @SuppressWarnings("NumericCastThatLosesPrecision")
     private static String convertToAbjad(final String mapcode) {
         String str;
         final String rest;
