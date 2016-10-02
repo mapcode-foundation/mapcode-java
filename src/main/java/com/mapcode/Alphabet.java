@@ -45,7 +45,8 @@ public enum Alphabet {
     ARMENIAN(10),
     BENGALI(11),
     GURMUKHI(12),
-    TIBETAN(13);
+    TIBETAN(13),
+    ARABIC(14);
 
     /**
      * The numeric code is synonym for the alphanumeric code. Used in the decoder.
