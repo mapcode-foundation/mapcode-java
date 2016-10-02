@@ -25,11 +25,8 @@ import javax.annotation.Nonnull;
 public final class UnknownPrecisionFormatException extends IllegalArgumentException {
     private static final long serialVersionUID = 1L;
 
-    private final Integer precision;
-
     public UnknownPrecisionFormatException(@Nonnull final String message) {
         super(message);
         assert message != null;
-        this.precision = null;
     }
 }

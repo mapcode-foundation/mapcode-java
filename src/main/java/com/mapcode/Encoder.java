@@ -57,7 +57,6 @@ class Encoder {
     private final static char[] ENCODE_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',
             'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z', 'A', 'E', 'U'};
 
-    @SuppressWarnings("ConstantConditions")
     @Nonnull
     private static List<Mapcode> encode(final double argLatDeg, final double argLonDeg,
                                         @Nullable final Territory territory, final boolean limitToOneResult,

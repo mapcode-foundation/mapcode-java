@@ -251,9 +251,9 @@ public class PointTest {
             assertEquals(Point.fromDeg(89.99, (i * 360) + 0.0), Point.fromDeg(89.99, 0.0).wrap());
             assertEquals(Point.fromDeg(90.01, (i * 360) + 0.0), Point.fromDeg(90.0, 0.0).wrap());
 
-            assertEquals(Point.fromDeg(0.0, (i * 360) + -180.0), Point.fromDeg(0.0, -180.0).wrap());
-            assertEquals(Point.fromDeg(0.0, (i * 360) + -179.99), Point.fromDeg(0.0, -179.99).wrap());
-            assertEquals(Point.fromDeg(0.0, (i * 360) + -180.01), Point.fromDeg(0.0, 179.99).wrap());
+            assertEquals(Point.fromDeg(0.0, (i * 360) - 180.0), Point.fromDeg(0.0, -180.0).wrap());
+            assertEquals(Point.fromDeg(0.0, (i * 360) - 179.99), Point.fromDeg(0.0, -179.99).wrap());
+            assertEquals(Point.fromDeg(0.0, (i * 360) - 180.01), Point.fromDeg(0.0, 179.99).wrap());
 
             assertEquals(Point.fromDeg(0.0, (i * 360) + 180.0), Point.fromDeg(0.0, -180.0).wrap());
             assertEquals(Point.fromDeg(0.0, (i * 360) + 179.99), Point.fromDeg(0.0, 179.99).wrap());

@@ -113,7 +113,7 @@ public class MapcodeTest {
         assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-12345Z"));
         assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-123456Z"));
         assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-1234567Z"));
-        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-123456789")); // more than 8 ePtension characters!
+        assertFalse(Mapcode.isValidMapcodeFormat("PP.PP-123456789")); // more than 8 extension characters!
         assertFalse(Mapcode.isValidMapcodeFormat("P.PPP"));
         assertFalse(Mapcode.isValidMapcodeFormat("PPP.P"));
         assertFalse(Mapcode.isValidMapcodeFormat("P.PPP-1"));
@@ -137,8 +137,8 @@ public class MapcodeTest {
         assertEquals(8, Mapcode.getPrecisionFormat("PP.QQ-12345678"));
 
         assertEquals(0, Mapcode.getPrecisionFormat("\u0e9a\u0e97\u0e84 \u0eab\u0ea7\u0e84.\u0ea73\u0eaa"));
-        assertEquals(1, Mapcode.getPrecisionFormat("\u0f40\u0f64\u0f4c \u0f535\u0f41\u0f42.5\u0f629-\u0f40"));
-        assertEquals(2, Mapcode.getPrecisionFormat("\u039d\u039b\u0394 \u03a7\u03a6\u0394.\u03a63\u03a9-\u039e7"));
+        assertEquals(1, Mapcode.getPrecisionFormat("\u0f40\u0f64\u0f55 \u0f535\u0f415.\u0f42\u0f629-\u0f40"));
+        assertEquals(2, Mapcode.getPrecisionFormat("\u039d\u039b\u0394 \u03a7\u03a68.\u03a63\u03a9-\u039e7"));
     }
 
     @Test(expected = UnknownPrecisionFormatException.class)

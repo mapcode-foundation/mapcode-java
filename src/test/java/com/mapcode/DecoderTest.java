@@ -279,7 +279,6 @@ public class DecoderTest {
         MapcodeCodec.decode(null, Territory.NLD);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Test(expected = UnknownMapcodeException.class)
     public void illegalArgument2() throws Exception {
         LOG.info("illegalArgument2");

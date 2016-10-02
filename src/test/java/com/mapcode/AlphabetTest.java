@@ -28,25 +28,80 @@ import static org.junit.Assert.assertEquals;
 public class AlphabetTest {
     private static final Logger LOG = LoggerFactory.getLogger(AlphabetTest.class);
 
+    private static final String[] CODE_TEST_PAIRS = {
+            "26.53UK", "\u039161.328\u03A5",
+            "FR.B016", "\u0395\u03A81.0716",
+            "000.EU", "\u0391\u0030\u0030.23",
+            "PQ.YZ", "\u03a1\u0398.57\u0396",
+            "PQ.XYZ", "\u03a1\u0398.56\u03a5\u0396",
+            "PQR.YZ", "\u03a1\u0398.89\u03a5\u0396",
+            "PQ.RXYZ", "\u03a1\u03983.\u03a70\u03a5\u0396",
+            "PQR.XYZ", "\u03a1\u03986.\u03a71\u03a5\u0396",
+            "PQRX.YZ", "\u03a1\u03989.\u03a72\u03a5\u0396",
+            "PQR.SXYZ", "\u03a1\u03984.\u03a3\u03a79\u03a5\u0396",
+            "PQRS.XYZ", "\u03a1\u03988.\u03a3\u03a79\u03a5\u0396",
+            "PQRS.WXYZ", "\u03a1\u03987\u03a3.8\u03a9\u03a72\u03a5",
+            "PQRST.WXYZ", "\u03a1\u03987\u03a3\u03a4.8\u03a9\u03a72\u03a5",
+            "P4.YZ", "\u03a14.\u03a5\u0396",
+            "PQ.4Z", "\u03a1\u0398.4\u0396",
+            "PQ.4YZ", "\u03a1\u0398.26\u03a5\u0396",
+            "PQ4.YZ", "\u03a1\u03984.\u03a5\u0396",
+            "PQ.46YZ", "\u03a1\u03981.61\u03a5\u0396",
+            "PQ4.6YZ", "\u03a1\u03984.6\u03a5\u0396",
+            "PQ46.YZ", "\u03a1\u039846.\u03a5\u0396",
+            "PQ4.S6YZ", "\u03a1\u03982.\u03a366\u03a5\u0396",
+            "PQ4S.6YZ", "\u03a1\u03984\u03a3.6\u03a5\u0396",
+            "PQ4S.W6YZ", "\u03a1\u03984\u03a3.\u03a96\u03a5\u0396",
+            "PQ4PQ.6YZ9", "\u03a1\u03984\u03a1\u0398.6\u03a5\u03969",
+            "PQ.YZ-BCD", "\u03a1\u0398.57\u0396-\u0392\u039e\u0394",
+            "PQ.XYZ-BCD", "\u03a1\u0398.56\u03a5\u0396-\u0392\u039e\u0394",
+            "PQR.YZ-BCD", "\u03a1\u0398.89\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ.RXYZ-BCD", "\u03a1\u03983.\u03a70\u03a5\u0396-\u0392\u039e\u0394",
+            "PQR.XYZ-BCD", "\u03a1\u03986.\u03a71\u03a5\u0396-\u0392\u039e\u0394",
+            "PQRX.YZ-BCD", "\u03a1\u03989.\u03a72\u03a5\u0396-\u0392\u039e\u0394",
+            "PQR.SXYZ-BCD", "\u03a1\u03984.\u03a3\u03a79\u03a5\u0396-\u0392\u039e\u0394",
+            "PQRS.XYZ-BCD", "\u03a1\u03988.\u03a3\u03a79\u03a5\u0396-\u0392\u039e\u0394",
+            "PQRS.WXYZ-BCD", "\u03a1\u03987\u03a3.8\u03a9\u03a72\u03a5-\u0392\u039e\u0394",
+            "PQRST.WXYZ-BCD", "\u03a1\u03987\u03a3\u03a4.8\u03a9\u03a72\u03a5-\u0392\u039e\u0394",
+            "P4.YZ-BCD", "\u03a14.\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ.4Z-BCD", "\u03a1\u0398.4\u0396-\u0392\u039e\u0394",
+            "PQ.4YZ-BCD", "\u03a1\u0398.26\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ4.YZ-BCD", "\u03a1\u03984.\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ.46YZ-BCD", "\u03a1\u03981.61\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ4.6YZ-BCD", "\u03a1\u03984.6\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ46.YZ-BCD", "\u03a1\u039846.\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ4.S6YZ-BCD", "\u03a1\u03982.\u03a366\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ4S.6YZ-BCD", "\u03a1\u03984\u03a3.6\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ4S.W6YZ-BCD", "\u03a1\u03984\u03a3.\u03a96\u03a5\u0396-\u0392\u039e\u0394",
+            "PQ4PQ.6YZ9-BCD", "\u03a1\u03984\u03a1\u0398.6\u03a5\u03969-\u0392\u039e\u0394",
+            ""
+    };
+
     @Test
     public void testConvertToAlphabet() throws Exception {
+
         LOG.info("testConvertToAlphabet");
-        convertCodeInAlphabet("\u0397\u03a0.\u03982", Territory.GRC, Alphabet.GREEK, 0);
-        convertCodeInAlphabet("\u0397\u03a0.\u03982-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
-        convertCodeInAlphabet("GRC \u0397\u03a0.\u03982-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
+        convertCodeInAlphabet("\u0397\u03a0.22", Territory.GRC, Alphabet.GREEK, 0);
+        convertCodeInAlphabet("\u0397\u03a0.22-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
+        convertCodeInAlphabet("GRC \u0397\u03a0.22-\u03a62", Territory.GRC, Alphabet.GREEK, 2);
 
-        String code = "26.53UK";
-        String codeGreek = Mapcode.convertStringToAlphabet(code, Alphabet.GREEK);
-        String codeAscii = Mapcode.convertStringToPlainAscii(codeGreek);
-        LOG.info("code = {}, codeGreek = {}, codeAscii = {}", code, codeGreek, codeAscii);
-        assertEquals(code, codeAscii);
-
-        code = "000.EU";
-        codeGreek = Mapcode.convertStringToAlphabet(code, Alphabet.GREEK);
-        codeAscii = Mapcode.convertStringToPlainAscii(codeGreek);
-        LOG.info("code = {}, codeGreek = {}, codeAscii = {}", code, codeGreek, codeAscii);
-        assertEquals(codeGreek, "\u0391\u0030\u0030.23");
-        assertEquals(code, codeAscii);
+        int i = 0;
+        while (true) {
+            final String code = CODE_TEST_PAIRS[i];
+            if (code.isEmpty()) {
+                break;
+            }
+            final String codeGreek = Mapcode.convertStringToAlphabet(code, Alphabet.GREEK);
+            LOG.debug("testConvertToAlphabet: code={}, codeGreek={}", code, codeGreek);
+            final String expect = CODE_TEST_PAIRS[i + 1];
+            if (!expect.isEmpty()) {
+                assertEquals(codeGreek, expect);
+            }
+            final String codeAscii = Mapcode.convertStringToPlainAscii(codeGreek);
+            LOG.debug("testConvertToAlphabet: code={}, codeGreek={}, codeAscii={}", code, codeGreek, codeAscii);
+            assertEquals(code, codeAscii);
+            i += 2;
+        }
     }
 
     @Test

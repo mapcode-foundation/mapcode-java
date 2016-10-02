@@ -225,14 +225,14 @@ public class Point {
 
     @SuppressWarnings("NonFinalFieldReferenceInEquals")
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
+    public boolean equals(final Object obj) {
+        if (this == obj) {
             return true;
         }
-        if (!(o instanceof Point)) {
+        if (!(obj instanceof Point)) {
             return false;
         }
-        final Point that = (Point) o;
+        final Point that = (Point) obj;
         return (this.latMicroDeg == that.latMicroDeg) &&
                 (this.lonMicroDeg == that.lonMicroDeg) &&
                 (this.latFractionOnlyDeg == that.latFractionOnlyDeg) &&

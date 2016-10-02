@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings({"JUnitTestMethodWithNoAssertions", "OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
+@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
 public class EncodeDecodeTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncodeDecodeTest.class);
 
@@ -51,7 +51,6 @@ public class EncodeDecodeTest {
         doEncodeDecode(seed);
     }
 
-    @SuppressWarnings("BusyWait")
     private static void doEncodeDecode(final long seed) throws InterruptedException {
 
         // Keep error count and create thread pool.

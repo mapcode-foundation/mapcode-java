@@ -230,7 +230,7 @@ class Decoder {
     private final static char[][] ASCII2LANGUAGE = {
             // Character:   A         B         C         D         E         F         G         H         I         J        K          L         M         N         O         P         Q         R         S         T         U         V         W         X         Y         Z         0         1         2         3         4         5         6         7         8         9
             /* Roman    */ {'\u0041', '\u0042', '\u0043', '\u0044', '\u0045', '\u0046', '\u0047', '\u0048', '\u0049', '\u004a', '\u004b', '\u004c', '\u004d', '\u004e', '\u004f', '\u0050', '\u0051', '\u0052', '\u0053', '\u0054', '\u0055', '\u0056', '\u0057', '\u0058', '\u0059', '\u005a', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Roman
-            /* Greek    */ {'\u0391', '\u0392', '\u039e', '\u0394', MISSCODE, '\u0395', '\u0393', '\u0397', '\u0399', '\u03a0', '\u039a', '\u039b', '\u039c', '\u039d', '\u039f', '\u03a1', '\u0398', '\u03a8', '\u03a3', '\u03a4', MISSCODE, '\u03a6', '\u03a9', '\u03a7', '\u03a5', '\u0396', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Greek
+            /* Greek    */ {'\u0391', '\u0392', '\u039e', '\u0394', '\u0388', '\u0395', '\u0393', '\u0397', '\u0399', '\u03a0', '\u039a', '\u039b', '\u039c', '\u039d', '\u039f', '\u03a1', '\u0398', '\u03a8', '\u03a3', '\u03a4', '\u0389', '\u03a6', '\u03a9', '\u03a7', '\u03a5', '\u0396', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Greek
             /* Cyrillic */ {'\u0410', '\u0412', '\u0421', '\u0414', '\u0415', '\u0416', '\u0413', '\u041d', '\u0418', '\u041f', '\u041a', '\u041b', '\u041c', '\u0417', '\u041e', '\u0420', '\u0424', '\u042f', '\u0426', '\u0422', '\u042d', '\u0427', '\u0428', '\u0425', '\u0423', '\u0411', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Cyrillic
             /* Hebrew   */ {'\u05d0', '\u05d1', '\u05d2', '\u05d3', '\u05e3', '\u05d4', '\u05d6', '\u05d7', '\u05d5', '\u05d8', '\u05d9', '\u05da', '\u05db', '\u05dc', '\u05e1', '\u05dd', '\u05de', '\u05e0', '\u05e2', '\u05e4', '\u05e5', '\u05e6', '\u05e7', '\u05e8', '\u05e9', '\u05ea', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Hebrew
             /* Hindi    */ {'\u0905', '\u0915', '\u0917', '\u0918', '\u090f', '\u091a', '\u091c', '\u091f', MISSCODE, '\u0920', '\u0923', '\u0924', '\u0926', '\u0927', MISSCODE, '\u0928', '\u092a', '\u092d', '\u092e', '\u0930', '\u092b', '\u0932', '\u0935', '\u0938', '\u0939', '\u0921', '\u0966', '\u0967', '\u0968', '\u0969', '\u096a', '\u096b', '\u096c', '\u096d', '\u096e', '\u096f'}, // Hindi
@@ -242,12 +242,13 @@ class Decoder {
             /* Armenian */ {'\u0556', '\u0532', '\u0533', '\u0534', '\u0535', '\u0538', '\u0539', '\u053a', '\u053b', '\u053d', '\u053f', '\u0540', '\u0541', '\u0543', '\u0555', '\u0547', '\u0548', '\u054a', '\u054d', '\u054e', '\u0545', '\u054f', '\u0550', '\u0551', '\u0552', '\u0553', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Armenian
             /* Bengali  */ {'\u0985', '\u098c', '\u0995', '\u0996', '\u098f', '\u0997', '\u0999', '\u099a', MISSCODE, '\u099d', '\u09a0', '\u09a1', '\u09a2', '\u09a3', MISSCODE, '\u09a4', '\u09a5', '\u09a6', '\u09a8', '\u09aa', '\u0993', '\u09ac', '\u09ad', '\u09af', '\u09b2', '\u09b9', '\u09e6', '\u09e7', '\u09e8', '\u09e9', '\u09ea', '\u09eb', '\u09ec', '\u09ed', '\u09ee', '\u09ef'}, // Bengali
             /* Gurmukhi */ {'\u0a05', '\u0a15', '\u0a17', '\u0a18', '\u0a0f', '\u0a1a', '\u0a1c', '\u0a1f', MISSCODE, '\u0a20', '\u0a23', '\u0a24', '\u0a26', '\u0a27', MISSCODE, '\u0a28', '\u0a2a', '\u0a2d', '\u0a2e', '\u0a30', '\u0a2b', '\u0a32', '\u0a35', '\u0a38', '\u0a39', '\u0a21', '\u0a66', '\u0a67', '\u0a68', '\u0a69', '\u0a6a', '\u0a6b', '\u0a6c', '\u0a6d', '\u0a6e', '\u0a6f'}, // Gurmukhi
-            /* Tibetan  */ {'\u0f58', '\u0f40', '\u0f41', '\u0f42', '\u0f64', '\u0f44', '\u0f45', '\u0f46', MISSCODE, '\u0f47', '\u0f4a', '\u0f4c', '\u0f4e', '\u0f4f', MISSCODE, '\u0f51', '\u0f53', '\u0f54', '\u0f56', '\u0f5e', '\u0f65', '\u0f5f', '\u0f61', '\u0f62', '\u0f63', '\u0f66', '\u0f20', '\u0f21', '\u0f22', '\u0f23', '\u0f24', '\u0f25', '\u0f26', '\u0f27', '\u0f28', '\u0f29'}, // Tibetan
+            /* Tibetan  */ {'\u0f58', '\u0f40', '\u0f41', '\u0f42', '\u0f64', '\u0f44', '\u0f45', '\u0f46', MISSCODE, '\u0f47', '\u0f49', '\u0f55', '\u0f50', '\u0f4f', MISSCODE, '\u0f51', '\u0f53', '\u0f54', '\u0f56', '\u0f5e', '\u0f60', '\u0f5f', '\u0f61', '\u0f62', '\u0f63', '\u0f66', '\u0f20', '\u0f21', '\u0f22', '\u0f23', '\u0f24', '\u0f25', '\u0f26', '\u0f27', '\u0f28', '\u0f29'}, // Tibetan
+            /* Arabic   */ {'\u0628', '\u062a', '\u062d', '\u062e', '\u0649', '\u062f', '\u0630', '\u0631', '\u0049', '\u0632', '\u0633', '\u0634', '\u0635', '\u0636', '\u004f', '\u0637', '\u0638', '\u0639', '\u063a', '\u0641', '\u0642', '\u0643', '\u0644', '\u0645', '\u0646', '\u0648', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Arabic
     };
 
     private final static Unicode2Ascii[] UNICODE2ASCII = {
             /* Roman    */ new Unicode2Ascii('\u0041', '\u005a', "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),                                                        // Roman
-            /* Greek    */ new Unicode2Ascii('\u0391', '\u03a9', "ABGDFZHQIKLMNCOJP?STYVXRW"),                                                         // Greek
+            /* Greek    */ new Unicode2Ascii('\u0388', '\u03a9', "EU???????ABGDFZHQIKLMNCOJP?STYVXRW"),                                                // Greek
             /* Cyrillic */ new Unicode2Ascii('\u0410', '\u042f', "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"),                                                  // Cyrillic
             /* Hebrew   */ new Unicode2Ascii('\u05d0', '\u05ea', "ABCDFIGHJKLMNPQ?ROSETUVWXYZ"),                                                       // Hebrew
             /* Hindi    */ new Unicode2Ascii('\u0905', '\u0939', "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Hindi
@@ -259,7 +260,8 @@ class Decoder {
             /* Armenian */ new Unicode2Ascii('\u0532', '\u0556', "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA"),                                             // Armenian
             /* Bengali  */ new Unicode2Ascii('\u0985', '\u09b9', "A??????B??E???U?CDF?GH??J??KLMNPQR?S?T?VW?X??Y??????Z"),                             // Bengali
             /* Gurmukhi */ new Unicode2Ascii('\u0a05', '\u0a39', "A?????????E?????B?CD?F?G??HJZ?KL?MNP?QU?RS?T?V??W??XY"),                             // Gurmukhi
-            /* Tibetan  */ new Unicode2Ascii('\u0f40', '\u0f66', "BCD?FGHJ??K?L?MN?P?QR?S?A?????TV?WXYEUZ"),                                           // Tibetan
+            /* Tibetan  */ new Unicode2Ascii('\u0f40', '\u0f66', "BCD?FGHJ?K?????NMP?QRLS?A?????TVUWXYE?Z"),                                           // Tibetan
+            /* Arabic   */ new Unicode2Ascii('\u0628', '\u0649', "A?B??CDFGHJKLMNPQRS??????TUVWXY?ZE"),                                                // Arabic
 
             /* Hindi    */ new Unicode2Ascii('\u0966', '\u096f', ""),
             /* Malai    */ new Unicode2Ascii('\u0d66', '\u0d6f', ""),
@@ -269,7 +271,7 @@ class Decoder {
             /* Tibetan  */ new Unicode2Ascii('\u0f20', '\u0f29', ""),
 
             // Lowercase variants:
-            /* Greek    */ new Unicode2Ascii('\u03B1', '\u03c9', "ABGDFZHQIKLMNCOJP?STYVXRW"),
+            /* Greek    */ new Unicode2Ascii('\u03ad', '\u03c9', "EU??ABGDFZHQIKLMNCOJP?STYVXRW"),
             /* Georgian */ new Unicode2Ascii('\u10d0', '\u10ef', "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),
             /* Armenian */ new Unicode2Ascii('\u0562', '\u0586', "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA")
     };
@@ -665,27 +667,37 @@ class Decoder {
             }
             result = Encoder.aeuPack(unpacked, false);
         }
-        return result;
+
+        if (isAbjadScript(mapcode)) {
+            return convertFromAbjad(result);
+        } else {
+            return result;
+        }
     }
 
-    static String encodeUTF16(final String mapcode, final int alphabetCode) throws IllegalArgumentException {
-        final String mapcodeToEncode;
-        if (ASCII2LANGUAGE[alphabetCode][4] == MISSCODE) {
+    static String encodeUTF16(final String mapcodeInput, final int alphabetCode) throws IllegalArgumentException {
 
-            // Alphabet does not contain 'E' (Greek).
-            if (mapcode.matches("^.*[EU].*")) {
-                final String unpacked = aeuUnpack(mapcode);
-                if (unpacked.isEmpty()) {
-                    throw new IllegalArgumentException("encodeToAlphabetCode: cannot encode '" + mapcode +
-                            "' to alphabet " + alphabetCode);
-                }
-                mapcodeToEncode = Encoder.aeuPack(unpacked, true);
-            } else {
-                mapcodeToEncode = mapcode;
+        final String mapcode;
+        if ((alphabetCode == Alphabet.GREEK.getNumber()) ||
+                (alphabetCode == Alphabet.HEBREW.getNumber()) ||
+                (alphabetCode == Alphabet.ARABIC.getNumber())) {
+            mapcode = convertToAbjad(mapcodeInput);
+        } else {
+            mapcode = mapcodeInput;
+        }
+
+        final String mapcodeToEncode;
+        if ((alphabetCode == Alphabet.GREEK.getNumber()) && ((mapcode.indexOf('E') != -1) || (mapcode.indexOf('U') != -1))) {
+            final String unpacked = aeuUnpack(mapcode);
+            if (unpacked.isEmpty()) {
+                throw new IllegalArgumentException("encodeToAlphabetCode: cannot encode '" + mapcode +
+                        "' to alphabet " + alphabetCode);
             }
+            mapcodeToEncode = Encoder.aeuPack(unpacked, true);
         } else {
             mapcodeToEncode = mapcode;
         }
+
         final StringBuilder sb = new StringBuilder();
         for (char ch : mapcodeToEncode.toCharArray()) {
             ch = Character.toUpperCase(ch);
@@ -820,5 +832,199 @@ class Decoder {
             }
         }
         return mapcodeZone;
+    }
+
+    private static boolean isAbjadScript(final String argStr) {
+        for (final char ch : argStr.toCharArray()) {
+            int c = (int) ch;
+            if ((c >= 1576) && (c <= 1609)) {
+                return true; // Arabic
+            }
+            if ((c >= 1488) && (c <= 1514)) {
+                return true; // Hebrew
+            }
+            if ((c >= 904) && (c <= 969)) {
+                return true; // Greek 0x388-0x3C9
+            }
+        }
+        return false;
+    }
+
+    private static String convertFromAbjad(final String mapcode) {
+        // split into prefix, s, postfix
+        int p = mapcode.lastIndexOf(' ');
+        if (p < 0) {
+            p = 0;
+        } else {
+            p++;
+        }
+        final String prefix = mapcode.substring(0, p);
+        String remainder = mapcode.substring(p);
+        final String postfix;
+        final int h = remainder.indexOf('-');
+        final String s;
+        if (h > 0) {
+            postfix = remainder.substring(h);
+            s = aeuUnpack(remainder.substring(0, h));
+        } else {
+            postfix = "";
+            s = aeuUnpack(remainder);
+        }
+
+        final int len = s.length();
+        final int dot = s.indexOf('.');
+        if ((dot < 2) || (dot > 5)) {
+            return mapcode;
+        }
+        final int form = (10 * dot) + (len - dot - 1);
+
+        String newstr = "";
+        if (form == 23) {
+            final int c = (DECODE_CHARS[(int) s.charAt(3)] * 8) + (DECODE_CHARS[(int) s.charAt(4)] - 18);
+            if ((c >= 0) && (c < 31)) {
+                newstr = s.substring(0, 2) + '.' + Data.ENCODE_CHARS[c] + s.charAt(5);
+            }
+        } else if (form == 24) {
+            final int c = (DECODE_CHARS[(int) s.charAt(3)] * 8) + (DECODE_CHARS[(int) s.charAt(4)] - 18);
+            if ((c >= 32) && (c < 63)) {
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c - 32] + '.' + s.charAt(5) + s.charAt(6);
+            } else if ((c >= 0) && (c < 31)) {
+                newstr = s.substring(0, 2) + '.' + Data.ENCODE_CHARS[c % 31] + s.charAt(5) + s.charAt(6);
+            }
+        } else if (form == 34) {
+            final int c = (DECODE_CHARS[(int) s.charAt(2)] * 10) + (DECODE_CHARS[(int) s.charAt(5)] - 7);
+            if ((c >= 0) && (c < 31)) {
+                newstr = s.substring(0, 2) + '.' + Data.ENCODE_CHARS[c] + s.charAt(4) + s.charAt(6) + s.charAt(7);
+            } else if ((c >= 31) && (c < 62)) {
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c - 31] + '.' + s.charAt(4) + s.charAt(6) + s.charAt(7);
+            } else if ((c >= 62) && (c < 93)) {
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c - 62] + s.charAt(4) + '.' + s.charAt(6) + s.charAt(7);
+            }
+        } else if (form == 35) {
+            final int c = ((DECODE_CHARS[(int) s.charAt(2)] * 8) + (DECODE_CHARS[(int) s.charAt(6)] - 18));
+            if ((c >= 32) && (c < 63)) {
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c - 32] + s.charAt(4) + '.' + s.charAt(5) + s.charAt(7) + s.charAt(8);
+            } else if ((c >= 0) && (c < 31)) {
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c] + '.' + s.charAt(4) + s.charAt(5) + s.charAt(7) + s.charAt(8);
+            }
+        } else if (form == 45) {
+            final int c = (DECODE_CHARS[(int) s.charAt(2)] * 100) + (DECODE_CHARS[(int) s.charAt(5)] * 10) + (DECODE_CHARS[(int) s.charAt(8)] - 39);
+            if ((c >= 0) && (c < 961)) {
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c / 31] + s.charAt(3) + '.' + s.charAt(6) + s.charAt(7) + s.charAt(9) + Data.ENCODE_CHARS[c % 31];
+            }
+        } else if (form == 55) {
+            final int c = (DECODE_CHARS[(int) s.charAt(2)] * 100) + (DECODE_CHARS[(int) s.charAt(6)] * 10) + (DECODE_CHARS[(int) s.charAt(9)] - 39);
+            if ((c >= 0) && (c < 961)) {
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c / 31] + s.charAt(3) + s.charAt(4) + '.' + s.charAt(7) + s.charAt(8) + s.charAt(10) + Data.ENCODE_CHARS[c % 31];
+            }
+        }
+
+        if (newstr.isEmpty()) {
+            return mapcode;
+        }
+        return prefix + Encoder.aeuPack(newstr, false) + postfix;
+    }
+
+    @SuppressWarnings("NumericCastThatLosesPrecision")
+    private static String convertToAbjad(final String mapcode) {
+        String str;
+        final String rest;
+        final int h = mapcode.indexOf('-');
+        if (h > 0) {
+            rest = mapcode.substring(h);
+            str = aeuUnpack(mapcode.substring(0, h));
+        } else {
+            rest = "";
+            str = aeuUnpack(mapcode);
+        }
+
+        final int len = str.length();
+        final int dot = str.indexOf('.');
+        if ((dot < 2) || (dot > 5)) {
+            return mapcode;
+        }
+        final int form = (10 * dot) + (len - dot - 1);
+
+        // see if >2 non-digits in a row
+        int inarow = 0;
+        for (final char ch : str.toCharArray()) {
+            if (ch != '.') {
+                inarow++;
+                if ((ch >= '0') && (ch <= '9')) {
+                    inarow = 0;
+                } else if (inarow > 2) {
+                    break;
+                }
+            }
+        }
+
+        if ((inarow < 3) && ((form == 22) || (form == 32) || (form == 33) || (form == 42) || (form == 43) || (form == 44) || (form == 54))) {
+            // no need to do anything
+            return mapcode;
+        }
+        // determine the code of the second non-digit character (before or after the dot)
+        int c = DECODE_CHARS[(int) str.charAt(2)];
+        if (c < 0) {
+            c = DECODE_CHARS[(int) str.charAt(3)];
+        }
+        if (c < 0) {
+            return mapcode; // bad character
+        }
+
+        // create 2 or 3 new digits
+        final char c1;
+        final char c2;
+        final char c3;
+        if (form >= 44) {
+            c = (c * 31) + DECODE_CHARS[(int) str.charAt(len - 1)] + 39;
+            if ((c < 39) || (c > 999)) {
+                return mapcode; // out of range (last character must be bad)
+            }
+            c1 = Data.ENCODE_CHARS[c / 100];
+            c2 = Data.ENCODE_CHARS[((c % 100) / 10)];
+            c3 = Data.ENCODE_CHARS[c % 10];
+        } else if (len == 7) {
+            if (form == 24) {
+                c += 7;
+            } else if (form == 33) {
+                c += 38;
+            } else if (form == 42) {
+                c += 69;
+            }
+            c1 = Data.ENCODE_CHARS[c / 10];
+            c2 = Data.ENCODE_CHARS[c % 10];
+            c3 = '?';
+        } else {
+            c1 = Data.ENCODE_CHARS[2 + (c / 8)];
+            c2 = Data.ENCODE_CHARS[2 + (c % 8)];
+            c3 = '?';
+        }
+
+        // re-order the characters
+        if (form == 22) {
+            str = str.substring(0, 2) + '.' + c1 + c2 + str.charAt(4);
+        } else if (form == 23) {
+            str = str.substring(0, 2) + '.' + c1 + c2 + str.charAt(4) + str.charAt(5);
+        } else if (form == 32) {
+            str = str.substring(0, 2) + '.' + (char) ((int) c1 + 4) + c2 + str.charAt(4) + str.charAt(5);
+        } else if (form == 24) {
+            str = str.substring(0, 2) + c1 + '.' + str.charAt(4) + c2 + str.charAt(5) + str.charAt(6);
+        } else if (form == 33) {
+            str = str.substring(0, 2) + c1 + '.' + str.charAt(4) + c2 + str.charAt(5) + str.charAt(6);
+        } else if (form == 42) {
+            str = str.substring(0, 2) + c1 + '.' + str.charAt(3) + c2 + str.charAt(5) + str.charAt(6);
+        } else if (form == 43) {
+            str = str.substring(0, 2) + (char) ((int) c1 + 4) + '.' + str.charAt(3) + str.charAt(5) + c2 + str.charAt(6) + str.charAt(7);
+        } else if (form == 34) {
+            str = str.substring(0, 2) + c1 + '.' + str.charAt(4) + str.charAt(5) + c2 + str.charAt(6) + str.charAt(7);
+        } else if (form == 44) {
+            str = str.substring(0, 2) + c1 + str.charAt(3) + '.' + c2 + str.charAt(5) + str.charAt(6) + c3 + str.charAt(7);
+        } else if (form == 54) {
+            str = str.substring(0, 2) + c1 + str.charAt(3) + str.charAt(4) + '.' + c2 + str.charAt(6) + str.charAt(7) + c3 + str.charAt(8);
+        } else {
+            // not a valid mapcode form
+            return mapcode;
+        }
+        return Encoder.aeuPack(str + rest, false);
     }
 }

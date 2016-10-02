@@ -52,7 +52,6 @@ public class ReferenceFileTest {
 
     private static final int LOG_LINE_EVERY = 10000;
 
-    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkRandomReferenceRecords() throws Exception {
         LOG.info("checkRandomReferenceRecords");
@@ -65,7 +64,6 @@ public class ReferenceFileTest {
         checkFile(8, RANDOM_REFERENCE_FILE_3, false);
     }
 
-    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkGridReferenceRecords() throws Exception {
         LOG.info("checkGridReferenceRecords");
@@ -78,7 +76,6 @@ public class ReferenceFileTest {
         checkFile(8, GRID_REFERENCE_FILE_3, false);
     }
 
-    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void checkBoundariesReferenceRecords() throws Exception {
         LOG.info("checkBoundariesReferenceRecords");
@@ -86,7 +83,6 @@ public class ReferenceFileTest {
         checkFile(8, BOUNDARIES_REFERENCE_FILE, true);
     }
 
-    @SuppressWarnings("BusyWait")
     private static void checkFile(
             final int precision,
             @Nonnull final String baseFileName,
@@ -254,6 +250,7 @@ public class ReferenceFileTest {
 
                                     // Keep distance. This is a multi-threaded get/set; requires synchronized.
                                     synchronized (deltaNm) {
+                                        //noinspection NumericCastThatLosesPrecision
                                         deltaNm[precision].set(Math.max(deltaNm[precision].get(),
                                                 (long) (distanceM * 1.0e6)));
                                     }
@@ -399,7 +396,6 @@ public class ReferenceFileTest {
         @SuppressWarnings("OverlyBroadThrowsClause")
         @Nonnull
         private String readNonEmptyLine() throws IOException {
-            //noinspection NonConstantStringShouldBeStringBuffer
             String line = null;
             do {
                 boolean tryNextChunk;

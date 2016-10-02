@@ -21,45 +21,40 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-
-import static org.junit.Assert.assertEquals;
-
-@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
 public class DataModelTest {
     private static final Logger LOG = LoggerFactory.getLogger(DataModelTest.class);
 
     public void testFileOK() {
         LOG.info("testFileOK");
         final DataModel dataModel = new DataModel("/com/mapcode/mminfo_ok.dat");
-        Assert.assertTrue(dataModel != null);
+        Assert.assertNotNull(dataModel);
     }
 
     @Test(expected = IncorrectDataModelException.class)
     public void testFileTooShort() {
         LOG.info("testFileTooShort");
         final DataModel dataModel = new DataModel("/com/mapcode/mminfo_too_short.dat");
-        Assert.assertTrue(false);
+        Assert.assertNull(dataModel);
     }
 
     @Test(expected = IncorrectDataModelException.class)
     public void testFileEndsEarly() {
         LOG.info("testFileEndsEarly");
         final DataModel dataModel = new DataModel("/com/mapcode/mminfo_ends_early.dat");
-        Assert.assertTrue(false);
+        Assert.assertNull(dataModel);
     }
 
     @Test(expected = IncorrectDataModelException.class)
     public void testFileNoHeader() {
         LOG.info("testFileNoHeader");
         final DataModel dataModel = new DataModel("/com/mapcode/mminfo_no_header.dat");
-        Assert.assertTrue(false);
+        Assert.assertNull(dataModel);
     }
 
     @Test(expected = IncorrectDataModelException.class)
     public void testFileWrongversion() {
         LOG.info("testFileWrongversion");
         final DataModel dataModel = new DataModel("/com/mapcode/mminfo_wrong_version.dat");
-        Assert.assertTrue(false);
+        Assert.assertNull(dataModel);
     }
 }

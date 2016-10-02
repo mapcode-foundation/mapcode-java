@@ -25,11 +25,8 @@ import javax.annotation.Nonnull;
 public final class UnknownAlphabetException extends IllegalArgumentException {
     private static final long serialVersionUID = 1L;
 
-    private final Integer code;
-
     public UnknownAlphabetException(@Nonnull final String message) {
         super(message);
         assert message != null;
-        this.code = null;
     }
 }
