@@ -98,7 +98,7 @@ import java.io.InputStream;
 
 <span class="fc" id="L99">    DataModel(@Nonnull final String fileName) throws IncorrectDataModelException {</span>
         // Read data only once in static initializer.
-<span class="fc" id="L101">        LOG.info(&quot;DataAccess: reading regions from file: {}&quot;, fileName);</span>
+<span class="fc" id="L101">        LOG.info(&quot;DataModel: reading regions from file: {}&quot;, fileName);</span>
 <span class="fc" id="L102">        final byte[] readBuffer = new byte[FILE_BUFFER_SIZE];</span>
 <span class="fc" id="L103">        int total = 0;</span>
         try {
@@ -119,7 +119,7 @@ import java.io.InputStream;
 <span class="fc" id="L119">                    final byte[] bytes = outputStream.toByteArray();</span>
 <span class="pc bpc" id="L120" title="2 of 4 branches missed.">                    assert total == bytes.length;</span>
 <span class="fc bfc" id="L121" title="All 2 branches covered.">                    if (total &lt; 12) {</span>
-<span class="fc" id="L122">                        LOG.error(&quot;DataAccess: expected more than {} bytes&quot;, total);</span>
+<span class="fc" id="L122">                        LOG.error(&quot;DataModel: expected more than {} bytes&quot;, total);</span>
 <span class="fc" id="L123">                        throw new IncorrectDataModelException(&quot;Data file corrupt: &quot; + fileName);</span>
                     }
 
@@ -140,7 +140,7 @@ import java.io.InputStream;
 
                     // Check if the number of territories matches the enumeration in Territory.
 <span class="pc bpc" id="L142" title="1 of 2 branches missed.">                    if (nrTerritories != Territory.values().length) {</span>
-<span class="nc" id="L143">                        LOG.error(&quot;DataAccess: expected {} territories, got {}&quot;, Territory.values().length, nrTerritories);</span>
+<span class="nc" id="L143">                        LOG.error(&quot;DataModel: expected {} territories, got {}&quot;, Territory.values().length, nrTerritories);</span>
 <span class="nc" id="L144">                        throw new IncorrectDataModelException(&quot;Data file corrupt: &quot; + fileName);</span>
                     }
 
@@ -150,10 +150,10 @@ import java.io.InputStream;
                             (nrTerritoryRecords * (DATA_FIELDS_PER_REC * BYTES_PER_LONG));
 
 <span class="fc bfc" id="L152" title="All 2 branches covered.">                    if (expectedSize != total) {</span>
-<span class="fc" id="L153">                        LOG.error(&quot;DataAccess: expected {} bytes, got {}&quot;, expectedSize, total);</span>
+<span class="fc" id="L153">                        LOG.error(&quot;DataModel: expected {} bytes, got {}&quot;, expectedSize, total);</span>
 <span class="fc" id="L154">                        throw new IncorrectDataModelException(&quot;Data file corrupt: &quot; + fileName);</span>
                     }
-<span class="fc" id="L156">                    LOG.debug(&quot;DataAccess: version={} territories={} territory records={}&quot;, dataVersion, nrTerritories, nrTerritoryRecords);</span>
+<span class="fc" id="L156">                    LOG.debug(&quot;DataModel: version={} territories={} territory records={}&quot;, dataVersion, nrTerritories, nrTerritoryRecords);</span>
 
                     // Read DATA+START array (2 bytes per territory, plus closing record).
 <span class="fc" id="L159">                    index = new int[nrTerritories + 1];</span>
@@ -170,19 +170,17 @@ import java.io.InputStream;
 <span class="fc" id="L170">                        i += 4;</span>
                     }
                 } finally {
-                    //noinspection ThrowFromFinallyBlock
-<span class="fc" id="L174">                    outputStream.close();</span>
-<span class="fc" id="L175">                }</span>
+<span class="fc" id="L173">                    outputStream.close();</span>
+<span class="fc" id="L174">                }</span>
             } finally {
-                //noinspection ThrowFromFinallyBlock
-<span class="fc" id="L178">                inputStream.close();</span>
-<span class="fc" id="L179">            }</span>
-<span class="nc" id="L180">        } catch (final IOException e) {</span>
-<span class="nc" id="L181">            throw new IncorrectDataModelException(&quot;Cannot initialize static data structure from: &quot; +</span>
+<span class="fc" id="L176">                inputStream.close();</span>
+<span class="fc" id="L177">            }</span>
+<span class="nc" id="L178">        } catch (final IOException e) {</span>
+<span class="nc" id="L179">            throw new IncorrectDataModelException(&quot;Cannot initialize static data structure from: &quot; +</span>
                     fileName + &quot;, exception=&quot; + e);
-<span class="fc" id="L183">        }</span>
-<span class="fc" id="L184">        LOG.info(&quot;DataAccess: regions initialized, read {} bytes&quot;, total);</span>
-<span class="fc" id="L185">    }</span>
+<span class="fc" id="L181">        }</span>
+<span class="fc" id="L182">        LOG.info(&quot;DataModel: regions initialized, read {} bytes&quot;, total);</span>
+<span class="fc" id="L183">    }</span>
 
     /**
      * Get number of territories.
@@ -190,7 +188,7 @@ import java.io.InputStream;
      * @return Number of territories.
      */
     int getNrTerritories() {
-<span class="nc" id="L193">        return nrTerritories;</span>
+<span class="nc" id="L191">        return nrTerritories;</span>
     }
 
     /**
@@ -199,42 +197,42 @@ import java.io.InputStream;
      * @return Number of rectangles per territory.
      */
     int getNrTerritoryRecords() {
-<span class="fc" id="L202">        return nrTerritoryRecords;</span>
+<span class="fc" id="L200">        return nrTerritoryRecords;</span>
     }
 
     @SuppressWarnings(&quot;PointlessArithmeticExpression&quot;)
     int getLonMicroDegMin(final int territoryRecord) {
-<span class="fc" id="L207">        return data[((territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LON_MICRO_DEG_MIN)];</span>
+<span class="fc" id="L205">        return data[((territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LON_MICRO_DEG_MIN)];</span>
     }
 
     int getLatMicroDegMin(final int territoryRecord) {
-<span class="fc" id="L211">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LAT_MICRO_DEG_MIN];</span>
+<span class="fc" id="L209">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LAT_MICRO_DEG_MIN];</span>
     }
 
     int getLonMicroDegMax(final int territoryRecord) {
-<span class="fc" id="L215">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LON_MICRO_DEG_MAX];</span>
+<span class="fc" id="L213">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LON_MICRO_DEG_MAX];</span>
     }
 
     int getLatMicroDegMax(final int territoryRecord) {
-<span class="fc" id="L219">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LAT_MICRO_DEG_MAX];</span>
+<span class="fc" id="L217">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LAT_MICRO_DEG_MAX];</span>
     }
 
     int getDataFlags(final int territoryRecord) {
-<span class="fc" id="L223">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_DATA_FLAGS] &amp; MASK_DATA_DATA_FLAGS;</span>
+<span class="fc" id="L221">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_DATA_FLAGS] &amp; MASK_DATA_DATA_FLAGS;</span>
     }
 
     int getSmartDiv(final int territoryRecord) {
-<span class="fc" id="L227">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_DATA_FLAGS] &gt;&gt; SHIFT_POS_DATA_SMART_DIV;</span>
+<span class="fc" id="L225">        return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_DATA_FLAGS] &gt;&gt; SHIFT_POS_DATA_SMART_DIV;</span>
     }
 
     // Low-level routines for data access.
     @SuppressWarnings(&quot;PointlessArithmeticExpression&quot;)
     int getDataFirstRecord(final int territoryNumber) {
-<span class="fc" id="L233">        return index[territoryNumber + POS_INDEX_FIRST_RECORD];</span>
+<span class="fc" id="L231">        return index[territoryNumber + POS_INDEX_FIRST_RECORD];</span>
     }
 
     int getDataLastRecord(final int territoryNumber) {
-<span class="fc" id="L237">        return index[territoryNumber + POS_INDEX_LAST_RECORD] - 1;</span>
+<span class="fc" id="L235">        return index[territoryNumber + POS_INDEX_LAST_RECORD] - 1;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

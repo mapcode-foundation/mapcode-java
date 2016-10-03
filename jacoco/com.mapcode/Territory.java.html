@@ -912,46 +912,45 @@ import static com.mapcode.CheckArgs.checkNonnull;
      * @return Territory.
      * @throws UnknownTerritoryException Thrown if the territory is not found.
      */
-    @SuppressWarnings(&quot;TailRecursion&quot;)
     @Nonnull
     private static Territory createFromString(
             @Nonnull final String alphaCode,
             @Nullable final Territory parentTerritory) throws UnknownTerritoryException {
 
         // Replace '_' with '-', but leave spaces alone (may be part of the name).
-<span class="fc" id="L922">        final String trimmed = Mapcode.convertStringToPlainAscii(</span>
-<span class="fc" id="L923">                alphaCode.trim().replace('_', '-')).toUpperCase();</span>
+<span class="fc" id="L921">        final String trimmed = Mapcode.convertStringToPlainAscii(</span>
+<span class="fc" id="L922">                alphaCode.trim().replace('_', '-')).toUpperCase();</span>
 
         // Try as alpha code.
-<span class="fc" id="L926">        final List&lt;Territory&gt; territories = nameMap.get(trimmed);</span>
-<span class="fc bfc" id="L927" title="All 2 branches covered.">        if (territories != null) {</span>
-<span class="fc bfc" id="L928" title="All 2 branches covered.">            if (parentTerritory == null) {</span>
-<span class="fc" id="L929">                return territories.get(0);</span>
+<span class="fc" id="L925">        final List&lt;Territory&gt; territories = nameMap.get(trimmed);</span>
+<span class="fc bfc" id="L926" title="All 2 branches covered.">        if (territories != null) {</span>
+<span class="fc bfc" id="L927" title="All 2 branches covered.">            if (parentTerritory == null) {</span>
+<span class="fc" id="L928">                return territories.get(0);</span>
             }
-<span class="fc bfc" id="L931" title="All 2 branches covered.">            for (final Territory territory : territories) {</span>
-<span class="fc bfc" id="L932" title="All 2 branches covered.">                if (territory.getParentTerritory() == parentTerritory) {</span>
-<span class="fc" id="L933">                    return territory;</span>
+<span class="fc bfc" id="L930" title="All 2 branches covered.">            for (final Territory territory : territories) {</span>
+<span class="fc bfc" id="L931" title="All 2 branches covered.">                if (territory.getParentTerritory() == parentTerritory) {</span>
+<span class="fc" id="L932">                    return territory;</span>
                 }
-<span class="fc" id="L935">            }</span>
+<span class="fc" id="L934">            }</span>
         } else {
 
             // Check for a case such as &quot;United States of America-IN&quot;.
-<span class="fc" id="L939">            final int lastSeparator = Math.max(     // Find last separator.</span>
-<span class="fc" id="L940">                    trimmed.lastIndexOf('-'),       // Allow '-'.</span>
-<span class="fc" id="L941">                    trimmed.lastIndexOf(' '));      // And ' '.</span>
-<span class="fc bfc" id="L942" title="All 2 branches covered.">            if (lastSeparator &gt;= 0) {</span>
-<span class="fc" id="L943">                final String prefix = trimmed.substring(0, lastSeparator);</span>
-<span class="fc" id="L944">                final Territory parent = createFromString(prefix, parentTerritory);</span>
-<span class="fc bfc" id="L945" title="All 2 branches covered.">                if (PARENT_TERRITORIES.contains(parent)) {</span>
-<span class="fc" id="L946">                    final String postfix = trimmed.substring(lastSeparator + 1);</span>
-<span class="fc" id="L947">                    final Territory child = createFromString(postfix, parentTerritory);</span>
-<span class="fc bfc" id="L948" title="All 2 branches covered.">                    if (child.parentTerritory == parent) {</span>
-<span class="fc" id="L949">                        return child;</span>
+<span class="fc" id="L938">            final int lastSeparator = Math.max(     // Find last separator.</span>
+<span class="fc" id="L939">                    trimmed.lastIndexOf('-'),       // Allow '-'.</span>
+<span class="fc" id="L940">                    trimmed.lastIndexOf(' '));      // And ' '.</span>
+<span class="fc bfc" id="L941" title="All 2 branches covered.">            if (lastSeparator &gt;= 0) {</span>
+<span class="fc" id="L942">                final String prefix = trimmed.substring(0, lastSeparator);</span>
+<span class="fc" id="L943">                final Territory parent = createFromString(prefix, parentTerritory);</span>
+<span class="fc bfc" id="L944" title="All 2 branches covered.">                if (PARENT_TERRITORIES.contains(parent)) {</span>
+<span class="fc" id="L945">                    final String postfix = trimmed.substring(lastSeparator + 1);</span>
+<span class="fc" id="L946">                    final Territory child = createFromString(postfix, parentTerritory);</span>
+<span class="fc bfc" id="L947" title="All 2 branches covered.">                    if (child.parentTerritory == parent) {</span>
+<span class="fc" id="L948">                        return child;</span>
                     }
                 }
             }
         }
-<span class="fc" id="L954">        throw new UnknownTerritoryException(trimmed);</span>
+<span class="fc" id="L953">        throw new UnknownTerritoryException(trimmed);</span>
     }
 
     /**
@@ -965,80 +964,80 @@ import static com.mapcode.CheckArgs.checkNonnull;
             @Nonnull final Territory territory) {
 
         // Add the name as provided
-<span class="fc" id="L968">        addNameWithSeperatorVariants(name, territory);</span>
+<span class="fc" id="L967">        addNameWithSeperatorVariants(name, territory);</span>
 
-<span class="fc bfc" id="L970" title="All 2 branches covered.">        if (name.contains(&quot;-&quot;)) {</span>
-<span class="fc" id="L971">            final String childTerritoryName = name.substring(name.lastIndexOf('-') + 1);</span>
+<span class="fc bfc" id="L969" title="All 2 branches covered.">        if (name.contains(&quot;-&quot;)) {</span>
+<span class="fc" id="L970">            final String childTerritoryName = name.substring(name.lastIndexOf('-') + 1);</span>
 
             // Tolerate a child territory specified without the parent.
             // (e.g. &quot;CA&quot; rather than &quot;US-CA&quot;)
-<span class="fc" id="L975">            addName(childTerritoryName, territory);</span>
+<span class="fc" id="L974">            addName(childTerritoryName, territory);</span>
 
-<span class="fc bfc" id="L977" title="All 2 branches covered.">            if (territory.parentTerritory != null) {</span>
+<span class="fc bfc" id="L976" title="All 2 branches covered.">            if (territory.parentTerritory != null) {</span>
 
                 // Add the variant using the primary parent name.
-<span class="fc" id="L980">                String nameVariant = (territory.parentTerritory.toString() + '-') + childTerritoryName;</span>
-<span class="pc bpc" id="L981" title="1 of 2 branches missed.">                if (!nameVariant.contentEquals(name)) {</span>
-<span class="fc" id="L982">                    addNameWithSeperatorVariants(nameVariant, territory);</span>
+<span class="fc" id="L979">                String nameVariant = (territory.parentTerritory.toString() + '-') + childTerritoryName;</span>
+<span class="pc bpc" id="L980" title="1 of 2 branches missed.">                if (!nameVariant.contentEquals(name)) {</span>
+<span class="fc" id="L981">                    addNameWithSeperatorVariants(nameVariant, territory);</span>
                 }
 
                 // Add each variant using the parent alias names.
-<span class="fc bfc" id="L986" title="All 2 branches covered.">                for (final String alias : territory.parentTerritory.aliases) {</span>
-<span class="fc" id="L987">                    nameVariant = alias + '-' + childTerritoryName;</span>
-<span class="fc bfc" id="L988" title="All 2 branches covered.">                    if (!nameVariant.contentEquals(name)) {</span>
-<span class="fc" id="L989">                        addNameWithSeperatorVariants(nameVariant, territory);</span>
+<span class="fc bfc" id="L985" title="All 2 branches covered.">                for (final String alias : territory.parentTerritory.aliases) {</span>
+<span class="fc" id="L986">                    nameVariant = alias + '-' + childTerritoryName;</span>
+<span class="fc bfc" id="L987" title="All 2 branches covered.">                    if (!nameVariant.contentEquals(name)) {</span>
+<span class="fc" id="L988">                        addNameWithSeperatorVariants(nameVariant, territory);</span>
                     }
                 }
             }
         }
-<span class="fc" id="L994">    }</span>
+<span class="fc" id="L993">    }</span>
 
     private static void addNameWithSeperatorVariants(@Nonnull final String name, @Nonnull final Territory territory) {
-<span class="fc" id="L997">        addName(name, territory);</span>
+<span class="fc" id="L996">        addName(name, territory);</span>
 
         // Tolerate a space character in place of a hyphen.
         // (e.g. &quot;US CA&quot; in addition to &quot;US-CA&quot;)
-<span class="fc bfc" id="L1001" title="All 2 branches covered.">        if (name.contains(&quot;-&quot;)) {</span>
-<span class="fc" id="L1002">            addName(name.replace('-', ' '), territory);</span>
+<span class="fc bfc" id="L1000" title="All 2 branches covered.">        if (name.contains(&quot;-&quot;)) {</span>
+<span class="fc" id="L1001">            addName(name.replace('-', ' '), territory);</span>
         }
-<span class="fc" id="L1004">    }</span>
+<span class="fc" id="L1003">    }</span>
 
     private static void addName(@Nonnull final String name, @Nonnull final Territory territory) {
-<span class="fc bfc" id="L1007" title="All 2 branches covered.">        if (nameMap.containsKey(name)) {</span>
-<span class="fc" id="L1008">            final List&lt;Territory&gt; territories = nameMap.get(name);</span>
+<span class="fc bfc" id="L1006" title="All 2 branches covered.">        if (nameMap.containsKey(name)) {</span>
+<span class="fc" id="L1007">            final List&lt;Territory&gt; territories = nameMap.get(name);</span>
 
             // Add child territories in the order the parents are declared.
             // This results in consistent decoding of ambiguous territory names.
-<span class="fc" id="L1012">            final Territory newTerritoryParent = territory.getParentTerritory();</span>
-<span class="fc bfc" id="L1013" title="All 4 branches covered.">            if ((newTerritoryParent == null) &amp;&amp; name.equals(territory.toString())) {</span>
+<span class="fc" id="L1011">            final Territory newTerritoryParent = territory.getParentTerritory();</span>
+<span class="fc bfc" id="L1012" title="All 4 branches covered.">            if ((newTerritoryParent == null) &amp;&amp; name.equals(territory.toString())) {</span>
 
                 // A primary identifier always takes priority.
-<span class="fc" id="L1016">                territories.clear();</span>
-<span class="fc" id="L1017">                territories.add(territory);</span>
-<span class="fc" id="L1018">                return;</span>
+<span class="fc" id="L1015">                territories.clear();</span>
+<span class="fc" id="L1016">                territories.add(territory);</span>
+<span class="fc" id="L1017">                return;</span>
             }
 
-<span class="fc bfc" id="L1021" title="All 2 branches covered.">            if (newTerritoryParent != null) {</span>
-<span class="fc bfc" id="L1022" title="All 2 branches covered.">                for (int i = 0; i &lt; territories.size(); i++) {</span>
+<span class="fc bfc" id="L1020" title="All 2 branches covered.">            if (newTerritoryParent != null) {</span>
+<span class="fc bfc" id="L1021" title="All 2 branches covered.">                for (int i = 0; i &lt; territories.size(); i++) {</span>
 
-<span class="fc" id="L1024">                    final Territory existingTerritoryParent = territories.get(i).getParentTerritory();</span>
-<span class="fc bfc" id="L1025" title="All 4 branches covered.">                    if ((existingTerritoryParent == null) &amp;&amp; territories.get(i).toString().contentEquals(name)) {</span>
+<span class="fc" id="L1023">                    final Territory existingTerritoryParent = territories.get(i).getParentTerritory();</span>
+<span class="fc bfc" id="L1024" title="All 4 branches covered.">                    if ((existingTerritoryParent == null) &amp;&amp; territories.get(i).toString().contentEquals(name)) {</span>
                         // A primary identifier always takes priority.
-<span class="fc" id="L1027">                        return;</span>
+<span class="fc" id="L1026">                        return;</span>
                     }
-<span class="fc bfc" id="L1029" title="All 2 branches covered.">                    if ((existingTerritoryParent == null) ||</span>
-<span class="fc bfc" id="L1030" title="All 2 branches covered.">                            (existingTerritoryParent.ordinal() &gt; newTerritoryParent.ordinal())) {</span>
-<span class="fc" id="L1031">                        territories.add(i, territory);</span>
-<span class="fc" id="L1032">                        return;</span>
+<span class="fc bfc" id="L1028" title="All 2 branches covered.">                    if ((existingTerritoryParent == null) ||</span>
+<span class="fc bfc" id="L1029" title="All 2 branches covered.">                            (existingTerritoryParent.ordinal() &gt; newTerritoryParent.ordinal())) {</span>
+<span class="fc" id="L1030">                        territories.add(i, territory);</span>
+<span class="fc" id="L1031">                        return;</span>
                     }
                 }
             }
-<span class="fc" id="L1036">            territories.add(territory);</span>
-<span class="fc" id="L1037">        } else {</span>
-<span class="fc" id="L1038">            final ArrayList&lt;Territory&gt; arrayList = new ArrayList&lt;Territory&gt;();</span>
-<span class="fc" id="L1039">            arrayList.add(territory);</span>
-<span class="fc" id="L1040">            nameMap.put(name, arrayList);</span>
+<span class="fc" id="L1035">            territories.add(territory);</span>
+<span class="fc" id="L1036">        } else {</span>
+<span class="fc" id="L1037">            final ArrayList&lt;Territory&gt; arrayList = new ArrayList&lt;Territory&gt;();</span>
+<span class="fc" id="L1038">            arrayList.add(territory);</span>
+<span class="fc" id="L1039">            nameMap.put(name, arrayList);</span>
         }
-<span class="fc" id="L1042">    }</span>
+<span class="fc" id="L1041">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.eclemma.org/jacoco">JaCoCo</a> 0.7.7.201606060606</span></div></body></html>

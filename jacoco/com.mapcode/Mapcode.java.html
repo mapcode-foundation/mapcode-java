@@ -421,14 +421,14 @@ import static com.mapcode.CheckArgs.checkNonnull;
     }
 
     @Override
-    public boolean equals(@Nullable final Object o) {
-<span class="pc bpc" id="L425" title="1 of 2 branches missed.">        if (this == o) {</span>
+    public boolean equals(@Nullable final Object obj) {
+<span class="pc bpc" id="L425" title="1 of 2 branches missed.">        if (this == obj) {</span>
 <span class="nc" id="L426">            return true;</span>
         }
-<span class="pc bpc" id="L428" title="1 of 2 branches missed.">        if (!(o instanceof Mapcode)) {</span>
+<span class="pc bpc" id="L428" title="1 of 2 branches missed.">        if (!(obj instanceof Mapcode)) {</span>
 <span class="nc" id="L429">            return false;</span>
         }
-<span class="fc" id="L431">        final Mapcode that = (Mapcode) o;</span>
+<span class="fc" id="L431">        final Mapcode that = (Mapcode) obj;</span>
 <span class="fc bfc" id="L432" title="All 2 branches covered.">        return this.territory.equals(that.territory) &amp;&amp;</span>
 <span class="fc bfc" id="L433" title="All 2 branches covered.">            this.codePrecision8.equals(that.codePrecision8);</span>
     }
