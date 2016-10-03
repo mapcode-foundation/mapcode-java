@@ -2,6 +2,16 @@
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.3.1
+
+* Fixed data for some parts of China.
+
+### 2.3.0
+
+* Added Arabic support.
+
+* Fixed Greek, Hebrew and Hindi support.
+
 ### 2.2.5
 
 * Updated documentation.
