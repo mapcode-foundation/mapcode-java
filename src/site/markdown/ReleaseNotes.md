@@ -2,9 +2,11 @@
 
 These are the release notes for the Java library for mapcodes.
 
-### 2.3.2
+### 2.4.0
 
-* Updated dependencies.
+* Added scripts for Korean (Choson'gul/Hangul), Burmese, Khmer, Sinhalese, Thaana (Maldivan), Chinese (Zhuyin, Bopomofo).
+
+* Renamed constant `MALAY` to `MALAYALAM`.
 
 ### 2.3.1
 
