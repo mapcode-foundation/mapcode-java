@@ -244,6 +244,13 @@ class Decoder {
             /* Gurmukhi */ {'\u0a05', '\u0a15', '\u0a17', '\u0a18', '\u0a0f', '\u0a1a', '\u0a1c', '\u0a1f', MISSCODE, '\u0a20', '\u0a23', '\u0a24', '\u0a26', '\u0a27', MISSCODE, '\u0a28', '\u0a2a', '\u0a2d', '\u0a2e', '\u0a30', '\u0a2b', '\u0a32', '\u0a35', '\u0a38', '\u0a39', '\u0a21', '\u0a66', '\u0a67', '\u0a68', '\u0a69', '\u0a6a', '\u0a6b', '\u0a6c', '\u0a6d', '\u0a6e', '\u0a6f'}, // Gurmukhi
             /* Tibetan  */ {'\u0f58', '\u0f40', '\u0f41', '\u0f42', '\u0f64', '\u0f44', '\u0f45', '\u0f46', MISSCODE, '\u0f47', '\u0f49', '\u0f55', '\u0f50', '\u0f4f', MISSCODE, '\u0f51', '\u0f53', '\u0f54', '\u0f56', '\u0f5e', '\u0f60', '\u0f5f', '\u0f61', '\u0f62', '\u0f63', '\u0f66', '\u0f20', '\u0f21', '\u0f22', '\u0f23', '\u0f24', '\u0f25', '\u0f26', '\u0f27', '\u0f28', '\u0f29'}, // Tibetan
             /* Arabic   */ {'\u0628', '\u062a', '\u062d', '\u062e', '\u0649', '\u062f', '\u0630', '\u0631', '\u0049', '\u0632', '\u0633', '\u0634', '\u0635', '\u0636', '\u004f', '\u0637', '\u0638', '\u0639', '\u063a', '\u0641', '\u0642', '\u0643', '\u0644', '\u0645', '\u0646', '\u0648', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Arabic
+            /* Korean   */ {'\u1112', '\u1100', '\u1102', '\u1103', '\u1166', '\u1105', '\u1107', '\u1109', '\u1175', '\u1110', '\u1111', '\u1161', '\u1162', '\u1163', '\u110b', '\u1164', '\u1165', '\u1167', '\u1169', '\u1172', '\u1174', '\u110c', '\u110e', '\u110f', '\u116d', '\u116e', '\uc601', '\uc77c', '\uc774', '\uc0bc', '\uc0ac', '\uc624', '\uc721', '\uce60', '\ud314', '\uad6c'}, // Korean 
+            /* Burmese  */ {'\u1005', '\u1000', '\u1001', '\u1002', '\u1013', '\u1003', '\u1004', '\u101a', '\u101b', '\u1007', '\u100c', '\u100d', '\u100e', '\u1010', '\u101d', '\u1011', '\u1012', '\u101e', '\u1014', '\u1015', '\u1016', '\u101f', '\u1017', '\u1018', '\u100f', '\u101c', '\u1040', '\u1041', '\u1042', '\u1043', '\u1044', '\u1045', '\u1046', '\u1047', '\u1048', '\u1049'}, // Burmese
+            /* Khmer    */ {'\u1789', '\u1780', '\u1781', '\u1782', '\u1785', '\u1783', '\u1784', '\u1787', '\u179a', '\u1788', '\u178a', '\u178c', '\u178d', '\u178e', '\u179c', '\u1791', '\u1792', '\u1793', '\u1794', '\u1795', '\u179f', '\u1796', '\u1798', '\u179b', '\u17a0', '\u17a2', '\u17e0', '\u17e1', '\u17e2', '\u17e3', '\u17e4', '\u17e5', '\u17e6', '\u17e7', '\u17e8', '\u17e9'}, // Khmer
+            /* Sinhalese*/ {'\u0d85', '\u0d9a', '\u0d9c', '\u0d9f', '\u0d89', '\u0da2', '\u0da7', '\u0da9', '\u0dc2', '\u0dac', '\u0dad', '\u0daf', '\u0db1', '\u0db3', '\u0dc5', '\u0db4', '\u0db6', '\u0db8', '\u0db9', '\u0dba', '\u0d8b', '\u0dbb', '\u0dbd', '\u0dc0', '\u0dc3', '\u0dc4', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Sinhalese
+            /* Thaana   */ {'\u0794', '\u0780', '\u0781', '\u0782', '\u0797', '\u0783', '\u0784', '\u0785', '\u07a4', '\u0786', '\u0787', '\u0788', '\u0789', '\u078a', '\u0796', '\u078b', '\u078c', '\u078d', '\u078e', '\u078f', '\u079c', '\u0790', '\u0791', '\u0792', '\u0793', '\u07b1', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Thaana
+            /* Chinese  */ {'\u3123', '\u3105', '\u3108', '\u3106', '\u3114', '\u3107', '\u3109', '\u310a', '\u311e', '\u310b', '\u310c', '\u310d', '\u310e', '\u310f', '\u3120', '\u3115', '\u3116', '\u3110', '\u3111', '\u3112', '\u3113', '\u3129', '\u3117', '\u3128', '\u3118', '\u3119', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}  // Chinese
+
     };
 
     private final static Unicode2Ascii[] UNICODE2ASCII = {
@@ -269,6 +276,26 @@ class Decoder {
             /* Bengali  */ new Unicode2Ascii('\u09e6', '\u09ef', ""),
             /* Gurmukhi */ new Unicode2Ascii('\u0a66', '\u0a6f', ""),
             /* Tibetan  */ new Unicode2Ascii('\u0f20', '\u0f29', ""),
+            /* Burmese  */ new Unicode2Ascii('\u1040', '\u1049', ""), // Burmese digits
+            /* Khmer    */ new Unicode2Ascii('\u17e0', '\u17e9', ""), // Khmer digits
+
+            /* Korean   */ new Unicode2Ascii('\u1100', '\u1175', "B?CD?F?G?H?OV?WXJKA??????????????????????????????????????????????????????????????????????????????LMNPQER?S???YZ???T?UI"), // Korean
+            /* Burmese  */ new Unicode2Ascii('\u1000', '\u101f', "BCDFGA?J????KLMYNPQESTUWX?HIZORV"),                                                  // Burmese
+            /* Khmer    */ new Unicode2Ascii('\u1780', '\u17a2', "BCDFGE?HJAK?LMN??PQRSTV?W?IXO??UY?Z"),                                               // Khmer
+            /* Sinhalese*/ new Unicode2Ascii('\u0d85', '\u0dc5', "A???E?U??????????????B?C??D??F????G?H??JK?L?M?NP?Q?RSTV?W??X?IYZO"),                 // Sinhalese
+            /* Thaana   */ new Unicode2Ascii('\u0780', '\u07b1', "BCDFGHJKLMNPQRSTVWXYA?OE????U???????I????????????Z"),                                // Thaana
+            /* Chinese  */ new Unicode2Ascii('\u3105', '\u3129', "BDFCGHJKLMNRSTUEPQWYZ????I?O??A????XV"),                                             // Chinese
+
+            /* Korean   */ new Unicode2Ascii('\uc601', '\uc601', "0"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\uc77c', '\uc77c', "1"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\uc774', '\uc774', "2"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\uc0bc', '\uc0bc', "3"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\uc0ac', '\uc0ac', "4"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\uc624', '\uc624', "5"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\uc721', '\uc721', "6"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\uce60', '\uce60', "7"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\ud314', '\ud314', "8"), // Korean digit
+            /* Korean   */ new Unicode2Ascii('\uad6c', '\uad6c', "9"), // Korean digit
 
             // Lowercase variants:
             /* Greek    */ new Unicode2Ascii('\u03ad', '\u03c9', "EU??ABGDFZHQIKLMNCOJP?STYVXRW"),
@@ -680,6 +707,7 @@ class Decoder {
         final String mapcode;
         if ((alphabetCode == Alphabet.GREEK.getNumber()) ||
                 (alphabetCode == Alphabet.HEBREW.getNumber()) ||
+                (alphabetCode == Alphabet.KOREAN.getNumber()) ||
                 (alphabetCode == Alphabet.ARABIC.getNumber())) {
             mapcode = convertToAbjad(mapcodeInput);
         } else {
@@ -837,14 +865,17 @@ class Decoder {
     private static boolean isAbjadScript(final String argStr) {
         for (final char ch : argStr.toCharArray()) {
             int c = (int) ch;
-            if ((c >= 1576) && (c <= 1609)) {
+            if ((c >= 0x0628) && (c <= 0x0649)) {
                 return true; // Arabic
             }
-            if ((c >= 1488) && (c <= 1514)) {
+            if ((c >= 0x05d0) && (c <= 0x05ea)) {
                 return true; // Hebrew
             }
-            if ((c >= 904) && (c <= 969)) {
-                return true; // Greek 0x388-0x3C9
+            if ((c >= 0x388) && (c <= 0x3C9)) {
+                return true; // Greek uppercase and lowecase
+            }
+            if ((c >= 0x1100) && (c <= 0x1174) || (c >= 0xad6c) && (c <= 0xd314)) {
+                return true; // Korean
             }
         }
         return false;

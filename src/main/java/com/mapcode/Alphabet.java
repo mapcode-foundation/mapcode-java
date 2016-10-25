@@ -37,7 +37,7 @@ public enum Alphabet {
     CYRILLIC(2),
     HEBREW(3),
     HINDI(4),
-    MALAY(5),
+    MALAYALAM(5),
     GEORGIAN(6),
     KATAKANA(7),
     THAI(8),
@@ -46,7 +46,13 @@ public enum Alphabet {
     BENGALI(11),
     GURMUKHI(12),
     TIBETAN(13),
-    ARABIC(14);
+    ARABIC(14),
+    KOREAN(15),
+    BURMESE(16),
+    KHMER(17),
+    SINHALESE(18),
+    THAANA(19),
+    CHINESE(20);
 
     /**
      * The numeric code is synonym for the alphanumeric code. Used in the decoder.
