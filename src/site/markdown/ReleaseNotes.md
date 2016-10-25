@@ -8,6 +8,10 @@ These are the release notes for the Java library for mapcodes.
 
 * Renamed constant `MALAY` to `MALAYALAM`.
 
+### 2.3.2
+
+* Updated dependencies.
+
 ### 2.3.1
 
 * Fixed data for some parts of China.
