@@ -46,6 +46,25 @@ public class TerritoryTest {
     }
 
     @Test
+    public void checkAlphabets() {
+        LOG.info("checkAlphabets");
+        assertEquals(Territory.VAT.getAlphabets().length, 1);
+        assertEquals(Territory.PRI.getAlphabets().length, 1);
+        assertEquals(Territory.AAA.getAlphabets().length, 1);
+        assertEquals(Territory.CN_XZ.getAlphabets().length, 3);
+        assertEquals(Territory.IN_LD.getAlphabets().length, 3);
+        assertEquals(Territory.VAT.getAlphabets()[0], Alphabet.ROMAN);
+        assertEquals(Territory.PRI.getAlphabets()[0], Alphabet.ROMAN);
+        assertEquals(Territory.CPT.getAlphabets()[0], Alphabet.ROMAN);
+        assertEquals(Territory.CN_XZ.getAlphabets()[0], Alphabet.TIBETAN);
+        assertEquals(Territory.CN_XZ.getAlphabets()[1], Alphabet.CHINESE);
+        assertEquals(Territory.CN_XZ.getAlphabets()[2], Alphabet.ROMAN);
+        assertEquals(Territory.IN_LD.getAlphabets()[0], Alphabet.MALAYALAM);
+        assertEquals(Territory.IN_LD.getAlphabets()[1], Alphabet.ROMAN);
+        assertEquals(Territory.IN_LD.getAlphabets()[2], Alphabet.DEVANAGARI);
+    }
+
+    @Test
     public void checkDash() {
         LOG.info("checkDash");
         assertEquals(Territory.IN_MN, Territory.fromString("IND-MN"));

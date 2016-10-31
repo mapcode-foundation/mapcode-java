@@ -36,7 +36,7 @@ public enum Alphabet {
     GREEK(1),               // of the mapcode library. Do not change them.
     CYRILLIC(2),
     HEBREW(3),
-    HINDI(4),
+    DEVANAGARI(4),
     MALAYALAM(5),
     GEORGIAN(6),
     KATAKANA(7),
@@ -52,7 +52,14 @@ public enum Alphabet {
     KHMER(17),
     SINHALESE(18),
     THAANA(19),
-    CHINESE(20);
+    CHINESE(20),
+    TIFINAGH(21),
+    TAMIL(22),
+    AMHARIC(23),
+    TELUGU(24),
+    ODIA(25),
+    KANNADA(26),
+    GUJARATI(27);
 
     /**
      * The numeric code is synonym for the alphanumeric code. Used in the decoder.
