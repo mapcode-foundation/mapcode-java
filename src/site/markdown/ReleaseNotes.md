@@ -2,15 +2,23 @@
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.1
+
+* Added scripts for Tifinagh (Berber), Tamil, Amharic, Telugu, Odia, Kannada, Gujarati.
+
+* Added `getAlphabets()` to `Territory` class, returning the most commonly used languages for the territory.
+
+* Renamed constant `HINDI` to `DEVANAGIRI`.
+
+* Improved some characters for Arabic and Devanagari.
+
+* Fixed Bengali to also support Assamese.
+
 ### 2.4.0
 
 * Added scripts for Korean (Choson'gul/Hangul), Burmese, Khmer, Sinhalese, Thaana (Maldivan), Chinese (Zhuyin, Bopomofo).
 
 * Renamed constant `MALAY` to `MALAYALAM`.
-
-### 2.3.2
-
-* Updated dependencies.
 
 ### 2.3.1
 
