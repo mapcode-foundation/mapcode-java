@@ -1,7 +1,7 @@
 The binary file "mminfo.dat" is subject to the following copyright and
 license statements:
 
-Copyright (C) 2014-2016 Stichting Mapcode Foundation (http://www.mapcode.com)
+Copyright (C) 2014-2016, Stichting Mapcode Foundation (http://www.mapcode.com)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
