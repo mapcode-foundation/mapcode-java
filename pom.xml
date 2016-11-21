@@ -67,6 +67,8 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- JDK 1.6 is specified, but 1.7 and 1.8 work fine as well. -->
         <jdk.version>1.6</jdk.version>
 
         <!-- Modules. -->
