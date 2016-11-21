@@ -2,10 +2,12 @@
 
 These are the release notes for the Java library for mapcodes.
 
-### 2.4.1
+### 2.4.2
 
 * Removed secret Coveralls key from POM file.
  
+### 2.4.1
+
 * Added scripts for Tifinagh (Berber), Tamil, Amharic, Telugu, Odia, Kannada, Gujarati.
 
 * Added `getAlphabets()` to `Territory` class, returning the most commonly used languages for the territory.
