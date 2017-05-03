@@ -17,6 +17,7 @@
 package com.mapcode;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * This runtime exception is thrown for unknown territory codes. It is specifically a runtime exception, because
@@ -36,5 +37,10 @@ public final class UnknownTerritoryException extends IllegalArgumentException {
     public UnknownTerritoryException(final int code) {
         super();
         this.code = code;
+    }
+
+    @Nullable
+    public Integer getCode() {
+        return code;
     }
 }

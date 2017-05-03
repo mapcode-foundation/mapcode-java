@@ -27,8 +27,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 @SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
 public class EncodeDecodeTest {
@@ -75,7 +75,7 @@ public class EncodeDecodeTest {
 
             // Check encodeToShortest and encodeToInternational.
             final List<Mapcode> resultsAll = MapcodeCodec.encode(latDeg, lonDeg);
-            assertTrue(!resultsAll.isEmpty());
+            assertFalse(resultsAll.isEmpty());
             assertEquals("encodeToInternational failed, result=" + resultsAll,
                     resultsAll.get(resultsAll.size() - 1), mapcodeInternational);
 

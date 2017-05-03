@@ -32,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -344,7 +345,7 @@ public class ReferenceFileTest {
         final ArrayList<MapcodeRec> mapcodeRecs = new ArrayList<MapcodeRec>();
         for (int i = 0; i < count; ++i) {
             final String line = chunkedFile.readNonEmptyLine();
-            assertTrue("Line should not be empty", !line.isEmpty());
+            assertFalse("Line should not be empty", line.isEmpty());
 
             final String[] mapcodeLine = line.split(" ");
             assertTrue("Expecting 1 or 2 elements, territory and mapcode, got: " + mapcodeLine.length + ", " + line,
