@@ -1,5 +1,6 @@
 # Mapcode Library for Java
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0c9f11645f504b50bd154a80fb95a5c3)](https://www.codacy.com/app/rijnb/mapcode-java?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mapcode-foundation/mapcode-java&amp;utm_campaign=Badge_Grade)
 [![Build Status](https://img.shields.io/travis/mapcode-foundation/mapcode-java.svg?maxAge=3600)](https://travis-ci.org/mapcode-foundation/mapcode-java)
 [![Coverage Status](https://coveralls.io/repos/github/mapcode-foundation/mapcode-java/badge.svg?branch=master&maxAge=3600)](https://coveralls.io/github/mapcode-foundation/mapcode-java?branch=master)
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)]()
