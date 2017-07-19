@@ -29,16 +29,23 @@ import org.slf4j.LoggerFactory;
 class Common {
     private static final Logger LOG = LoggerFactory.getLogger(Common.class);
 
-    static final int[] nc = {
+    // TODO: Need better name and explanation.
+    static final int[] NC = {
             1, 31, 961, 29791, 923521, 28629151, 887503681
     };
-    static final int[] xSide = {
+
+    // TODO: Need better name and explanation.
+    static final int[] X_SIDE = {
             0, 5, 31, 168, 961, 5208, 29791, 165869, 923521, 5141947
     };
-    static final int[] ySide = {
+
+    // TODO: Need better name and explanation.
+    static final int[] Y_SIDE = {
             0, 6, 31, 176, 961, 5456, 29791, 165869, 923521, 5141947
     };
-    private static final int[] xDivider19 = {
+
+    // TODO: Need better name and explanation.
+    private static final int[] X_DIVIDER_19 = {
             360, 360, 360, 360, 360, 360, 361, 361, 361, 361,
             362, 362, 362, 363, 363, 363, 364, 364, 365, 366,
             366, 367, 367, 368, 369, 370, 370, 371, 372, 373,
@@ -86,46 +93,48 @@ class Common {
      * @param maxY Longitude.
      * @return Divider.
      */
+    // TODO: Need better names for minY and maxY
     static int xDivider(final int minY, final int maxY) {
         assert minY < maxY;
         if (minY >= 0) {
             // maxY > minY > 0
             assert (maxY > minY) && (minY > 0);
-            return xDivider19[minY >> 19];
+            return X_DIVIDER_19[minY >> 19];
         } else if (maxY >= 0) {
             // maxY > 0 > minY
             assert (maxY > 0) && (0 > minY);
-            return xDivider19[0];
+            return X_DIVIDER_19[0];
         } else {
             // 0 > maxY > minY
             assert (0 > maxY) && (maxY > minY);
-            return xDivider19[(-maxY) >> 19];
+            return X_DIVIDER_19[(-maxY) >> 19];
         }
     }
 
+    // TODO: Need to explain what a codex is.
     static int countCityCoordinatesForCountry(final int codex, final int territoryRecord, final int firstTerritoryRecord) {
         assert codex >= 0;
         assert territoryRecord >= 0;
         assert firstTerritoryRecord >= 0;
-        final int i = getFirstNamelessRecord(codex, territoryRecord, firstTerritoryRecord);
-        int e = territoryRecord;
-        while (Data.getCodex(e) == codex) {
-            e++;
+        final int firstRecord = getFirstNamelessRecord(codex, territoryRecord, firstTerritoryRecord);
+        int record = territoryRecord;
+        while (Data.getCodex(record) == codex) {
+            record++;
         }
-        assert i <= e;
-        return e - i;
+        assert firstRecord <= record;
+        return record - firstRecord;
     }
 
     static int getFirstNamelessRecord(final int codex, final int territoryRecord, final int firstTerritoryRecord) {
         assert codex >= 0;
         assert territoryRecord >= 0;
         assert firstTerritoryRecord >= 0;
-        int i = territoryRecord;
-        while ((i >= firstTerritoryRecord) && Data.isNameless(i) && (Data.getCodex(i) == codex)) {
-            i--;
+        int record = territoryRecord;
+        while ((record >= firstTerritoryRecord) && Data.isNameless(record) && (Data.getCodex(record) == codex)) {
+            record--;
         }
-        i++;
-        assert i <= territoryRecord;
-        return i;
+        record++;
+        assert record <= territoryRecord;
+        return record;
     }
 }

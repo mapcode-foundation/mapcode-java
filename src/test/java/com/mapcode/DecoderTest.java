@@ -26,6 +26,55 @@ import static org.junit.Assert.assertEquals;
 public class DecoderTest {
     private static final Logger LOG = LoggerFactory.getLogger(DecoderTest.class);
 
+    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
+    @Test
+    public void getInternationalGrid() {
+        final DataModel dataModel = DataModel.getInstance();
+        final int world = Territory.AAA.getNumber();
+        final int to = dataModel.getDataLastRecord(world);
+        final int from = dataModel.getDataFirstRecord(world);
+        for (int index = from; index <= to; index++) {
+            final Boundary boundary = Boundary.createBoundaryForTerritoryRecord(index);
+            LOG.info("{}: ({}, {}), ({}, {})", (index - from) + 1,
+                    boundary.getLatMicroDegMin() / 1.0e6,
+                    boundary.getLonMicroDegMin() / 1.0e6,
+                    boundary.getLatMicroDegMax() / 1.0e6,
+                    boundary.getLonMicroDegMax() / 1.0e6
+            );
+        }
+    }
+
+    @Test
+    public void decodeToRectangle() throws Exception {
+        LOG.info("decodeToRectangle");
+        Point center = MapcodeCodec.decode("49.4V", Territory.NLD);
+        Rectangle rectangle = MapcodeCodec.decodeToRectangle("49.4V", Territory.NLD);
+        Point southWest = Point.fromDeg(52.37646900000124, 4.9084705);
+        Point northEast = Point.fromDeg(52.37655900000124, 4.908616250000001);
+        LOG.debug("decodeToRectangle: center={}. rectangle={}", center, rectangle);
+        assertEquals("center", center, rectangle.getCenter());
+        assertEquals("southWest", southWest, rectangle.getSouthWest());
+        assertEquals("northEast", northEast, rectangle.getNorthEast());
+
+        center = MapcodeCodec.decode("VHXGB.1J9J");
+        rectangle = MapcodeCodec.decodeToRectangle("VHXGB.1J9J");
+        southWest = Point.fromDeg(52.376483, 4.908505);
+        northEast = Point.fromDeg(52.376525, 4.908566);
+        LOG.debug("decodeToRectangle: center={}. rectangle={}", center, rectangle);
+        assertEquals("center", center, rectangle.getCenter());
+        assertEquals("southWest", southWest, rectangle.getSouthWest());
+        assertEquals("northEast", northEast, rectangle.getNorthEast());
+
+        center = MapcodeCodec.decode("VHXGB.ZPHH");
+        rectangle = MapcodeCodec.decodeToRectangle("VHXGB.ZPHH");
+        southWest = Point.fromDeg(52.370015, 4.963710);
+        northEast = Point.fromDeg(52.370057, 4.963758);
+        LOG.debug("decodeToRectangle: center={}. rectangle={}", center, rectangle);
+        assertEquals("center", center, rectangle.getCenter());
+        assertEquals("southWest", southWest, rectangle.getSouthWest());
+        assertEquals("northEast", northEast, rectangle.getNorthEast());
+    }
+
     @Test
     public void decodeMapcodeWithTerritory() throws Exception {
         LOG.info("decodeMapcodeWithTerritory");

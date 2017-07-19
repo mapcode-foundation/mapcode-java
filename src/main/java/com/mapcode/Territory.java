@@ -18,14 +18,7 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.mapcode.CheckArgs.checkNonnull;
 
@@ -702,9 +695,8 @@ public enum Territory {
      * @throws UnknownTerritoryException Thrown if the territory is not found given the parentTerritory.
      */
     @Nonnull
-    public static Territory fromString(
-            @Nonnull final String alphaCode,
-            @Nonnull final Territory parentTerritory) throws UnknownTerritoryException {
+    public static Territory fromString(@Nonnull final String alphaCode,
+                                       @Nonnull final Territory parentTerritory) throws UnknownTerritoryException {
         checkNonnull("alphaCode", alphaCode);
         checkNonnull("parentTerritory", parentTerritory);
         if (!PARENT_TERRITORIES.contains(parentTerritory)) {
@@ -803,43 +795,38 @@ public enum Territory {
     /**
      * Private constructors to create a territory code.
      */
-    private Territory(
-            final int number,
-            @Nonnull final String fullName) {
+    private Territory(final int number,
+                      @Nonnull final String fullName) {
         this(number, fullName, null, null, null, null);
     }
 
-    private Territory(
-            final int number,
-            @Nonnull final String fullName,
-            @Nullable final Alphabet[] alphabets) {
+    private Territory(final int number,
+                      @Nonnull final String fullName,
+                      @Nullable final Alphabet[] alphabets) {
         this(number, fullName, alphabets, null, null, null);
     }
 
-    private Territory(
-            final int number,
-            @Nonnull final String fullName,
-            @Nullable final Alphabet[] alphabets,
-            @Nullable final Territory parentTerritory) {
+    private Territory(final int number,
+                      @Nonnull final String fullName,
+                      @Nullable final Alphabet[] alphabets,
+                      @Nullable final Territory parentTerritory) {
         this(number, fullName, alphabets, parentTerritory, null, null);
     }
 
-    private Territory(
-            final int number,
-            @Nonnull final String fullName,
-            @Nullable final Alphabet[] alphabets,
-            @Nullable final Territory parentTerritory,
-            @Nullable final String[] aliases) {
+    private Territory(final int number,
+                      @Nonnull final String fullName,
+                      @Nullable final Alphabet[] alphabets,
+                      @Nullable final Territory parentTerritory,
+                      @Nullable final String[] aliases) {
         this(number, fullName, alphabets, parentTerritory, aliases, null);
     }
 
-    private Territory(
-            final int number,
-            @Nonnull final String fullName,
-            @Nullable final Alphabet[] alphabets,
-            @Nullable final Territory parentTerritory,
-            @Nullable final String[] aliases,
-            @Nullable final String[] fullNameAliases) {
+    private Territory(final int number,
+                      @Nonnull final String fullName,
+                      @Nullable final Alphabet[] alphabets,
+                      @Nullable final Territory parentTerritory,
+                      @Nullable final String[] aliases,
+                      @Nullable final String[] fullNameAliases) {
         assert number >= 0;
         this.number = number;
         this.fullName = fullName;
@@ -866,7 +853,7 @@ public enum Territory {
         parentList = new ArrayList<Territory>();
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
-        final Set<Integer> territoryCodes = new HashSet<Integer>();
+        final Set<Integer> territoryNumbers = new HashSet<Integer>();
         final Set<String> namesSet = new HashSet<String>();
 
         for (final Territory territory : Territory.values()) {
@@ -879,10 +866,10 @@ public enum Territory {
             }
 
             // Check if territory code was already used.
-            if (territoryCodes.contains(territoryNumber)) {
+            if (territoryNumbers.contains(territoryNumber)) {
                 throw new ExceptionInInitializerError(errorPrefix + "non-unique territory number: " + territoryNumber);
             }
-            territoryCodes.add(territory.getNumber());
+            territoryNumbers.add(territory.getNumber());
 
             final int initialCodeListSize = codeList.size();
             for (int i = initialCodeListSize; i <= territory.number; i++) {
@@ -927,7 +914,7 @@ public enum Territory {
             max = Math.max(max, territory.number);
             assert territory.alphabets.length > 0;
         }
-        assert territoryCodes.size() == Territory.values().length;
+        assert territoryNumbers.size() == Territory.values().length;
 
         // Check that territory has at least one alphabet.
 
@@ -946,9 +933,8 @@ public enum Territory {
      * @throws UnknownTerritoryException Thrown if the territory is not found.
      */
     @Nonnull
-    private static Territory createFromString(
-            @Nonnull final String alphaCode,
-            @Nullable final Territory parentTerritory) throws UnknownTerritoryException {
+    private static Territory createFromString(@Nonnull final String alphaCode,
+                                              @Nullable final Territory parentTerritory) throws UnknownTerritoryException {
 
         // Replace '_' with '-', but leave spaces alone (may be part of the name).
         final String trimmed = Mapcode.convertStringToPlainAscii(
@@ -992,9 +978,8 @@ public enum Territory {
      * @param name      Name to add.
      * @param territory Territory.
      */
-    private static void addNameWithParentVariants(
-            @Nonnull final String name,
-            @Nonnull final Territory territory) {
+    private static void addNameWithParentVariants(@Nonnull final String name,
+                                                  @Nonnull final Territory territory) {
 
         // Add the name as provided
         addNameWithSeperatorVariants(name, territory);

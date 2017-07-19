@@ -34,6 +34,7 @@ import java.io.InputStream;
 class DataModel {
     private static final Logger LOG = LoggerFactory.getLogger(DataModel.class);
 
+    // TODO: This class needs a thorough description of what the data file format looks like and what all bit fields means exactly.
     private static final int HEADER_ID_1 = 0;
     private static final int HEADER_ID_2 = 1;
     private static final int HEADER_VERSION_LO = 2;
@@ -196,11 +197,13 @@ class DataModel {
      *
      * @return Number of rectangles per territory.
      */
+    // TODO: Explain what territory records contain exactly.
     int getNrTerritoryRecords() {
         return nrTerritoryRecords;
     }
 
     @SuppressWarnings("PointlessArithmeticExpression")
+    // TODO: Explain what this does exactly, why not return a Point or Rectangle?
     int getLonMicroDegMin(final int territoryRecord) {
         return data[((territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LON_MICRO_DEG_MIN)];
     }
@@ -221,17 +224,21 @@ class DataModel {
         return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_DATA_FLAGS] & MASK_DATA_DATA_FLAGS;
     }
 
+    // TODO: Explain what a "div" and "smart div" is and how you use, and why you need to use it.
     int getSmartDiv(final int territoryRecord) {
         return data[(territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_DATA_FLAGS] >> SHIFT_POS_DATA_SMART_DIV;
     }
 
+    // TODO: Explain what these methods do exactly.
     // Low-level routines for data access.
     @SuppressWarnings("PointlessArithmeticExpression")
     int getDataFirstRecord(final int territoryNumber) {
+        assert (0 <= territoryNumber) && (territoryNumber <= Territory.AAA.getNumber());
         return index[territoryNumber + POS_INDEX_FIRST_RECORD];
     }
 
     int getDataLastRecord(final int territoryNumber) {
+        assert (0 <= territoryNumber) && (territoryNumber <= Territory.AAA.getNumber());
         return index[territoryNumber + POS_INDEX_LAST_RECORD] - 1;
     }
 }
