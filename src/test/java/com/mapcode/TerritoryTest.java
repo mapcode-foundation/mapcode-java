@@ -29,8 +29,8 @@ public class TerritoryTest {
     private static final Logger LOG = LoggerFactory.getLogger(TerritoryTest.class);
 
     @Test(expected = UnknownTerritoryException.class)
-    public void emptyTerritoryCodeTest() {
-        LOG.info("emptyCodeTest");
+    public void emptyTerritoryNumberTest() {
+        LOG.info("emptyTerritoryNumberTest");
         Territory.fromString("");
     }
 

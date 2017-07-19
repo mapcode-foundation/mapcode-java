@@ -26,6 +26,8 @@ import javax.annotation.Nonnull;
  * This class the data class for Mapcode codex items.
  */
 class Data {
+
+    // TODO: Need explanation what this is and how this is used.
     static final char[] ENCODE_CHARS = {
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',           // Numerals.
             'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',           // Consonants.
@@ -33,31 +35,40 @@ class Data {
             'A', 'E', 'U'                                               // Vowels.
     };
 
+    // Get direct access to the data model.
     private static final DataModel DATA_MODEL = DataModel.getInstance();
 
     private Data() {
         // Disabled.
     }
 
+    // TODO: Explain what these values are. Can we make this an enum instead (safer)?
+    static final int TERRITORY_RECORD_TYPE_NONE = 0;
+    static final int TERRITORY_RECORD_TYPE_PIPE = 1;
+    static final int TERRITORY_RECORD_TYPE_PLUS = 2;
+    static final int TERRITORY_RECORD_TYPE_STAR = 3;
+
+    // TODO: Need to explain what "nameless" means and what a territoryRecord is (different from territoryNumber).
     static boolean isNameless(final int territoryRecord) {
         assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
         return (DATA_MODEL.getDataFlags(territoryRecord) & 64) != 0;
     }
 
+    // TODO: Need to explain what "special shape" means.
     static boolean isSpecialShape(final int territoryRecord) {
         assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
+
+        // TODO: The "magic" of binary operators and bit shifting should be in class DataModel, not here.
         return (DATA_MODEL.getDataFlags(territoryRecord) & 1024) != 0;
     }
 
-    static final int TERRITORY_RECORD_TYPE_NONE = 0;
-    static final int TERRITORY_RECORD_TYPE_PIPE = 1;
-    static final int TERRITORY_RECORD_TYPE_PLUS = 2;
-
+    // TODO: Explain what territory record types are. Can they be an enum instead?
     static int getTerritoryRecordType(final int territoryRecord) {
         assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
         return (DATA_MODEL.getDataFlags(territoryRecord) >> 7) & 3; // 1=pipe 2=plus 3=star
     }
 
+    // TODO: What does "restricted" mean?
     static boolean isRestricted(final int territoryRecord) {
         assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
         return (DATA_MODEL.getDataFlags(territoryRecord) & 512) != 0;
@@ -69,17 +80,15 @@ class Data {
         return (10 * (codexflags / 5)) + (codexflags % 5) + 1;
     }
 
+    // TODO: What does this method do? What is parameter i (rename)?
     @Nonnull
     static String headerLetter(final int i) {
         final int flags = DATA_MODEL.getDataFlags(i);
+
+        // TODO: The "magic" of how to interpret flags must be in DataModel, not here.
         if (((flags >> 7) & 3) == 1) {
             return Character.toString(ENCODE_CHARS[(flags >> 11) & 31]);
         }
         return "";
-    }
-
-    @Nonnull
-    static Boundary getBoundary(final int territoryRecord) {
-        return Boundary.createBoundaryForTerritoryRecord(territoryRecord);
     }
 }

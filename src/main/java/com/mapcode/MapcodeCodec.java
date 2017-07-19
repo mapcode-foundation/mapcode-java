@@ -34,7 +34,8 @@ import static com.mapcode.Mapcode.getPrecisionFormat;
  */
 public final class MapcodeCodec {
 
-    private static final DataModel dataModel = DataModel.getInstance();
+    // Get direct access to the data model.
+    private static final DataModel DATA_MODEL = DataModel.getInstance();
 
     private MapcodeCodec() {
         // Prevent instantiation.
@@ -98,15 +99,13 @@ public final class MapcodeCodec {
     public static List<Mapcode> encode(final double latDeg, final double lonDeg,
                                        @Nullable final Territory restrictToTerritory)
             throws IllegalArgumentException {
-        // Call Mapcode encoder.
-        final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, /* Stop with one result: */ false);
+        final List<Mapcode> results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, false);
         assert results != null;
         return results;
     }
 
     @Nonnull
-    public static List<Mapcode> encode(@Nonnull final Point point,
-                                       @Nullable final Territory restrictToTerritory)
+    public static List<Mapcode> encode(@Nonnull final Point point, @Nullable final Territory restrictToTerritory)
             throws IllegalArgumentException {
         checkNonnull("point", point);
         return encode(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
@@ -220,13 +219,103 @@ public final class MapcodeCodec {
      */
     @SuppressWarnings("DuplicateThrows")
     @Nonnull
-    public static Point decode(
-            @Nonnull final String mapcode,
-            @Nullable final Territory defaultTerritoryContext)
+    public static Point decode(@Nonnull final String mapcode, @Nullable final Territory defaultTerritoryContext)
             throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
         checkNonnull("mapcode", mapcode);
 
-        // Clean up mapcode.
+        final MapcodeZone mapcodeZone = decodeToMapcodeZone(mapcode, defaultTerritoryContext);
+        if (mapcodeZone.isEmpty()) {
+            throw new UnknownMapcodeException("Unknown mapcode, mapcode=" + mapcode + ", territoryContext=" + defaultTerritoryContext);
+        }
+        return mapcodeZone.getCenter();
+    }
+
+    /**
+     * Decode a mapcode to a Rectangle, which defines the valid zone for a mapcode. The boundaries of the
+     * mapcode zone are inclusive for the South and West borders and exclusive for the North and East borders.
+     * This is essentially the same call as a 'decode', except it returns a rectangle, rather than its center point.
+     *
+     * @param mapcode Mapcode.
+     * @return Rectangle Mapcode zone. South/West borders are inclusive, North/East borders exclusive.
+     * @throws UnknownMapcodeException         Thrown if the mapcode has the correct syntax,
+     *                                         but cannot be decoded into a point.
+     * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
+     * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
+     */
+    @Nonnull
+    public static Rectangle decodeToRectangle(@Nonnull final String mapcode)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+        return decodeToRectangle(mapcode, Territory.AAA);
+    }
+
+    /**
+     * Decode a mapcode to a Rectangle, which defines the valid zone for a mapcode. The boundaries of the
+     * mapcode zone are inclusive for the South and West borders and exclusive for the North and East borders.
+     * This is essentially the same call as a 'decode', except it returns a rectangle, rather than its center point.
+     *
+     * @param mapcode                 Mapcode.
+     * @param defaultTerritoryContext Default territory context for disambiguation purposes. May be null.
+     * @return Rectangle Mapcode zone. South/West borders are inclusive, North/East borders exclusive.
+     * @throws UnknownMapcodeException         Thrown if the mapcode has the correct syntax,
+     *                                         but cannot be decoded into a point.
+     * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
+     * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
+     */
+    @Nonnull
+    public static Rectangle decodeToRectangle(@Nonnull final String mapcode, @Nullable final Territory defaultTerritoryContext)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+        checkNonnull("mapcode", mapcode);
+        final MapcodeZone mapcodeZone = decodeToMapcodeZone(mapcode, defaultTerritoryContext);
+        final Point southWest = Point.fromLatLonFractions(mapcodeZone.getLatFractionMin(), mapcodeZone.getLonFractionMin());
+        final Point northEast = Point.fromLatLonFractions(mapcodeZone.getLatFractionMax(), mapcodeZone.getLonFractionMax());
+        final Rectangle rectangle = new Rectangle(southWest, northEast);
+        return rectangle;
+    }
+
+
+    /**
+     * Is coordinate near multiple territory borders?
+     *
+     * @param point     Latitude/Longitude in degrees.
+     * @param territory Territory.
+     * @return true Iff the coordinate is near more than one territory border (and thus encode(decode(M)) may not produce M).
+     */
+    public static boolean isNearMultipleBorders(@Nonnull final Point point, @Nonnull final Territory territory) {
+        checkDefined("point", point);
+        // TODO: This description is not clear enough. When do you use this exactly?
+        if (territory != Territory.AAA) {
+            final int territoryNumber = territory.getNumber();
+            if (territory.getParentTerritory() != null) {
+                // There is a parent! check its borders as well...
+                if (isNearMultipleBorders(point, territory.getParentTerritory())) {
+                    return true;
+                }
+            }
+            int nrFound = 0;
+            final int fromTerritoryRecord = DATA_MODEL.getDataFirstRecord(territoryNumber);
+            final int uptoTerritoryRecord = DATA_MODEL.getDataLastRecord(territoryNumber);
+            for (int territoryRecord = uptoTerritoryRecord; territoryRecord >= fromTerritoryRecord; territoryRecord--) {
+                if (!Data.isRestricted(territoryRecord)) {
+                    final Boundary boundary = Boundary.createBoundaryForTerritoryRecord(territoryRecord);
+                    final int xdiv8 = Common.xDivider(boundary.getLatMicroDegMin(), boundary.getLatMicroDegMax()) / 4;
+                    if (boundary.extendBoundary(60, xdiv8).containsPoint(point)) {
+                        if (!boundary.extendBoundary(-60, -xdiv8).containsPoint(point)) {
+                            nrFound++;
+                            if (nrFound > 1) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    @Nonnull
+    private static MapcodeZone decodeToMapcodeZone(@Nonnull final String mapcode, @Nullable final Territory defaultTerritoryContext)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+        checkNonnull("mapcode", mapcode);
         String mapcodeClean = Mapcode.convertStringToPlainAscii(mapcode.trim()).toUpperCase();
 
         // Determine territory from mapcode.
@@ -252,53 +341,6 @@ public final class MapcodeCodec {
 
         // Throws an exception if the format is incorrect.
         getPrecisionFormat(mapcodeClean);
-
-        @Nonnull final Point point = Decoder.decode(mapcodeClean, territory);
-        assert point != null;
-
-        // Points can only be undefined within the mapcode implementation. Throw an exception here if undefined.
-        if (!point.isDefined()) {
-            throw new UnknownMapcodeException("Unknown Mapcode: " + mapcodeClean +
-                    ", territoryContext=" + defaultTerritoryContext);
-        }
-        return point;
-    }
-
-    /**
-     * Is coordinate near multiple territory borders?
-     *
-     * @param point     Latitude/Longitude in degrees.
-     * @param territory Territory.
-     * @return true Iff the coordinate is near more than one territory border (and thus encode(decode(M)) may not produce M).
-     */
-    public static boolean isNearMultipleBorders(@Nonnull final Point point, @Nonnull final Territory territory) {
-        checkDefined("point", point);
-        if (territory != Territory.AAA) {
-            final int ccode = territory.getNumber();
-            if (territory.getParentTerritory() != null) {
-                // There is a parent! check its borders as well...
-                if (isNearMultipleBorders(point, territory.getParentTerritory())) {
-                    return true;
-                }
-            }
-            int nrFound = 0;
-            final int fromTerritoryRecord = dataModel.getDataFirstRecord(ccode);
-            final int uptoTerritoryRecord = dataModel.getDataLastRecord(ccode);
-            for (int territoryRecord = uptoTerritoryRecord; territoryRecord >= fromTerritoryRecord; territoryRecord--) {
-                if (!Data.isRestricted(territoryRecord)) {
-                    final Boundary boundary = Boundary.createBoundaryForTerritoryRecord(territoryRecord);
-                    final int xdiv8 = Common.xDivider(boundary.getLatMicroDegMin(), boundary.getLatMicroDegMax()) / 4;
-                    if (boundary.extendBoundary(60, xdiv8).containsPoint(point)) {
-                        if (!boundary.extendBoundary(-60, -xdiv8).containsPoint(point)) {
-                            nrFound++;
-                            if (nrFound > 1) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return false;
+        return Decoder.decodeToMapcodeZone(mapcodeClean, territory);
     }
 }

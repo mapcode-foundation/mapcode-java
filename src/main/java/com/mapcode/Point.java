@@ -220,7 +220,7 @@ public class Point {
     @SuppressWarnings("NonFinalFieldReferencedInHashCode")
     @Override
     public int hashCode() {
-        return Arrays.hashCode(new Object[]{getLatDeg(), getLonDeg(), defined});
+        return Arrays.hashCode(new Object[]{latMicroDeg, lonMicroDeg, latFractionOnlyDeg, lonFractionOnlyDeg, defined});
     }
 
     @SuppressWarnings("NonFinalFieldReferenceInEquals")

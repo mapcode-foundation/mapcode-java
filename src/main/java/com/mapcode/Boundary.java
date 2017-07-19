@@ -33,11 +33,8 @@ class Boundary {
 
     private static final DataModel DATA_MODEL = DataModel.getInstance();
 
-    private Boundary(
-            final int lonMicroDegMin,
-            final int lonMicroDegMax,
-            final int latMicroDegMin,
-            final int latMicroDegMax) {
+    private Boundary(final int lonMicroDegMin, final int lonMicroDegMax,
+                     final int latMicroDegMin, final int latMicroDegMax) {
         this.lonMicroDegMin = lonMicroDegMin;
         this.latMicroDegMin = latMicroDegMin;
         this.lonMicroDegMax = lonMicroDegMax;
@@ -98,7 +95,7 @@ class Boundary {
         }
         final int lonMicroDeg = p.getLonMicroDeg();
 
-        // Longitude boundaries can extend (slightly) outside the [-180,180) range
+        // Longitude boundaries can extend (slightly) outside the [-180,180) range.
         if (lonMicroDeg < lonMicroDegMin) {
             return (lonMicroDegMin <= (lonMicroDeg + Point.MICRO_DEG_360)) && ((lonMicroDeg + Point.MICRO_DEG_360) < lonMicroDegMax);
         } else if (lonMicroDeg >= lonMicroDegMax) {

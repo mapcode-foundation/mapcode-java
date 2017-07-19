@@ -24,8 +24,11 @@ import javax.annotation.Nonnull;
  * ----------------------------------------------------------------------------------------------
  * Simple class to represent all the coordinates that would deliver a particular mapcode.
  */
+// TODO: Is a mapcode zone always a rectangle? Is the smallest rectangle around 1 mapcode, or something else?
+// TODO: Why is it called MapcodeZone and not for example MapcodeBoundary?
 class MapcodeZone {
 
+    // TODO: Explain why you need these fractions and how they work exactly.
     // Longitudes in LonFractions ("1/3240 billionths").
     private double lonFractionMin;
     private double lonFractionMax;
@@ -34,35 +37,20 @@ class MapcodeZone {
     private double latFractionMin;
     private double latFractionMax;
 
-    // Construct an (empty) zone.
+    MapcodeZone(final double latFractionMin, final double latFractionMax,
+                final double lonFractionMin, final double lonFractionMax) {
+        this.latFractionMin = latFractionMin;
+        this.latFractionMax = latFractionMax;
+        this.lonFractionMin = lonFractionMin;
+        this.lonFractionMax = lonFractionMax;
+    }
+
+    MapcodeZone(@Nonnull final MapcodeZone mapcodeZone) {
+        this(mapcodeZone.latFractionMin, mapcodeZone.latFractionMax, mapcodeZone.lonFractionMin, mapcodeZone.lonFractionMax);
+    }
+
     MapcodeZone() {
-        setEmpty();
-    }
-
-    // Construct an (empty) zone.
-    void setEmpty() {
-        latFractionMin = 0;
-        latFractionMax = 0;
-        lonFractionMin = 0;
-        lonFractionMax = 0;
-    }
-
-    // Construct a copy of an existing zone.
-    MapcodeZone(@Nonnull final MapcodeZone zone) {
-        copyFrom(zone);
-    }
-
-    // construct a copy of an existing zone
-    void copyFrom(@Nonnull final MapcodeZone other) {
-        latFractionMin = other.latFractionMin;
-        latFractionMax = other.latFractionMax;
-        lonFractionMin = other.lonFractionMin;
-        lonFractionMax = other.lonFractionMax;
-    }
-
-    @Nonnull
-    static MapcodeZone empty() {
-        return new MapcodeZone();
+        this(0.0, 0.0, 0.0, 0.0);
     }
 
     double getLonFractionMin() {
@@ -97,10 +85,10 @@ class MapcodeZone {
         this.latFractionMax = latFractionMax;
     }
 
+    // TODO: Use of this method is unclear.
     // Generate upper and lower limits based on x and y, and delta's.
-    void setFromFractions(
-            final double latFraction, final double lonFraction,
-            final double latFractionDelta, final double lonFractionDelta) {
+    void setFromFractions(final double latFraction, final double lonFraction,
+                          final double latFractionDelta, final double lonFractionDelta) {
         assert (lonFractionDelta >= 0.0);
         assert (latFractionDelta != 0.0);
         lonFractionMin = lonFraction;
@@ -118,55 +106,58 @@ class MapcodeZone {
         return ((lonFractionMax <= lonFractionMin) || (latFractionMax <= latFractionMin));
     }
 
+    // TODO: What does this return?
     @Nonnull
-    Point getMidPoint() {
+    Point getCenter() {
         if (isEmpty()) {
             return Point.undefined();
         } else {
-            final double latFrac = Math.floor((latFractionMin + latFractionMax) / 2);
-            final double lonFrac = Math.floor((lonFractionMin + lonFractionMax) / 2);
+            final double latFrac = Math.floor((latFractionMin + latFractionMax) / 2.0);
+            final double lonFrac = Math.floor((lonFractionMin + lonFractionMax) / 2.0);
             return Point.fromLatLonFractions(latFrac, lonFrac);
         }
     }
 
+    // TODO: Explain when this is used. Does it clip a mapcode zon after it was retrieved?
     // Returns a non-empty intersection of a mapcode zone and a territory area.
     // Returns null if no such intersection exists.
     @Nonnull
     MapcodeZone restrictZoneTo(@Nonnull final Boundary area) {
-        final MapcodeZone z = new MapcodeZone(this);
+        final MapcodeZone mapcodeZone = new MapcodeZone(latFractionMin, latFractionMax, lonFractionMin, lonFractionMax);
         final double latMin = area.getLatMicroDegMin() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
-        if (z.latFractionMin < latMin) {
-            z.latFractionMin = latMin;
+        if (mapcodeZone.latFractionMin < latMin) {
+            mapcodeZone.latFractionMin = latMin;
         }
         final double latMax = area.getLatMicroDegMax() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
-        if (z.latFractionMax > latMax) {
-            z.latFractionMax = latMax;
+        if (mapcodeZone.latFractionMax > latMax) {
+            mapcodeZone.latFractionMax = latMax;
         }
-        if (z.latFractionMin < z.latFractionMax) {
+        if (mapcodeZone.latFractionMin < mapcodeZone.latFractionMax) {
             double lonMin = area.getLonMicroDegMin() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
             double lonMax = area.getLonMicroDegMax() * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR;
-            if ((lonMax < 0) && (z.lonFractionMin > 0)) {
+            if ((lonMax < 0) && (mapcodeZone.lonFractionMin > 0)) {
                 lonMin += (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
                 lonMax += (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
-            } else if ((lonMin > 1) && (z.lonFractionMax < 0)) {
+            } else if ((lonMin > 1) && (mapcodeZone.lonFractionMax < 0)) {
                 lonMin -= (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
                 lonMax -= (Point.MICRO_DEG_360 * Point.LON_MICRODEG_TO_FRACTIONS_FACTOR);
             }
-            if (z.lonFractionMin < lonMin) {
-                z.lonFractionMin = lonMin;
+            if (mapcodeZone.lonFractionMin < lonMin) {
+                mapcodeZone.lonFractionMin = lonMin;
             }
-            if (z.lonFractionMax > lonMax) {
-                z.lonFractionMax = lonMax;
+            if (mapcodeZone.lonFractionMax > lonMax) {
+                mapcodeZone.lonFractionMax = lonMax;
             }
         }
-        return z;
+        return mapcodeZone;
     }
 
     @Nonnull
     @Override
     public String toString() {
-        return isEmpty() ? "empty" :
-                ("[" + (latFractionMin / Point.LAT_TO_FRACTIONS_FACTOR) + ", " + (latFractionMax / Point.LAT_TO_FRACTIONS_FACTOR) +
-                        "), [" + (lonFractionMin / Point.LON_TO_FRACTIONS_FACTOR) + ", " + (lonFractionMax / Point.LON_TO_FRACTIONS_FACTOR) + ')');
+        return isEmpty() ? "empty" : ("[" + (latFractionMin / Point.LAT_TO_FRACTIONS_FACTOR) + ", " +
+                (latFractionMax / Point.LAT_TO_FRACTIONS_FACTOR) +
+                "), [" + (lonFractionMin / Point.LON_TO_FRACTIONS_FACTOR) + ", " +
+                (lonFractionMax / Point.LON_TO_FRACTIONS_FACTOR) + ')');
     }
 }

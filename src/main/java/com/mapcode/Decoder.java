@@ -39,78 +39,88 @@ class Decoder {
     // ----------------------------------------------------------------------
 
     @Nonnull
-    static Point decode(@Nonnull final String argMapcode,
-                        @Nonnull final Territory argTerritory)
+    static MapcodeZone decodeToMapcodeZone(@Nonnull final String argMapcode,
+                                           @Nonnull final Territory argTerritory)
             throws UnknownMapcodeException {
         LOG.trace("decode: mapcode={}, territory={}", argMapcode, argTerritory.name());
 
         String mapcode = argMapcode;
         Territory territory = argTerritory;
 
-        String extrapostfix = "";
-
-        final int minpos = mapcode.indexOf('-');
-        if (minpos > 0) {
-            extrapostfix = decodeUTF16(mapcode.substring(minpos + 1).trim());
-            if (extrapostfix.contains("Z")) {
-                throw new UnknownMapcodeException("Invalid character Z");
+        String precisionPostfix = "";
+        final int positionOfDash = mapcode.indexOf('-');
+        if (positionOfDash > 0) {
+            precisionPostfix = decodeUTF16(mapcode.substring(positionOfDash + 1).trim());
+            if (precisionPostfix.contains("Z")) {
+                throw new UnknownMapcodeException("Invalid character Z, mapcode=" + argMapcode + ", territory=" + argTerritory);
             }
-            mapcode = mapcode.substring(0, minpos);
-        }
 
+            // Cut the precision postfix from the mapcode.
+            mapcode = mapcode.substring(0, positionOfDash);
+        }
+        assert !mapcode.contains("-");
+
+        // TODO: What does AEU unpack do?
         mapcode = aeuUnpack(mapcode).trim();
         if (mapcode.isEmpty()) {
-            LOG.info("decode: Failed to aeuUnpack {}", argMapcode);
-            return Point.undefined(); // failed to aeuUnpack
+            // TODO: Is this a useful log message?
+            LOG.debug("decode: Failed to aeuUnpack {}", argMapcode);
+            throw new UnknownMapcodeException("Failed to AEU unpack, mapcode=" + argMapcode + ", territory=" + argTerritory);
         }
 
-        final int incodexlen = mapcode.length() - 1;
+        // TODO: What does incodexlen mean?
+        final int codexLen = mapcode.length() - 1;
 
         // *** long codes in states are handled by the country
-        if (incodexlen >= 9) {
+        if (codexLen >= 9) {
+            // International codes are 9 characters.
+            assert codexLen == 9;
             territory = Territory.AAA;
         } else {
             final Territory parentTerritory = territory.getParentTerritory();
-            if (((incodexlen >= 8) && ((parentTerritory == Territory.USA) || (parentTerritory == Territory.CAN)
+            if (((codexLen >= 8) && ((parentTerritory == Territory.USA) || (parentTerritory == Territory.CAN)
                     || (parentTerritory == Territory.AUS) || (parentTerritory == Territory.BRA)
                     || (parentTerritory == Territory.CHN) || (parentTerritory == Territory.RUS)))
-                    || ((incodexlen >= 7) &&
+                    || ((codexLen >= 7) &&
                     ((parentTerritory == Territory.IND) || (parentTerritory == Territory.MEX)))) {
 
                 territory = parentTerritory;
             }
         }
 
-        final int ccode = territory.getNumber();
+        final int territoryNumber = territory.getNumber();
 
-        final int fromTerritoryRecord = dataModel.getDataFirstRecord(ccode);
-        final int uptoTerritoryRecord = dataModel.getDataLastRecord(ccode);
+        final int fromTerritoryRecord = dataModel.getDataFirstRecord(territoryNumber);
+        final int uptoTerritoryRecord = dataModel.getDataLastRecord(territoryNumber);
 
-        final int incodexhi = mapcode.indexOf('.');
-        final int incodex = (incodexhi * 10) + (incodexlen - incodexhi);
+        // Determine the codex pattern as 2-digits: length-of-left-part * 10 + length-of-right-part.
+        final int positionOfDot = mapcode.indexOf('.');
+        final int codex = (positionOfDot * 10) + (codexLen - positionOfDot);
 
-        MapcodeZone mapcodeZone = MapcodeZone.empty();
-
+        MapcodeZone mapcodeZone = new MapcodeZone();
         for (int territoryRecord = fromTerritoryRecord; territoryRecord <= uptoTerritoryRecord; territoryRecord++) {
-            final int codexi = Data.getCodex(territoryRecord);
-            final Boundary boundary = createBoundaryForTerritoryRecord(territoryRecord);
+            final int codexOfTerritory = Data.getCodex(territoryRecord);
+            final Boundary boundaryOfTerritory = createBoundaryForTerritoryRecord(territoryRecord);
             if (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_NONE) {
+
                 if (Data.isNameless(territoryRecord)) {
                     // i = nameless
-                    if (((codexi == 21) && (incodex == 22)) ||
-                            ((codexi == 22) && (incodex == 32)) ||
-                            ((codexi == 13) && (incodex == 23))) {
-                        mapcodeZone = decodeNameless(mapcode, territoryRecord, extrapostfix);
+                    if (((codexOfTerritory == 21) && (codex == 22)) ||
+                            ((codexOfTerritory == 22) && (codex == 32)) ||
+                            ((codexOfTerritory == 13) && (codex == 23))) {
+                        mapcodeZone = decodeNameless(mapcode, territoryRecord, precisionPostfix);
                         break;
                     }
                 } else {
+
                     // i = grid without headerletter
-                    if ((codexi == incodex) || ((incodex == 22) && (codexi == 21))) {
+                    if ((codexOfTerritory == codex) ||
+                            ((codex == 22) && (codexOfTerritory == 21))) {
 
                         mapcodeZone = decodeGrid(mapcode,
-                                boundary.getLonMicroDegMin(), boundary.getLatMicroDegMin(),
-                                boundary.getLonMicroDegMax(), boundary.getLatMicroDegMax(),
-                                territoryRecord, extrapostfix);
+                                boundaryOfTerritory.getLonMicroDegMin(), boundaryOfTerritory.getLatMicroDegMin(),
+                                boundaryOfTerritory.getLonMicroDegMax(), boundaryOfTerritory.getLatMicroDegMax(),
+                                territoryRecord, precisionPostfix);
 
                         // first of all, make sure the zone fits the country
                         mapcodeZone = mapcodeZone.restrictZoneTo(createBoundaryForTerritoryRecord(uptoTerritoryRecord));
@@ -118,7 +128,7 @@ class Decoder {
                         if (Data.isRestricted(territoryRecord) && !mapcodeZone.isEmpty()) {
                             int nrZoneOverlaps = 0;
                             int j;
-                            final Point result = mapcodeZone.getMidPoint();
+                            final Point result = mapcodeZone.getCenter();
                             // see if midpoint of mapcode zone is in any sub-area...
                             for (j = territoryRecord - 1; j >= fromTerritoryRecord; j--) {
                                 if (!Data.isRestricted(j)) {
@@ -131,7 +141,7 @@ class Decoder {
 
                             if (nrZoneOverlaps == 0) {
                                 // see if mapcode zone OVERLAPS any sub-area...
-                                final MapcodeZone zfound = MapcodeZone.empty();
+                                MapcodeZone zfound = new MapcodeZone();
                                 for (j = fromTerritoryRecord; j < territoryRecord; j++) { // try all smaller rectangles j
                                     if (!Data.isRestricted(j)) {
                                         final MapcodeZone z = mapcodeZone.restrictZoneTo(createBoundaryForTerritoryRecord(j));
@@ -139,7 +149,7 @@ class Decoder {
                                             nrZoneOverlaps++;
                                             if (nrZoneOverlaps == 1) {
                                                 // first fit! remember...
-                                                zfound.copyFrom(z);
+                                                zfound = new MapcodeZone(z);
                                             } else { // nrZoneOverlaps > 1
                                                 // more than one hit
                                                 break; // give up!
@@ -148,12 +158,12 @@ class Decoder {
                                     }
                                 }
                                 if (nrZoneOverlaps == 1) { // intersected exactly ONE sub-area?
-                                    mapcodeZone.copyFrom(zfound); // use the intersection found...
+                                    mapcodeZone = new MapcodeZone(zfound); // use the intersection found...
                                 }
                             }
 
                             if (nrZoneOverlaps == 0) {
-                                mapcodeZone.setEmpty();
+                                mapcodeZone = new MapcodeZone();
                             }
                         }
                         break;
@@ -161,30 +171,29 @@ class Decoder {
                 }
             } else if (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_PIPE) {
                 // i = grid with headerletter
-                if ((incodex == (codexi + 10)) && (Data.headerLetter(territoryRecord).charAt(0) == mapcode.charAt(0))) {
+                if ((codex == (codexOfTerritory + 10)) &&
+                        (Data.headerLetter(territoryRecord).charAt(0) == mapcode.charAt(0))) {
                     mapcodeZone = decodeGrid(mapcode.substring(1),
-                            boundary.getLonMicroDegMin(), boundary.getLatMicroDegMin(),
-                            boundary.getLonMicroDegMax(), boundary.getLatMicroDegMax(),
-                            territoryRecord, extrapostfix);
+                            boundaryOfTerritory.getLonMicroDegMin(), boundaryOfTerritory.getLatMicroDegMin(),
+                            boundaryOfTerritory.getLonMicroDegMax(), boundaryOfTerritory.getLatMicroDegMax(),
+                            territoryRecord, precisionPostfix);
                     break;
                 }
             } else {
+                assert (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_PLUS) ||
+                        (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_STAR);
                 // i = autoheader
-                if (((incodex == 23) && (codexi == 22)) || ((incodex == 33) && (codexi == 23))) {
-                    mapcodeZone = decodeAutoHeader(mapcode, territoryRecord, extrapostfix);
+                if (((codex == 23) && (codexOfTerritory == 22)) ||
+                        ((codex == 33) && (codexOfTerritory == 23))) {
+                    mapcodeZone = decodeAutoHeader(mapcode, territoryRecord, precisionPostfix);
                     break;
                 }
             }
         }
 
         mapcodeZone = mapcodeZone.restrictZoneTo(createBoundaryForTerritoryRecord(uptoTerritoryRecord));
-
-        final Point result = mapcodeZone.getMidPoint();
-
-        LOG.trace("decode: result=({}, {})",
-                result.isDefined() ? result.getLatDeg() : Double.NaN,
-                result.isDefined() ? result.getLonDeg() : Double.NaN);
-        return result;
+        LOG.trace("decode: zone={}", mapcodeZone);
+        return mapcodeZone;
     }
 
     // ----------------------------------------------------------------------
@@ -333,10 +342,10 @@ class Decoder {
         int divy;
         divy = dataModel.getSmartDiv(m);
         if (divy == 1) {
-            divx = Common.xSide[prelen];
-            divy = Common.ySide[prelen];
+            divx = Common.X_SIDE[prelen];
+            divy = Common.Y_SIDE[prelen];
         } else {
-            divx = Common.nc[prelen] / divy;
+            divx = Common.NC[prelen] / divy;
         }
 
         if ((prelen == 4) && (divx == 961) && (divy == 961)) {
@@ -361,9 +370,9 @@ class Decoder {
         rely = miny + (rely * ygridsize);
         relx = minx + (relx * xgridsize);
 
-        final int yp = Common.ySide[postlen];
+        final int yp = Common.Y_SIDE[postlen];
         final int dividery = ((ygridsize + yp) - 1) / yp;
-        final int xp = Common.xSide[postlen];
+        final int xp = Common.X_SIDE[postlen];
         final int dividerx = ((xgridsize + xp) - 1) / xp;
 
         String rest = result.substring(prelen + 1);
@@ -393,7 +402,7 @@ class Decoder {
         final Point pt = Point.fromMicroDeg(cornery, cornerx);
         if (!(createBoundaryForTerritoryRecord(m).containsPoint(pt))) {
             LOG.info("decodeGrid: Failed decodeGrid({}): {} not in {}", str, pt, createBoundaryForTerritoryRecord(m));
-            return MapcodeZone.empty(); // already out of range
+            return new MapcodeZone(); // already out of range
         }
 
         final int decodeMaxx = ((relx + xgridsize) < maxx) ? (relx + xgridsize) : maxx;
@@ -473,7 +482,7 @@ class Decoder {
         }
 
         if (nrX > a) {  // past end!
-            return MapcodeZone.empty();
+            return new MapcodeZone();
         }
 
         final int territoryRecord = firstrec + nrX;
@@ -506,7 +515,7 @@ class Decoder {
         if (dx >= xSIDE) // else out-of-range!
         {
             LOG.error("decodeGrid: Failed, decodeNameless({}): dx {} > xSIDE {}", str, dx, xSIDE);
-            return MapcodeZone.empty(); // return undefined (out of range!)
+            return new MapcodeZone(); // return undefined (out of range!)
         }
 
         final int dividerx4 = Common.xDivider(miny, maxy); // 4 times too large!
@@ -537,7 +546,7 @@ class Decoder {
         while (true) {
             if ((Data.getTerritoryRecordType(i) < Data.TERRITORY_RECORD_TYPE_PLUS) || (Data.getCodex(i) != codexm)) {
                 LOG.error("decodeGrid: Failed, decodeAutoHeader({}): out of {} records", input, codexm);
-                return MapcodeZone.empty(); // return undefined
+                return new MapcodeZone(); // return undefined
             }
 
             final int maxx = createBoundaryForTerritoryRecord(i).getLonMicroDegMax();
@@ -576,7 +585,7 @@ class Decoder {
 
                 if ((cornerx < minx) || (cornerx >= maxx) || (cornery < miny) || (cornery > maxy)) {
                     LOG.error("decodeGrid: Failed, decodeAutoHeader({}): corner {}, {} out of bounds", input, cornery, cornerx);
-                    return MapcodeZone.empty(); // corner out of bounds
+                    return new MapcodeZone(); // corner out of bounds
                 }
 
                 return decodeExtension(cornery, cornerx, dividerx << 2, -dividery, extrapostfix,
@@ -833,7 +842,7 @@ class Decoder {
             c1 = DECODE_CHARS[c1];
             if ((c1 < 0) || (c1 == 30)) {
                 LOG.error("decodeGrid; Failed, decodeExtension({}): illegal c1 {}", extrapostfix, c1);
-                return MapcodeZone.empty();
+                return new MapcodeZone();
             }
             final int y1 = c1 / 5;
             final int x1 = c1 % 5;
@@ -845,7 +854,7 @@ class Decoder {
                 c2 = DECODE_CHARS[c2];
                 if ((c2 < 0) || (c2 == 30)) {
                     LOG.error("decodeGrid: Failed, decodeExtension({}): illegal c2 {}", extrapostfix, c2);
-                    return MapcodeZone.empty();
+                    return new MapcodeZone();
                 }
                 y2 = c2 / 6;
                 x2 = c2 % 6;

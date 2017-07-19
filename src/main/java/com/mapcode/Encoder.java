@@ -70,7 +70,7 @@ class Encoder {
 
         final Point pointToEncode = Point.fromDeg(argLatDeg, argLonDeg);
         final List<Mapcode> results = new ArrayList<Mapcode>();
-        int lastBaseSubTerritoryCode = -1;
+        int lastBaseSubTerritoryNumber = -1;
 
         // Determine whether to walk through all records, or just for one (given) territory.
         final int firstTerritoryRecord = (territory != null) ? territory.getNumber() : 0;
@@ -103,7 +103,7 @@ class Encoder {
                                     limitToOneResult, currentEncodeTerritory));
                             continue;
 
-                        } else if (!Data.isRestricted(subTerritoryRecord) || (lastBaseSubTerritoryCode == lastSubTerritoryRecord)) {
+                        } else if (!Data.isRestricted(subTerritoryRecord) || (lastBaseSubTerritoryNumber == lastSubTerritoryRecord)) {
                             if (Data.getCodex(subTerritoryRecord) < 54) {
                                 mapcode = encodeGrid(subTerritoryRecord, pointToEncode);
                             }
@@ -135,7 +135,7 @@ class Encoder {
                                         newResult.getCodeWithTerritory(), results.size());
                             }
 
-                            lastBaseSubTerritoryCode = lastSubTerritoryRecord;
+                            lastBaseSubTerritoryNumber = lastSubTerritoryRecord;
 
                             // Stop if we only need a single result anyway.
                             if (limitToOneResult) {
@@ -198,9 +198,9 @@ class Encoder {
 
     @Nonnull
     private static String encodeGrid(
-            final int territoryCode,
+            final int territoryNumber,
             @Nonnull final Point pointToEncode) {
-        int codexm = Data.getCodex(territoryCode);
+        int codexm = Data.getCodex(territoryNumber);
         final int orgcodex = codexm;
         if (codexm == 21) {
             codexm = 22;
@@ -210,18 +210,18 @@ class Encoder {
         final int prelen = codexm / 10;
         final int postlen = codexm % 10;
         final int divx;
-        int divy = dataModel.getSmartDiv(territoryCode);
+        int divy = dataModel.getSmartDiv(territoryNumber);
         if (divy == 1) {
-            divx = xSide[prelen];
-            divy = ySide[prelen];
+            divx = X_SIDE[prelen];
+            divy = Y_SIDE[prelen];
         } else {
-            divx = nc[prelen] / divy;
+            divx = NC[prelen] / divy;
         }
 
-        final int minx = createBoundaryForTerritoryRecord(territoryCode).getLonMicroDegMin();
-        final int miny = createBoundaryForTerritoryRecord(territoryCode).getLatMicroDegMin();
-        final int maxx = createBoundaryForTerritoryRecord(territoryCode).getLonMicroDegMax();
-        final int maxy = createBoundaryForTerritoryRecord(territoryCode).getLatMicroDegMax();
+        final int minx = createBoundaryForTerritoryRecord(territoryNumber).getLonMicroDegMin();
+        final int miny = createBoundaryForTerritoryRecord(territoryNumber).getLatMicroDegMin();
+        final int maxx = createBoundaryForTerritoryRecord(territoryNumber).getLonMicroDegMax();
+        final int maxy = createBoundaryForTerritoryRecord(territoryNumber).getLatMicroDegMax();
 
         final int ygridsize = (((maxy - miny) + divy) - 1) / divy;
         int rely = pointToEncode.getLatMicroDeg() - miny;
@@ -261,8 +261,8 @@ class Encoder {
         rely = miny + (rely * ygridsize);
         relx = minx + (relx * xgridsize);
 
-        final int dividery = ((ygridsize + ySide[postlen]) - 1) / ySide[postlen];
-        final int dividerx = ((xgridsize + xSide[postlen]) - 1) / xSide[postlen];
+        final int dividery = ((ygridsize + Y_SIDE[postlen]) - 1) / Y_SIDE[postlen];
+        final int dividerx = ((xgridsize + X_SIDE[postlen]) - 1) / X_SIDE[postlen];
 
         result += '.';
 
@@ -275,12 +275,12 @@ class Encoder {
         difx = difx / dividerx;
         dify = dify / dividery;
 
-        dify = ySide[postlen] - 1 - dify;
+        dify = Y_SIDE[postlen] - 1 - dify;
         if (postlen == 3) {
             result += encodeTriple(difx, dify);
         } else {
 
-            String postfix = encodeBase31(((difx) * ySide[postlen]) + dify, postlen);
+            String postfix = encodeBase31(((difx) * Y_SIDE[postlen]) + dify, postlen);
             if (postlen == 4) {
                 postfix = String.valueOf(postfix.charAt(0)) + postfix.charAt(2) + postfix.charAt(1) + postfix.charAt(3);
             }
@@ -293,7 +293,7 @@ class Encoder {
 
         result += encodeExtension(pointToEncode, extrax << 2, extray, dividerx << 2, dividery, 1); // grid
 
-        return Data.headerLetter(territoryCode) + result;
+        return Data.headerLetter(territoryNumber) + result;
     }
 
     @Nonnull
