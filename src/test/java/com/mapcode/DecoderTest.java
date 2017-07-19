@@ -73,6 +73,15 @@ public class DecoderTest {
         assertEquals("center", center, rectangle.getCenter());
         assertEquals("southWest", southWest, rectangle.getSouthWest());
         assertEquals("northEast", northEast, rectangle.getNorthEast());
+
+        center = MapcodeCodec.decode("VHWK3.Z0HF");
+        rectangle = MapcodeCodec.decodeToRectangle("VHWK3.Z0HF");
+        southWest = Point.fromDeg(52.317869, 4.675245);
+        northEast = Point.fromDeg(52.317881, 4.675293);
+        LOG.debug("decodeToRectangle: center={}. rectangle={}", center, rectangle);
+        assertEquals("center", center, rectangle.getCenter());
+        assertEquals("southWest", southWest, rectangle.getSouthWest());
+        assertEquals("northEast", northEast, rectangle.getNorthEast());
     }
 
     @Test
