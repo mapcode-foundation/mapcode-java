@@ -60,7 +60,7 @@ class Decoder {
         }
         assert !mapcode.contains("-");
 
-        // TODO: What does AEU unpack do?
+        // TODO: Explain what AEU unpack does.
         mapcode = aeuUnpack(mapcode).trim();
         if (mapcode.isEmpty()) {
             // TODO: Is this a useful log message?
@@ -68,7 +68,6 @@ class Decoder {
             throw new UnknownMapcodeException("Failed to AEU unpack, mapcode=" + argMapcode + ", territory=" + argTerritory);
         }
 
-        // TODO: What does incodexlen mean?
         final int codexLen = mapcode.length() - 1;
 
         // *** long codes in states are handled by the country

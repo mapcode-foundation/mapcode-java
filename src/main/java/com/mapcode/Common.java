@@ -93,7 +93,7 @@ class Common {
      * @param maxY Longitude.
      * @return Divider.
      */
-    // TODO: Need better names for minY and maxY
+    // TODO: Need better names for minY and maxY.
     static int xDivider(final int minY, final int maxY) {
         assert minY < maxY;
         if (minY >= 0) {

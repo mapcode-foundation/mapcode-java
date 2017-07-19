@@ -273,6 +273,7 @@ public final class MapcodeCodec {
     }
 
 
+    // TODO: Explain when this method is needed/used.
     /**
      * Is coordinate near multiple territory borders?
      *
@@ -282,7 +283,6 @@ public final class MapcodeCodec {
      */
     public static boolean isNearMultipleBorders(@Nonnull final Point point, @Nonnull final Territory territory) {
         checkDefined("point", point);
-        // TODO: This description is not clear enough. When do you use this exactly?
         if (territory != Territory.AAA) {
             final int territoryNumber = territory.getNumber();
             if (territory.getParentTerritory() != null) {
