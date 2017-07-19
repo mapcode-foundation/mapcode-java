@@ -24,8 +24,6 @@ import javax.annotation.Nonnull;
  * ----------------------------------------------------------------------------------------------
  * Simple class to represent all the coordinates that would deliver a particular mapcode.
  */
-// TODO: Is a mapcode zone always a rectangle? Is the smallest rectangle around 1 mapcode, or something else?
-// TODO: Why is it called MapcodeZone and not for example MapcodeBoundary?
 class MapcodeZone {
 
     // TODO: Explain why you need these fractions and how they work exactly.
@@ -106,7 +104,7 @@ class MapcodeZone {
         return ((lonFractionMax <= lonFractionMin) || (latFractionMax <= latFractionMin));
     }
 
-    // TODO: What does this return?
+    // TODO: Explain what this is (geo point of mapcode).
     @Nonnull
     Point getCenter() {
         if (isEmpty()) {
@@ -118,7 +116,7 @@ class MapcodeZone {
         }
     }
 
-    // TODO: Explain when this is used. Does it clip a mapcode zon after it was retrieved?
+    // TODO: Explain when this is used. It clips a zone to an encompassing boundary.
     // Returns a non-empty intersection of a mapcode zone and a territory area.
     // Returns null if no such intersection exists.
     @Nonnull

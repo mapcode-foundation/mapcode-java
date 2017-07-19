@@ -68,7 +68,7 @@ class Data {
         return (DATA_MODEL.getDataFlags(territoryRecord) >> 7) & 3; // 1=pipe 2=plus 3=star
     }
 
-    // TODO: What does "restricted" mean?
+    // TODO: Explain what "restricted" means.
     static boolean isRestricted(final int territoryRecord) {
         assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
         return (DATA_MODEL.getDataFlags(territoryRecord) & 512) != 0;
