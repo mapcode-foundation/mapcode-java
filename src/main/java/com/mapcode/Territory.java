@@ -895,7 +895,7 @@ public enum Territory {
 
             // Check if territory name is unique.
             if (namesSet.contains(territory.toString())) {
-                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory name: " + territory.toString());
+                throw new ExceptionInInitializerError(errorPrefix + "non-unique territory name: " + territory);
             }
             namesSet.add(territory.toString());
             addNameWithParentVariants(territory.toString(), territory);

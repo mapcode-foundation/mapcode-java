@@ -24,12 +24,13 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mapcode.Boundary.createFromTerritoryRecord;
+import static com.mapcode.Boundary.createBoundaryForTerritoryRecord;
 import static com.mapcode.Common.*;
 
 class Encoder {
     private static final Logger LOG = LoggerFactory.getLogger(Encoder.class);
 
+    // Singleton of the data model.
     private static final DataModel dataModel = DataModel.getInstance();
 
     private Encoder() {
@@ -45,9 +46,9 @@ class Encoder {
             final double latDeg,
             final double lonDeg,
             @Nullable final Territory territory,
-            final boolean stopWithOneResult) {
+            final boolean limitToOneResult) {
 
-        return encode(latDeg, lonDeg, territory, stopWithOneResult, null);
+        return encode(latDeg, lonDeg, territory, limitToOneResult, null);
     }
 
     // ----------------------------------------------------------------------
@@ -58,68 +59,88 @@ class Encoder {
             'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z', 'A', 'E', 'U'};
 
     @Nonnull
-    private static List<Mapcode> encode(final double argLatDeg, final double argLonDeg,
-                                        @Nullable final Territory territory, final boolean limitToOneResult,
-                                        @Nullable final Territory argStateOverride) {
+    private static List<Mapcode> encode(
+            final double argLatDeg,
+            final double argLonDeg,
+            @Nullable final Territory territory,
+            final boolean limitToOneResult,
+            @Nullable final Territory argStateOverride) {
         LOG.trace("encode: latDeg={}, lonDeg={}, territory={}, limitToOneResult={}",
                 argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), limitToOneResult);
 
         final Point pointToEncode = Point.fromDeg(argLatDeg, argLonDeg);
-
         final List<Mapcode> results = new ArrayList<Mapcode>();
+        int lastBaseSubTerritoryCode = -1;
 
-        int lastbasesubareaID = -1;
+        // Determine whether to walk through all records, or just for one (given) territory.
+        final int firstTerritoryRecord = (territory != null) ? territory.getNumber() : 0;
+        final int lastTerritoryRecord = (territory != null) ? territory.getNumber() : Territory.AAA.getNumber();
+        for (int territoryRecord = firstTerritoryRecord; territoryRecord <= lastTerritoryRecord; territoryRecord++) {
 
-        final int firstNr = (territory != null) ? territory.getNumber() : 0;
-        final int lastNr = (territory != null) ? territory.getNumber() : Territory.AAA.getNumber();
-        for (int ccode = firstNr; ccode <= lastNr; ccode++) {
+            // Check if the point to encode is covered by the last data record.
+            final int firstSubTerritoryRecord = dataModel.getDataLastRecord(territoryRecord);
+            if (createBoundaryForTerritoryRecord(firstSubTerritoryRecord).containsPoint(pointToEncode)) {
 
-            final int uptoTerritoryRecord = dataModel.getDataLastRecord(ccode);
-            if (!createFromTerritoryRecord(uptoTerritoryRecord).containsPoint(pointToEncode)) {
-                continue;
-            }
-            final int fromTerritoryRecord = dataModel.getDataFirstRecord(ccode);
-            final Territory currentEncodeTerritory = Territory.fromNumber(ccode);
+                final int lastSubTerritoryRecord = dataModel.getDataFirstRecord(territoryRecord);
+                final Territory currentEncodeTerritory = Territory.fromNumber(territoryRecord);
 
-            for (int territoryRecord = fromTerritoryRecord; territoryRecord <= uptoTerritoryRecord; territoryRecord++) {
-                if (createFromTerritoryRecord(territoryRecord).containsPoint(pointToEncode)) {
-                    String mapcode = "";
-                    if (Data.isNameless(territoryRecord)) {
-                        mapcode = encodeNameless(pointToEncode, territoryRecord, fromTerritoryRecord);
-                    } else if (Data.getTerritoryRecordType(territoryRecord) > Data.TERRITORY_RECORD_TYPE_PIPE) {
-                        mapcode = encodeAutoHeader(pointToEncode, territoryRecord);
-                    } else if ((territoryRecord == uptoTerritoryRecord) && (currentEncodeTerritory.getParentTerritory() != null)) {
-                        results.addAll(encode(argLatDeg, argLonDeg, currentEncodeTerritory.getParentTerritory(), limitToOneResult,
-                                currentEncodeTerritory));
-                        continue;
-                    } else if (!Data.isRestricted(territoryRecord) || (lastbasesubareaID == fromTerritoryRecord)) {
-                        if (Data.getCodex(territoryRecord) < 54) {
-                            mapcode = encodeGrid(territoryRecord, pointToEncode);
-                        }
-                    }
+                for (int subTerritoryRecord = lastSubTerritoryRecord; subTerritoryRecord <= firstSubTerritoryRecord; subTerritoryRecord++) {
 
-                    if (mapcode.length() > 4) {
-                        mapcode = aeuPack(mapcode, false);
+                    // Check if the point to encode is contained within the boundary.
+                    if (createBoundaryForTerritoryRecord(subTerritoryRecord).containsPoint(pointToEncode)) {
 
-                        final Territory encodeTerritory = (argStateOverride != null) ? argStateOverride : currentEncodeTerritory;
+                        // All fine, proceed with creating a mapcode.
+                        String mapcode = "";
+                        if (Data.isNameless(subTerritoryRecord)) {
+                            mapcode = encodeNameless(pointToEncode, subTerritoryRecord, lastSubTerritoryRecord);
 
-                        // Create new result.
-                        final Mapcode newResult = new Mapcode(mapcode, encodeTerritory);
+                        } else if (Data.getTerritoryRecordType(subTerritoryRecord) > Data.TERRITORY_RECORD_TYPE_PIPE) {
+                            mapcode = encodeAutoHeader(pointToEncode, subTerritoryRecord);
 
-                        // The result should not be stored yet.
-                        if (!results.contains(newResult)) {
-                            if (limitToOneResult) {
-                                results.clear();
+                        } else if ((subTerritoryRecord == firstSubTerritoryRecord) &&
+                                (currentEncodeTerritory.getParentTerritory() != null)) {
+                            results.addAll(encode(argLatDeg, argLonDeg, currentEncodeTerritory.getParentTerritory(),
+                                    limitToOneResult, currentEncodeTerritory));
+                            continue;
+
+                        } else if (!Data.isRestricted(subTerritoryRecord) || (lastBaseSubTerritoryCode == lastSubTerritoryRecord)) {
+                            if (Data.getCodex(subTerritoryRecord) < 54) {
+                                mapcode = encodeGrid(subTerritoryRecord, pointToEncode);
                             }
-                            results.add(newResult);
                         } else {
-                            LOG.error("encode: Duplicate results found, newResult={}, results={} items",
-                                    newResult.getCodeWithTerritory(), results.size());
+                            // Skip this record.
                         }
 
-                        lastbasesubareaID = fromTerritoryRecord;
-                        if (limitToOneResult) {
-                            return results;
+                        // Check if we created a mapcode.
+                        if (!mapcode.isEmpty()) {
+                            assert mapcode.length() > 4;
+                            mapcode = aeuPack(mapcode, false);
+
+                            final Territory encodeTerritory = (argStateOverride != null) ?
+                                    argStateOverride : currentEncodeTerritory;
+
+                            // Create new result.
+                            final Mapcode newResult = new Mapcode(mapcode, encodeTerritory);
+
+                            // The result should not be stored yet.
+                            if (!results.contains(newResult)) {
+
+                                // Remove existing results (if there was a parent territory).
+                                if (limitToOneResult) {
+                                    results.clear();
+                                }
+                                results.add(newResult);
+                            } else {
+                                LOG.error("encode: Duplicate results found, newResult={}, results={} items",
+                                        newResult.getCodeWithTerritory(), results.size());
+                            }
+
+                            lastBaseSubTerritoryCode = lastSubTerritoryRecord;
+
+                            // Stop if we only need a single result anyway.
+                            if (limitToOneResult) {
+                                return results;
+                            }
                         }
                     }
                 }
@@ -130,7 +151,14 @@ class Encoder {
         return results;
     }
 
-    private static String encodeExtension(final Point pointToEncode, final int extrax4, final int extray, final int dividerx4, final int dividery, final int ydirection) {
+    @Nonnull
+    private static String encodeExtension(
+            final Point pointToEncode,
+            final int extrax4,
+            final int extray,
+            final int dividerx4,
+            final int dividery,
+            final int ydirection) {
         int extraDigits = 8; // always generate 8 digits
 
         double factorx = Point.MAX_PRECISION_FACTOR * dividerx4;
@@ -168,8 +196,11 @@ class Encoder {
         return sb.toString();
     }
 
-    private static String encodeGrid(final int m, final Point pointToEncode) {
-        int codexm = Data.getCodex(m);
+    @Nonnull
+    private static String encodeGrid(
+            final int territoryCode,
+            @Nonnull final Point pointToEncode) {
+        int codexm = Data.getCodex(territoryCode);
         final int orgcodex = codexm;
         if (codexm == 21) {
             codexm = 22;
@@ -179,7 +210,7 @@ class Encoder {
         final int prelen = codexm / 10;
         final int postlen = codexm % 10;
         final int divx;
-        int divy = dataModel.getSmartDiv(m);
+        int divy = dataModel.getSmartDiv(territoryCode);
         if (divy == 1) {
             divx = xSide[prelen];
             divy = ySide[prelen];
@@ -187,10 +218,10 @@ class Encoder {
             divx = nc[prelen] / divy;
         }
 
-        final int minx = createFromTerritoryRecord(m).getLonMicroDegMin();
-        final int miny = createFromTerritoryRecord(m).getLatMicroDegMin();
-        final int maxx = createFromTerritoryRecord(m).getLonMicroDegMax();
-        final int maxy = createFromTerritoryRecord(m).getLatMicroDegMax();
+        final int minx = createBoundaryForTerritoryRecord(territoryCode).getLonMicroDegMin();
+        final int miny = createBoundaryForTerritoryRecord(territoryCode).getLatMicroDegMin();
+        final int maxx = createBoundaryForTerritoryRecord(territoryCode).getLonMicroDegMax();
+        final int maxy = createBoundaryForTerritoryRecord(territoryCode).getLatMicroDegMax();
 
         final int ygridsize = (((maxy - miny) + divy) - 1) / divy;
         int rely = pointToEncode.getLatMicroDeg() - miny;
@@ -262,16 +293,19 @@ class Encoder {
 
         result += encodeExtension(pointToEncode, extrax << 2, extray, dividerx << 2, dividery, 1); // grid
 
-        return Data.headerLetter(m) + result;
+        return Data.headerLetter(territoryCode) + result;
     }
 
-    private static String encodeAutoHeader(final Point pointToEncode, final int thisindex) {
-        final StringBuilder autoheader_result = new StringBuilder();
-        final int codexm = Data.getCodex(thisindex);
+    @Nonnull
+    private static String encodeAutoHeader(
+            @Nonnull final Point pointToEncode,
+            final int territoryRecord) {
+        final StringBuilder stringBuilder = new StringBuilder();
+        final int codexm = Data.getCodex(territoryRecord);
         int storageStart = 0;
 
         // search back to first pipe star
-        int firstindex = thisindex;
+        int firstindex = territoryRecord;
         while ((Data.getTerritoryRecordType(firstindex - 1) > Data.TERRITORY_RECORD_TYPE_PIPE) && (Data.getCodex(firstindex - 1) == codexm)) {
             firstindex--;
         }
@@ -279,10 +313,10 @@ class Encoder {
         int i = firstindex;
         while (true) {
 
-            final int maxx = createFromTerritoryRecord(i).getLonMicroDegMax();
-            final int maxy = createFromTerritoryRecord(i).getLatMicroDegMax();
-            final int minx = createFromTerritoryRecord(i).getLonMicroDegMin();
-            final int miny = createFromTerritoryRecord(i).getLatMicroDegMin();
+            final int maxx = createBoundaryForTerritoryRecord(i).getLonMicroDegMax();
+            final int maxy = createBoundaryForTerritoryRecord(i).getLatMicroDegMax();
+            final int minx = createBoundaryForTerritoryRecord(i).getLonMicroDegMin();
+            final int miny = createBoundaryForTerritoryRecord(i).getLatMicroDegMin();
 
             int h = ((maxy - miny) + 89) / 90;
             final int xdiv = xDivider(miny, maxy);
@@ -300,7 +334,7 @@ class Encoder {
                         ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
             }
 
-            if (i == thisindex) {
+            if (i == territoryRecord) {
                 final int dividerx = (((maxx - minx) + w) - 1) / w;
                 final int vx = (pointToEncode.getLonMicroDeg() - minx) / dividerx;
                 final int extrax = (pointToEncode.getLonMicroDeg() - minx) % dividerx;
@@ -317,13 +351,13 @@ class Encoder {
                 value += (vy / 176);
 
                 final int codexlen = (codexm / 10) + (codexm % 10);
-                autoheader_result.append(encodeBase31((storageStart / (961 * 31)) + value, codexlen - 2));
-                autoheader_result.append('.');
-                autoheader_result.append(encodeTriple(vx % 168, vy % 176));
+                stringBuilder.append(encodeBase31((storageStart / (961 * 31)) + value, codexlen - 2));
+                stringBuilder.append('.');
+                stringBuilder.append(encodeTriple(vx % 168, vy % 176));
 
-                autoheader_result.append(
+                stringBuilder.append(
                         encodeExtension(pointToEncode, extrax << 2, extray, dividerx << 2, dividery, -1)); // AutoHeader
-                return autoheader_result.toString();
+                return stringBuilder.toString();
             }
 
             storageStart += product;
@@ -331,17 +365,20 @@ class Encoder {
         }
     }
 
-    // mid-level encode/decode
-    private static String encodeNameless(final Point pointToEncode, final int index, final int firstcode)
-    // returns "" in case of (argument) error
-    {
-        final int codexm = Data.getCodex(index);
+    @Nonnull
+    private static String encodeNameless(
+            @Nonnull final Point pointToEncode,
+            final int territoryRecord,
+            final int firstTerritoryRecord) {
+        // mid-level encode/decode
+        // returns "" in case of (argument) error
+        final int codexm = Data.getCodex(territoryRecord);
         final int codexlen = (codexm / 10) + (codexm % 10);
-        final int first_nameless_record = getFirstNamelessRecord(codexm, index, firstcode);
-        final int a = countCityCoordinatesForCountry(codexm, index, firstcode);
+        final int firstNamelessRecord = getFirstNamelessRecord(codexm, territoryRecord, firstTerritoryRecord);
+        final int a = countCityCoordinatesForCountry(codexm, territoryRecord, firstTerritoryRecord);
         final int p = 31 / a;
         final int r = 31 % a;
-        final int nrX = index - first_nameless_record;
+        final int nrX = territoryRecord - firstNamelessRecord;
 
         int storage_offset;
 
@@ -368,13 +405,13 @@ class Encoder {
             storage_offset = nrX * basePowerA;
         }
 
-        int side = dataModel.getSmartDiv(index);
+        int side = dataModel.getSmartDiv(territoryRecord);
         final int orgSide = side;
         int xSide = side;
 
-        final int maxy = createFromTerritoryRecord(index).getLatMicroDegMax();
-        final int minx = createFromTerritoryRecord(index).getLonMicroDegMin();
-        final int miny = createFromTerritoryRecord(index).getLatMicroDegMin();
+        final int maxy = createBoundaryForTerritoryRecord(territoryRecord).getLatMicroDegMax();
+        final int minx = createBoundaryForTerritoryRecord(territoryRecord).getLonMicroDegMin();
+        final int miny = createBoundaryForTerritoryRecord(territoryRecord).getLatMicroDegMin();
 
         final int dividerx4 = xDivider(miny, maxy);
         final int xFracture = pointToEncode.getLonFraction() / 810000;
@@ -393,7 +430,7 @@ class Encoder {
         }
 
         int v = storage_offset;
-        if (Data.isSpecialShape(index)) {
+        if (Data.isSpecialShape(territoryRecord)) {
             xSide *= side;
             side = 1 + ((maxy - miny) / 90);
             xSide = xSide / side;
@@ -407,7 +444,7 @@ class Encoder {
         if (codexlen == 3) {
             result = result.substring(0, 2) + '.' + result.substring(2);
         } else if (codexlen == 4) {
-            if ((codexm == 22) && (a < 62) && (orgSide == 961) && !Data.isSpecialShape(index)) {
+            if ((codexm == 22) && (a < 62) && (orgSide == 961) && !Data.isSpecialShape(territoryRecord)) {
                 result = result.substring(0, 2) + result.charAt(3) + result.charAt(2) + result.charAt(4);
             }
             if (codexm == 13) {
@@ -421,8 +458,11 @@ class Encoder {
         return result;
     }
 
-    // add vowels to prevent all-digit mapcodes
-    static String aeuPack(final String argStr, final boolean argShort) {
+    @Nonnull
+    static String aeuPack(
+            @Nonnull final String argStr,
+            final boolean argShort) {
+        // add vowels to prevent all-digit mapcodes
         String str = argStr;
         int dotpos = -9;
         int rlen = str.length();
@@ -457,7 +497,10 @@ class Encoder {
         return str + rest;
     }
 
-    private static String encodeBase31(final int argValue, final int argNrChars) {
+    @Nonnull
+    private static String encodeBase31(
+            final int argValue,
+            final int argNrChars) {
         int value = argValue;
         int nrChars = argNrChars;
         final StringBuilder result = new StringBuilder();
@@ -469,8 +512,12 @@ class Encoder {
         return result.toString();
     }
 
-    private static int encodeSixWide(final int x, final int y, final int width, final int height) {
-        int d;
+    private static int encodeSixWide(
+            final int x,
+            final int y,
+            final int width,
+            final int height) {
+        final int d;
         int col = x / 6;
         final int maxcol = (width - 4) / 6;
         if (col >= maxcol) {
@@ -482,7 +529,10 @@ class Encoder {
         return ((height * 6 * col) + ((height - 1 - y) * d) + x) - (col * 6);
     }
 
-    private static String encodeTriple(final int difx, final int dify) {
+    @Nonnull
+    private static String encodeTriple(
+            final int difx,
+            final int dify) {
         if (dify < (4 * 34)) {
             return ENCODE_CHARS[((difx / 28) + (6 * (dify / 34)))] + encodeBase31(((difx % 28) * 34) + (dify % 34), 2);
         } else {

@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 
-import static com.mapcode.Boundary.createFromTerritoryRecord;
+import static com.mapcode.Boundary.createBoundaryForTerritoryRecord;
 
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
@@ -93,7 +93,7 @@ class Decoder {
 
         for (int territoryRecord = fromTerritoryRecord; territoryRecord <= uptoTerritoryRecord; territoryRecord++) {
             final int codexi = Data.getCodex(territoryRecord);
-            Boundary boundary = createFromTerritoryRecord(territoryRecord);
+            final Boundary boundary = createBoundaryForTerritoryRecord(territoryRecord);
             if (Data.getTerritoryRecordType(territoryRecord) == Data.TERRITORY_RECORD_TYPE_NONE) {
                 if (Data.isNameless(territoryRecord)) {
                     // i = nameless
@@ -113,16 +113,16 @@ class Decoder {
                                 territoryRecord, extrapostfix);
 
                         // first of all, make sure the zone fits the country
-                        mapcodeZone = mapcodeZone.restrictZoneTo(createFromTerritoryRecord(uptoTerritoryRecord));
+                        mapcodeZone = mapcodeZone.restrictZoneTo(createBoundaryForTerritoryRecord(uptoTerritoryRecord));
 
                         if (Data.isRestricted(territoryRecord) && !mapcodeZone.isEmpty()) {
                             int nrZoneOverlaps = 0;
                             int j;
-                            Point result = mapcodeZone.getMidPoint();
+                            final Point result = mapcodeZone.getMidPoint();
                             // see if midpoint of mapcode zone is in any sub-area...
                             for (j = territoryRecord - 1; j >= fromTerritoryRecord; j--) {
                                 if (!Data.isRestricted(j)) {
-                                    if (createFromTerritoryRecord(j).containsPoint(result)) {
+                                    if (createBoundaryForTerritoryRecord(j).containsPoint(result)) {
                                         nrZoneOverlaps++;
                                         break;
                                     }
@@ -131,10 +131,10 @@ class Decoder {
 
                             if (nrZoneOverlaps == 0) {
                                 // see if mapcode zone OVERLAPS any sub-area...
-                                MapcodeZone zfound = MapcodeZone.empty();
+                                final MapcodeZone zfound = MapcodeZone.empty();
                                 for (j = fromTerritoryRecord; j < territoryRecord; j++) { // try all smaller rectangles j
                                     if (!Data.isRestricted(j)) {
-                                        MapcodeZone z = mapcodeZone.restrictZoneTo(createFromTerritoryRecord(j));
+                                        final MapcodeZone z = mapcodeZone.restrictZoneTo(createBoundaryForTerritoryRecord(j));
                                         if (!z.isEmpty()) {
                                             nrZoneOverlaps++;
                                             if (nrZoneOverlaps == 1) {
@@ -177,7 +177,7 @@ class Decoder {
             }
         }
 
-        mapcodeZone = mapcodeZone.restrictZoneTo(createFromTerritoryRecord(uptoTerritoryRecord));
+        mapcodeZone = mapcodeZone.restrictZoneTo(createBoundaryForTerritoryRecord(uptoTerritoryRecord));
 
         final Point result = mapcodeZone.getMidPoint();
 
@@ -308,8 +308,14 @@ class Decoder {
     };
 
     @Nonnull
-    private static MapcodeZone decodeGrid(final String str, final int minx, final int miny, final int maxx, final int maxy,
-                                          final int m, final String extrapostfix) {
+    private static MapcodeZone decodeGrid(
+            @Nonnull final String str,
+            final int minx,
+            final int miny,
+            final int maxx,
+            final int maxy,
+            final int m,
+            @Nonnull final String extrapostfix) {
         // for a well-formed result, and integer variables
         String result = str;
         int relx;
@@ -384,9 +390,9 @@ class Decoder {
         final int cornery = rely + (dify * dividery);
         final int cornerx = relx + (difx * dividerx);
 
-        Point pt = Point.fromMicroDeg(cornery, cornerx);
-        if (!(createFromTerritoryRecord(m).containsPoint(pt))) {
-            LOG.info("decodeGrid: Failed decodeGrid({}): {} not in {}", str, pt, createFromTerritoryRecord(m));
+        final Point pt = Point.fromMicroDeg(cornery, cornerx);
+        if (!(createBoundaryForTerritoryRecord(m).containsPoint(pt))) {
+            LOG.info("decodeGrid: Failed decodeGrid({}): {} not in {}", str, pt, createBoundaryForTerritoryRecord(m));
             return MapcodeZone.empty(); // already out of range
         }
 
@@ -397,7 +403,10 @@ class Decoder {
     }
 
     @Nonnull
-    private static MapcodeZone decodeNameless(final String str, final int firstrec, final String extrapostfix) {
+    private static MapcodeZone decodeNameless(
+            @Nonnull final String str,
+            final int firstrec,
+            @Nonnull final String extrapostfix) {
         String result = str;
         final int codexm = Data.getCodex(firstrec);
         if (codexm == 22) {
@@ -406,7 +415,7 @@ class Decoder {
             result = result.substring(0, 2) + result.substring(3);
         }
 
-        int a = Common.countCityCoordinatesForCountry(codexm, firstrec, firstrec);
+        final int a = Common.countCityCoordinatesForCountry(codexm, firstrec, firstrec);
 
         final int p = 31 / a;
         final int r = 31 % a;
@@ -472,7 +481,7 @@ class Decoder {
         int side = dataModel.getSmartDiv(territoryRecord);
         int xSIDE = side;
 
-        Boundary boundary = createFromTerritoryRecord(territoryRecord);
+        final Boundary boundary = createBoundaryForTerritoryRecord(territoryRecord);
         final int maxx = boundary.getLonMicroDegMax();
         final int maxy = boundary.getLatMicroDegMax();
         final int minx = boundary.getLonMicroDegMin();
@@ -510,7 +519,10 @@ class Decoder {
     }
 
     @Nonnull
-    private static MapcodeZone decodeAutoHeader(final String input, final int m, final String extrapostfix) {
+    private static MapcodeZone decodeAutoHeader(
+            final String input,
+            final int m,
+            @Nonnull final String extrapostfix) {
         // returns Point.isUndefined() in case or error
         int storageStart = 0;
         final int codexm = Data.getCodex(m);
@@ -528,10 +540,10 @@ class Decoder {
                 return MapcodeZone.empty(); // return undefined
             }
 
-            final int maxx = createFromTerritoryRecord(i).getLonMicroDegMax();
-            final int maxy = createFromTerritoryRecord(i).getLatMicroDegMax();
-            final int minx = createFromTerritoryRecord(i).getLonMicroDegMin();
-            final int miny = createFromTerritoryRecord(i).getLatMicroDegMin();
+            final int maxx = createBoundaryForTerritoryRecord(i).getLonMicroDegMax();
+            final int maxy = createBoundaryForTerritoryRecord(i).getLatMicroDegMax();
+            final int minx = createBoundaryForTerritoryRecord(i).getLonMicroDegMin();
+            final int miny = createBoundaryForTerritoryRecord(i).getLatMicroDegMin();
 
             int h = ((maxy - miny) + 89) / 90;
             final int xdiv = Common.xDivider(miny, maxy);
@@ -576,7 +588,7 @@ class Decoder {
     }
 
     @Nonnull
-    private static String aeuUnpack(final String argStr) {
+    private static String aeuUnpack(@Nonnull final String argStr) {
         // unpack encoded into all-digit
         // (assume str already uppercase!), returns "" in case of error
         String str = decodeUTF16(argStr);
@@ -663,7 +675,8 @@ class Decoder {
      * @param mapcode Unicode string.
      * @return ASCII string.
      */
-    static String decodeUTF16(final String mapcode) {
+    @Nonnull
+    static String decodeUTF16(@Nonnull final String mapcode) {
         String result;
         final StringBuilder asciiBuf = new StringBuilder();
         for (final char ch : mapcode.toCharArray()) {
@@ -706,7 +719,10 @@ class Decoder {
         }
     }
 
-    static String encodeUTF16(final String mapcodeInput, final int alphabetCode) throws IllegalArgumentException {
+    @Nonnull
+    static String encodeUTF16(
+            @Nonnull final String mapcodeInput,
+            final int alphabetCode) throws IllegalArgumentException {
 
         final String mapcode;
         if ((alphabetCode == Alphabet.GREEK.getNumber()) ||
@@ -747,7 +763,7 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeTriple(final String str) {
+    private static Point decodeTriple(@Nonnull final String str) {
         final int c1 = DECODE_CHARS[(int) str.charAt(0)];
         final int x = decodeBase31(str.substring(1));
         if (c1 < 24) {
@@ -757,8 +773,11 @@ class Decoder {
     }
 
     @Nonnull
-    private static Point decodeSixWide(final int v, final int width, final int height) {
-        int d;
+    private static Point decodeSixWide(
+            final int v,
+            final int width,
+            final int height) {
+        final int d;
         int col = v / (height * 6);
         final int maxcol = (width - 4) / 6;
         if (col >= maxcol) {
@@ -774,7 +793,7 @@ class Decoder {
     // / lowest level encode/decode routines
     // decode up to dot or EOS;
     // returns negative in case of error
-    private static int decodeBase31(final String code) {
+    private static int decodeBase31(@Nonnull final String code) {
         int value = 0;
         for (final char c : code.toCharArray()) {
             if (c == '.') {
@@ -789,9 +808,16 @@ class Decoder {
     }
 
     @Nonnull
-    private static MapcodeZone decodeExtension(final int y, final int x, final int dividerx0, final int dividery0,
-                                               final String extrapostfix, final int lon_offset4, final int extremeLatMicroDeg, final int maxLonMicroDeg) {
-        MapcodeZone mapcodeZone = new MapcodeZone();
+    private static MapcodeZone decodeExtension(
+            final int y,
+            final int x,
+            final int dividerx0,
+            final int dividery0,
+            @Nonnull final String extrapostfix,
+            final int lon_offset4,
+            final int extremeLatMicroDeg,
+            final int maxLonMicroDeg) {
+        final MapcodeZone mapcodeZone = new MapcodeZone();
         double dividerx4 = (double) dividerx0;
         double dividery = (double) dividery0;
         double processor = 1;
@@ -840,8 +866,8 @@ class Decoder {
             processor *= 30;
         }
 
-        double lon4 = (x * 4 * Point.MAX_PRECISION_FACTOR) + (lon32 * dividerx4) + (lon_offset4 * Point.MAX_PRECISION_FACTOR);
-        double lat1 = (y * Point.MAX_PRECISION_FACTOR) + (lat32 * dividery);
+        final double lon4 = (x * 4 * Point.MAX_PRECISION_FACTOR) + (lon32 * dividerx4) + (lon_offset4 * Point.MAX_PRECISION_FACTOR);
+        final double lat1 = (y * Point.MAX_PRECISION_FACTOR) + (lat32 * dividery);
 
         // determine the range of coordinates that are encode to this mapcode
         if (odd) { // odd
@@ -866,9 +892,9 @@ class Decoder {
         return mapcodeZone;
     }
 
-    private static boolean isAbjadScript(final String argStr) {
+    private static boolean isAbjadScript(@Nonnull final String argStr) {
         for (final char ch : argStr.toCharArray()) {
-            int c = (int) ch;
+            final int c = (int) ch;
             if ((c >= 0x0628) && (c <= 0x0649)) {
                 return true; // Arabic
             }
@@ -878,14 +904,15 @@ class Decoder {
             if ((c >= 0x388) && (c <= 0x3C9)) {
                 return true; // Greek uppercase and lowecase
             }
-            if ((c >= 0x1100) && (c <= 0x1174) || (c >= 0xad6c) && (c <= 0xd314)) {
+            if (((c >= 0x1100) && (c <= 0x1174)) || ((c >= 0xad6c) && (c <= 0xd314))) {
                 return true; // Korean
             }
         }
         return false;
     }
 
-    private static String convertFromAbjad(final String mapcode) {
+    @Nonnull
+    private static String convertFromAbjad(@Nonnull final String mapcode) {
         // split into prefix, s, postfix
         int p = mapcode.lastIndexOf(' ');
         if (p < 0) {
@@ -894,7 +921,7 @@ class Decoder {
             p++;
         }
         final String prefix = mapcode.substring(0, p);
-        String remainder = mapcode.substring(p);
+        final String remainder = mapcode.substring(p);
         final String postfix;
         final int h = remainder.indexOf('-');
         final String s;
@@ -961,7 +988,8 @@ class Decoder {
     }
 
     @SuppressWarnings("NumericCastThatLosesPrecision")
-    private static String convertToAbjad(final String mapcode) {
+    @Nonnull
+    private static String convertToAbjad(@Nonnull final String mapcode) {
         String str;
         final String rest;
         final int h = mapcode.indexOf('-');

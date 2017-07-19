@@ -2,6 +2,10 @@
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.4
+
+* Minor code hygiene improvements.
+
 ### 2.4.3
 
 * Updated Maven dependencies for latest patches.

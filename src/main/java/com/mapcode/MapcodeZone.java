@@ -133,7 +133,7 @@ class MapcodeZone {
     // Returns null if no such intersection exists.
     @Nonnull
     MapcodeZone restrictZoneTo(@Nonnull final Boundary area) {
-        MapcodeZone z = new MapcodeZone(this);
+        final MapcodeZone z = new MapcodeZone(this);
         final double latMin = area.getLatMicroDegMin() * Point.LAT_MICRODEG_TO_FRACTIONS_FACTOR;
         if (z.latFractionMin < latMin) {
             z.latFractionMin = latMin;
