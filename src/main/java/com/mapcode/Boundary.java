@@ -46,7 +46,7 @@ class Boundary {
 
     // You have to use this factory method instead of a ctor.
     @Nonnull
-    static Boundary createFromTerritoryRecord(final int territoryRecord) {
+    static Boundary createBoundaryForTerritoryRecord(final int territoryRecord) {
         return new Boundary(
                 DATA_MODEL.getLonMicroDegMin(territoryRecord),
                 DATA_MODEL.getLonMicroDegMax(territoryRecord),

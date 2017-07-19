@@ -52,7 +52,6 @@ class Data {
     static final int TERRITORY_RECORD_TYPE_NONE = 0;
     static final int TERRITORY_RECORD_TYPE_PIPE = 1;
     static final int TERRITORY_RECORD_TYPE_PLUS = 2;
-    static final int TERRITORY_RECORD_TYPE_STAR = 3;
 
     static int getTerritoryRecordType(final int territoryRecord) {
         assert (0 <= territoryRecord) && (territoryRecord < DATA_MODEL.getNrTerritoryRecords());
@@ -81,6 +80,6 @@ class Data {
 
     @Nonnull
     static Boundary getBoundary(final int territoryRecord) {
-        return Boundary.createFromTerritoryRecord(territoryRecord);
+        return Boundary.createBoundaryForTerritoryRecord(territoryRecord);
     }
 }
