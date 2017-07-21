@@ -269,6 +269,7 @@ public final class MapcodeCodec {
         final Point southWest = Point.fromLatLonFractions(mapcodeZone.getLatFractionMin(), mapcodeZone.getLonFractionMin());
         final Point northEast = Point.fromLatLonFractions(mapcodeZone.getLatFractionMax(), mapcodeZone.getLonFractionMax());
         final Rectangle rectangle = new Rectangle(southWest, northEast);
+        assert rectangle.isDefined();
         return rectangle;
     }
 

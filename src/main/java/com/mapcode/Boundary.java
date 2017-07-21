@@ -26,29 +26,28 @@ import javax.annotation.Nonnull;
  * This class handles territory rectangles for mapcodes.
  */
 class Boundary {
-    private int lonMicroDegMin;     // Minimum longitude (in microdegrees). Inclusive.
-    private int lonMicroDegMax;     // Maximum longitude (in microdegrees). Exclusive.
     private int latMicroDegMin;     // Minimum latitude (in microdegrees). Inclusive.
+    private int lonMicroDegMin;     // Minimum longitude (in microdegrees). Inclusive.
     private int latMicroDegMax;     // Minimum latitude (in microdegrees). Exclusive.
+    private int lonMicroDegMax;     // Maximum longitude (in microdegrees). Exclusive.
 
+    // Get the singleton for the data model.
     private static final DataModel DATA_MODEL = DataModel.getInstance();
 
-    private Boundary(final int lonMicroDegMin, final int lonMicroDegMax,
-                     final int latMicroDegMin, final int latMicroDegMax) {
+    private Boundary(final int latMicroDegMin, final int lonMicroDegMin, final int latMicroDegMax, final int lonMicroDegMax) {
         this.lonMicroDegMin = lonMicroDegMin;
         this.latMicroDegMin = latMicroDegMin;
-        this.lonMicroDegMax = lonMicroDegMax;
         this.latMicroDegMax = latMicroDegMax;
+        this.lonMicroDegMax = lonMicroDegMax;
     }
 
     // You have to use this factory method instead of a ctor.
     @Nonnull
     static Boundary createBoundaryForTerritoryRecord(final int territoryRecord) {
         return new Boundary(
-                DATA_MODEL.getLonMicroDegMin(territoryRecord),
-                DATA_MODEL.getLonMicroDegMax(territoryRecord),
-                DATA_MODEL.getLatMicroDegMin(territoryRecord),
-                DATA_MODEL.getLatMicroDegMax(territoryRecord));
+                DATA_MODEL.getLatMicroDegMin(territoryRecord), DATA_MODEL.getLonMicroDegMin(territoryRecord),
+                DATA_MODEL.getLatMicroDegMax(territoryRecord), DATA_MODEL.getLonMicroDegMax(territoryRecord)
+        );
     }
 
     int getLonMicroDegMin() {
