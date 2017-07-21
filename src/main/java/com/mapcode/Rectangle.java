@@ -43,11 +43,7 @@ public class Rectangle {
         return northEast;
     }
 
-    public boolean isDefined() {
-        return southWest.isDefined() && northEast.isDefined();
-    }
-
-    @Nonnull
+   @Nonnull
     public Point getCenter() {
         if (!isDefined()) {
             return Point.undefined();
@@ -55,6 +51,10 @@ public class Rectangle {
         final double centerLat = ((southWest.getLatDeg() + northEast.getLatDeg()) / 2.0);
         final double centerLon = ((southWest.getLonDeg() + northEast.getLonDeg()) / 2.0);
         return Point.fromDeg(centerLat, centerLon);
+    }
+
+    boolean isDefined() {
+        return southWest.isDefined() && northEast.isDefined();
     }
 
     @Nonnull

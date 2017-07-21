@@ -73,6 +73,9 @@ class Common {
     static {
 
         // This code shows a message when assertions are active or disabled. It (ab)uses assert for that...
+        // Some of the methods (and tests) take considerably longer with assertions checking, so it's useful
+        // to have this information in the log file.
+
         //noinspection UnusedAssignment
         boolean debug = false;
         //noinspection AssertWithSideEffects
@@ -80,34 +83,24 @@ class Common {
         //noinspection ConstantConditions
         if (debug) {
             LOG.info("Common: assertions are active (JVM runtime option '-ea')");
-        }
-        else {
+        } else {
             LOG.debug("Common: assertions are not active, they are bypassed");
         }
     }
 
-    /**
-     * This method returns a divider for longitude (multiplied by 4), for a given latitude.
-     *
-     * @param minY Latitude.
-     * @param maxY Longitude.
-     * @return Divider.
-     */
+    // This method returns a divider for longitude (multiplied by 4), for a given latitude.
     // TODO: Need better names for minY and maxY.
-    static int xDivider(final int minY, final int maxY) {
-        assert minY < maxY;
-        if (minY >= 0) {
-            // maxY > minY > 0
-            assert (maxY > minY) && (minY > 0);
-            return X_DIVIDER_19[minY >> 19];
-        } else if (maxY >= 0) {
-            // maxY > 0 > minY
-            assert (maxY > 0) && (0 > minY);
+    static int xDivider(final int latMin, final int latMax) {
+        assert latMin < latMax;
+        if (latMin >= 0) {
+            assert (latMax > latMin) && (latMin > 0);
+            return X_DIVIDER_19[latMin >> 19];
+        } else if (latMax >= 0) {
+            assert (latMax > 0) && (0 > latMin);
             return X_DIVIDER_19[0];
         } else {
-            // 0 > maxY > minY
-            assert (0 > maxY) && (maxY > minY);
-            return X_DIVIDER_19[(-maxY) >> 19];
+            assert (0 > latMax) && (latMax > latMin);
+            return X_DIVIDER_19[(-latMax) >> 19];
         }
     }
 

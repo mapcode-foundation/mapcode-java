@@ -27,11 +27,18 @@ import java.util.List;
 import static com.mapcode.Boundary.createBoundaryForTerritoryRecord;
 import static com.mapcode.Common.*;
 
+/**
+ * ----------------------------------------------------------------------------------------------
+ * Package private implementation class. For internal use within the Mapcode implementation only.
+ * ----------------------------------------------------------------------------------------------
+ *
+ * This class contains encoder for mapcodes.
+ */
 class Encoder {
     private static final Logger LOG = LoggerFactory.getLogger(Encoder.class);
 
-    // Singleton of the data model.
-    private static final DataModel dataModel = DataModel.getInstance();
+    // Get direct access to data model singleton.
+    private static final DataModel DATA_MODEL = DataModel.getInstance();
 
     private Encoder() {
         // Prevent instantiation.
@@ -78,10 +85,10 @@ class Encoder {
         for (int territoryRecord = firstTerritoryRecord; territoryRecord <= lastTerritoryRecord; territoryRecord++) {
 
             // Check if the point to encode is covered by the last data record.
-            final int firstSubTerritoryRecord = dataModel.getDataLastRecord(territoryRecord);
+            final int firstSubTerritoryRecord = DATA_MODEL.getDataLastRecord(territoryRecord);
             if (createBoundaryForTerritoryRecord(firstSubTerritoryRecord).containsPoint(pointToEncode)) {
 
-                final int lastSubTerritoryRecord = dataModel.getDataFirstRecord(territoryRecord);
+                final int lastSubTerritoryRecord = DATA_MODEL.getDataFirstRecord(territoryRecord);
                 final Territory currentEncodeTerritory = Territory.fromNumber(territoryRecord);
 
                 for (int subTerritoryRecord = lastSubTerritoryRecord; subTerritoryRecord <= firstSubTerritoryRecord; subTerritoryRecord++) {
@@ -210,7 +217,7 @@ class Encoder {
         final int prelen = codexm / 10;
         final int postlen = codexm % 10;
         final int divx;
-        int divy = dataModel.getSmartDiv(territoryNumber);
+        int divy = DATA_MODEL.getSmartDiv(territoryNumber);
         if (divy == 1) {
             divx = X_SIDE[prelen];
             divy = Y_SIDE[prelen];
@@ -405,7 +412,7 @@ class Encoder {
             storage_offset = nrX * basePowerA;
         }
 
-        int side = dataModel.getSmartDiv(territoryRecord);
+        int side = DATA_MODEL.getSmartDiv(territoryRecord);
         final int orgSide = side;
         int xSide = side;
 

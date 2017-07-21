@@ -23,12 +23,18 @@ import javax.annotation.Nonnull;
 
 import static com.mapcode.Boundary.createBoundaryForTerritoryRecord;
 
+/**
+ * ----------------------------------------------------------------------------------------------
+ * Package private implementation class. For internal use within the Mapcode implementation only.
+ * ----------------------------------------------------------------------------------------------
+ *
+ * This class contains decoder for mapcodes.
+ */
 class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
 
-    private static final char GREEK_CAPITAL_ALPHA = '\u0391';
-
-    private static final DataModel dataModel = DataModel.getInstance();
+    // Get direct access to the data model singleton.
+    private static final DataModel DATA_MODEL = DataModel.getInstance();
 
     private Decoder() {
         // Prevent instantiation.
@@ -77,20 +83,19 @@ class Decoder {
             territory = Territory.AAA;
         } else {
             final Territory parentTerritory = territory.getParentTerritory();
-            if (((codexLen >= 8) && ((parentTerritory == Territory.USA) || (parentTerritory == Territory.CAN)
-                    || (parentTerritory == Territory.AUS) || (parentTerritory == Territory.BRA)
-                    || (parentTerritory == Territory.CHN) || (parentTerritory == Territory.RUS)))
-                    || ((codexLen >= 7) &&
-                    ((parentTerritory == Territory.IND) || (parentTerritory == Territory.MEX)))) {
-
+            if (((codexLen >= 8) &&
+                    ((parentTerritory == Territory.USA) || (parentTerritory == Territory.CAN) ||
+                            (parentTerritory == Territory.AUS) || (parentTerritory == Territory.BRA) ||
+                            (parentTerritory == Territory.CHN) || (parentTerritory == Territory.RUS))) ||
+                    ((codexLen >= 7) &&
+                            ((parentTerritory == Territory.IND) || (parentTerritory == Territory.MEX)))) {
                 territory = parentTerritory;
             }
         }
-
         final int territoryNumber = territory.getNumber();
 
-        final int fromTerritoryRecord = dataModel.getDataFirstRecord(territoryNumber);
-        final int uptoTerritoryRecord = dataModel.getDataLastRecord(territoryNumber);
+        final int fromTerritoryRecord = DATA_MODEL.getDataFirstRecord(territoryNumber);
+        final int uptoTerritoryRecord = DATA_MODEL.getDataLastRecord(territoryNumber);
 
         // Determine the codex pattern as 2-digits: length-of-left-part * 10 + length-of-right-part.
         final int positionOfDot = mapcode.indexOf('.');
@@ -232,6 +237,9 @@ class Decoder {
         }
     }
 
+    // Greek character A.
+    private static final char GREEK_CAPITAL_ALPHA = '\u0391';
+
     // Special character '?' indicating missing character in alphabet.
     private static final char MISSCODE = '?';
 
@@ -339,7 +347,7 @@ class Decoder {
 
         final int divx;
         int divy;
-        divy = dataModel.getSmartDiv(m);
+        divy = DATA_MODEL.getSmartDiv(m);
         if (divy == 1) {
             divx = Common.X_SIDE[prelen];
             divy = Common.Y_SIDE[prelen];
@@ -486,7 +494,7 @@ class Decoder {
 
         final int territoryRecord = firstrec + nrX;
 
-        int side = dataModel.getSmartDiv(territoryRecord);
+        int side = DATA_MODEL.getSmartDiv(territoryRecord);
         int xSIDE = side;
 
         final Boundary boundary = createBoundaryForTerritoryRecord(territoryRecord);
