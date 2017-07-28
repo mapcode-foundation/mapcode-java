@@ -40,7 +40,7 @@ public enum Territory {
     CHN(528, "China", new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, null, new String[]{"CN"}),
     ATA(531, "Antarctica"),
 
-    VAT(0, "Vatican City", null, null, null, new String[]{"Holy See)"}),
+    VAT(0, "Vatican City", null, null, null, new String[]{"Holy See"}),
     MCO(1, "Monaco"),
     GIB(2, "Gibraltar"),
     TKL(3, "Tokelau"),
