@@ -220,6 +220,11 @@ reference C implementation.
 The library requires a minimum Java language revision level 6, but has been tested and verified to work
 with JDK 1.6, JDK 1.7 and JDK 1.8.
 
+First, make sure you have the correct file encoding (UTF8) set for Java on your system.
+Include this environment variable in your `.profile` or `.bashrc`:
+
+    export JAVA_TOOL_OPTIONS="-Dfile.encoding=UTF8"
+
 To build the library:
 
     cd <MAPCODE-HOME>
