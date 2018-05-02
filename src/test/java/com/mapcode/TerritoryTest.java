@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
+@SuppressWarnings("MagicNumber")
 public class TerritoryTest {
     private static final Logger LOG = LoggerFactory.getLogger(TerritoryTest.class);
 
@@ -48,20 +48,20 @@ public class TerritoryTest {
     @Test
     public void checkAlphabets() {
         LOG.info("checkAlphabets");
-        assertEquals(Territory.VAT.getAlphabets().length, 1);
-        assertEquals(Territory.PRI.getAlphabets().length, 1);
-        assertEquals(Territory.AAA.getAlphabets().length, 1);
-        assertEquals(Territory.CN_XZ.getAlphabets().length, 3);
-        assertEquals(Territory.IN_LD.getAlphabets().length, 3);
-        assertEquals(Territory.VAT.getAlphabets()[0], Alphabet.ROMAN);
-        assertEquals(Territory.PRI.getAlphabets()[0], Alphabet.ROMAN);
-        assertEquals(Territory.CPT.getAlphabets()[0], Alphabet.ROMAN);
-        assertEquals(Territory.CN_XZ.getAlphabets()[0], Alphabet.TIBETAN);
-        assertEquals(Territory.CN_XZ.getAlphabets()[1], Alphabet.CHINESE);
-        assertEquals(Territory.CN_XZ.getAlphabets()[2], Alphabet.ROMAN);
-        assertEquals(Territory.IN_LD.getAlphabets()[0], Alphabet.MALAYALAM);
-        assertEquals(Territory.IN_LD.getAlphabets()[1], Alphabet.ROMAN);
-        assertEquals(Territory.IN_LD.getAlphabets()[2], Alphabet.DEVANAGARI);
+        assertEquals(1, Territory.VAT.getAlphabets().length);
+        assertEquals(1, Territory.PRI.getAlphabets().length);
+        assertEquals(1, Territory.AAA.getAlphabets().length);
+        assertEquals(3, Territory.CN_XZ.getAlphabets().length);
+        assertEquals(3, Territory.IN_LD.getAlphabets().length);
+        assertEquals(Alphabet.ROMAN, Territory.VAT.getAlphabets()[0]);
+        assertEquals(Alphabet.ROMAN, Territory.PRI.getAlphabets()[0]);
+        assertEquals(Alphabet.ROMAN, Territory.CPT.getAlphabets()[0]);
+        assertEquals(Alphabet.TIBETAN, Territory.CN_XZ.getAlphabets()[0]);
+        assertEquals(Alphabet.CHINESE, Territory.CN_XZ.getAlphabets()[1]);
+        assertEquals(Alphabet.ROMAN, Territory.CN_XZ.getAlphabets()[2]);
+        assertEquals(Alphabet.MALAYALAM, Territory.IN_LD.getAlphabets()[0]);
+        assertEquals(Alphabet.ROMAN, Territory.IN_LD.getAlphabets()[1]);
+        assertEquals(Alphabet.DEVANAGARI, Territory.IN_LD.getAlphabets()[2]);
     }
 
     @Test
@@ -96,7 +96,7 @@ public class TerritoryTest {
     }
 
     @Test
-    public void testTerritoryFromString() throws Exception {
+    public void testTerritoryFromString() {
         LOG.info("testTerritoryFromString");
 
         // Accept ISO-style codes.
@@ -124,7 +124,7 @@ public class TerritoryTest {
     }
 
     @Test(expected = UnknownTerritoryException.class)
-    public void testTerritoryFromStringIncorrectDash1() throws Exception {
+    public void testTerritoryFromStringIncorrectDash1() {
         LOG.info("testTerritoryFromStringIncorrectDash1");
 
         // Issue: https://github.com/mapcode-foundation/mapcode-java/issues/23
@@ -132,13 +132,13 @@ public class TerritoryTest {
     }
 
     @Test(expected = UnknownTerritoryException.class)
-    public void testTerritoryFromStringIncorrectDash2() throws Exception {
+    public void testTerritoryFromStringIncorrectDash2() {
         LOG.info("testTerritoryFromStringIncorrectDash2");
         assertEquals(Territory.AAA, Territory.fromString("USA-NLD"));    // Exception must be thrown.
     }
 
     @Test(expected = UnknownTerritoryException.class)
-    public void testTerritoryFromStringNumeric() throws Exception {
+    public void testTerritoryFromStringNumeric() {
         LOG.info("testTerritoryFromStringNumeric");
 
         // No longer support: numeric codes.
@@ -177,9 +177,10 @@ public class TerritoryTest {
         Territory.fromString("999");
     }
 
+    @Test
     public void testFromNumberOK() {
         LOG.info("testFromNumberOK");
-        Territory.fromNumber(0);
+        assertEquals(Territory.VAT, Territory.fromNumber(0));
     }
 
     @Test(expected = UnknownTerritoryException.class)

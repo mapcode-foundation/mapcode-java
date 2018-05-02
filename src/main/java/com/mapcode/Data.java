@@ -25,7 +25,8 @@ import javax.annotation.Nonnull;
  *
  * This class the data class for Mapcode codex items.
  */
-class Data {
+@SuppressWarnings("MagicNumber")
+final class Data {
 
     // TODO: Need explanation what this is and how this is used.
     static final char[] ENCODE_CHARS = {

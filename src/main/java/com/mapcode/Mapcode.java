@@ -422,7 +422,7 @@ public final class Mapcode {
             return false;
         }
         final Mapcode that = (Mapcode) obj;
-        return this.territory.equals(that.territory) &&
+        return (this.territory == that.territory) &&
                 this.codePrecision8.equals(that.codePrecision8);
     }
 }

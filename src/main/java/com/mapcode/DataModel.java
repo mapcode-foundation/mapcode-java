@@ -31,6 +31,7 @@ import java.io.InputStream;
  *
  * This class contains the module that reads the Mapcode areas into memory and processes them.
  */
+@SuppressWarnings("MagicNumber")
 class DataModel {
     private static final Logger LOG = LoggerFactory.getLogger(DataModel.class);
 
@@ -81,7 +82,6 @@ class DataModel {
     private final int[] index;
     private final int[] data;
 
-    @SuppressWarnings("StaticNonFinalField")
     private static volatile DataModel instance = null;
     private static final Object mutex = new Object();
 
@@ -97,6 +97,7 @@ class DataModel {
         return instance;
     }
 
+    @SuppressWarnings("NestedTryStatement")
     DataModel(@Nonnull final String fileName) throws IncorrectDataModelException {
         // Read data only once in static initializer.
         LOG.info("DataModel: reading regions from file: {}", fileName);

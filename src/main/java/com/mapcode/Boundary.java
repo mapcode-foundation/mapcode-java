@@ -25,7 +25,7 @@ import javax.annotation.Nonnull;
  *
  * This class handles territory rectangles for mapcodes.
  */
-class Boundary {
+final class Boundary {
     private int latMicroDegMin;     // Minimum latitude (in microdegrees). Inclusive.
     private int lonMicroDegMin;     // Minimum longitude (in microdegrees). Inclusive.
     private int latMicroDegMax;     // Minimum latitude (in microdegrees). Exclusive.

@@ -20,39 +20,44 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
 public class CheckArgsTest {
     private static final Logger LOG = LoggerFactory.getLogger(CheckArgsTest.class);
 
-    public void testCheckNonnullOK() throws Exception {
+    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
+    @Test
+    public void testCheckNonnullOK() {
         LOG.info("testCheckNonnullOK");
         CheckArgs.checkNonnull("test", this);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCheckNonnullError() throws Exception {
+    public void testCheckNonnullError() {
         LOG.info("testCheckNonnullError");
         CheckArgs.checkNonnull("test", null);
     }
 
-    public void testCheckDefinedOK() throws Exception {
+    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
+    @Test
+    public void testCheckDefinedOK() {
         LOG.info("testCheckDefinedOK");
         CheckArgs.checkDefined("test", Point.fromDeg(0.0, 0.0));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testCheckDefinedError() throws Exception {
+    public void testCheckDefinedError() {
         LOG.info("testCheckDefinedError");
         CheckArgs.checkDefined("test", Point.undefined());
     }
 
-    public void testMapcodeCodeOK() throws Exception {
+    @SuppressWarnings("JUnitTestMethodWithNoAssertions")
+    @Test
+    public void testMapcodeCodeOK() {
         LOG.info("testCheckMapcodeCodeOK");
         CheckArgs.checkMapcodeCode("test", "XX.XX");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testMapcodeCodeError() throws Exception {
+    public void testMapcodeCodeError() {
         LOG.info("testCheckMapcodeCodeError");
         CheckArgs.checkMapcodeCode("test", "XX.XX-");
     }

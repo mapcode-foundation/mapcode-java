@@ -28,8 +28,7 @@ import static com.mapcode.Mapcode.getPrecisionFormat;
  *
  * This class provides a number of helper methods to check (runtime) arguments.
  */
-@SuppressWarnings("OverlyBroadThrowsClause")
-class CheckArgs {
+final class CheckArgs {
 
     private CheckArgs() {
         // Prevent instantiation.

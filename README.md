@@ -461,6 +461,10 @@ Normally, one of our developers should be able to comment on them and fix.
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.6
+
+* General cleanup after running stricter IntelliJ inspections profile.
+
 ### 2.4.5
 
 * Remove hard reference to `log4j` for production. Left only for unit tests.

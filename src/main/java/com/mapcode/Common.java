@@ -26,7 +26,8 @@ import org.slf4j.LoggerFactory;
  *
  * This class contains common data structures and methods used by the Mapcode implementation.
  */
-class Common {
+@SuppressWarnings("MagicNumber")
+final class Common {
     private static final Logger LOG = LoggerFactory.getLogger(Common.class);
 
     // TODO: Need better name and explanation.
@@ -76,7 +77,6 @@ class Common {
         // Some of the methods (and tests) take considerably longer with assertions checking, so it's useful
         // to have this information in the log file.
 
-        //noinspection UnusedAssignment
         boolean debug = false;
         //noinspection AssertWithSideEffects
         assert debug = true;
@@ -90,6 +90,7 @@ class Common {
 
     // This method returns a divider for longitude (multiplied by 4), for a given latitude.
     // TODO: Need better names for minY and maxY.
+    @SuppressWarnings("ConstantConditions")
     static int xDivider(final int latMin, final int latMax) {
         assert latMin < latMax;
         if (latMin >= 0) {

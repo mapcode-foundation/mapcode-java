@@ -569,7 +569,6 @@ public enum Territory {
     CPT(530, "Clipperton Island"),
     AAA(532, "International", null, null, null, new String[]{"Worldwide", "Earth"});
 
-    @SuppressWarnings("PublicStaticCollectionField")
     @Nonnull
     public static final Set<Territory> PARENT_TERRITORIES = Collections.unmodifiableSet(
             EnumSet.of(USA, IND, CAN, AUS, MEX, BRA, RUS, CHN, ATA));
@@ -795,25 +794,25 @@ public enum Territory {
     /**
      * Private constructors to create a territory code.
      */
-    private Territory(final int number,
+    Territory(final int number,
                       @Nonnull final String fullName) {
         this(number, fullName, null, null, null, null);
     }
 
-    private Territory(final int number,
+    Territory(final int number,
                       @Nonnull final String fullName,
                       @Nullable final Alphabet[] alphabets) {
         this(number, fullName, alphabets, null, null, null);
     }
 
-    private Territory(final int number,
+    Territory(final int number,
                       @Nonnull final String fullName,
                       @Nullable final Alphabet[] alphabets,
                       @Nullable final Territory parentTerritory) {
         this(number, fullName, alphabets, parentTerritory, null, null);
     }
 
-    private Territory(final int number,
+    Territory(final int number,
                       @Nonnull final String fullName,
                       @Nullable final Alphabet[] alphabets,
                       @Nullable final Territory parentTerritory,
@@ -821,7 +820,7 @@ public enum Territory {
         this(number, fullName, alphabets, parentTerritory, aliases, null);
     }
 
-    private Territory(final int number,
+    Territory(final int number,
                       @Nonnull final String fullName,
                       @Nullable final Alphabet[] alphabets,
                       @Nullable final Territory parentTerritory,

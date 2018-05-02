@@ -34,7 +34,8 @@ import static com.mapcode.Common.*;
  *
  * This class contains encoder for mapcodes.
  */
-class Encoder {
+@SuppressWarnings({"MagicNumber", "StringConcatenationMissingWhitespace"})
+final class Encoder {
     private static final Logger LOG = LoggerFactory.getLogger(Encoder.class);
 
     // Get direct access to data model singleton.
@@ -130,16 +131,16 @@ class Encoder {
                             final Mapcode newResult = new Mapcode(mapcode, encodeTerritory);
 
                             // The result should not be stored yet.
-                            if (!results.contains(newResult)) {
+                            if (results.contains(newResult)) {
+                                LOG.error("encode: Duplicate results found, newResult={}, results={} items",
+                                        newResult.getCodeWithTerritory(), results.size());
+                            } else {
 
                                 // Remove existing results (if there was a parent territory).
                                 if (limitToOneResult) {
                                     results.clear();
                                 }
                                 results.add(newResult);
-                            } else {
-                                LOG.error("encode: Duplicate results found, newResult={}, results={} items",
-                                        newResult.getCodeWithTerritory(), results.size());
                             }
 
                             lastBaseSubTerritoryNumber = lastSubTerritoryRecord;

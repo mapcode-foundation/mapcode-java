@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
+@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared", "MagicNumber"})
 public class DecoderTest {
     private static final Logger LOG = LoggerFactory.getLogger(DecoderTest.class);
 

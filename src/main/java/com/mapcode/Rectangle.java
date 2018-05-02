@@ -63,13 +63,11 @@ public class Rectangle {
         return "[" + southWest + ", " + northEast + ']';
     }
 
-    @SuppressWarnings("NonFinalFieldReferencedInHashCode")
     @Override
     public int hashCode() {
         return Arrays.hashCode(new Object[]{southWest, northEast});
     }
 
-    @SuppressWarnings("NonFinalFieldReferenceInEquals")
     @Override
     public boolean equals(final Object obj) {
         if (this == obj) {
