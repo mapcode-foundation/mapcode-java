@@ -30,7 +30,8 @@ import static com.mapcode.Boundary.createBoundaryForTerritoryRecord;
  *
  * This class contains decoder for mapcodes.
  */
-class Decoder {
+@SuppressWarnings({"MagicNumber", "StringConcatenationMissingWhitespace"})
+final class Decoder {
     private static final Logger LOG = LoggerFactory.getLogger(Decoder.class);
 
     // Get direct access to the data model singleton.
@@ -225,12 +226,12 @@ class Decoder {
 
     private static class Unicode2Ascii {
 
-        public final char min;
-        public final char max;
+        final char min;
+        final char max;
         @Nonnull
-        public final String convert;
+        final String convert;
 
-        public Unicode2Ascii(final char min, final char max, @Nonnull final String convert) {
+        Unicode2Ascii(final char min, final char max, @Nonnull final String convert) {
             this.min = min;
             this.max = max;
             this.convert = convert;
@@ -243,7 +244,8 @@ class Decoder {
     // Special character '?' indicating missing character in alphabet.
     private static final char MISSCODE = '?';
 
-    private final static char[][] ASCII2LANGUAGE = {
+    // @formatter:off
+    @SuppressWarnings("LongLine") private final static char[][] ASCII2LANGUAGE = {
             // Character:   A         B         C         D         E         F         G         H         I         J        K          L         M         N         O         P         Q         R         S         T         U         V         W         X         Y         Z         0         1         2         3         4         5         6         7         8         9
             /* Roman    */ {'\u0041', '\u0042', '\u0043', '\u0044', '\u0045', '\u0046', '\u0047', '\u0048', '\u0049', '\u004a', '\u004b', '\u004c', '\u004d', '\u004e', '\u004f', '\u0050', '\u0051', '\u0052', '\u0053', '\u0054', '\u0055', '\u0056', '\u0057', '\u0058', '\u0059', '\u005a', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Roman
             /* Greek    */ {'\u0391', '\u0392', '\u039e', '\u0394', '\u0388', '\u0395', '\u0393', '\u0397', '\u0399', '\u03a0', '\u039a', '\u039b', '\u039c', '\u039d', '\u039f', '\u03a1', '\u0398', '\u03a8', '\u03a3', '\u03a4', '\u0389', '\u03a6', '\u03a9', '\u03a7', '\u03a5', '\u0396', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Greek
@@ -274,8 +276,10 @@ class Decoder {
             /* Kannada  */ {'\u0C92', '\u0C95', '\u0C96', '\u0C97', '\u0C8E', '\u0C99', '\u0C9A', '\u0C9B', '\u0C85', '\u0C9C', '\u0CA0', '\u0CA1', '\u0CA3', '\u0CA4', '\u0C89', '\u0CA6', '\u0CA7', '\u0CA8', '\u0CAA', '\u0CAB', '\u0C87', '\u0CAC', '\u0CAD', '\u0CB0', '\u0CB2', '\u0CB5', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Kannada
             /* Gujarati */ {'\u0AB3', '\u0A97', '\u0A9C', '\u0AA1', '\u0A87', '\u0AA6', '\u0AAC', '\u0A95', '\u0A8F', '\u0A9A', '\u0A9F', '\u0AA4', '\u0AAA', '\u0AA0', '\u0A8D', '\u0AB0', '\u0AB5', '\u0A9E', '\u0AAE', '\u0AAB', '\u0A89', '\u0AB7', '\u0AA8', '\u0A9D', '\u0AA2', '\u0AAD', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}  // Gujarati
     };
+    // @formatter:on
 
-    private final static Unicode2Ascii[] UNICODE2ASCII = {
+    // @formatter:off
+    @SuppressWarnings("LongLine") private final static Unicode2Ascii[] UNICODE2ASCII = {
             /* Roman    */ new Unicode2Ascii('\u0041', '\u005a', "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),                                                        // Roman
             /* Greek    */ new Unicode2Ascii('\u0388', '\u03a9', "EU???????ABGDFZHQIKLMNCOJP?STYVXRW"),                                                // Greek
             /* Cyrillic */ new Unicode2Ascii('\u0410', '\u042f', "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"),                                                  // Cyrillic
@@ -322,6 +326,7 @@ class Decoder {
             /* Georgian */ new Unicode2Ascii('\u10d0', '\u10ef', "AB?CE?D?UF?GHOJ?KLMINPQRSTVW?XYZ"),
             /* Armenian */ new Unicode2Ascii('\u0562', '\u0586', "BCDE??FGHI?J?KLM?N?U?PQ?R??STVWXYZ?OA")
     };
+    // @formatter:on
 
     @Nonnull
     private static MapcodeZone decodeGrid(
@@ -981,19 +986,25 @@ class Decoder {
         } else if (form == 35) {
             final int c = ((DECODE_CHARS[(int) s.charAt(2)] * 8) + (DECODE_CHARS[(int) s.charAt(6)] - 18));
             if ((c >= 32) && (c < 63)) {
-                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c - 32] + s.charAt(4) + '.' + s.charAt(5) + s.charAt(7) + s.charAt(8);
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c - 32] + s.charAt(4) + '.' + s.charAt(5) + s.charAt(7) +
+                        s.charAt(8);
             } else if ((c >= 0) && (c < 31)) {
-                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c] + '.' + s.charAt(4) + s.charAt(5) + s.charAt(7) + s.charAt(8);
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c] + '.' + s.charAt(4) + s.charAt(5) + s.charAt(7) +
+                        s.charAt(8);
             }
         } else if (form == 45) {
-            final int c = (DECODE_CHARS[(int) s.charAt(2)] * 100) + (DECODE_CHARS[(int) s.charAt(5)] * 10) + (DECODE_CHARS[(int) s.charAt(8)] - 39);
+            final int c = (DECODE_CHARS[(int) s.charAt(2)] * 100) + (DECODE_CHARS[(int) s.charAt(5)] * 10) +
+                    (DECODE_CHARS[(int) s.charAt(8)] - 39);
             if ((c >= 0) && (c < 961)) {
-                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c / 31] + s.charAt(3) + '.' + s.charAt(6) + s.charAt(7) + s.charAt(9) + Data.ENCODE_CHARS[c % 31];
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c / 31] + s.charAt(3) + '.' + s.charAt(6) + s.charAt(7) +
+                        s.charAt(9) + Data.ENCODE_CHARS[c % 31];
             }
         } else if (form == 55) {
-            final int c = (DECODE_CHARS[(int) s.charAt(2)] * 100) + (DECODE_CHARS[(int) s.charAt(6)] * 10) + (DECODE_CHARS[(int) s.charAt(9)] - 39);
+            final int c = (DECODE_CHARS[(int) s.charAt(2)] * 100) + (DECODE_CHARS[(int) s.charAt(6)] * 10) +
+                    (DECODE_CHARS[(int) s.charAt(9)] - 39);
             if ((c >= 0) && (c < 961)) {
-                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c / 31] + s.charAt(3) + s.charAt(4) + '.' + s.charAt(7) + s.charAt(8) + s.charAt(10) + Data.ENCODE_CHARS[c % 31];
+                newstr = s.substring(0, 2) + Data.ENCODE_CHARS[c / 31] + s.charAt(3) + s.charAt(4) + '.' + s.charAt(7) +
+                        s.charAt(8) + s.charAt(10) + Data.ENCODE_CHARS[c % 31];
             }
         }
 

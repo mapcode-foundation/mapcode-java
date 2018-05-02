@@ -25,7 +25,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
-@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared", "ValueOfIncrementOrDecrementUsed"})
+@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared", "ValueOfIncrementOrDecrementUsed", "MagicNumber"})
 public class EncoderTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncoderTest.class);
 

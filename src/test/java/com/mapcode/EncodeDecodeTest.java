@@ -16,6 +16,7 @@
 
 package com.mapcode;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,10 +28,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 
-@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared"})
+@SuppressWarnings({"OverlyBroadThrowsClause", "ProhibitedExceptionDeclared", "MagicNumber"})
 public class EncodeDecodeTest {
     private static final Logger LOG = LoggerFactory.getLogger(EncodeDecodeTest.class);
 
@@ -75,7 +75,7 @@ public class EncodeDecodeTest {
 
             // Check encodeToShortest and encodeToInternational.
             final List<Mapcode> resultsAll = MapcodeCodec.encode(latDeg, lonDeg);
-            assertFalse(resultsAll.isEmpty());
+            Assert.assertFalse(resultsAll.isEmpty());
             assertEquals("encodeToInternational failed, result=" + resultsAll,
                     resultsAll.get(resultsAll.size() - 1), mapcodeInternational);
 
@@ -103,7 +103,7 @@ public class EncodeDecodeTest {
                                 try {
                                     decodeLocation = MapcodeCodec.decode(codePrecision, territory);
                                 } catch (final UnknownMapcodeException e) {
-                                    LOG.error("FAILED {} Decode({} {}) generated from ({}, {}) in {}", count, territory, codePrecision, latDeg, lonDeg);
+                                    LOG.error("FAILED {} Decode({} {}) generated from ({}, {})", count, codePrecision, territory, latDeg, lonDeg);
                                     LOG.error("encodeDecodeTest: Unknown mapcode exception", e);
                                     errors.getAndIncrement();
                                     continue;
@@ -111,7 +111,8 @@ public class EncodeDecodeTest {
 
                                 final double distance = Point.distanceInMeters(encode, decodeLocation);
                                 if (distance >= Mapcode.getSafeMaxOffsetInMeters(nrDigits)) {
-                                    LOG.error("encodeDecodeTest: " + mapcode + " digits = " + nrDigits + " distance = " + distance + " >= " + Mapcode.getSafeMaxOffsetInMeters(nrDigits));
+                                    LOG.error("encodeDecodeTest: {} digits = {} distance = {} >= {}", mapcode, nrDigits, distance,
+                                            Mapcode.getSafeMaxOffsetInMeters(nrDigits));
                                     errors.getAndIncrement();
                                 } else {
                                     // check that decode can be encoded back to original
@@ -138,7 +139,8 @@ public class EncodeDecodeTest {
                                             }
                                             if (!found) {
                                                 if (!MapcodeCodec.isNearMultipleBorders(decodeLocation, territory)) { // but should be found!
-                                                    LOG.error("Re-encode{} of {} failed for {} {} from ({},{})", nrDigits, decodeLocation, territory, codePrecision, latDeg, lonDeg);
+                                                    LOG.error("Re-encode{} of {} failed for {} {} from ({},{})", nrDigits, decodeLocation, territory,
+                                                            codePrecision, latDeg, lonDeg);
                                                     errors.getAndIncrement();
                                                     for (final Mapcode candidate : recodedMapcodes) {
                                                         LOG.info(" * candidate: {}", candidate.getCode(nrDigits));
@@ -155,8 +157,8 @@ public class EncodeDecodeTest {
                                 final String mapcodeAlphabet = mapcode.getCode(alphabet);
                                 final String mapcodeAscii = Mapcode.convertStringToPlainAscii(mapcodeAlphabet);
                                 if (!mapcode.getCode(0).equals(mapcodeAscii)) {
-                                    LOG.error("encodeDecodeTest: " + mapcode + " alphabet=" + alphabet + ", original=" + mapcode.getCode(0) +
-                                            ", mapcodeAlphabet=" + mapcodeAlphabet + ", mapcodeAscii=" + mapcodeAscii);
+                                    LOG.error("encodeDecodeTest: {} alphabet={}, original={}, mapcodeAlphabet={}, mapcodeAscii={}",
+                                            mapcode, alphabet, mapcode.getCode(0), mapcodeAlphabet, mapcodeAscii);
                                     errors.incrementAndGet();
                                 }
                             }

@@ -78,6 +78,15 @@ public class AlphabetTest {
     };
 
     @Test
+    public void testOrderOfValues() {
+        int i = 0;
+        for (final Alphabet alphabet : Alphabet.values()) {
+            assertEquals("Incorrect alphabet number: " + alphabet + ".number should be " + i, i, Alphabet.values()[i].getNumber());
+            ++i;
+        }
+    }
+
+    @Test
     public void testConvertToAlphabet() throws Exception {
 
         LOG.info("testConvertToAlphabet");
@@ -105,7 +114,7 @@ public class AlphabetTest {
     }
 
     @Test
-    public void testFromString() throws Exception {
+    public void testFromString() {
         LOG.info("testFromString");
         assertEquals(Alphabet.ROMAN, Alphabet.fromString("ROMAN"));
         assertEquals(Alphabet.ROMAN, Alphabet.fromString("roman"));
@@ -116,7 +125,7 @@ public class AlphabetTest {
     }
 
     @Test(expected = UnknownAlphabetException.class)
-    public void testFromStringNumeric() throws Exception {
+    public void testFromStringNumeric() {
         LOG.info("testFromStringNumeric");
         assertEquals(Alphabet.ROMAN, Alphabet.fromString("0"));
     }

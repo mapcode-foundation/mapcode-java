@@ -24,6 +24,7 @@ import javax.annotation.Nonnull;
  * Note that for syntactically incorrect mapcodes, normally {@link IllegalArgumentException}s are thrown,
  * not {@link UnknownMapcodeException}.
  */
+@SuppressWarnings("CheckedExceptionClass")
 public final class UnknownMapcodeException extends Exception {
     private static final long serialVersionUID = 1L;
 

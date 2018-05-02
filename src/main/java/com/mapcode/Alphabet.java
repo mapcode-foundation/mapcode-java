@@ -101,17 +101,4 @@ public enum Alphabet {
             throw new UnknownAlphabetException(trimmed);
         }
     }
-
-    /**
-     * Static consistency check of internal data structures.
-     */
-    static {
-        int i = 0;
-        for (final Alphabet alphabet : Alphabet.values()) {
-            if (Alphabet.values()[i].number != i) {
-                throw new ExceptionInInitializerError("Incorrect alphabet number: " + alphabet + ".number should be " + i);
-            }
-            ++i;
-        }
-    }
 }

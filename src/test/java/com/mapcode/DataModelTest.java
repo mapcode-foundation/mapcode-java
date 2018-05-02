@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 public class DataModelTest {
     private static final Logger LOG = LoggerFactory.getLogger(DataModelTest.class);
 
+    @Test
     public void testFileOK() {
         LOG.info("testFileOK");
         final DataModel dataModel = new DataModel("/com/mapcode/mminfo_ok.dat");

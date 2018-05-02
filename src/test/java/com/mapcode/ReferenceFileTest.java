@@ -18,6 +18,7 @@ package com.mapcode;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,12 +32,12 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
-import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-@SuppressWarnings({"ProhibitedExceptionDeclared", "OverlyBroadThrowsClause"})
+@SuppressWarnings({"ProhibitedExceptionDeclared", "OverlyBroadThrowsClause", "MagicNumber"})
 public class ReferenceFileTest {
     private static final Logger LOG = LoggerFactory.getLogger(ReferenceFileTest.class);
     private static final Gson GSON = new GsonBuilder().serializeSpecialFloatingPointValues().create();
@@ -52,6 +53,7 @@ public class ReferenceFileTest {
     private static final int PRECISION_MAX = 8;
 
     private static final int LOG_LINE_EVERY = 10000;
+    private static final Pattern PATTERN_SPACE = Pattern.compile(" ");
 
     @Test
     public void checkRandomReferenceRecords() throws Exception {
@@ -104,6 +106,7 @@ public class ReferenceFileTest {
 
         // Open data file.
         final ChunkedFile chunkedFile = new ChunkedFile(baseFileName);
+        //noinspection CatchMayIgnoreException
         try {
 
             //noinspection InfiniteLoopStatement
@@ -137,7 +140,7 @@ public class ReferenceFileTest {
                                 reference.point.getLatDeg(), reference.point.getLonDeg());
                         final Mapcode expectedInternational = results.get(results.size() - 1);
                         if (!resultInternational.equals(expectedInternational)) {
-                            LOG.error("checkFile: encodeToInternational fails, expected={}, got={} for reference",
+                            LOG.error("checkFile: encodeToInternational fails, expected={}, got={}, reference={}",
                                     expectedInternational, resultInternational, reference);
                             errors.incrementAndGet();
                         }
@@ -169,7 +172,7 @@ public class ReferenceFileTest {
                             for (final MapcodeRec referenceMapcodeRec : reference.mapcodes) {
 
                                 // Check if the territory corresponds.
-                                if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
+                                if (referenceMapcodeRec.territory == result.getTerritory()) {
 
                                     // Check if the mapcode corresponds; use only the specified precision.
                                     final int indexOfDash = referenceMapcodeRec.mapcode.lastIndexOf('-');
@@ -212,7 +215,7 @@ public class ReferenceFileTest {
                             for (final Mapcode result : results) {
 
                                 // Check if the territory corresponds.
-                                if (referenceMapcodeRec.territory.equals(result.getTerritory())) {
+                                if (referenceMapcodeRec.territory == result.getTerritory()) {
 
                                     // Check if the mapcode corresponds; use only the specified precision.
                                     if (referenceMapcode.equals(result.getCode(precision))) {
@@ -303,7 +306,7 @@ public class ReferenceFileTest {
         @Nonnull
         private final Territory territory;
 
-        public MapcodeRec(@Nonnull final String mapcode, @Nonnull final Territory territory) {
+        MapcodeRec(@Nonnull final String mapcode, @Nonnull final Territory territory) {
             this.mapcode = mapcode;
             this.territory = territory;
         }
@@ -315,7 +318,7 @@ public class ReferenceFileTest {
         @Nonnull
         private final ArrayList<MapcodeRec> mapcodes;
 
-        public ReferenceRec(@Nonnull final Point point, @Nonnull final ArrayList<MapcodeRec> mapcodes) {
+        ReferenceRec(@Nonnull final Point point, @Nonnull final ArrayList<MapcodeRec> mapcodes) {
             this.point = point;
             this.mapcodes = mapcodes;
         }
@@ -327,7 +330,7 @@ public class ReferenceFileTest {
 
         // Read first line of data file: <nr> <lat> <lon> <x> <y> <z>
         final String firstLine = chunkedFile.readNonEmptyLine();
-        final String[] args = firstLine.split(" ");
+        final String[] args = PATTERN_SPACE.split(firstLine);
         assertTrue("Expecting 3 or 6 elements, not " + args.length + " in line: " + firstLine,
                 (args.length == 3) || (args.length == 6));
 
@@ -345,9 +348,9 @@ public class ReferenceFileTest {
         final ArrayList<MapcodeRec> mapcodeRecs = new ArrayList<MapcodeRec>();
         for (int i = 0; i < count; ++i) {
             final String line = chunkedFile.readNonEmptyLine();
-            assertFalse("Line should not be empty", line.isEmpty());
+            Assert.assertFalse("Line should not be empty", line.isEmpty());
 
-            final String[] mapcodeLine = line.split(" ");
+            final String[] mapcodeLine = PATTERN_SPACE.split(line);
             assertTrue("Expecting 1 or 2 elements, territory and mapcode, got: " + mapcodeLine.length + ", " + line,
                     mapcodeLine.length <= 2);
 
@@ -373,7 +376,7 @@ public class ReferenceFileTest {
      * like '.a', '.b', etc. This class provides reading lines from such files and moving
      * to next chunks when needed.
      */
-    private static class ChunkedFile {
+    private static final class ChunkedFile {
         final private String baseFileName;
         private String fileName;
         private char fileExt;
@@ -390,11 +393,10 @@ public class ReferenceFileTest {
                 LOG.info("ChunkedFile: Reading {}...", fileName);
                 this.bufferedReader = new BufferedReader(new InputStreamReader(this.inputStream));
             } else {
-                throw new IOException();
+                throw new IOException("getResourceAsStream() returned null");
             }
         }
 
-        @SuppressWarnings("OverlyBroadThrowsClause")
         @Nonnull
         private String readNonEmptyLine() throws IOException {
             String line = null;
@@ -430,7 +432,7 @@ public class ReferenceFileTest {
                 bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
             } else {
                 LOG.debug("nextChunk: End of chunked file found (chunk {} not found)", fileName);
-                throw new EOFException();
+                throw new EOFException("getResourceAsStream() returned null");
             }
         }
 

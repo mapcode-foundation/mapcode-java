@@ -32,6 +32,7 @@ import static com.mapcode.Mapcode.getPrecisionFormat;
  *
  * This class is the external Java interface for encoding and decoding mapcodes.
  */
+@SuppressWarnings("MagicNumber")
 public final class MapcodeCodec {
 
     // Get direct access to the data model.
@@ -194,7 +195,6 @@ public final class MapcodeCodec {
      * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
      * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
      */
-    @SuppressWarnings("DuplicateThrows")
     @Nonnull
     public static Point decode(@Nonnull final String mapcode)
             throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
@@ -217,7 +217,6 @@ public final class MapcodeCodec {
      * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
      * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
      */
-    @SuppressWarnings("DuplicateThrows")
     @Nonnull
     public static Point decode(@Nonnull final String mapcode, @Nullable final Territory defaultTerritoryContext)
             throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
@@ -315,18 +314,14 @@ public final class MapcodeCodec {
 
     @Nonnull
     private static MapcodeZone decodeToMapcodeZone(@Nonnull final String mapcode, @Nullable final Territory defaultTerritoryContext)
-            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+            throws UnknownMapcodeException, IllegalArgumentException {
         checkNonnull("mapcode", mapcode);
         String mapcodeClean = Mapcode.convertStringToPlainAscii(mapcode.trim()).toUpperCase();
 
         // Determine territory from mapcode.
         final Territory territory;
         final Matcher matcherTerritory = Mapcode.PATTERN_TERRITORY.matcher(mapcodeClean);
-        if (!matcherTerritory.find()) {
-
-            // No territory code was supplied in the string, use specified territory context parameter.
-            territory = (defaultTerritoryContext != null) ? defaultTerritoryContext : Territory.AAA;
-        } else {
+        if (matcherTerritory.find()) {
 
             // Use the territory code from the string.
             final String territoryName = mapcodeClean.substring(matcherTerritory.start(), matcherTerritory.end()).trim();
@@ -338,6 +333,10 @@ public final class MapcodeCodec {
 
             // Cut off the territory part.
             mapcodeClean = mapcodeClean.substring(matcherTerritory.end()).trim();
+        } else {
+
+            // No territory code was supplied in the string, use specified territory context parameter.
+            territory = (defaultTerritoryContext != null) ? defaultTerritoryContext : Territory.AAA;
         }
 
         // Throws an exception if the format is incorrect.

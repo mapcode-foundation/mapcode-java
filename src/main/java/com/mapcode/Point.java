@@ -32,7 +32,8 @@ import static com.mapcode.CheckArgs.checkNonnull;
  * It represent the fractions in pairs of integers, the first integer
  * representing 1/1,000,000th of degrees, the second representing the remainder.
  */
-public class Point {
+@SuppressWarnings("MagicNumber")
+public final class Point {
 
     // Latitude and longitude ranges.
     public static final double LON_DEG_MIN = -180.0;

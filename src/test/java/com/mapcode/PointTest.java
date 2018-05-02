@@ -20,9 +20,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
+@SuppressWarnings("MagicNumber")
 public class PointTest {
     private static final Logger LOG = LoggerFactory.getLogger(PointTest.class);
     private static final double DELTA = 0.000001;
@@ -31,14 +31,14 @@ public class PointTest {
     public void invalidPoint() {
         LOG.info("invalidPoint");
         final Point point = Point.undefined();
-        assertEquals("Undefined point", false, point.isDefined());
+        assertFalse("Undefined point", point.isDefined());
     }
 
     @Test
     public void validPoint() {
         LOG.info("validPoint");
         final Point point = Point.fromMicroDeg(2, 1);
-        assertEquals("Valid point", true, point.isDefined());
+        assertTrue("Valid point", point.isDefined());
 
         assertEquals(0, Point.fromDeg(0, 0).getLatMicroDeg());
         assertEquals(0, Point.fromDeg(0, 0).getLonMicroDeg());
@@ -55,7 +55,7 @@ public class PointTest {
         LOG.info("invalidatedPoint");
         final Point point = Point.fromMicroDeg(2, 1);
         point.setUndefined();
-        assertEquals("Cleared point", false, point.isDefined());
+        assertFalse("Cleared point", point.isDefined());
     }
 
     @Test
