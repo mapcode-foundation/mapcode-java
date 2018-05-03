@@ -23,11 +23,11 @@ import javax.annotation.Nonnull;
 
 import static com.mapcode.Boundary.createBoundaryForTerritoryRecord;
 
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the mapcode implementation only.
+//----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the Mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * This class contains decoder for mapcodes.
  */
 @SuppressWarnings({"MagicNumber", "StringConcatenationMissingWhitespace"})

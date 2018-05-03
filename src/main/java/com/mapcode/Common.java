@@ -19,11 +19,11 @@ package com.mapcode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the Mapcode implementation only.
+// ----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the Mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * This class contains common data structures and methods used by the Mapcode implementation.
  */
 @SuppressWarnings("MagicNumber")

@@ -26,11 +26,11 @@ import static com.mapcode.CheckArgs.checkDefined;
 import static com.mapcode.CheckArgs.checkNonnull;
 import static com.mapcode.Mapcode.getPrecisionFormat;
 
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the mapcode implementation only.
+//----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Mapcode public interface.
- * ----------------------------------------------------------------------------------------------
- *
  * This class is the external Java interface for encoding and decoding mapcodes.
  */
 @SuppressWarnings("MagicNumber")
@@ -43,11 +43,9 @@ public final class MapcodeCodec {
         // Prevent instantiation.
     }
 
-    /**
-     * ------------------------------------------------------------------------------------------
-     * Encoding latitude, longitude to mapcodes.
-     * ------------------------------------------------------------------------------------------
-     */
+    // ------------------------------------------------------------------------------------------
+    // Encoding latitude, longitude to mapcodes.
+    // ------------------------------------------------------------------------------------------
 
     /**
      * Encode a lat/lon pair to a mapcode with territory information. This produces a non-empty list of mapcode,
@@ -243,11 +241,10 @@ public final class MapcodeCodec {
         return encodeToInternational(point.getLatDeg(), point.getLonDeg());
     }
 
-    /**
-     * ------------------------------------------------------------------------------------------
-     * Decoding mapcodes back to latitude, longitude.
-     * ------------------------------------------------------------------------------------------
-     */
+    // ------------------------------------------------------------------------------------------
+    // Decoding mapcodes back to latitude, longitude.
+    // ------------------------------------------------------------------------------------------
+    //
 
     /**
      * Decode a mapcode to a Point. The decoding process may fail for local mapcodes,

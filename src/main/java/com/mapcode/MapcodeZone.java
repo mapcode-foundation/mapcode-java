@@ -18,11 +18,11 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the Mapcode implementation only.
+// ----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the Mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * Simple class to represent all the coordinates that would deliver a particular mapcode.
  */
 class MapcodeZone {

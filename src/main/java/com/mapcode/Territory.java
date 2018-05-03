@@ -22,11 +22,11 @@ import java.util.*;
 
 import static com.mapcode.CheckArgs.checkNonnull;
 
+// ----------------------------------------------------------------------------------------------
+// Mapcode public interface.
+// ----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Mapcode public interface.
- * ----------------------------------------------------------------------------------------------
- *
  * This class defines the available territory codes as used by mapcode.
  */
 public enum Territory {
@@ -840,37 +840,37 @@ public enum Territory {
      * Private constructors to create a territory code.
      */
     Territory(final int number,
-                      @Nonnull final String fullName) {
+              @Nonnull final String fullName) {
         this(number, fullName, null, null, null, null);
     }
 
     Territory(final int number,
-                      @Nonnull final String fullName,
-                      @Nullable final Alphabet[] alphabets) {
+              @Nonnull final String fullName,
+              @Nullable final Alphabet[] alphabets) {
         this(number, fullName, alphabets, null, null, null);
     }
 
     Territory(final int number,
-                      @Nonnull final String fullName,
-                      @Nullable final Alphabet[] alphabets,
-                      @Nullable final Territory parentTerritory) {
+              @Nonnull final String fullName,
+              @Nullable final Alphabet[] alphabets,
+              @Nullable final Territory parentTerritory) {
         this(number, fullName, alphabets, parentTerritory, null, null);
     }
 
     Territory(final int number,
-                      @Nonnull final String fullName,
-                      @Nullable final Alphabet[] alphabets,
-                      @Nullable final Territory parentTerritory,
-                      @Nullable final String[] aliases) {
+              @Nonnull final String fullName,
+              @Nullable final Alphabet[] alphabets,
+              @Nullable final Territory parentTerritory,
+              @Nullable final String[] aliases) {
         this(number, fullName, alphabets, parentTerritory, aliases, null);
     }
 
     Territory(final int number,
-                      @Nonnull final String fullName,
-                      @Nullable final Alphabet[] alphabets,
-                      @Nullable final Territory parentTerritory,
-                      @Nullable final String[] aliases,
-                      @Nullable final String[] fullNameAliases) {
+              @Nonnull final String fullName,
+              @Nullable final Alphabet[] alphabets,
+              @Nullable final Territory parentTerritory,
+              @Nullable final String[] aliases,
+              @Nullable final String[] fullNameAliases) {
         assert number >= 0;
         this.number = number;
         this.fullName = fullName;

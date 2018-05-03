@@ -24,11 +24,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the Mapcode implementation only.
+// ----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the Mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * This class contains the module that reads the Mapcode areas into memory and processes them.
  */
 @SuppressWarnings("MagicNumber")
@@ -204,7 +204,7 @@ class DataModel {
     }
 
     @SuppressWarnings("PointlessArithmeticExpression")
-    // TODO: Explain what this does exactly, why not return a Point or Rectangle?
+        // TODO: Explain what this does exactly, why not return a Point or Rectangle?
     int getLonMicroDegMin(final int territoryRecord) {
         return data[((territoryRecord * DATA_FIELDS_PER_REC) + POS_DATA_LON_MICRO_DEG_MIN)];
     }

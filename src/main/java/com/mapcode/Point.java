@@ -241,11 +241,10 @@ public final class Point {
                 (this.defined == that.defined);
     }
 
-    /**
-     * -----------------------------------------------------------------------
-     * (Package) private data and methods.
-     * -----------------------------------------------------------------------
-     */
+    // -----------------------------------------------------------------------
+    // (Package) private data and methods.
+    // -----------------------------------------------------------------------
+
     // Constants to convert between Degrees, MicroDegrees and Fractions
     static final double MICRODEG_TO_DEG_FACTOR = 1000000.0;
     static final double MAX_PRECISION_FACTOR = 810000.0;

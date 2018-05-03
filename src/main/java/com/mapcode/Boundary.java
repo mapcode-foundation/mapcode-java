@@ -18,11 +18,11 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the mapcode implementation only.
+//----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * This class handles territory rectangles for mapcodes.
  */
 final class Boundary {
