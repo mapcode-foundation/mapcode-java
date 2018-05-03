@@ -196,54 +196,89 @@ public class TerritoryTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFromStringCountryIso2Error1() {
-        LOG.info("testFromStringCountryIso2Error1");
+    public void testFromStringCountryISO2Error1() {
+        LOG.info("testFromStringCountryISO2Error1");
         Territory.fromCountryISO2("US-IN");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFromStringCountryIso2Error2() {
-        LOG.info("testFromStringCountryIso2Error2");
+    public void testFromStringCountryISO2Error2() {
+        LOG.info("testFromStringCountryISO2Error2");
         Territory.fromCountryISO2("USA");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFromStringCountryIso2Error3() {
-        LOG.info("testFromStringCountryIso2Error3");
+    public void testFromStringCountryISO2Error3() {
+        LOG.info("testFromStringCountryISO2Error3");
         Territory.fromCountryISO2("");
     }
 
     @Test
-    public void testFromStringCountryIso2OK() {
-        LOG.info("testFromStringCountryIso2OK");
+    public void testFromStringCountryISO2OK() {
+        LOG.info("testFromStringCountryISO2OK");
         assertEquals("NLD", Territory.fromCountryISO2("NL").toString());
         assertEquals("BRA", Territory.fromCountryISO2("br").toString());
         assertEquals("USA", Territory.fromCountryISO2("Us").toString());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFromStringCountryIso3Error1() {
-        LOG.info("testFromStringCountryIso3Error1");
+    public void testFromStringCountryISO3Error1() {
+        LOG.info("testFromStringCountryISO3Error1");
         Territory.fromCountryISO3("US-IN");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFromStringCountryIso3Error2() {
-        LOG.info("testFromStringCountryIso3Error2");
+    public void testFromStringCountryISO3Error2() {
+        LOG.info("testFromStringCountryISO3Error2");
         Territory.fromCountryISO3("US");
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testFromStringCountryIso3Error3() {
-        LOG.info("testFromStringCountryIso3Error3");
+    public void testFromStringCountryISO3Error3() {
+        LOG.info("testFromStringCountryISO3Error3");
         Territory.fromCountryISO3("");
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringCountryISO3Error4() {
+        LOG.info("testFromStringCountryISO3Error4");
+        Territory.fromCountryISO3("AAA");
+    }
+
     @Test
-    public void testFromStringCountryIso3OK() {
-        LOG.info("testFromStringCountryIso3OK");
+    public void testFromStringCountryISO3OK() {
+        LOG.info("testFromStringCountryISO3OK");
         assertEquals("NLD", Territory.fromCountryISO3("NLD").toString());
         assertEquals("BRA", Territory.fromCountryISO3("bra").toString());
         assertEquals("USA", Territory.fromCountryISO3("Usa").toString());
     }
+
+    @Test
+    public void testGetCountryISO3FromISO2() {
+        LOG.info("testGetCountryISO3FromISO2");
+        assertEquals("NLD", Territory.getCountryISO3FromISO2("NL"));
+        assertEquals("BRA", Territory.getCountryISO3FromISO2("br"));
+        assertEquals("USA", Territory.getCountryISO3FromISO2("Us"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetCountryISO3FromISO2Error() {
+        LOG.info("testGetCountryISO3FromISO2Error");
+        Territory.getCountryISO3FromISO2("NLD");
+    }
+
+    @Test
+    public void testGetCountryISO2FromISO3() {
+        LOG.info("testGetCountryISO2FromISO3");
+        assertEquals("NL", Territory.getCountryISO2FromISO3("NLD"));
+        assertEquals("BR", Territory.getCountryISO2FromISO3("bra"));
+        assertEquals("US", Territory.getCountryISO2FromISO3("Usa"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testGetCountryISO2FromISO3Error() {
+        LOG.info("testGetCountryISO2FromISO3Error");
+        Territory.getCountryISO2FromISO3("NL");
+    }
+
 }
