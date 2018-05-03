@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Encoder.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">Encoder.java</span></div><h1>Encoder.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2017, Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.mapcode.Boundary.createBoundaryForTerritoryRecord;
+import static com.mapcode.Common.*;
+
+ // ----------------------------------------------------------------------------------------------
+ // Package private implementation class. For internal use within the Mapcode implementation only.
+ // ----------------------------------------------------------------------------------------------
+
+/**
+ * This class contains encoder for mapcodes.
+ */
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">@SuppressWarnings({&quot;MagicNumber&quot;, &quot;StringConcatenationMissingWhitespace&quot;})</span>
+final class Encoder {
+<span class="fc" id="L39">    private static final Logger LOG = LoggerFactory.getLogger(Encoder.class);</span>
+
+    // Get direct access to data model singleton.
+<span class="fc" id="L42">    private static final DataModel DATA_MODEL = DataModel.getInstance();</span>
+
+    private Encoder() {
+        // Prevent instantiation.
+    }
+
+    // ----------------------------------------------------------------------
+    // Method called from public Java API.
+    // ----------------------------------------------------------------------
+
+    @Nonnull
+    static List&lt;Mapcode&gt; encode(
+            final double latDeg,
+            final double lonDeg,
+            @Nullable final Territory territory,
+            final boolean limitToOneResult) {
+
+<span class="fc" id="L59">        return encode(latDeg, lonDeg, territory, limitToOneResult, null);</span>
+    }
+
+    // ----------------------------------------------------------------------
+    // Private methods.
+    // ----------------------------------------------------------------------
+
+<span class="fc" id="L66">    private final static char[] ENCODE_CHARS = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'B', 'C', 'D', 'F',</span>
+            'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z', 'A', 'E', 'U'};
+
+    @Nonnull
+    private static List&lt;Mapcode&gt; encode(
+            final double argLatDeg,
+            final double argLonDeg,
+            @Nullable final Territory territory,
+            final boolean limitToOneResult,
+            @Nullable final Territory argStateOverride) {
+<span class="fc" id="L76">        LOG.trace(&quot;encode: latDeg={}, lonDeg={}, territory={}, limitToOneResult={}&quot;,</span>
+<span class="fc bfc" id="L77" title="All 2 branches covered.">                argLatDeg, argLonDeg, (territory == null) ? null : territory.name(), limitToOneResult);</span>
+
+<span class="fc" id="L79">        final Point pointToEncode = Point.fromDeg(argLatDeg, argLonDeg);</span>
+<span class="fc" id="L80">        final List&lt;Mapcode&gt; results = new ArrayList&lt;Mapcode&gt;();</span>
+<span class="fc" id="L81">        int lastBaseSubTerritoryNumber = -1;</span>
+
+        // Determine whether to walk through all records, or just for one (given) territory.
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        final int firstTerritoryRecord = (territory != null) ? territory.getNumber() : 0;</span>
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        final int lastTerritoryRecord = (territory != null) ? territory.getNumber() : Territory.AAA.getNumber();</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        for (int territoryRecord = firstTerritoryRecord; territoryRecord &lt;= lastTerritoryRecord; territoryRecord++) {</span>
+
+            // Check if the point to encode is covered by the last data record.
+<span class="fc" id="L89">            final int firstSubTerritoryRecord = DATA_MODEL.getDataLastRecord(territoryRecord);</span>
+<span class="fc bfc" id="L90" title="All 2 branches covered.">            if (createBoundaryForTerritoryRecord(firstSubTerritoryRecord).containsPoint(pointToEncode)) {</span>
+
+<span class="fc" id="L92">                final int lastSubTerritoryRecord = DATA_MODEL.getDataFirstRecord(territoryRecord);</span>
+<span class="fc" id="L93">                final Territory currentEncodeTerritory = Territory.fromNumber(territoryRecord);</span>
+
+<span class="fc bfc" id="L95" title="All 2 branches covered.">                for (int subTerritoryRecord = lastSubTerritoryRecord; subTerritoryRecord &lt;= firstSubTerritoryRecord; subTerritoryRecord++) {</span>
+
+                    // Check if the point to encode is contained within the boundary.
+<span class="fc bfc" id="L98" title="All 2 branches covered.">                    if (createBoundaryForTerritoryRecord(subTerritoryRecord).containsPoint(pointToEncode)) {</span>
+
+                        // All fine, proceed with creating a mapcode.
+<span class="fc" id="L101">                        String mapcode = &quot;&quot;;</span>
+<span class="fc bfc" id="L102" title="All 2 branches covered.">                        if (Data.isNameless(subTerritoryRecord)) {</span>
+<span class="fc" id="L103">                            mapcode = encodeNameless(pointToEncode, subTerritoryRecord, lastSubTerritoryRecord);</span>
+
+<span class="fc bfc" id="L105" title="All 2 branches covered.">                        } else if (Data.getTerritoryRecordType(subTerritoryRecord) &gt; Data.TERRITORY_RECORD_TYPE_PIPE) {</span>
+<span class="fc" id="L106">                            mapcode = encodeAutoHeader(pointToEncode, subTerritoryRecord);</span>
+
+<span class="fc bfc" id="L108" title="All 2 branches covered.">                        } else if ((subTerritoryRecord == firstSubTerritoryRecord) &amp;&amp;</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">                                (currentEncodeTerritory.getParentTerritory() != null)) {</span>
+<span class="fc" id="L110">                            results.addAll(encode(argLatDeg, argLonDeg, currentEncodeTerritory.getParentTerritory(),</span>
+                                    limitToOneResult, currentEncodeTerritory));
+<span class="fc" id="L112">                            continue;</span>
+
+<span class="fc bfc" id="L114" title="All 4 branches covered.">                        } else if (!Data.isRestricted(subTerritoryRecord) || (lastBaseSubTerritoryNumber == lastSubTerritoryRecord)) {</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">                            if (Data.getCodex(subTerritoryRecord) &lt; 54) {</span>
+<span class="fc" id="L116">                                mapcode = encodeGrid(subTerritoryRecord, pointToEncode);</span>
+                            }
+                        } else {
+                            // Skip this record.
+                        }
+
+                        // Check if we created a mapcode.
+<span class="fc bfc" id="L123" title="All 2 branches covered.">                        if (!mapcode.isEmpty()) {</span>
+<span class="pc bpc" id="L124" title="2 of 4 branches missed.">                            assert mapcode.length() &gt; 4;</span>
+<span class="fc" id="L125">                            mapcode = aeuPack(mapcode, false);</span>
+
+<span class="fc bfc" id="L127" title="All 2 branches covered.">                            final Territory encodeTerritory = (argStateOverride != null) ?</span>
+                                    argStateOverride : currentEncodeTerritory;
+
+                            // Create new result.
+<span class="fc" id="L131">                            final Mapcode newResult = new Mapcode(mapcode, encodeTerritory);</span>
+
+                            // The result should not be stored yet.
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">                            if (results.contains(newResult)) {</span>
+<span class="nc" id="L135">                                LOG.error(&quot;encode: Duplicate results found, newResult={}, results={} items&quot;,</span>
+<span class="nc" id="L136">                                        newResult.getCodeWithTerritory(), results.size());</span>
+                            } else {
+
+                                // Remove existing results (if there was a parent territory).
+<span class="fc bfc" id="L140" title="All 2 branches covered.">                                if (limitToOneResult) {</span>
+<span class="fc" id="L141">                                    results.clear();</span>
+                                }
+<span class="fc" id="L143">                                results.add(newResult);</span>
+                            }
+
+<span class="fc" id="L146">                            lastBaseSubTerritoryNumber = lastSubTerritoryRecord;</span>
+
+                            // Stop if we only need a single result anyway.
+<span class="fc bfc" id="L149" title="All 2 branches covered.">                            if (limitToOneResult) {</span>
+<span class="fc" id="L150">                                return results;</span>
+                            }
+                        }
+                    }
+                }
+            }
+        }
+<span class="fc" id="L157">        LOG.trace(&quot;encode: results={} items&quot;, results.size());</span>
+<span class="fc" id="L158">        LOG.trace(&quot;&quot;);</span>
+<span class="fc" id="L159">        return results;</span>
+    }
+
+    @Nonnull
+    private static String encodeExtension(
+            final Point pointToEncode,
+            final int extrax4,
+            final int extray,
+            final int dividerx4,
+            final int dividery,
+            final int ydirection) {
+<span class="fc" id="L170">        int extraDigits = 8; // always generate 8 digits</span>
+
+<span class="fc" id="L172">        double factorx = Point.MAX_PRECISION_FACTOR * dividerx4;</span>
+<span class="fc" id="L173">        double factory = Point.MAX_PRECISION_FACTOR * dividery;</span>
+<span class="fc" id="L174">        double valx = (Point.MAX_PRECISION_FACTOR * extrax4) + pointToEncode.getLonFraction();</span>
+<span class="fc" id="L175">        double valy = (Point.MAX_PRECISION_FACTOR * extray) + (ydirection * pointToEncode.getLatFraction());</span>
+
+<span class="fc" id="L177">        final StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L178">        sb.append('-');</span>
+
+        while (true) {
+<span class="fc" id="L181">            factorx /= 30;</span>
+            //noinspection NumericCastThatLosesPrecision
+<span class="fc" id="L183">            final int gx = (int) (valx / factorx);</span>
+
+<span class="fc" id="L185">            factory /= 30;</span>
+            //noinspection NumericCastThatLosesPrecision
+<span class="fc" id="L187">            final int gy = (int) (valy / factory);</span>
+
+<span class="fc" id="L189">            sb.append(ENCODE_CHARS[((gy / 5) * 5) + (gx / 6)]);</span>
+<span class="fc" id="L190">            --extraDigits;</span>
+<span class="pc bpc" id="L191" title="1 of 2 branches missed.">            if (extraDigits == 0) {</span>
+<span class="nc" id="L192">                break;</span>
+            }
+
+<span class="fc" id="L195">            sb.append(ENCODE_CHARS[(((gy % 5) * 6) + (gx % 6))]);</span>
+<span class="fc" id="L196">            --extraDigits;</span>
+<span class="fc bfc" id="L197" title="All 2 branches covered.">            if (extraDigits == 0) {</span>
+<span class="fc" id="L198">                break;</span>
+            }
+
+<span class="fc" id="L201">            valx -= factorx * gx;</span>
+<span class="fc" id="L202">            valy -= factory * gy;</span>
+<span class="fc" id="L203">        }</span>
+<span class="fc" id="L204">        return sb.toString();</span>
+    }
+
+    @Nonnull
+    private static String encodeGrid(
+            final int territoryNumber,
+            @Nonnull final Point pointToEncode) {
+<span class="fc" id="L211">        int codexm = Data.getCodex(territoryNumber);</span>
+<span class="fc" id="L212">        final int orgcodex = codexm;</span>
+<span class="fc bfc" id="L213" title="All 2 branches covered.">        if (codexm == 21) {</span>
+<span class="fc" id="L214">            codexm = 22;</span>
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        } else if (codexm == 14) {</span>
+<span class="fc" id="L216">            codexm = 23;</span>
+        }
+<span class="fc" id="L218">        final int prelen = codexm / 10;</span>
+<span class="fc" id="L219">        final int postlen = codexm % 10;</span>
+        final int divx;
+<span class="fc" id="L221">        int divy = DATA_MODEL.getSmartDiv(territoryNumber);</span>
+<span class="fc bfc" id="L222" title="All 2 branches covered.">        if (divy == 1) {</span>
+<span class="fc" id="L223">            divx = X_SIDE[prelen];</span>
+<span class="fc" id="L224">            divy = Y_SIDE[prelen];</span>
+        } else {
+<span class="fc" id="L226">            divx = NC[prelen] / divy;</span>
+        }
+
+<span class="fc" id="L229">        final int minx = createBoundaryForTerritoryRecord(territoryNumber).getLonMicroDegMin();</span>
+<span class="fc" id="L230">        final int miny = createBoundaryForTerritoryRecord(territoryNumber).getLatMicroDegMin();</span>
+<span class="fc" id="L231">        final int maxx = createBoundaryForTerritoryRecord(territoryNumber).getLonMicroDegMax();</span>
+<span class="fc" id="L232">        final int maxy = createBoundaryForTerritoryRecord(territoryNumber).getLatMicroDegMax();</span>
+
+<span class="fc" id="L234">        final int ygridsize = (((maxy - miny) + divy) - 1) / divy;</span>
+<span class="fc" id="L235">        int rely = pointToEncode.getLatMicroDeg() - miny;</span>
+<span class="fc" id="L236">        rely = rely / ygridsize;</span>
+
+<span class="fc" id="L238">        final int xgridsize = (((maxx - minx) + divx) - 1) / divx;</span>
+<span class="fc" id="L239">        int x = pointToEncode.getLonMicroDeg();</span>
+<span class="fc" id="L240">        int relx = x - minx;</span>
+<span class="fc bfc" id="L241" title="All 2 branches covered.">        if (relx &lt; 0) {</span>
+<span class="fc" id="L242">            x += Point.MICRO_DEG_360;</span>
+<span class="fc" id="L243">            relx += Point.MICRO_DEG_360;</span>
+<span class="fc bfc" id="L244" title="All 2 branches covered.">        } else if (relx &gt;= Point.MICRO_DEG_360) {</span>
+<span class="fc" id="L245">            x -= Point.MICRO_DEG_360;</span>
+<span class="fc" id="L246">            relx -= Point.MICRO_DEG_360;</span>
+        }
+<span class="pc bpc" id="L248" title="1 of 2 branches missed.">        if (relx &lt; 0) {</span>
+<span class="nc" id="L249">            return &quot;&quot;;</span>
+        }
+<span class="fc" id="L251">        relx = relx / xgridsize;</span>
+<span class="pc bpc" id="L252" title="2 of 4 branches missed.">        if ((relx &gt;= divx) || (rely &gt;= divy)) {</span>
+<span class="nc" id="L253">            return &quot;&quot;;</span>
+        }
+
+        final int v;
+<span class="fc bfc" id="L257" title="All 4 branches covered.">        if ((divx != divy) &amp;&amp; (prelen &gt; 2)) {</span>
+<span class="fc" id="L258">            v = encodeSixWide(relx, rely, divx, divy);</span>
+        } else {
+<span class="fc" id="L260">            v = ((relx * divy) + divy) - 1 - rely;</span>
+        }
+
+<span class="fc" id="L263">        String result = encodeBase31(v, prelen);</span>
+
+<span class="pc bpc" id="L265" title="1 of 6 branches missed.">        if ((prelen == 4) &amp;&amp; (divx == 961) &amp;&amp; (divy == 961)) {</span>
+<span class="fc" id="L266">            result = String.valueOf(result.charAt(0)) + result.charAt(2) + result.charAt(1) + result.charAt(3);</span>
+        }
+
+<span class="fc" id="L269">        rely = miny + (rely * ygridsize);</span>
+<span class="fc" id="L270">        relx = minx + (relx * xgridsize);</span>
+
+<span class="fc" id="L272">        final int dividery = ((ygridsize + Y_SIDE[postlen]) - 1) / Y_SIDE[postlen];</span>
+<span class="fc" id="L273">        final int dividerx = ((xgridsize + X_SIDE[postlen]) - 1) / X_SIDE[postlen];</span>
+
+<span class="fc" id="L275">        result += '.';</span>
+
+<span class="fc" id="L277">        int difx = x - relx;</span>
+<span class="fc" id="L278">        int dify = pointToEncode.getLatMicroDeg() - rely;</span>
+
+<span class="fc" id="L280">        final int extrax = difx % dividerx;</span>
+<span class="fc" id="L281">        final int extray = dify % dividery;</span>
+
+<span class="fc" id="L283">        difx = difx / dividerx;</span>
+<span class="fc" id="L284">        dify = dify / dividery;</span>
+
+<span class="fc" id="L286">        dify = Y_SIDE[postlen] - 1 - dify;</span>
+<span class="fc bfc" id="L287" title="All 2 branches covered.">        if (postlen == 3) {</span>
+<span class="fc" id="L288">            result += encodeTriple(difx, dify);</span>
+        } else {
+
+<span class="fc" id="L291">            String postfix = encodeBase31(((difx) * Y_SIDE[postlen]) + dify, postlen);</span>
+<span class="fc bfc" id="L292" title="All 2 branches covered.">            if (postlen == 4) {</span>
+<span class="fc" id="L293">                postfix = String.valueOf(postfix.charAt(0)) + postfix.charAt(2) + postfix.charAt(1) + postfix.charAt(3);</span>
+            }
+<span class="fc" id="L295">            result += postfix;</span>
+        }
+
+<span class="fc bfc" id="L298" title="All 2 branches covered.">        if (orgcodex == 14) {</span>
+<span class="fc" id="L299">            result = result.charAt(0) + &quot;.&quot; + result.charAt(1) + result.substring(3);</span>
+        }
+
+<span class="fc" id="L302">        result += encodeExtension(pointToEncode, extrax &lt;&lt; 2, extray, dividerx &lt;&lt; 2, dividery, 1); // grid</span>
+
+<span class="fc" id="L304">        return Data.headerLetter(territoryNumber) + result;</span>
+    }
+
+    @Nonnull
+    private static String encodeAutoHeader(
+            @Nonnull final Point pointToEncode,
+            final int territoryRecord) {
+<span class="fc" id="L311">        final StringBuilder stringBuilder = new StringBuilder();</span>
+<span class="fc" id="L312">        final int codexm = Data.getCodex(territoryRecord);</span>
+<span class="fc" id="L313">        int storageStart = 0;</span>
+
+        // search back to first pipe star
+<span class="fc" id="L316">        int firstindex = territoryRecord;</span>
+<span class="pc bpc" id="L317" title="1 of 4 branches missed.">        while ((Data.getTerritoryRecordType(firstindex - 1) &gt; Data.TERRITORY_RECORD_TYPE_PIPE) &amp;&amp; (Data.getCodex(firstindex - 1) == codexm)) {</span>
+<span class="fc" id="L318">            firstindex--;</span>
+        }
+
+<span class="fc" id="L321">        int i = firstindex;</span>
+        while (true) {
+
+<span class="fc" id="L324">            final int maxx = createBoundaryForTerritoryRecord(i).getLonMicroDegMax();</span>
+<span class="fc" id="L325">            final int maxy = createBoundaryForTerritoryRecord(i).getLatMicroDegMax();</span>
+<span class="fc" id="L326">            final int minx = createBoundaryForTerritoryRecord(i).getLonMicroDegMin();</span>
+<span class="fc" id="L327">            final int miny = createBoundaryForTerritoryRecord(i).getLatMicroDegMin();</span>
+
+<span class="fc" id="L329">            int h = ((maxy - miny) + 89) / 90;</span>
+<span class="fc" id="L330">            final int xdiv = xDivider(miny, maxy);</span>
+<span class="fc" id="L331">            int w = ((((maxx - minx) * 4) + xdiv) - 1) / xdiv;</span>
+
+<span class="fc" id="L333">            h = 176 * (((h + 176) - 1) / 176);</span>
+<span class="fc" id="L334">            w = 168 * (((w + 168) - 1) / 168);</span>
+
+<span class="fc" id="L336">            int product = (w / 168) * (h / 176) * 961 * 31;</span>
+
+<span class="fc bfc" id="L338" title="All 2 branches covered.">            if (Data.getTerritoryRecordType(i) == Data.TERRITORY_RECORD_TYPE_PLUS) // plus pipe</span>
+            {
+<span class="fc bfc" id="L340" title="All 2 branches covered.">                final int goodRounder = (codexm &gt;= 23) ? (961 * 961 * 31) : (961 * 961);</span>
+<span class="fc" id="L341">                product =</span>
+                        ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
+            }
+
+<span class="fc bfc" id="L345" title="All 2 branches covered.">            if (i == territoryRecord) {</span>
+<span class="fc" id="L346">                final int dividerx = (((maxx - minx) + w) - 1) / w;</span>
+<span class="fc" id="L347">                final int vx = (pointToEncode.getLonMicroDeg() - minx) / dividerx;</span>
+<span class="fc" id="L348">                final int extrax = (pointToEncode.getLonMicroDeg() - minx) % dividerx;</span>
+
+<span class="fc" id="L350">                final int dividery = (((maxy - miny) + h) - 1) / h;</span>
+<span class="fc" id="L351">                int vy = (maxy - pointToEncode.getLatMicroDeg()) / dividery;</span>
+<span class="fc" id="L352">                int extray = (maxy - pointToEncode.getLatMicroDeg()) % dividery;</span>
+
+<span class="fc" id="L354">                int value = (vx / 168) * (h / 176);</span>
+<span class="fc bfc" id="L355" title="All 4 branches covered.">                if ((extray == 0) &amp;&amp; (pointToEncode.getLatFraction() &gt; 0)) {</span>
+<span class="fc" id="L356">                    vy--;</span>
+<span class="fc" id="L357">                    extray += dividery;</span>
+                }
+<span class="fc" id="L359">                value += (vy / 176);</span>
+
+<span class="fc" id="L361">                final int codexlen = (codexm / 10) + (codexm % 10);</span>
+<span class="fc" id="L362">                stringBuilder.append(encodeBase31((storageStart / (961 * 31)) + value, codexlen - 2));</span>
+<span class="fc" id="L363">                stringBuilder.append('.');</span>
+<span class="fc" id="L364">                stringBuilder.append(encodeTriple(vx % 168, vy % 176));</span>
+
+<span class="fc" id="L366">                stringBuilder.append(</span>
+<span class="fc" id="L367">                        encodeExtension(pointToEncode, extrax &lt;&lt; 2, extray, dividerx &lt;&lt; 2, dividery, -1)); // AutoHeader</span>
+<span class="fc" id="L368">                return stringBuilder.toString();</span>
+            }
+
+<span class="fc" id="L371">            storageStart += product;</span>
+<span class="fc" id="L372">            i++;</span>
+<span class="fc" id="L373">        }</span>
+    }
+
+    @Nonnull
+    private static String encodeNameless(
+            @Nonnull final Point pointToEncode,
+            final int territoryRecord,
+            final int firstTerritoryRecord) {
+        // mid-level encode/decode
+        // returns &quot;&quot; in case of (argument) error
+<span class="fc" id="L383">        final int codexm = Data.getCodex(territoryRecord);</span>
+<span class="fc" id="L384">        final int codexlen = (codexm / 10) + (codexm % 10);</span>
+<span class="fc" id="L385">        final int firstNamelessRecord = getFirstNamelessRecord(codexm, territoryRecord, firstTerritoryRecord);</span>
+<span class="fc" id="L386">        final int a = countCityCoordinatesForCountry(codexm, territoryRecord, firstTerritoryRecord);</span>
+<span class="fc" id="L387">        final int p = 31 / a;</span>
+<span class="fc" id="L388">        final int r = 31 % a;</span>
+<span class="fc" id="L389">        final int nrX = territoryRecord - firstNamelessRecord;</span>
+
+        int storage_offset;
+
+<span class="fc bfc" id="L393" title="All 4 branches covered.">        if ((codexm != 21) &amp;&amp; (a &lt;= 31)) {</span>
+<span class="fc bfc" id="L394" title="All 2 branches covered.">            storage_offset = ((nrX * p) + ((nrX &lt; r) ? nrX : r)) * (961 * 961);</span>
+<span class="fc bfc" id="L395" title="All 4 branches covered.">        } else if ((codexm != 21) &amp;&amp; (a &lt; 62)) {</span>
+<span class="fc bfc" id="L396" title="All 2 branches covered.">            if (nrX &lt; (62 - a)) {</span>
+<span class="fc" id="L397">                storage_offset = nrX * 961 * 961;</span>
+            } else {
+<span class="fc" id="L399">                storage_offset = ((62 - a) + (((nrX - 62) + a) / 2)) * 961 * 961;</span>
+<span class="fc bfc" id="L400" title="All 2 branches covered.">                if (((nrX + a) &amp; 1) != 0) {</span>
+<span class="fc" id="L401">                    storage_offset += 16 * 961 * 31;</span>
+                }
+            }
+        } else {
+<span class="fc bfc" id="L405" title="All 2 branches covered.">            final int basePower = (codexm == 21) ? (961 * 961) : (961 * 961 * 31);</span>
+<span class="fc" id="L406">            int basePowerA = basePower / a;</span>
+<span class="pc bpc" id="L407" title="1 of 2 branches missed.">            if (a == 62) {</span>
+<span class="nc" id="L408">                basePowerA++;</span>
+            } else {
+<span class="fc" id="L410">                basePowerA = 961 * (basePowerA / 961);</span>
+            }
+
+<span class="fc" id="L413">            storage_offset = nrX * basePowerA;</span>
+        }
+
+<span class="fc" id="L416">        int side = DATA_MODEL.getSmartDiv(territoryRecord);</span>
+<span class="fc" id="L417">        final int orgSide = side;</span>
+<span class="fc" id="L418">        int xSide = side;</span>
+
+<span class="fc" id="L420">        final int maxy = createBoundaryForTerritoryRecord(territoryRecord).getLatMicroDegMax();</span>
+<span class="fc" id="L421">        final int minx = createBoundaryForTerritoryRecord(territoryRecord).getLonMicroDegMin();</span>
+<span class="fc" id="L422">        final int miny = createBoundaryForTerritoryRecord(territoryRecord).getLatMicroDegMin();</span>
+
+<span class="fc" id="L424">        final int dividerx4 = xDivider(miny, maxy);</span>
+<span class="fc" id="L425">        final int xFracture = pointToEncode.getLonFraction() / 810000;</span>
+<span class="fc" id="L426">        final int dminx = pointToEncode.getLonMicroDeg() - minx;</span>
+<span class="fc" id="L427">        final int dx = ((4 * dminx) + xFracture) / dividerx4;</span>
+<span class="fc" id="L428">        final int extrax4 = (4 * dminx) - (dx * dividerx4); // like modulus, but with floating point value</span>
+
+<span class="fc" id="L430">        final int dividery = 90;</span>
+<span class="fc" id="L431">        final int dmaxy = maxy - pointToEncode.getLatMicroDeg();</span>
+<span class="fc" id="L432">        int dy = dmaxy / dividery;</span>
+<span class="fc" id="L433">        int extray = dmaxy % dividery;</span>
+
+<span class="fc bfc" id="L435" title="All 4 branches covered.">        if ((extray == 0) &amp;&amp; (pointToEncode.getLatFraction() &gt; 0)) {</span>
+<span class="fc" id="L436">            dy--;</span>
+<span class="fc" id="L437">            extray += dividery;</span>
+        }
+
+<span class="fc" id="L440">        int v = storage_offset;</span>
+<span class="fc bfc" id="L441" title="All 2 branches covered.">        if (Data.isSpecialShape(territoryRecord)) {</span>
+<span class="fc" id="L442">            xSide *= side;</span>
+<span class="fc" id="L443">            side = 1 + ((maxy - miny) / 90);</span>
+<span class="fc" id="L444">            xSide = xSide / side;</span>
+<span class="fc" id="L445">            v += encodeSixWide(dx, side - 1 - dy, xSide, side);</span>
+        } else {
+<span class="fc" id="L447">            v += (dx * side) + dy;</span>
+        }
+
+<span class="fc" id="L450">        String result = encodeBase31(v, codexlen + 1);</span>
+
+<span class="fc bfc" id="L452" title="All 2 branches covered.">        if (codexlen == 3) {</span>
+<span class="fc" id="L453">            result = result.substring(0, 2) + '.' + result.substring(2);</span>
+<span class="pc bpc" id="L454" title="1 of 2 branches missed.">        } else if (codexlen == 4) {</span>
+<span class="fc bfc" id="L455" title="All 8 branches covered.">            if ((codexm == 22) &amp;&amp; (a &lt; 62) &amp;&amp; (orgSide == 961) &amp;&amp; !Data.isSpecialShape(territoryRecord)) {</span>
+<span class="fc" id="L456">                result = result.substring(0, 2) + result.charAt(3) + result.charAt(2) + result.charAt(4);</span>
+            }
+<span class="fc bfc" id="L458" title="All 2 branches covered.">            if (codexm == 13) {</span>
+<span class="fc" id="L459">                result = result.substring(0, 2) + '.' + result.substring(2);</span>
+            } else {
+<span class="fc" id="L461">                result = result.substring(0, 3) + '.' + result.substring(3);</span>
+            }
+        }
+<span class="fc" id="L464">        result += encodeExtension(pointToEncode, extrax4, extray, dividerx4, dividery, -1); // for encodeNameless</span>
+
+<span class="fc" id="L466">        return result;</span>
+    }
+
+    @Nonnull
+    static String aeuPack(
+            @Nonnull final String argStr,
+            final boolean argShort) {
+        // add vowels to prevent all-digit mapcodes
+<span class="fc" id="L474">        String str = argStr;</span>
+<span class="fc" id="L475">        int dotpos = -9;</span>
+<span class="fc" id="L476">        int rlen = str.length();</span>
+        int d;
+<span class="fc" id="L478">        String rest = &quot;&quot;;</span>
+<span class="fc bfc" id="L479" title="All 2 branches covered.">        for (d = 0; d &lt; rlen; d++) {</span>
+<span class="fc bfc" id="L480" title="All 4 branches covered.">            if ((str.charAt(d) &lt; '0') || (str.charAt(d) &gt; '9')) // not digit?</span>
+            {
+<span class="pc bpc" id="L482" title="1 of 4 branches missed.">                if ((str.charAt(d) == '.') &amp;&amp; (dotpos &lt; 0)) // first dot?</span>
+                {
+<span class="fc" id="L484">                    dotpos = d;</span>
+<span class="fc bfc" id="L485" title="All 2 branches covered.">                } else if (str.charAt(d) == '-') {</span>
+<span class="fc" id="L486">                    rest = str.substring(d);</span>
+<span class="fc" id="L487">                    str = str.substring(0, d);</span>
+<span class="fc" id="L488">                    rlen = d;</span>
+                } else {
+<span class="fc" id="L490">                    return str; // not all-digit (or multiple dots)</span>
+                }
+            }
+        }
+
+<span class="pc bpc" id="L495" title="1 of 2 branches missed.">        if ((rlen - 2) &gt; dotpos) {</span>
+            // does r have a dot, AND at least 2 chars after the dot?
+<span class="fc bfc" id="L497" title="All 2 branches covered.">            if (argShort) { // use A only</span>
+<span class="fc" id="L498">                final int v = ((((int) str.charAt(0)) - 48) * 100) + ((((int) str.charAt(rlen - 2)) - 48) * 10) + (((int) str.charAt(rlen - 1)) - 48);</span>
+<span class="fc" id="L499">                return 'A' + str.substring(1, rlen - 2) + ENCODE_CHARS[v / 32] + ENCODE_CHARS[v % 32] + rest;</span>
+            } else { // use A, E and U
+<span class="fc" id="L501">                final int v = (((((int) str.charAt(rlen - 2)) - 48) * 10) + ((int) str.charAt(rlen - 1))) - 48;</span>
+<span class="fc" id="L502">                str = str.substring(0, rlen - 2) + ENCODE_CHARS[31 + (v / 34)] + ENCODE_CHARS[v % 34];</span>
+            }
+        }
+<span class="fc" id="L505">        return str + rest;</span>
+    }
+
+    @Nonnull
+    private static String encodeBase31(
+            final int argValue,
+            final int argNrChars) {
+<span class="fc" id="L512">        int value = argValue;</span>
+<span class="fc" id="L513">        int nrChars = argNrChars;</span>
+<span class="fc" id="L514">        final StringBuilder result = new StringBuilder();</span>
+<span class="fc bfc" id="L515" title="All 2 branches covered.">        while (nrChars &gt; 0) {</span>
+<span class="fc" id="L516">            nrChars--;</span>
+<span class="fc" id="L517">            result.insert(0, ENCODE_CHARS[value % 31]);</span>
+<span class="fc" id="L518">            value = value / 31;</span>
+        }
+<span class="fc" id="L520">        return result.toString();</span>
+    }
+
+    private static int encodeSixWide(
+            final int x,
+            final int y,
+            final int width,
+            final int height) {
+        final int d;
+<span class="fc" id="L529">        int col = x / 6;</span>
+<span class="fc" id="L530">        final int maxcol = (width - 4) / 6;</span>
+<span class="fc bfc" id="L531" title="All 2 branches covered.">        if (col &gt;= maxcol) {</span>
+<span class="fc" id="L532">            col = maxcol;</span>
+<span class="fc" id="L533">            d = width - (maxcol * 6);</span>
+        } else {
+<span class="fc" id="L535">            d = 6;</span>
+        }
+<span class="fc" id="L537">        return ((height * 6 * col) + ((height - 1 - y) * d) + x) - (col * 6);</span>
+    }
+
+    @Nonnull
+    private static String encodeTriple(
+            final int difx,
+            final int dify) {
+<span class="fc bfc" id="L544" title="All 2 branches covered.">        if (dify &lt; (4 * 34)) {</span>
+<span class="fc" id="L545">            return ENCODE_CHARS[((difx / 28) + (6 * (dify / 34)))] + encodeBase31(((difx % 28) * 34) + (dify % 34), 2);</span>
+        } else {
+<span class="fc" id="L547">            return ENCODE_CHARS[((difx / 24) + 24)] + encodeBase31((((difx % 24) * 40) + dify) - 136, 2);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

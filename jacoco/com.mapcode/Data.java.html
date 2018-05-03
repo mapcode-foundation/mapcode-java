@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Data.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">Data.java</span></div><h1>Data.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2017, Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import javax.annotation.Nonnull;
+
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the Mapcode implementation only.
+// ----------------------------------------------------------------------------------------------
+
+/**
+ * This class the data class for Mapcode codex items.
+ */
+<span class="pc bpc" id="L28" title="1 of 2 branches missed.">@SuppressWarnings(&quot;MagicNumber&quot;)</span>
+final class Data {
+
+    // TODO: Need explanation what this is and how this is used.
+<span class="fc" id="L32">    static final char[] ENCODE_CHARS = {</span>
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',           // Numerals.
+            'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',           // Consonants.
+            'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z',
+            'A', 'E', 'U'                                               // Vowels.
+    };
+
+    // Get direct access to the data model.
+<span class="fc" id="L40">    private static final DataModel DATA_MODEL = DataModel.getInstance();</span>
+
+    private Data() {
+        // Disabled.
+    }
+
+    // TODO: Explain what these values are. Can we make this an enum instead (safer)?
+    static final int TERRITORY_RECORD_TYPE_NONE = 0;
+    static final int TERRITORY_RECORD_TYPE_PIPE = 1;
+    static final int TERRITORY_RECORD_TYPE_PLUS = 2;
+    static final int TERRITORY_RECORD_TYPE_STAR = 3;
+
+    // TODO: Need to explain what &quot;nameless&quot; means and what a territoryRecord is (different from territoryNumber).
+    static boolean isNameless(final int territoryRecord) {
+<span class="pc bpc" id="L54" title="3 of 6 branches missed.">        assert (0 &lt;= territoryRecord) &amp;&amp; (territoryRecord &lt; DATA_MODEL.getNrTerritoryRecords());</span>
+<span class="fc bfc" id="L55" title="All 2 branches covered.">        return (DATA_MODEL.getDataFlags(territoryRecord) &amp; 64) != 0;</span>
+    }
+
+    // TODO: Need to explain what &quot;special shape&quot; means.
+    static boolean isSpecialShape(final int territoryRecord) {
+<span class="pc bpc" id="L60" title="3 of 6 branches missed.">        assert (0 &lt;= territoryRecord) &amp;&amp; (territoryRecord &lt; DATA_MODEL.getNrTerritoryRecords());</span>
+
+        // TODO: The &quot;magic&quot; of binary operators and bit shifting should be in class DataModel, not here.
+<span class="fc bfc" id="L63" title="All 2 branches covered.">        return (DATA_MODEL.getDataFlags(territoryRecord) &amp; 1024) != 0;</span>
+    }
+
+    // TODO: Explain what territory record types are. Can they be an enum instead?
+    static int getTerritoryRecordType(final int territoryRecord) {
+<span class="pc bpc" id="L68" title="3 of 6 branches missed.">        assert (0 &lt;= territoryRecord) &amp;&amp; (territoryRecord &lt; DATA_MODEL.getNrTerritoryRecords());</span>
+<span class="fc" id="L69">        return (DATA_MODEL.getDataFlags(territoryRecord) &gt;&gt; 7) &amp; 3; // 1=pipe 2=plus 3=star</span>
+    }
+
+    // TODO: Explain what &quot;restricted&quot; means.
+    static boolean isRestricted(final int territoryRecord) {
+<span class="pc bpc" id="L74" title="3 of 6 branches missed.">        assert (0 &lt;= territoryRecord) &amp;&amp; (territoryRecord &lt; DATA_MODEL.getNrTerritoryRecords());</span>
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        return (DATA_MODEL.getDataFlags(territoryRecord) &amp; 512) != 0;</span>
+    }
+
+    static int getCodex(final int territoryRecord) {
+<span class="pc bpc" id="L79" title="3 of 6 branches missed.">        assert (0 &lt;= territoryRecord) &amp;&amp; (territoryRecord &lt; DATA_MODEL.getNrTerritoryRecords());</span>
+<span class="fc" id="L80">        final int codexflags = DATA_MODEL.getDataFlags(territoryRecord) &amp; 31;</span>
+<span class="fc" id="L81">        return (10 * (codexflags / 5)) + (codexflags % 5) + 1;</span>
+    }
+
+    // TODO: What does this method do? What is parameter i (rename)?
+    @Nonnull
+    static String headerLetter(final int i) {
+<span class="fc" id="L87">        final int flags = DATA_MODEL.getDataFlags(i);</span>
+
+        // TODO: The &quot;magic&quot; of how to interpret flags must be in DataModel, not here.
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (((flags &gt;&gt; 7) &amp; 3) == 1) {</span>
+<span class="fc" id="L91">            return Character.toString(ENCODE_CHARS[(flags &gt;&gt; 11) &amp; 31]);</span>
+        }
+<span class="fc" id="L93">        return &quot;&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

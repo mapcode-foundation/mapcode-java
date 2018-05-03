@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Alphabet.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">Alphabet.java</span></div><h1>Alphabet.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2017, Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import javax.annotation.Nonnull;
+
+import static com.mapcode.CheckArgs.checkNonnull;
+
+/**
+ * This enum defines all alphabets supported for mapcodes. Note that an alphabet is different
+ * from a language or locale. Note that the term alphabet was historically chosen. Script is a
+ * more precise term.
+ *
+ * Mapcodes can be safely converted between alphabets/scripts and fed to the mapcode decoder
+ * in the regular ASCII Roman alphabet or any other.
+ *
+ * The characters within an alphabet/script have been carefully chosen to resemble each other
+ * as much as possible.
+ */
+<span class="fc" id="L34">public enum Alphabet {</span>
+<span class="fc" id="L35">    ROMAN(0),               // The numeric codes for alphabets are used by the implementation</span>
+<span class="fc" id="L36">    GREEK(1),               // of the mapcode library. Do not change them.</span>
+<span class="fc" id="L37">    CYRILLIC(2),</span>
+<span class="fc" id="L38">    HEBREW(3),</span>
+<span class="fc" id="L39">    DEVANAGARI(4),</span>
+<span class="fc" id="L40">    MALAYALAM(5),</span>
+<span class="fc" id="L41">    GEORGIAN(6),</span>
+<span class="fc" id="L42">    KATAKANA(7),</span>
+<span class="fc" id="L43">    THAI(8),</span>
+<span class="fc" id="L44">    LAO(9),</span>
+<span class="fc" id="L45">    ARMENIAN(10),</span>
+<span class="fc" id="L46">    BENGALI(11),</span>
+<span class="fc" id="L47">    GURMUKHI(12),</span>
+<span class="fc" id="L48">    TIBETAN(13),</span>
+<span class="fc" id="L49">    ARABIC(14),</span>
+<span class="fc" id="L50">    KOREAN(15),</span>
+<span class="fc" id="L51">    BURMESE(16),</span>
+<span class="fc" id="L52">    KHMER(17),</span>
+<span class="fc" id="L53">    SINHALESE(18),</span>
+<span class="fc" id="L54">    THAANA(19),</span>
+<span class="fc" id="L55">    CHINESE(20),</span>
+<span class="fc" id="L56">    TIFINAGH(21),</span>
+<span class="fc" id="L57">    TAMIL(22),</span>
+<span class="fc" id="L58">    AMHARIC(23),</span>
+<span class="fc" id="L59">    TELUGU(24),</span>
+<span class="fc" id="L60">    ODIA(25),</span>
+<span class="fc" id="L61">    KANNADA(26),</span>
+<span class="fc" id="L62">    GUJARATI(27);</span>
+
+    /**
+     * The numeric code is synonym for the alphanumeric code. Used in the decoder.
+     */
+    private final int number;
+
+    /**
+     * Private constructor.
+     *
+     * @param number Alphabet number, for internal use only.
+     */
+<span class="fc" id="L74">    Alphabet(final int number) {</span>
+<span class="fc" id="L75">        this.number = number;</span>
+<span class="fc" id="L76">    }</span>
+
+    /**
+     * Get alphabet number. Package private, for internal use only.
+     *
+     * @return Numeric code.
+     */
+    int getNumber() {
+<span class="fc" id="L84">        return number;</span>
+    }
+
+    /**
+     * Return alphabet from a string, which needs to be an alphanumeric code.
+     *
+     * @param alphaCode Alphabet, alphanumeric code.
+     * @return Alphabet.
+     * @throws UnknownAlphabetException Thrown if incorrect numeric or alphanumeric code.
+     */
+    @Nonnull
+    public static Alphabet fromString(@Nonnull final String alphaCode) throws UnknownAlphabetException {
+<span class="fc" id="L96">        checkNonnull(&quot;alphaCode&quot;, alphaCode);</span>
+<span class="fc" id="L97">        final String trimmed = alphaCode.trim().toUpperCase();</span>
+        try {
+<span class="fc" id="L99">            return valueOf(trimmed);</span>
+<span class="fc" id="L100">        } catch (final IllegalArgumentException ignored) {</span>
+<span class="fc" id="L101">            throw new UnknownAlphabetException(trimmed);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

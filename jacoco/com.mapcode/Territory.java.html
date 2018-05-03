@@ -1,0 +1,1139 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Territory.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">Territory.java</span></div><h1>Territory.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2017, Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.*;
+
+import static com.mapcode.CheckArgs.checkNonnull;
+
+// ----------------------------------------------------------------------------------------------
+// Mapcode public interface.
+// ----------------------------------------------------------------------------------------------
+
+/**
+ * This class defines the available territory codes as used by mapcode.
+ */
+<span class="pc bpc" id="L32" title="1 of 2 branches missed.">public enum Territory {</span>
+<span class="fc" id="L33">    USA(410, &quot;USA&quot;, null, null, new String[]{&quot;US&quot;}, new String[]{&quot;United States of America&quot;, &quot;America&quot;}),</span>
+<span class="fc" id="L34">    IND(407, &quot;India&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.BENGALI, Alphabet.ROMAN}, null, new String[]{&quot;IN&quot;}),</span>
+<span class="fc" id="L35">    CAN(495, &quot;Canada&quot;, null, null, new String[]{&quot;CA&quot;}),</span>
+<span class="fc" id="L36">    AUS(408, &quot;Australia&quot;, null, null, new String[]{&quot;AU&quot;}),</span>
+<span class="fc" id="L37">    MEX(411, &quot;Mexico&quot;, null, null, new String[]{&quot;MX&quot;}),</span>
+<span class="fc" id="L38">    BRA(409, &quot;Brazil&quot;, null, null, new String[]{&quot;BR&quot;}),</span>
+<span class="fc" id="L39">    RUS(496, &quot;Russia&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, null, new String[]{&quot;RU&quot;}),</span>
+<span class="fc" id="L40">    CHN(528, &quot;China&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, null, new String[]{&quot;CN&quot;}),</span>
+<span class="fc" id="L41">    ATA(531, &quot;Antarctica&quot;),</span>
+
+<span class="fc" id="L43">    VAT(0, &quot;Vatican City&quot;, null, null, null, new String[]{&quot;Holy See&quot;}),</span>
+<span class="fc" id="L44">    MCO(1, &quot;Monaco&quot;),</span>
+<span class="fc" id="L45">    GIB(2, &quot;Gibraltar&quot;),</span>
+<span class="fc" id="L46">    TKL(3, &quot;Tokelau&quot;),</span>
+<span class="fc" id="L47">    CCK(4, &quot;Cocos Islands&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.ARABIC}, null, new String[]{&quot;AU-CC&quot;, &quot;AUS-CC&quot;}, new String[]{&quot;Keeling Islands&quot;}),</span>
+<span class="fc" id="L48">    BLM(5, &quot;Saint-Barthelemy&quot;),</span>
+<span class="fc" id="L49">    NRU(6, &quot;Nauru&quot;),</span>
+<span class="fc" id="L50">    TUV(7, &quot;Tuvalu&quot;),</span>
+<span class="fc" id="L51">    MAC(8, &quot;Macau&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, null, new String[]{&quot;CN-92&quot;, &quot;CHN-92&quot;, &quot;CN-MC&quot;, &quot;CHN-MC&quot;}, new String[]{&quot;Aomen&quot;}),</span>
+<span class="fc" id="L52">    SXM(9, &quot;Sint Maarten&quot;),</span>
+<span class="fc" id="L53">    MAF(10, &quot;Saint-Martin&quot;),</span>
+<span class="fc" id="L54">    NFK(11, &quot;Norfolk and Philip Island&quot;, null, null, new String[]{&quot;AU-NF&quot;, &quot;AUS-NF&quot;},</span>
+            new String[]{&quot;Philip Island&quot;}),
+<span class="fc" id="L56">    PCN(12, &quot;Pitcairn Islands&quot;),</span>
+<span class="fc" id="L57">    BVT(13, &quot;Bouvet Island&quot;),</span>
+<span class="fc" id="L58">    BMU(14, &quot;Bermuda&quot;),</span>
+<span class="fc" id="L59">    IOT(15, &quot;British Indian Ocean Territory&quot;, null, null, new String[]{&quot;DGA&quot;}),</span>
+<span class="fc" id="L60">    SMR(16, &quot;San Marino&quot;),</span>
+<span class="fc" id="L61">    GGY(17, &quot;Guernsey&quot;),</span>
+<span class="fc" id="L62">    AIA(18, &quot;Anguilla&quot;),</span>
+<span class="fc" id="L63">    MSR(19, &quot;Montserrat&quot;),</span>
+<span class="fc" id="L64">    JEY(20, &quot;Jersey&quot;),</span>
+<span class="fc" id="L65">    CXR(21, &quot;Christmas Island&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ARABIC, Alphabet.ROMAN}, null, new String[]{&quot;AU-CX&quot;, &quot;AUS-CX&quot;}),</span>
+<span class="fc" id="L66">    WLF(22, &quot;Wallis and Futuna&quot;, null, null, null, new String[]{&quot;Futuna&quot;}),</span>
+<span class="fc" id="L67">    VGB(23, &quot;British Virgin Islands&quot;, null, null, null, new String[]{&quot;Virgin Islands, British&quot;}),</span>
+<span class="fc" id="L68">    LIE(24, &quot;Liechtenstein&quot;),</span>
+<span class="fc" id="L69">    ABW(25, &quot;Aruba&quot;),</span>
+<span class="fc" id="L70">    MHL(26, &quot;Marshall Islands&quot;, null, null, new String[]{&quot;WAK&quot;}),</span>
+<span class="fc" id="L71">    ASM(27, &quot;American Samoa&quot;, null, null, new String[]{&quot;US-AS&quot;, &quot;USA-AS&quot;}, new String[]{&quot;Samoa, American&quot;}),</span>
+<span class="fc" id="L72">    COK(28, &quot;Cook islands&quot;),</span>
+<span class="fc" id="L73">    SPM(29, &quot;Saint Pierre and Miquelon&quot;, null, null, null, new String[]{&quot;Miquelon&quot;}),</span>
+<span class="fc" id="L74">    NIU(30, &quot;Niue&quot;),</span>
+<span class="fc" id="L75">    KNA(31, &quot;Saint Kitts and Nevis&quot;, null, null, null, new String[]{&quot;Nevis&quot;}),</span>
+<span class="fc" id="L76">    CYM(32, &quot;Cayman islands&quot;),</span>
+<span class="fc" id="L77">    BES(33, &quot;Bonaire, St Eustasuis and Saba&quot;, null, null, null, new String[]{&quot;Saba&quot;, &quot;St Eustasius&quot;}),</span>
+<span class="fc" id="L78">    MDV(34, &quot;Maldives&quot;, new Alphabet[]{Alphabet.THAANA, Alphabet.ROMAN}),</span>
+<span class="fc" id="L79">    SHN(35, &quot;Saint Helena, Ascension and Tristan da Cunha&quot;, null, null, new String[]{&quot;TAA&quot;, &quot;ASC&quot;},</span>
+            new String[]{&quot;Ascension&quot;, &quot;Tristan da Cunha&quot;}),
+<span class="fc" id="L81">    MLT(36, &quot;Malta&quot;),</span>
+<span class="fc" id="L82">    GRD(37, &quot;Grenada&quot;),</span>
+<span class="fc" id="L83">    VIR(38, &quot;US Virgin Islands&quot;, null, null, new String[]{&quot;US-VI&quot;, &quot;USA-VI&quot;}, new String[]{&quot;Virgin Islands, US&quot;}),</span>
+<span class="fc" id="L84">    MYT(39, &quot;Mayotte&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.ARABIC}),</span>
+<span class="fc" id="L85">    SJM(40, &quot;Svalbard and Jan Mayen&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.CYRILLIC}, null, null, new String[]{&quot;Jan Mayen&quot;, &quot;Spitsbergen&quot;}),</span>
+<span class="fc" id="L86">    VCT(41, &quot;Saint Vincent and the Grenadines&quot;, null, null, null, new String[]{&quot;Grenadines&quot;}),</span>
+<span class="fc" id="L87">    HMD(42, &quot;Heard Island and McDonald Islands&quot;, null, null, new String[]{&quot;AU-HM&quot;, &quot;AUS-HM&quot;},</span>
+            new String[]{&quot;McDonald Islands&quot;}),
+<span class="fc" id="L89">    BRB(43, &quot;Barbados&quot;),</span>
+<span class="fc" id="L90">    ATG(44, &quot;Antigua and Barbuda&quot;, null, null, null, new String[]{&quot;Barbuda&quot;}),</span>
+<span class="fc" id="L91">    CUW(45, &quot;Curacao&quot;),</span>
+<span class="fc" id="L92">    SYC(46, &quot;Seychelles&quot;),</span>
+<span class="fc" id="L93">    PLW(47, &quot;Palau&quot;),</span>
+<span class="fc" id="L94">    MNP(48, &quot;Northern Mariana Islands&quot;, null, null, new String[]{&quot;US-MP&quot;, &quot;USA-MP&quot;}),</span>
+<span class="fc" id="L95">    AND(49, &quot;Andorra&quot;),</span>
+<span class="fc" id="L96">    GUM(50, &quot;Guam&quot;, null, null, new String[]{&quot;US-GU&quot;, &quot;USA-GU&quot;}),</span>
+<span class="fc" id="L97">    IMN(51, &quot;Isle of Man&quot;),</span>
+<span class="fc" id="L98">    LCA(52, &quot;Saint Lucia&quot;),</span>
+<span class="fc" id="L99">    FSM(53, &quot;Micronesia&quot;, null, null, null, new String[]{&quot;Federated States of Micronesia&quot;}),</span>
+<span class="fc" id="L100">    SGP(54, &quot;Singapore&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L101">    TON(55, &quot;Tonga&quot;),</span>
+<span class="fc" id="L102">    DMA(56, &quot;Dominica&quot;),</span>
+<span class="fc" id="L103">    BHR(57, &quot;Bahrain&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L104">    KIR(58, &quot;Kiribati&quot;),</span>
+<span class="fc" id="L105">    TCA(59, &quot;Turks and Caicos Islands&quot;, null, null, null, new String[]{&quot;Caicos Islands&quot;}),</span>
+<span class="fc" id="L106">    STP(60, &quot;Sao Tome and Principe&quot;, null, null, null, new String[]{&quot;Principe&quot;}),</span>
+<span class="fc" id="L107">    HKG(61, &quot;Hong Kong&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, null, new String[]{&quot;CN-91&quot;, &quot;CHN-91&quot;, &quot;CN-HK&quot;, &quot;CHN-HK&quot;}, new String[]{&quot;Xianggang&quot;}),</span>
+<span class="fc" id="L108">    MTQ(62, &quot;Martinique&quot;),</span>
+<span class="fc" id="L109">    FRO(63, &quot;Faroe Islands&quot;),</span>
+<span class="fc" id="L110">    GLP(64, &quot;Guadeloupe&quot;),</span>
+<span class="fc" id="L111">    COM(65, &quot;Comoros&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L112">    MUS(66, &quot;Mauritius&quot;),</span>
+<span class="fc" id="L113">    REU(67, &quot;Reunion&quot;),</span>
+<span class="fc" id="L114">    LUX(68, &quot;Luxembourg&quot;),</span>
+<span class="fc" id="L115">    WSM(69, &quot;Samoa&quot;),</span>
+<span class="fc" id="L116">    SGS(70, &quot;South Georgia and the South Sandwich Islands&quot;, null, null, null, new String[]{&quot;South Sandwich Islands&quot;}),</span>
+<span class="fc" id="L117">    PYF(71, &quot;French Polynesia&quot;),</span>
+<span class="fc" id="L118">    CPV(72, &quot;Cape Verde&quot;),</span>
+<span class="fc" id="L119">    TTO(73, &quot;Trinidad and Tobago&quot;, null, null, null, new String[]{&quot;Tobago&quot;}),</span>
+<span class="fc" id="L120">    BRN(74, &quot;Brunei&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L121">    ATF(75, &quot;French Southern and Antarctic Lands&quot;),</span>
+<span class="fc" id="L122">    PRI(76, &quot;Puerto Rico&quot;, null, null, new String[]{&quot;US-PR&quot;, &quot;USA-PR&quot;}),</span>
+<span class="fc" id="L123">    CYP(77, &quot;Cyprus&quot;, new Alphabet[]{Alphabet.GREEK, Alphabet.ROMAN}),</span>
+<span class="fc" id="L124">    LBN(78, &quot;Lebanon&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L125">    JAM(79, &quot;Jamaica&quot;),</span>
+<span class="fc" id="L126">    GMB(80, &quot;Gambia&quot;),</span>
+<span class="fc" id="L127">    QAT(81, &quot;Qatar&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L128">    FLK(82, &quot;Falkland Islands&quot;),</span>
+<span class="fc" id="L129">    VUT(83, &quot;Vanuatu&quot;),</span>
+<span class="fc" id="L130">    MNE(84, &quot;Montenegro&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L131">    BHS(85, &quot;Bahamas&quot;),</span>
+<span class="fc" id="L132">    TLS(86, &quot;East Timor&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.ARABIC}),</span>
+<span class="fc" id="L133">    SWZ(87, &quot;Swaziland&quot;),</span>
+<span class="fc" id="L134">    KWT(88, &quot;Kuwait&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L135">    FJI(89, &quot;Fiji Islands&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.DEVANAGARI}),</span>
+<span class="fc" id="L136">    NCL(90, &quot;New Caledonia&quot;),</span>
+<span class="fc" id="L137">    SVN(91, &quot;Slovenia&quot;),</span>
+<span class="fc" id="L138">    ISR(92, &quot;Israel&quot;, new Alphabet[]{Alphabet.HEBREW, Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L139">    PSE(93, &quot;Palestinian territory&quot;, new Alphabet[]{Alphabet.HEBREW, Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L140">    SLV(94, &quot;El Salvador&quot;),</span>
+<span class="fc" id="L141">    BLZ(95, &quot;Belize&quot;),</span>
+<span class="fc" id="L142">    DJI(96, &quot;Djibouti&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L143">    MKD(97, &quot;Macedonia&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L144">    RWA(98, &quot;Rwanda&quot;),</span>
+<span class="fc" id="L145">    HTI(99, &quot;Haiti&quot;),</span>
+<span class="fc" id="L146">    BDI(100, &quot;Burundi&quot;),</span>
+<span class="fc" id="L147">    GNQ(101, &quot;Equatorial Guinea&quot;),</span>
+<span class="fc" id="L148">    ALB(102, &quot;Albania&quot;),</span>
+<span class="fc" id="L149">    SLB(103, &quot;Solomon Islands&quot;),</span>
+<span class="fc" id="L150">    ARM(104, &quot;Armenia&quot;, new Alphabet[]{Alphabet.ARMENIAN, Alphabet.ROMAN}),</span>
+<span class="fc" id="L151">    LSO(105, &quot;Lesotho&quot;),</span>
+<span class="fc" id="L152">    BEL(106, &quot;Belgium&quot;),</span>
+<span class="fc" id="L153">    MDA(107, &quot;Moldova&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L154">    GNB(108, &quot;Guinea-Bissau&quot;),</span>
+<span class="fc" id="L155">    TWN(109, &quot;Taiwan&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, null, new String[]{&quot;CN-71&quot;, &quot;CHN-71&quot;, &quot;CN-TW&quot;, &quot;CHN-TW&quot;}),</span>
+<span class="fc" id="L156">    BTN(110, &quot;Bhutan&quot;, new Alphabet[]{Alphabet.TIBETAN, Alphabet.ROMAN}),</span>
+<span class="fc" id="L157">    CHE(111, &quot;Switzerland&quot;),</span>
+<span class="fc" id="L158">    NLD(112, &quot;Netherlands&quot;),</span>
+<span class="fc" id="L159">    DNK(113, &quot;Denmark&quot;),</span>
+<span class="fc" id="L160">    EST(114, &quot;Estonia&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L161">    DOM(115, &quot;Dominican Republic&quot;),</span>
+<span class="fc" id="L162">    SVK(116, &quot;Slovakia&quot;),</span>
+<span class="fc" id="L163">    CRI(117, &quot;Costa Rica&quot;),</span>
+<span class="fc" id="L164">    BIH(118, &quot;Bosnia and Herzegovina&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.CYRILLIC}),</span>
+<span class="fc" id="L165">    HRV(119, &quot;Croatia&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.CYRILLIC}),</span>
+<span class="fc" id="L166">    TGO(120, &quot;Togo&quot;),</span>
+<span class="fc" id="L167">    LVA(121, &quot;Latvia&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L168">    LTU(122, &quot;Lithuania&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L169">    LKA(123, &quot;Sri Lanka&quot;, new Alphabet[]{Alphabet.SINHALESE, Alphabet.TAMIL, Alphabet.ROMAN}),</span>
+<span class="fc" id="L170">    GEO(124, &quot;Georgia&quot;, new Alphabet[]{Alphabet.GEORGIAN, Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L171">    IRL(125, &quot;Ireland&quot;),</span>
+<span class="fc" id="L172">    SLE(126, &quot;Sierra Leone&quot;),</span>
+<span class="fc" id="L173">    PAN(127, &quot;Panama&quot;),</span>
+<span class="fc" id="L174">    CZE(128, &quot;Czech Republic&quot;),</span>
+<span class="fc" id="L175">    GUF(129, &quot;French Guiana&quot;),</span>
+<span class="fc" id="L176">    ARE(130, &quot;United Arab Emirates&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L177">    AUT(131, &quot;Austria&quot;),</span>
+<span class="fc" id="L178">    AZE(132, &quot;Azerbaijan&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.CYRILLIC, Alphabet.ARABIC}),</span>
+<span class="fc" id="L179">    SRB(133, &quot;Serbia&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L180">    JOR(134, &quot;Jordan&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L181">    PRT(135, &quot;Portugal&quot;),</span>
+<span class="fc" id="L182">    HUN(136, &quot;Hungary&quot;),</span>
+<span class="fc" id="L183">    KOR(137, &quot;South Korea&quot;, new Alphabet[]{Alphabet.KOREAN, Alphabet.ROMAN}),</span>
+<span class="fc" id="L184">    ISL(138, &quot;Iceland&quot;),</span>
+<span class="fc" id="L185">    GTM(139, &quot;Guatemala&quot;),</span>
+<span class="fc" id="L186">    CUB(140, &quot;Cuba&quot;),</span>
+<span class="fc" id="L187">    BGR(141, &quot;Bulgaria&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L188">    LBR(142, &quot;Liberia&quot;),</span>
+<span class="fc" id="L189">    HND(143, &quot;Honduras&quot;),</span>
+<span class="fc" id="L190">    BEN(144, &quot;Benin&quot;),</span>
+<span class="fc" id="L191">    ERI(145, &quot;Eritrea&quot;, new Alphabet[]{Alphabet.AMHARIC, Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L192">    MWI(146, &quot;Malawi&quot;),</span>
+<span class="fc" id="L193">    PRK(147, &quot;North Korea&quot;, new Alphabet[]{Alphabet.KOREAN, Alphabet.ROMAN}),</span>
+<span class="fc" id="L194">    NIC(148, &quot;Nicaragua&quot;),</span>
+<span class="fc" id="L195">    GRC(149, &quot;Greece&quot;, new Alphabet[]{Alphabet.GREEK, Alphabet.ROMAN}),</span>
+<span class="fc" id="L196">    TJK(150, &quot;Tajikistan&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L197">    BGD(151, &quot;Bangladesh&quot;, new Alphabet[]{Alphabet.BENGALI, Alphabet.ROMAN}),</span>
+<span class="fc" id="L198">    NPL(152, &quot;Nepal&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}),</span>
+<span class="fc" id="L199">    TUN(153, &quot;Tunisia&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN, Alphabet.TIFINAGH}),</span>
+<span class="fc" id="L200">    SUR(154, &quot;Suriname&quot;),</span>
+<span class="fc" id="L201">    URY(155, &quot;Uruguay&quot;),</span>
+<span class="fc" id="L202">    KHM(156, &quot;Cambodia&quot;, new Alphabet[]{Alphabet.KHMER, Alphabet.ROMAN}),</span>
+<span class="fc" id="L203">    SYR(157, &quot;Syria&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L204">    SEN(158, &quot;Senegal&quot;),</span>
+<span class="fc" id="L205">    KGZ(159, &quot;Kyrgyzstan&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L206">    BLR(160, &quot;Belarus&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L207">    GUY(161, &quot;Guyana&quot;),</span>
+<span class="fc" id="L208">    LAO(162, &quot;Laos&quot;, new Alphabet[]{Alphabet.LAO, Alphabet.ROMAN}),</span>
+<span class="fc" id="L209">    ROU(163, &quot;Romania&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L210">    GHA(164, &quot;Ghana&quot;),</span>
+<span class="fc" id="L211">    UGA(165, &quot;Uganda&quot;),</span>
+<span class="fc" id="L212">    GBR(166, &quot;United Kingdom&quot;, null, null, null,</span>
+            new String[]{&quot;Scotland&quot;, &quot;Great Britain&quot;, &quot;Northern Ireland&quot;, &quot;Ireland, Northern&quot;}),
+<span class="fc" id="L214">    GIN(167, &quot;Guinea&quot;),</span>
+<span class="fc" id="L215">    ECU(168, &quot;Ecuador&quot;),</span>
+<span class="fc" id="L216">    ESH(169, &quot;Western Sahara&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}, null, null, new String[]{&quot;Sahrawi&quot;}),</span>
+<span class="fc" id="L217">    GAB(170, &quot;Gabon&quot;),</span>
+<span class="fc" id="L218">    NZL(171, &quot;New Zealand&quot;),</span>
+<span class="fc" id="L219">    BFA(172, &quot;Burkina Faso&quot;),</span>
+<span class="fc" id="L220">    PHL(173, &quot;Philippines&quot;),</span>
+<span class="fc" id="L221">    ITA(174, &quot;Italy&quot;),</span>
+<span class="fc" id="L222">    OMN(175, &quot;Oman&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L223">    POL(176, &quot;Poland&quot;),</span>
+<span class="fc" id="L224">    CIV(177, &quot;Ivory Coast&quot;),</span>
+<span class="fc" id="L225">    NOR(178, &quot;Norway&quot;),</span>
+<span class="fc" id="L226">    MYS(179, &quot;Malaysia&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.ARABIC, Alphabet.CHINESE}),</span>
+<span class="fc" id="L227">    VNM(180, &quot;Vietnam&quot;),</span>
+<span class="fc" id="L228">    FIN(181, &quot;Finland&quot;),</span>
+<span class="fc" id="L229">    COG(182, &quot;Congo-Brazzaville&quot;),</span>
+<span class="fc" id="L230">    DEU(183, &quot;Germany&quot;),</span>
+<span class="fc" id="L231">    JPN(184, &quot;Japan&quot;, new Alphabet[]{Alphabet.KATAKANA, Alphabet.ROMAN}),</span>
+<span class="fc" id="L232">    ZWE(185, &quot;Zimbabwe&quot;),</span>
+<span class="fc" id="L233">    PRY(186, &quot;Paraguay&quot;),</span>
+<span class="fc" id="L234">    IRQ(187, &quot;Iraq&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L235">    MAR(188, &quot;Morocco&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN, Alphabet.TIFINAGH}),</span>
+<span class="fc" id="L236">    UZB(189, &quot;Uzbekistan&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L237">    SWE(190, &quot;Sweden&quot;),</span>
+<span class="fc" id="L238">    PNG(191, &quot;Papua New Guinea&quot;),</span>
+<span class="fc" id="L239">    CMR(192, &quot;Cameroon&quot;),</span>
+<span class="fc" id="L240">    TKM(193, &quot;Turkmenistan&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L241">    ESP(194, &quot;Spain&quot;),</span>
+<span class="fc" id="L242">    THA(195, &quot;Thailand&quot;, new Alphabet[]{Alphabet.THAI, Alphabet.ROMAN}),</span>
+<span class="fc" id="L243">    YEM(196, &quot;Yemen&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L244">    FRA(197, &quot;France&quot;),</span>
+<span class="fc" id="L245">    ALA(198, &quot;Aaland Islands&quot;),</span>
+<span class="fc" id="L246">    KEN(199, &quot;Kenya&quot;),</span>
+<span class="fc" id="L247">    BWA(200, &quot;Botswana&quot;),</span>
+<span class="fc" id="L248">    MDG(201, &quot;Madagascar&quot;),</span>
+<span class="fc" id="L249">    UKR(202, &quot;Ukraine&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L250">    SSD(203, &quot;South Sudan&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.ARABIC}),</span>
+<span class="fc" id="L251">    CAF(204, &quot;Central African Republic&quot;),</span>
+<span class="fc" id="L252">    SOM(205, &quot;Somalia&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L253">    AFG(206, &quot;Afghanistan&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L254">    MMR(207, &quot;Myanmar&quot;, new Alphabet[]{Alphabet.BURMESE, Alphabet.ROMAN}, null, null, new String[]{&quot;Burma&quot;}),</span>
+<span class="fc" id="L255">    ZMB(208, &quot;Zambia&quot;),</span>
+<span class="fc" id="L256">    CHL(209, &quot;Chile&quot;),</span>
+<span class="fc" id="L257">    TUR(210, &quot;Turkey&quot;),</span>
+<span class="fc" id="L258">    PAK(211, &quot;Pakistan&quot;, new Alphabet[]{Alphabet.GURMUKHI, Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L259">    MOZ(212, &quot;Mozambique&quot;),</span>
+<span class="fc" id="L260">    NAM(213, &quot;Namibia&quot;),</span>
+<span class="fc" id="L261">    VEN(214, &quot;Venezuela&quot;),</span>
+<span class="fc" id="L262">    NGA(215, &quot;Nigeria&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.ARABIC}),</span>
+<span class="fc" id="L263">    TZA(216, &quot;Tanzania&quot;),</span>
+<span class="fc" id="L264">    EGY(217, &quot;Egypt&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L265">    MRT(218, &quot;Mauritania&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L266">    BOL(219, &quot;Bolivia&quot;),</span>
+<span class="fc" id="L267">    ETH(220, &quot;Ethiopia&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.AMHARIC, Alphabet.ARABIC}),</span>
+<span class="fc" id="L268">    COL(221, &quot;Colombia&quot;),</span>
+<span class="fc" id="L269">    ZAF(222, &quot;South Africa&quot;),</span>
+<span class="fc" id="L270">    MLI(223, &quot;Mali&quot;),</span>
+<span class="fc" id="L271">    AGO(224, &quot;Angola&quot;),</span>
+<span class="fc" id="L272">    NER(225, &quot;Niger&quot;),</span>
+<span class="fc" id="L273">    TCD(226, &quot;Chad&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L274">    PER(227, &quot;Peru&quot;),</span>
+<span class="fc" id="L275">    MNG(228, &quot;Mongolia&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L276">    IRN(229, &quot;Iran&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L277">    LBY(230, &quot;Libya&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN, Alphabet.TIFINAGH}),</span>
+<span class="fc" id="L278">    SDN(231, &quot;Sudan&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L279">    IDN(232, &quot;Indonesia&quot;),</span>
+<span class="fc" id="L280">    MX_DIF(233, &quot;Federal District&quot;, null, MEX, new String[]{&quot;MX-DF&quot;}),</span>
+<span class="fc" id="L281">    MX_TLA(234, &quot;Tlaxcala&quot;, null, MEX, new String[]{&quot;MX-TL&quot;}),</span>
+<span class="fc" id="L282">    MX_MOR(235, &quot;Morelos&quot;, null, MEX, new String[]{&quot;MX-MO&quot;}),</span>
+<span class="fc" id="L283">    MX_AGU(236, &quot;Aguascalientes&quot;, null, MEX, new String[]{&quot;MX-AG&quot;}),</span>
+<span class="fc" id="L284">    MX_CL(237, &quot;Colima&quot;, null, MEX, new String[]{&quot;MX-COL&quot;}),</span>
+<span class="fc" id="L285">    MX_QUE(238, &quot;Queretaro&quot;, null, MEX, new String[]{&quot;MX-QE&quot;}),</span>
+<span class="fc" id="L286">    MX_HID(239, &quot;Hidalgo&quot;, null, MEX, new String[]{&quot;MX-HG&quot;}),</span>
+<span class="fc" id="L287">    MX_MX(240, &quot;Mexico State&quot;, null, MEX, new String[]{&quot;MX-ME&quot;, &quot;MX-MEX&quot;}),</span>
+<span class="fc" id="L288">    MX_TAB(241, &quot;Tabasco&quot;, null, MEX, new String[]{&quot;MX-TB&quot;}),</span>
+<span class="fc" id="L289">    MX_NAY(242, &quot;Nayarit&quot;, null, MEX, new String[]{&quot;MX-NA&quot;}),</span>
+<span class="fc" id="L290">    MX_GUA(243, &quot;Guanajuato&quot;, null, MEX, new String[]{&quot;MX-GT&quot;}),</span>
+<span class="fc" id="L291">    MX_PUE(244, &quot;Puebla&quot;, null, MEX, new String[]{&quot;MX-PB&quot;}),</span>
+<span class="fc" id="L292">    MX_YUC(245, &quot;Yucatan&quot;, null, MEX, new String[]{&quot;MX-YU&quot;}),</span>
+<span class="fc" id="L293">    MX_ROO(246, &quot;Quintana Roo&quot;, null, MEX, new String[]{&quot;MX-QR&quot;}),</span>
+<span class="fc" id="L294">    MX_SIN(247, &quot;Sinaloa&quot;, null, MEX, new String[]{&quot;MX-SI&quot;}),</span>
+<span class="fc" id="L295">    MX_CAM(248, &quot;Campeche&quot;, null, MEX, new String[]{&quot;MX-CM&quot;}),</span>
+<span class="fc" id="L296">    MX_MIC(249, &quot;Michoacan&quot;, null, MEX, new String[]{&quot;MX-MI&quot;}),</span>
+<span class="fc" id="L297">    MX_SLP(250, &quot;San Luis Potosi&quot;, null, MEX, new String[]{&quot;MX-SL&quot;}),</span>
+<span class="fc" id="L298">    MX_GRO(251, &quot;Guerrero&quot;, null, MEX, new String[]{&quot;MX-GR&quot;}),</span>
+<span class="fc" id="L299">    MX_NLE(252, &quot;Nuevo Leon&quot;, null, MEX, new String[]{&quot;MX-NL&quot;}),</span>
+<span class="fc" id="L300">    MX_BCN(253, &quot;Baja California&quot;, null, MEX, new String[]{&quot;MX-BC&quot;}),</span>
+<span class="fc" id="L301">    MX_VER(254, &quot;Veracruz&quot;, null, MEX, new String[]{&quot;MX-VE&quot;}),</span>
+<span class="fc" id="L302">    MX_CHP(255, &quot;Chiapas&quot;, null, MEX, new String[]{&quot;MX-CS&quot;}),</span>
+<span class="fc" id="L303">    MX_BCS(256, &quot;Baja California Sur&quot;, null, MEX, new String[]{&quot;MX-BS&quot;}),</span>
+<span class="fc" id="L304">    MX_ZAC(257, &quot;Zacatecas&quot;, null, MEX, new String[]{&quot;MX-ZA&quot;}),</span>
+<span class="fc" id="L305">    MX_JAL(258, &quot;Jalisco&quot;, null, MEX, new String[]{&quot;MX-JA&quot;}),</span>
+<span class="fc" id="L306">    MX_TAM(259, &quot;Tamaulipas&quot;, null, MEX, new String[]{&quot;MX-TM&quot;}),</span>
+<span class="fc" id="L307">    MX_OAX(260, &quot;Oaxaca&quot;, null, MEX, new String[]{&quot;MX-OA&quot;}),</span>
+<span class="fc" id="L308">    MX_DUR(261, &quot;Durango&quot;, null, MEX, new String[]{&quot;MX-DG&quot;}),</span>
+<span class="fc" id="L309">    MX_COA(262, &quot;Coahuila&quot;, null, MEX, new String[]{&quot;MX-CO&quot;}),</span>
+<span class="fc" id="L310">    MX_SON(263, &quot;Sonora&quot;, null, MEX, new String[]{&quot;MX-SO&quot;}),</span>
+<span class="fc" id="L311">    MX_CHH(264, &quot;Chihuahua&quot;, null, MEX, new String[]{&quot;MX-CH&quot;}),</span>
+<span class="fc" id="L312">    GRL(265, &quot;Greenland&quot;),</span>
+<span class="fc" id="L313">    SAU(266, &quot;Saudi Arabia&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L314">    COD(267, &quot;Congo-Kinshasa&quot;),</span>
+<span class="fc" id="L315">    DZA(268, &quot;Algeria&quot;, new Alphabet[]{Alphabet.ARABIC, Alphabet.ROMAN, Alphabet.TIFINAGH}),</span>
+<span class="fc" id="L316">    KAZ(269, &quot;Kazakhstan&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}),</span>
+<span class="fc" id="L317">    ARG(270, &quot;Argentina&quot;),</span>
+<span class="fc" id="L318">    IN_DD(271, &quot;Daman and Diu&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.GUJARATI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L319">    IN_DN(272, &quot;Dadra and Nagar Haveli&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.GUJARATI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L320">    IN_CH(273, &quot;Chandigarh&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN, Alphabet.GURMUKHI}, IND),</span>
+<span class="fc" id="L321">    IN_AN(274, &quot;Andaman and Nicobar&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN, Alphabet.BENGALI}, IND),</span>
+<span class="fc" id="L322">    IN_LD(275, &quot;Lakshadweep&quot;, new Alphabet[]{Alphabet.MALAYALAM, Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L323">    IN_DL(276, &quot;Delhi&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.GURMUKHI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L324">    IN_ML(277, &quot;Meghalaya&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L325">    IN_NL(278, &quot;Nagaland&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L326">    IN_MN(279, &quot;Manipur&quot;, new Alphabet[]{Alphabet.BENGALI, Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L327">    IN_TR(280, &quot;Tripura&quot;, new Alphabet[]{Alphabet.BENGALI, Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L328">    IN_MZ(281, &quot;Mizoram&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L329">    IN_SK(282, &quot;Sikkim&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L330">    IN_PB(283, &quot;Punjab&quot;, new Alphabet[]{Alphabet.GURMUKHI, Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L331">    IN_HR(284, &quot;Haryana&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.GURMUKHI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L332">    IN_AR(285, &quot;Arunachal Pradesh&quot;, new Alphabet[]{Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L333">    IN_AS(286, &quot;Assam&quot;, new Alphabet[]{Alphabet.BENGALI, Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L334">    IN_BR(287, &quot;Bihar&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L335">    IN_UT(288, &quot;Uttarakhand&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND, new String[]{&quot;IN-UK&quot;}),</span>
+<span class="fc" id="L336">    IN_GA(289, &quot;Goa&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L337">    IN_KL(290, &quot;Kerala&quot;, new Alphabet[]{Alphabet.MALAYALAM, Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L338">    IN_TN(291, &quot;Tamil Nadu&quot;, new Alphabet[]{Alphabet.TAMIL, Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L339">    IN_HP(292, &quot;Himachal Pradesh&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L340">    IN_JK(293, &quot;Jammu and Kashmir&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.GURMUKHI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L341">    IN_CT(294, &quot;Chhattisgarh&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND, new String[]{&quot;IN-CG&quot;}),</span>
+<span class="fc" id="L342">    IN_JH(295, &quot;Jharkhand&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.BENGALI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L343">    IN_KA(296, &quot;Karnataka&quot;, new Alphabet[]{Alphabet.KANNADA, Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L344">    IN_RJ(297, &quot;Rajasthan&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L345">    IN_OR(298, &quot;Odisha&quot;, new Alphabet[]{Alphabet.ODIA, Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND, new String[]{&quot;IN-OD&quot;}, new String[]{&quot;Orissa&quot;}),</span>
+<span class="fc" id="L346">    IN_GJ(299, &quot;Gujarat&quot;, new Alphabet[]{Alphabet.GUJARATI, Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L347">    IN_WB(300, &quot;West Bengal&quot;, new Alphabet[]{Alphabet.BENGALI, Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L348">    IN_MP(301, &quot;Madhya Pradesh&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L349">    IN_TG(302, &quot;Telangana&quot;, new Alphabet[]{Alphabet.TELUGU, Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L350">    IN_AP(303, &quot;Andhra Pradesh&quot;, new Alphabet[]{Alphabet.TELUGU, Alphabet.ROMAN, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L351">    IN_MH(304, &quot;Maharashtra&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L352">    IN_UP(305, &quot;Uttar Pradesh&quot;, new Alphabet[]{Alphabet.DEVANAGARI, Alphabet.ROMAN}, IND),</span>
+<span class="fc" id="L353">    IN_PY(306, &quot;Puducherry&quot;, new Alphabet[]{Alphabet.MALAYALAM, Alphabet.TELUGU, Alphabet.DEVANAGARI}, IND),</span>
+<span class="fc" id="L354">    AU_NSW(307, &quot;New South Wales&quot;, null, AUS),</span>
+<span class="fc" id="L355">    AU_ACT(308, &quot;Australian Capital Territory&quot;, null, AUS),</span>
+<span class="fc" id="L356">    AU_JBT(309, &quot;Jervis Bay Territory&quot;, null, AUS),</span>
+<span class="fc" id="L357">    AU_NT(310, &quot;Northern Territory&quot;, null, AUS),</span>
+<span class="fc" id="L358">    AU_SA(311, &quot;South Australia&quot;, null, AUS),</span>
+<span class="fc" id="L359">    AU_TAS(312, &quot;Tasmania&quot;, null, AUS),</span>
+<span class="fc" id="L360">    AU_VIC(313, &quot;Victoria&quot;, null, AUS),</span>
+<span class="fc" id="L361">    AU_WA(314, &quot;Western Australia&quot;, null, AUS),</span>
+<span class="fc" id="L362">    AU_QLD(315, &quot;Queensland&quot;, null, AUS),</span>
+<span class="fc" id="L363">    BR_DF(316, &quot;Distrito Federal&quot;, null, BRA),</span>
+<span class="fc" id="L364">    BR_SE(317, &quot;Sergipe&quot;, null, BRA),</span>
+<span class="fc" id="L365">    BR_AL(318, &quot;Alagoas&quot;, null, BRA),</span>
+<span class="fc" id="L366">    BR_RJ(319, &quot;Rio de Janeiro&quot;, null, BRA),</span>
+<span class="fc" id="L367">    BR_ES(320, &quot;Espirito Santo&quot;, null, BRA),</span>
+<span class="fc" id="L368">    BR_RN(321, &quot;Rio Grande do Norte&quot;, null, BRA),</span>
+<span class="fc" id="L369">    BR_PB(322, &quot;Paraiba&quot;, null, BRA),</span>
+<span class="fc" id="L370">    BR_SC(323, &quot;Santa Catarina&quot;, null, BRA),</span>
+<span class="fc" id="L371">    BR_PE(324, &quot;Pernambuco&quot;, null, BRA),</span>
+<span class="fc" id="L372">    BR_AP(325, &quot;Amapa&quot;, null, BRA),</span>
+<span class="fc" id="L373">    BR_CE(326, &quot;Ceara&quot;, null, BRA),</span>
+<span class="fc" id="L374">    BR_AC(327, &quot;Acre&quot;, null, BRA),</span>
+<span class="fc" id="L375">    BR_PR(328, &quot;Parana&quot;, null, BRA),</span>
+<span class="fc" id="L376">    BR_RR(329, &quot;Roraima&quot;, null, BRA),</span>
+<span class="fc" id="L377">    BR_RO(330, &quot;Rondonia&quot;, null, BRA),</span>
+<span class="fc" id="L378">    BR_SP(331, &quot;Sao Paulo&quot;, null, BRA),</span>
+<span class="fc" id="L379">    BR_PI(332, &quot;Piaui&quot;, null, BRA),</span>
+<span class="fc" id="L380">    BR_TO(333, &quot;Tocantins&quot;, null, BRA),</span>
+<span class="fc" id="L381">    BR_RS(334, &quot;Rio Grande do Sul&quot;, null, BRA),</span>
+<span class="fc" id="L382">    BR_MA(335, &quot;Maranhao&quot;, null, BRA),</span>
+<span class="fc" id="L383">    BR_GO(336, &quot;Goias&quot;, null, BRA),</span>
+<span class="fc" id="L384">    BR_MS(337, &quot;Mato Grosso do Sul&quot;, null, BRA),</span>
+<span class="fc" id="L385">    BR_BA(338, &quot;Bahia&quot;, null, BRA),</span>
+<span class="fc" id="L386">    BR_MG(339, &quot;Minas Gerais&quot;, null, BRA),</span>
+<span class="fc" id="L387">    BR_MT(340, &quot;Mato Grosso&quot;, null, BRA),</span>
+<span class="fc" id="L388">    BR_PA(341, &quot;Para&quot;, null, BRA),</span>
+<span class="fc" id="L389">    BR_AM(342, &quot;Amazonas&quot;, null, BRA),</span>
+<span class="fc" id="L390">    US_DC(343, &quot;District of Columbia&quot;, null, USA),</span>
+<span class="fc" id="L391">    US_RI(344, &quot;Rhode Island&quot;, null, USA),</span>
+<span class="fc" id="L392">    US_DE(345, &quot;Delaware&quot;, null, USA),</span>
+<span class="fc" id="L393">    US_CT(346, &quot;Connecticut&quot;, null, USA),</span>
+<span class="fc" id="L394">    US_NJ(347, &quot;New Jersey&quot;, null, USA),</span>
+<span class="fc" id="L395">    US_NH(348, &quot;New Hampshire&quot;, null, USA),</span>
+<span class="fc" id="L396">    US_VT(349, &quot;Vermont&quot;, null, USA),</span>
+<span class="fc" id="L397">    US_MA(350, &quot;Massachusetts&quot;, null, USA),</span>
+<span class="fc" id="L398">    US_HI(351, &quot;Hawaii&quot;, null, USA, new String[]{&quot;US-MID&quot;}),</span>
+<span class="fc" id="L399">    US_MD(352, &quot;Maryland&quot;, null, USA),</span>
+<span class="fc" id="L400">    US_WV(353, &quot;West Virginia&quot;, null, USA),</span>
+<span class="fc" id="L401">    US_SC(354, &quot;South Carolina&quot;, null, USA),</span>
+<span class="fc" id="L402">    US_ME(355, &quot;Maine&quot;, null, USA),</span>
+<span class="fc" id="L403">    US_IN(356, &quot;Indiana&quot;, null, USA),</span>
+<span class="fc" id="L404">    US_KY(357, &quot;Kentucky&quot;, null, USA),</span>
+<span class="fc" id="L405">    US_TN(358, &quot;Tennessee&quot;, null, USA),</span>
+<span class="fc" id="L406">    US_VA(359, &quot;Virginia&quot;, null, USA),</span>
+<span class="fc" id="L407">    US_OH(360, &quot;Ohio&quot;, null, USA),</span>
+<span class="fc" id="L408">    US_PA(361, &quot;Pennsylvania&quot;, null, USA),</span>
+<span class="fc" id="L409">    US_MS(362, &quot;Mississippi&quot;, null, USA),</span>
+<span class="fc" id="L410">    US_LA(363, &quot;Louisiana&quot;, null, USA),</span>
+<span class="fc" id="L411">    US_AL(364, &quot;Alabama&quot;, null, USA),</span>
+<span class="fc" id="L412">    US_AR(365, &quot;Arkansas&quot;, null, USA),</span>
+<span class="fc" id="L413">    US_NC(366, &quot;North Carolina&quot;, null, USA),</span>
+<span class="fc" id="L414">    US_NY(367, &quot;New York&quot;, null, USA),</span>
+<span class="fc" id="L415">    US_IA(368, &quot;Iowa&quot;, null, USA),</span>
+<span class="fc" id="L416">    US_IL(369, &quot;Illinois&quot;, null, USA),</span>
+<span class="fc" id="L417">    US_GA(370, &quot;Georgia&quot;, null, USA),</span>
+<span class="fc" id="L418">    US_WI(371, &quot;Wisconsin&quot;, null, USA),</span>
+<span class="fc" id="L419">    US_FL(372, &quot;Florida&quot;, null, USA),</span>
+<span class="fc" id="L420">    US_MO(373, &quot;Missouri&quot;, null, USA),</span>
+<span class="fc" id="L421">    US_OK(374, &quot;Oklahoma&quot;, null, USA),</span>
+<span class="fc" id="L422">    US_ND(375, &quot;North Dakota&quot;, null, USA),</span>
+<span class="fc" id="L423">    US_WA(376, &quot;Washington&quot;, null, USA),</span>
+<span class="fc" id="L424">    US_SD(377, &quot;South Dakota&quot;, null, USA),</span>
+<span class="fc" id="L425">    US_NE(378, &quot;Nebraska&quot;, null, USA),</span>
+<span class="fc" id="L426">    US_KS(379, &quot;Kansas&quot;, null, USA),</span>
+<span class="fc" id="L427">    US_ID(380, &quot;Idaho&quot;, null, USA),</span>
+<span class="fc" id="L428">    US_UT(381, &quot;Utah&quot;, null, USA),</span>
+<span class="fc" id="L429">    US_MN(382, &quot;Minnesota&quot;, null, USA),</span>
+<span class="fc" id="L430">    US_MI(383, &quot;Michigan&quot;, null, USA),</span>
+<span class="fc" id="L431">    US_WY(384, &quot;Wyoming&quot;, null, USA),</span>
+<span class="fc" id="L432">    US_OR(385, &quot;Oregon&quot;, null, USA),</span>
+<span class="fc" id="L433">    US_CO(386, &quot;Colorado&quot;, null, USA),</span>
+<span class="fc" id="L434">    US_NV(387, &quot;Nevada&quot;, null, USA),</span>
+<span class="fc" id="L435">    US_AZ(388, &quot;Arizona&quot;, null, USA),</span>
+<span class="fc" id="L436">    US_NM(389, &quot;New Mexico&quot;, null, USA),</span>
+<span class="fc" id="L437">    US_MT(390, &quot;Montana&quot;, null, USA),</span>
+<span class="fc" id="L438">    US_CA(391, &quot;California&quot;, null, USA),</span>
+<span class="fc" id="L439">    US_TX(392, &quot;Texas&quot;, null, USA),</span>
+<span class="fc" id="L440">    US_AK(393, &quot;Alaska&quot;, null, USA),</span>
+<span class="fc" id="L441">    CA_BC(394, &quot;British Columbia&quot;, null, CAN),</span>
+<span class="fc" id="L442">    CA_AB(395, &quot;Alberta&quot;, null, CAN),</span>
+<span class="fc" id="L443">    CA_ON(396, &quot;Ontario&quot;, null, CAN),</span>
+<span class="fc" id="L444">    CA_QC(397, &quot;Quebec&quot;, null, CAN),</span>
+<span class="fc" id="L445">    CA_SK(398, &quot;Saskatchewan&quot;, null, CAN),</span>
+<span class="fc" id="L446">    CA_MB(399, &quot;Manitoba&quot;, null, CAN),</span>
+<span class="fc" id="L447">    CA_NL(400, &quot;Newfoundland&quot;, null, CAN),</span>
+<span class="fc" id="L448">    CA_NB(401, &quot;New Brunswick&quot;, null, CAN),</span>
+<span class="fc" id="L449">    CA_NS(402, &quot;Nova Scotia&quot;, null, CAN),</span>
+<span class="fc" id="L450">    CA_PE(403, &quot;Prince Edward Island&quot;, null, CAN),</span>
+<span class="fc" id="L451">    CA_YT(404, &quot;Yukon&quot;, null, CAN),</span>
+<span class="fc" id="L452">    CA_NT(405, &quot;Northwest Territories&quot;, null, CAN),</span>
+<span class="fc" id="L453">    CA_NU(406, &quot;Nunavut&quot;, null, CAN),</span>
+<span class="fc" id="L454">    RU_MOW(412, &quot;Moscow&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L455">    RU_SPE(413, &quot;Saint Petersburg&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L456">    RU_KGD(414, &quot;Kaliningrad Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L457">    RU_IN(415, &quot;Ingushetia Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L458">    RU_AD(416, &quot;Adygea Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L459">    RU_SE(417, &quot;North Ossetia-Alania Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L460">    RU_KB(418, &quot;Kabardino-Balkar Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L461">    RU_KC(419, &quot;Karachay-Cherkess Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L462">    RU_CE(420, &quot;Chechen Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L463">    RU_CU(421, &quot;Chuvash Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L464">    RU_IVA(422, &quot;Ivanovo Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L465">    RU_LIP(423, &quot;Lipetsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L466">    RU_ORL(424, &quot;Oryol Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L467">    RU_TUL(425, &quot;Tula Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L468">    RU_BE(426, &quot;Belgorod Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS, new String[]{&quot;RU-BEL&quot;}),</span>
+<span class="fc" id="L469">    RU_VLA(427, &quot;Vladimir Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L470">    RU_KRS(428, &quot;Kursk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L471">    RU_KLU(429, &quot;Kaluga Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L472">    RU_TT(430, &quot;Tambov Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS, new String[]{&quot;RU-TAM&quot;}),</span>
+<span class="fc" id="L473">    RU_BRY(431, &quot;Bryansk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L474">    RU_YAR(432, &quot;Yaroslavl Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L475">    RU_RYA(433, &quot;Ryazan Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L476">    RU_AST(434, &quot;Astrakhan Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L477">    RU_MOS(435, &quot;Moscow Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L478">    RU_SMO(436, &quot;Smolensk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L479">    RU_DA(437, &quot;Dagestan Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L480">    RU_VOR(438, &quot;Voronezh Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L481">    RU_NGR(439, &quot;Novgorod Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L482">    RU_PSK(440, &quot;Pskov Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L483">    RU_KOS(441, &quot;Kostroma Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L484">    RU_STA(442, &quot;Stavropol Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L485">    RU_KDA(443, &quot;Krasnodar Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L486">    RU_KL(444, &quot;Kalmykia Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L487">    RU_TVE(445, &quot;Tver Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L488">    RU_LEN(446, &quot;Leningrad Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L489">    RU_ROS(447, &quot;Rostov Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L490">    RU_VGG(448, &quot;Volgograd Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L491">    RU_VLG(449, &quot;Vologda Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L492">    RU_MUR(450, &quot;Murmansk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L493">    RU_KR(451, &quot;Karelia Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L494">    RU_NEN(452, &quot;Nenets Autonomous Okrug&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L495">    RU_KO(453, &quot;Komi Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L496">    RU_ARK(454, &quot;Arkhangelsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L497">    RU_MO(455, &quot;Mordovia Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L498">    RU_NIZ(456, &quot;Nizhny Novgorod Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L499">    RU_PNZ(457, &quot;Penza Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L500">    RU_KI(458, &quot;Kirov Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS, new String[]{&quot;RU-KIR&quot;}),</span>
+<span class="fc" id="L501">    RU_ME(459, &quot;Mari El Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L502">    RU_ORE(460, &quot;Orenburg Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L503">    RU_ULY(461, &quot;Ulyanovsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L504">    RU_PM(462, &quot;Perm Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS, new String[]{&quot;RU-PER&quot;}),</span>
+<span class="fc" id="L505">    RU_BA(463, &quot;Bashkortostan Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L506">    RU_UD(464, &quot;Udmurt Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L507">    RU_TA(465, &quot;Tatarstan Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L508">    RU_SAM(466, &quot;Samara Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L509">    RU_SAR(467, &quot;Saratov Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L510">    RU_YAN(468, &quot;Yamalo-Nenets&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L511">    RU_KM(469, &quot;Khanty-Mansi&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS, new String[]{&quot;RU-KHM&quot;}),</span>
+<span class="fc" id="L512">    RU_SVE(470, &quot;Sverdlovsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L513">    RU_TYU(471, &quot;Tyumen Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L514">    RU_KGN(472, &quot;Kurgan Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L515">    RU_CH(473, &quot;Chelyabinsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS, new String[]{&quot;RU-CHE&quot;}),</span>
+<span class="fc" id="L516">    RU_BU(474, &quot;Buryatia Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L517">    RU_ZAB(475, &quot;Zabaykalsky Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L518">    RU_IRK(476, &quot;Irkutsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L519">    RU_NVS(477, &quot;Novosibirsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L520">    RU_TOM(478, &quot;Tomsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L521">    RU_OMS(479, &quot;Omsk Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L522">    RU_KK(480, &quot;Khakassia Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L523">    RU_KEM(481, &quot;Kemerovo Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L524">    RU_AL(482, &quot;Altai Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L525">    RU_ALT(483, &quot;Altai Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L526">    RU_TY(484, &quot;Tuva Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L527">    RU_KYA(485, &quot;Krasnoyarsk Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L528">    RU_MAG(486, &quot;Magadan Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L529">    RU_CHU(487, &quot;Chukotka Okrug&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L530">    RU_KAM(488, &quot;Kamchatka Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L531">    RU_SAK(489, &quot;Sakhalin Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L532">    RU_PO(490, &quot;Primorsky Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS, new String[]{&quot;RU-PRI&quot;}),</span>
+<span class="fc" id="L533">    RU_YEV(491, &quot;Jewish Autonomous Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L534">    RU_KHA(492, &quot;Khabarovsk Krai&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L535">    RU_AMU(493, &quot;Amur Oblast&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS),</span>
+<span class="fc" id="L536">    RU_SA(494, &quot;Sakha Republic&quot;, new Alphabet[]{Alphabet.CYRILLIC, Alphabet.ROMAN}, RUS, null, new String[]{&quot;Yakutia Republic&quot;}),</span>
+<span class="fc" id="L537">    CN_SH(497, &quot;Shanghai&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-31&quot;}),</span>
+<span class="fc" id="L538">    CN_TJ(498, &quot;Tianjin&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-12&quot;}),</span>
+<span class="fc" id="L539">    CN_BJ(499, &quot;Beijing&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-11&quot;}),</span>
+<span class="fc" id="L540">    CN_HI(500, &quot;Hainan&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-46&quot;}),</span>
+<span class="fc" id="L541">    CN_NX(501, &quot;Ningxia Hui&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-64&quot;}),</span>
+<span class="fc" id="L542">    CN_CQ(502, &quot;Chongqing&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-50&quot;}),</span>
+<span class="fc" id="L543">    CN_ZJ(503, &quot;Zhejiang&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-33&quot;}),</span>
+<span class="fc" id="L544">    CN_JS(504, &quot;Jiangsu&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-32&quot;}),</span>
+<span class="fc" id="L545">    CN_FJ(505, &quot;Fujian&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-35&quot;}),</span>
+<span class="fc" id="L546">    CN_AH(506, &quot;Anhui&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-34&quot;}),</span>
+<span class="fc" id="L547">    CN_LN(507, &quot;Liaoning&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-21&quot;}),</span>
+<span class="fc" id="L548">    CN_SD(508, &quot;Shandong&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-37&quot;}),</span>
+<span class="fc" id="L549">    CN_SX(509, &quot;Shanxi&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-14&quot;}),</span>
+<span class="fc" id="L550">    CN_JX(510, &quot;Jiangxi&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-36&quot;}),</span>
+<span class="fc" id="L551">    CN_HA(511, &quot;Henan&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-41&quot;}),</span>
+<span class="fc" id="L552">    CN_GZ(512, &quot;Guizhou&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-52&quot;}),</span>
+<span class="fc" id="L553">    CN_GD(513, &quot;Guangdong&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-44&quot;}),</span>
+<span class="fc" id="L554">    CN_HB(514, &quot;Hubei&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-42&quot;}),</span>
+<span class="fc" id="L555">    CN_JL(515, &quot;Jilin&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-22&quot;}),</span>
+<span class="fc" id="L556">    CN_HE(516, &quot;Hebei&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-13&quot;}),</span>
+<span class="fc" id="L557">    CN_SN(517, &quot;Shaanxi&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-61&quot;}),</span>
+<span class="fc" id="L558">    CN_NM(518, &quot;Nei Mongol&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-15&quot;}, new String[]{&quot;Inner Mongolia&quot;}),</span>
+<span class="fc" id="L559">    CN_HL(519, &quot;Heilongjiang&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-23&quot;}),</span>
+<span class="fc" id="L560">    CN_HN(520, &quot;Hunan&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-43&quot;}),</span>
+<span class="fc" id="L561">    CN_GX(521, &quot;Guangxi Zhuang&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-45&quot;}),</span>
+<span class="fc" id="L562">    CN_SC(522, &quot;Sichuan&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-51&quot;}),</span>
+<span class="fc" id="L563">    CN_YN(523, &quot;Yunnan&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-53&quot;}),</span>
+<span class="fc" id="L564">    CN_XZ(524, &quot;Xizang&quot;, new Alphabet[]{Alphabet.TIBETAN, Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-54&quot;}, new String[]{&quot;Tibet&quot;}),</span>
+<span class="fc" id="L565">    CN_GS(525, &quot;Gansu&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-62&quot;}),</span>
+<span class="fc" id="L566">    CN_QH(526, &quot;Qinghai&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-63&quot;}),</span>
+<span class="fc" id="L567">    CN_XJ(527, &quot;Xinjiang Uyghur&quot;, new Alphabet[]{Alphabet.CHINESE, Alphabet.ROMAN}, CHN, new String[]{&quot;CN-65&quot;}),</span>
+<span class="fc" id="L568">    UMI(529, &quot;United States Minor Outlying Islands&quot;, null, null, new String[]{&quot;US-UM&quot;, &quot;USA-UM&quot;, &quot;JTN&quot;}),</span>
+<span class="fc" id="L569">    CPT(530, &quot;Clipperton Island&quot;),</span>
+<span class="fc" id="L570">    AAA(532, &quot;International&quot;, null, null, null, new String[]{&quot;Worldwide&quot;, &quot;Earth&quot;});</span>
+
+    @Nonnull
+<span class="fc" id="L573">    public static final Set&lt;Territory&gt; PARENT_TERRITORIES = Collections.unmodifiableSet(</span>
+<span class="fc" id="L574">            EnumSet.of(USA, IND, CAN, AUS, MEX, BRA, RUS, CHN, ATA));</span>
+
+    private final int number;
+    @Nonnull
+    private final String fullName;
+    @Nullable
+    private final Territory parentTerritory;
+    @Nonnull
+    private final String[] aliases;
+    @Nonnull
+    private final String[] fullNameAliases;
+    @Nonnull
+    private final Alphabet[] alphabets;
+
+    /**
+     * Return the numeric territory code for a territory. Package private, because territory numbers are no longer
+     * exposed publicly.
+     *
+     * @return Integer territory code.
+     */
+    int getNumber() {
+<span class="fc" id="L595">        return number;</span>
+    }
+
+    /**
+     * Return the full name of the territory.
+     *
+     * @return Full name.
+     */
+    @Nonnull
+    public String getFullName() {
+<span class="nc" id="L605">        return fullName;</span>
+    }
+
+    /**
+     * Return aliases (if any) for a territory. If there are no aliases, the array is empty.
+     *
+     * @return Aliases. Empty if no aliases exist.
+     */
+    @Nonnull
+    public String[] getAliases() {
+<span class="nc" id="L615">        return aliases;</span>
+    }
+
+    /**
+     * Return the parent territory.
+     *
+     * @return Parent territory for this territory. Null if no parent territory exists.
+     */
+    @Nullable
+    public Territory getParentTerritory() {
+<span class="fc" id="L625">        return parentTerritory;</span>
+    }
+
+    /**
+     * Return aliases (if any) for the full name of a territory. If there are no aliases, the array is empty.
+     *
+     * @return Aliases. Empty if no aliases exist.
+     */
+    @Nonnull
+    public String[] getFullNameAliases() {
+<span class="nc" id="L635">        return fullNameAliases;</span>
+    }
+
+    /**
+     * Return the alphabets most commonly used in the territory, in order of importance.
+     *
+     * @return Alphabets (never empty).
+     */
+    @Nonnull
+    public Alphabet[] getAlphabets() {
+<span class="fc" id="L645">        return alphabets;</span>
+    }
+
+    /**
+     * Return the territory for a specific code. Package private, because territory numbers are no longer exposed
+     * publicly.
+     *
+     * @param number Numeric territory code.
+     * @return Territory.
+     * @throws UnknownTerritoryException Thrown if incorrect numeric or alphanumeric code.
+     */
+    @Nonnull
+    static Territory fromNumber(final int number) throws UnknownTerritoryException {
+<span class="fc bfc" id="L658" title="All 4 branches covered.">        if ((number &lt; 0) || (number &gt;= CODE_LIST.size())) {</span>
+<span class="fc" id="L659">            throw new UnknownTerritoryException(number);</span>
+        }
+<span class="fc" id="L661">        return CODE_LIST.get(number);</span>
+    }
+
+    /**
+     * Get a territory from a mapcode territory abbreviation (or a territory name). Note that the provided abbreviation is NOT an
+     * ISO code: it's a mapcode prefix. As local mapcodes for subdivisions have been optimized to prefer to use 2-character
+     * subdivisions codes in local codes, subdivisions are preferred over countries in this case.
+     *
+     * For example, fromString(&quot;AS&quot;) returns {@link Territory#IN_AS} rather than {@link Territory#ASM} and
+     * fromString(&quot;BR&quot;) returns {@link Territory#IN_BR} rather than {@link Territory#BRA}.
+     *
+     * This behavior is intentional as local mapcodes are designed to be as short as possible. A mapcode within
+     * the Indian state Bihar should therefore be able to specified as &quot;BR 49.46M3&quot; rather &quot;IN-BR 49.46M3&quot;.
+     *
+     * Brazilian mapcodes, on the other hand, would be specified as &quot;BRA BDHP.JK39-1D&quot;, using the ISO 3 letter code.
+     *
+     * @param alphaCode Territory name or alphanumeric code.
+     * @return Territory.
+     * @throws UnknownTerritoryException Thrown if incorrect numeric or alphanumeric code.
+     */
+    @Nonnull
+    public static Territory fromString(@Nonnull final String alphaCode) throws UnknownTerritoryException {
+<span class="fc" id="L683">        checkNonnull(&quot;alphaCode&quot;, alphaCode);</span>
+<span class="fc" id="L684">        return createFromString(alphaCode, null);</span>
+    }
+
+    /**
+     * Get a territory from a name, specifying a parent territory for disambiguation.
+     *
+     * @param alphaCode       Territory, alphanumeric code. See {@link #fromString(String)}
+     *                        for an explanation of the format for this name. (This is NOT strictly an ISO code!)
+     * @param parentTerritory Parent territory.
+     * @return Territory.
+     * @throws UnknownTerritoryException Thrown if the territory is not found given the parentTerritory.
+     */
+    @Nonnull
+    public static Territory fromString(@Nonnull final String alphaCode,
+                                       @Nonnull final Territory parentTerritory) throws UnknownTerritoryException {
+<span class="fc" id="L699">        checkNonnull(&quot;alphaCode&quot;, alphaCode);</span>
+<span class="fc" id="L700">        checkNonnull(&quot;parentTerritory&quot;, parentTerritory);</span>
+<span class="pc bpc" id="L701" title="1 of 2 branches missed.">        if (!PARENT_TERRITORIES.contains(parentTerritory)) {</span>
+<span class="nc" id="L702">            throw new IllegalArgumentException(&quot;Parameter &quot; + parentTerritory + &quot; is not a parent territory&quot;);</span>
+        }
+<span class="fc" id="L704">        return createFromString(alphaCode, parentTerritory);</span>
+    }
+
+    /**
+     * Create a Territory object from a valid ISO2 country code.
+     *
+     * @param countryISO2 ISO 3166 country code, 2 characters.
+     * @return Territory object for the country.
+     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166 code, 2 characters.
+     */
+    @Nonnull
+    public static Territory fromCountryISO2(@Nonnull final String countryISO2) {
+<span class="fc" id="L716">        return fromString(getCountryISO3FromISO2(countryISO2));</span>
+    }
+
+    /**
+     * Return the ISO 3166 2 character country code for a ISO 3166 3 character code.
+     *
+     * @param countryISO3 ISO 3166 country code, 3 characters.
+     * @return ISO 3166 country code, 2 characters.
+     */
+    @Nonnull
+    public static String getCountryISO2FromISO3(@Nonnull final String countryISO3) {
+<span class="fc" id="L727">        final String countryISO2 = MAP_ISO3_TO_ISO2.get(countryISO3.toUpperCase());</span>
+<span class="fc bfc" id="L728" title="All 2 branches covered.">        if (countryISO2 == null) {</span>
+<span class="fc" id="L729">            throw new IllegalArgumentException(&quot;Parameter &quot; + countryISO3 + &quot; must be a valid ISO 3166 country code, 3 characters&quot;);</span>
+        }
+<span class="fc" id="L731">        return countryISO2;</span>
+    }
+
+    /**
+     * Return the ISO 3166 3 character country code for a ISO 3166 2 character code.
+     *
+     * @param countryISO2 ISO 3166 country code, 2 characters.
+     * @return ISO 3166 country code, characters.
+     */
+    @Nonnull
+    public static String getCountryISO3FromISO2(@Nonnull final String countryISO2) {
+        // Clipperton Island not recognized by Java - treat separately.
+<span class="fc bfc" id="L743" title="All 2 branches covered.">        if (&quot;CP&quot;.equalsIgnoreCase(countryISO2)) {</span>
+<span class="fc" id="L744">            return &quot;CPT&quot;;</span>
+        }
+
+        // Otherwise, use Java locales.
+<span class="fc" id="L748">        final Locale locale = new Locale(&quot;&quot;, countryISO2);</span>
+        try {
+<span class="fc" id="L750">            return locale.getISO3Country().toUpperCase();</span>
+<span class="fc" id="L751">        } catch (final MissingResourceException ignored) {</span>
+<span class="fc" id="L752">            throw new IllegalArgumentException(&quot;Parameter &quot; + countryISO2 + &quot; must be a valid ISO 3166 country code, 2 characters&quot;);</span>
+        }
+    }
+
+    /**
+     * Create a Territory object from a valid ISO 3166 country code, 3 characters.
+     *
+     * @param countryISO3 ISO 3166 country code, 3 characters.
+     * @return Territory object for the country.
+     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166 code, 3 characters.
+     */
+    @Nonnull
+    public static Territory fromCountryISO3(@Nonnull final String countryISO3) {
+<span class="fc bfc" id="L765" title="All 2 branches covered.">        if (!MAP_ISO3_TO_ISO2.containsKey(countryISO3.toUpperCase())) {</span>
+<span class="fc" id="L766">            throw new IllegalArgumentException(&quot;Parameter &quot; + countryISO3 + &quot; must be a valid ISO 3166 country code, 3 characters&quot;);</span>
+        }
+<span class="fc" id="L768">        return fromString(countryISO3);</span>
+    }
+
+    /**
+     * Return the international value of the territory name, with dashes rather than underscores.
+     * This is the same as {@link #toAlphaCode(AlphaCodeFormat)} for {@link AlphaCodeFormat#INTERNATIONAL}.
+     *
+     * @param alphabet Alphabet. May be null.
+     * @return Territory name. Underscores have been replaced with dashes.
+     */
+    @Nonnull
+    public String toString(@Nullable final Alphabet alphabet) {
+<span class="fc" id="L780">        return toAlphaCode(AlphaCodeFormat.INTERNATIONAL, alphabet);</span>
+    }
+
+    /**
+     * Return the international value of the territory name, with dashes rather than underscores.
+     * This is the same as {@link #toAlphaCode(AlphaCodeFormat)} for {@link AlphaCodeFormat#INTERNATIONAL}.
+     *
+     * @return Territory name. Underscores have been replaced with dashes.
+     */
+    @Override
+    @Nonnull
+    public String toString() {
+<span class="fc" id="L792">        return toString(null);</span>
+    }
+
+    /**
+     * Enumeration that specifies the format for mapcodes.
+     */
+<span class="fc" id="L798">    public enum AlphaCodeFormat {</span>
+<span class="fc" id="L799">        INTERNATIONAL,          // Same as name() with underscores replaces with dashes.</span>
+<span class="fc" id="L800">        MINIMAL_UNAMBIGUOUS,    // Minimal code, which is still unambiguous.</span>
+<span class="fc" id="L801">        MINIMAL                 // Minimal code, may be ambiguous, eg. RJ instead of IN-RJ.</span>
+    }
+
+    /**
+     * Return the territory name, given a specific territory name format.
+     *
+     * @param format   Format to be used.
+     * @param alphabet Alphabet. May be null.
+     * @return Mapcode.
+     */
+    @Nonnull
+    public String toAlphaCode(@Nonnull final AlphaCodeFormat format, @Nullable final Alphabet alphabet) {
+<span class="fc" id="L813">        checkNonnull(&quot;format&quot;, format);</span>
+<span class="fc" id="L814">        String result = name().replace('_', '-');</span>
+<span class="pc bpc" id="L815" title="1 of 2 branches missed.">        if (format != AlphaCodeFormat.INTERNATIONAL) {</span>
+<span class="nc" id="L816">            final int index = name().lastIndexOf('_');</span>
+<span class="nc bnc" id="L817" title="All 2 branches missed.">            if (index != -1) {</span>
+<span class="nc bnc" id="L818" title="All 4 branches missed.">                assert name().length() &gt; (index + 1);</span>
+<span class="nc" id="L819">                final String shortName = name().substring(index + 1);</span>
+<span class="nc bnc" id="L820" title="All 4 branches missed.">                if ((format == AlphaCodeFormat.MINIMAL) || (NAME_MAP.get(shortName).size() == 1)) {</span>
+<span class="nc" id="L821">                    result = shortName;</span>
+                }
+            }
+        }
+<span class="fc bfc" id="L825" title="All 2 branches covered.">        if (alphabet != null) {</span>
+            try {
+<span class="fc" id="L827">                result = Mapcode.convertStringToAlphabet(result, alphabet);</span>
+<span class="nc" id="L828">            } catch (final IllegalArgumentException ignored) {</span>
+                // Simply return result if translation to alphabet fails.
+<span class="fc" id="L830">            }</span>
+        }
+<span class="fc" id="L832">        return result;</span>
+    }
+
+    @Nonnull
+    public String toAlphaCode(@Nonnull final AlphaCodeFormat format) {
+<span class="fc" id="L837">        return toAlphaCode(format, null);</span>
+    }
+
+    /**
+     * Returns if this territory is a subdivisions of another territory.
+     *
+     * @return True if this territory has a parent territory.
+     */
+    public boolean isSubdivision() {
+<span class="nc bnc" id="L846" title="All 2 branches missed.">        return parentTerritory != null;</span>
+    }
+
+    /**
+     * Returns if this territory contains other territory subdivisions.
+     *
+     * @return True if this territory contains other territory subdivisions.
+     */
+    public boolean hasSubdivisions() {
+<span class="nc" id="L855">        return PARENT_LIST.contains(this);</span>
+    }
+
+    /**
+     * Private constructors to create a territory code.
+     */
+    Territory(final int number,
+              @Nonnull final String fullName) {
+<span class="fc" id="L863">        this(number, fullName, null, null, null, null);</span>
+<span class="fc" id="L864">    }</span>
+
+    Territory(final int number,
+              @Nonnull final String fullName,
+              @Nullable final Alphabet[] alphabets) {
+<span class="fc" id="L869">        this(number, fullName, alphabets, null, null, null);</span>
+<span class="fc" id="L870">    }</span>
+
+    Territory(final int number,
+              @Nonnull final String fullName,
+              @Nullable final Alphabet[] alphabets,
+              @Nullable final Territory parentTerritory) {
+<span class="fc" id="L876">        this(number, fullName, alphabets, parentTerritory, null, null);</span>
+<span class="fc" id="L877">    }</span>
+
+    Territory(final int number,
+              @Nonnull final String fullName,
+              @Nullable final Alphabet[] alphabets,
+              @Nullable final Territory parentTerritory,
+              @Nullable final String[] aliases) {
+<span class="fc" id="L884">        this(number, fullName, alphabets, parentTerritory, aliases, null);</span>
+<span class="fc" id="L885">    }</span>
+
+    Territory(final int number,
+              @Nonnull final String fullName,
+              @Nullable final Alphabet[] alphabets,
+              @Nullable final Territory parentTerritory,
+              @Nullable final String[] aliases,
+<span class="fc" id="L892">              @Nullable final String[] fullNameAliases) {</span>
+<span class="pc bpc" id="L893" title="2 of 4 branches missed.">        assert number &gt;= 0;</span>
+<span class="fc" id="L894">        this.number = number;</span>
+<span class="fc" id="L895">        this.fullName = fullName;</span>
+<span class="fc bfc" id="L896" title="All 2 branches covered.">        this.alphabets = (alphabets == null) ? new Alphabet[]{Alphabet.ROMAN} : alphabets;</span>
+<span class="fc" id="L897">        this.parentTerritory = parentTerritory;</span>
+<span class="fc bfc" id="L898" title="All 2 branches covered.">        this.aliases = (aliases == null) ? new String[]{} : aliases;</span>
+<span class="fc bfc" id="L899" title="All 2 branches covered.">        this.fullNameAliases = (fullNameAliases == null) ? new String[]{} : fullNameAliases;</span>
+<span class="fc" id="L900">    }</span>
+
+    // Keep a mapping from ISO3 to ISO2 codes. This map is used to make sure valid ISO3 codes are being used.
+    @Nonnull
+    private static final Map&lt;String, String&gt; MAP_ISO3_TO_ISO2;
+    @Nonnull
+    private static final List&lt;Territory&gt; CODE_LIST;
+    @Nonnull
+    private static final Map&lt;String, List&lt;Territory&gt;&gt; NAME_MAP;
+    @Nonnull
+    private static final List&lt;Territory&gt; PARENT_LIST;
+
+    static {
+<span class="fc" id="L913">        final String[] countries = Locale.getISOCountries();</span>
+<span class="fc" id="L914">        MAP_ISO3_TO_ISO2 = new HashMap&lt;String, String&gt;(countries.length);</span>
+<span class="fc bfc" id="L915" title="All 2 branches covered.">        for (final String countryISO2 : countries) {</span>
+<span class="fc" id="L916">            final String countryISO3 = new Locale(&quot;&quot;, countryISO2).getISO3Country();</span>
+<span class="fc" id="L917">            MAP_ISO3_TO_ISO2.put(countryISO3.toUpperCase(), countryISO2.toUpperCase());</span>
+        }
+
+        // Add Clipperton Island (not recognized by Java).
+<span class="fc" id="L921">        MAP_ISO3_TO_ISO2.put(&quot;CPT&quot;, &quot;CP&quot;);</span>
+    }
+
+    /**
+     * Static checking of the static data structures.
+     */
+    static {
+<span class="fc" id="L928">        final String errorPrefix = &quot;Initializing error: &quot;;</span>
+<span class="fc" id="L929">        CODE_LIST = new ArrayList&lt;Territory&gt;();</span>
+<span class="fc" id="L930">        NAME_MAP = new HashMap&lt;String, List&lt;Territory&gt;&gt;();</span>
+<span class="fc" id="L931">        PARENT_LIST = new ArrayList&lt;Territory&gt;();</span>
+<span class="fc" id="L932">        int min = Integer.MAX_VALUE;</span>
+<span class="fc" id="L933">        int max = Integer.MIN_VALUE;</span>
+<span class="fc" id="L934">        final Set&lt;Integer&gt; territoryNumbers = new HashSet&lt;Integer&gt;();</span>
+<span class="fc" id="L935">        final Set&lt;String&gt; namesSet = new HashSet&lt;String&gt;();</span>
+
+<span class="fc bfc" id="L937" title="All 2 branches covered.">        for (final Territory territory : Territory.values()) {</span>
+<span class="fc" id="L938">            final int territoryNumber = territory.getNumber();</span>
+
+            // Check if territory code is within range.
+<span class="pc bpc" id="L941" title="2 of 4 branches missed.">            if ((territoryNumber &lt; 0) || (territoryNumber &gt;= Territory.values().length)) {</span>
+<span class="nc" id="L942">                throw new ExceptionInInitializerError(errorPrefix + &quot;territory number out of range: &quot; + territoryNumber);</span>
+
+            }
+
+            // Check if territory code was already used.
+<span class="pc bpc" id="L947" title="1 of 2 branches missed.">            if (territoryNumbers.contains(territoryNumber)) {</span>
+<span class="nc" id="L948">                throw new ExceptionInInitializerError(errorPrefix + &quot;non-unique territory number: &quot; + territoryNumber);</span>
+            }
+<span class="fc" id="L950">            territoryNumbers.add(territory.getNumber());</span>
+
+<span class="fc" id="L952">            final int initialCodeListSize = CODE_LIST.size();</span>
+<span class="fc bfc" id="L953" title="All 2 branches covered.">            for (int i = initialCodeListSize; i &lt;= territory.number; i++) {</span>
+<span class="fc" id="L954">                CODE_LIST.add(null);</span>
+            }
+<span class="fc" id="L956">            CODE_LIST.set(territory.number, territory);</span>
+<span class="fc bfc" id="L957" title="All 4 branches covered.">            if ((territory.parentTerritory != null) &amp;&amp; !PARENT_LIST.contains(territory.parentTerritory)) {</span>
+<span class="fc" id="L958">                PARENT_LIST.add(territory.parentTerritory);</span>
+            }
+
+            // Check if territory name is unique.
+<span class="pc bpc" id="L962" title="1 of 2 branches missed.">            if (namesSet.contains(territory.toString())) {</span>
+<span class="nc" id="L963">                throw new ExceptionInInitializerError(errorPrefix + &quot;non-unique territory name: &quot; + territory);</span>
+            }
+<span class="fc" id="L965">            namesSet.add(territory.toString());</span>
+<span class="fc" id="L966">            addNameWithParentVariants(territory.toString(), territory);</span>
+<span class="fc bfc" id="L967" title="All 2 branches covered.">            for (final String alias : territory.aliases) {</span>
+
+                // Check if alias is unique.
+<span class="pc bpc" id="L970" title="1 of 2 branches missed.">                if (namesSet.contains(alias)) {</span>
+<span class="nc" id="L971">                    throw new ExceptionInInitializerError(errorPrefix + &quot;non-unique alias: &quot; + alias);</span>
+                }
+<span class="fc" id="L973">                namesSet.add(alias);</span>
+<span class="fc" id="L974">                addNameWithParentVariants(alias, territory);</span>
+            }
+
+            // Check if fullname is unique. Skip special case where territory name == territory code (e.g. USA).
+<span class="pc bpc" id="L978" title="1 of 4 branches missed.">            if (namesSet.contains(territory.fullName.toUpperCase()) &amp;&amp; !territory.toString().equals(territory.fullName.toUpperCase())) {</span>
+<span class="nc" id="L979">                throw new ExceptionInInitializerError(errorPrefix + &quot;non-unique territory fullName: &quot; + territory.fullName.toUpperCase());</span>
+            }
+<span class="fc" id="L981">            addNameWithParentVariants(territory.fullName.toUpperCase(), territory);</span>
+<span class="fc bfc" id="L982" title="All 2 branches covered.">            for (final String fullNameAlias : territory.fullNameAliases) {</span>
+
+                // Check if fullname alias is unique.
+<span class="pc bpc" id="L985" title="1 of 2 branches missed.">                if (namesSet.contains(fullNameAlias.toUpperCase())) {</span>
+<span class="nc" id="L986">                    throw new ExceptionInInitializerError(errorPrefix + &quot;non-unique territory fullName alias: &quot; + fullNameAlias);</span>
+                }
+<span class="fc" id="L988">                namesSet.add(fullNameAlias.toUpperCase());</span>
+<span class="fc" id="L989">                addNameWithParentVariants(fullNameAlias.toUpperCase(), territory);</span>
+            }
+<span class="fc" id="L991">            min = Math.min(min, territory.number);</span>
+<span class="fc" id="L992">            max = Math.max(max, territory.number);</span>
+<span class="pc bpc" id="L993" title="2 of 4 branches missed.">            assert territory.alphabets.length &gt; 0;</span>
+        }
+<span class="pc bpc" id="L995" title="2 of 4 branches missed.">        assert territoryNumbers.size() == Territory.values().length;</span>
+
+        // Check that territory has at least one alphabet.
+
+        // Check for missing codes; minimum code must be 0, maximum code must be last code of enum.
+<span class="pc bpc" id="L1000" title="2 of 4 branches missed.">        if (!((min == 0) &amp;&amp; (max == (Territory.values().length - 1)))) {</span>
+<span class="nc" id="L1001">            throw new ExceptionInInitializerError(errorPrefix + &quot;incorrect min/max territory number: &quot; + min + '/' + max);</span>
+        }
+<span class="fc" id="L1003">    }</span>
+
+    /**
+     * Get a territory from a name, specifying a parent territory for disambiguation.
+     *
+     * @param alphaCode       Territory, alphanumeric code.
+     * @param parentTerritory Parent territory.
+     * @return Territory.
+     * @throws UnknownTerritoryException Thrown if the territory is not found.
+     */
+    @Nonnull
+    private static Territory createFromString(@Nonnull final String alphaCode,
+                                              @Nullable final Territory parentTerritory) throws UnknownTerritoryException {
+
+        // Replace '_' with '-', but leave spaces alone (may be part of the name).
+<span class="fc" id="L1018">        final String trimmed = Mapcode.convertStringToPlainAscii(</span>
+<span class="fc" id="L1019">                alphaCode.trim().replace('_', '-')).toUpperCase();</span>
+
+        // Try as alpha code.
+<span class="fc" id="L1022">        final List&lt;Territory&gt; territories = NAME_MAP.get(trimmed);</span>
+<span class="fc bfc" id="L1023" title="All 2 branches covered.">        if (territories != null) {</span>
+<span class="fc bfc" id="L1024" title="All 2 branches covered.">            if (parentTerritory == null) {</span>
+<span class="fc" id="L1025">                return territories.get(0);</span>
+            }
+<span class="fc bfc" id="L1027" title="All 2 branches covered.">            for (final Territory territory : territories) {</span>
+<span class="fc bfc" id="L1028" title="All 2 branches covered.">                if (territory.getParentTerritory() == parentTerritory) {</span>
+<span class="fc" id="L1029">                    return territory;</span>
+                }
+<span class="fc" id="L1031">            }</span>
+        } else {
+
+            // Check for a case such as &quot;United States of America-IN&quot;.
+<span class="fc" id="L1035">            final int lastSeparator = Math.max(     // Find last separator.</span>
+<span class="fc" id="L1036">                    trimmed.lastIndexOf('-'),       // Allow '-'.</span>
+<span class="fc" id="L1037">                    trimmed.lastIndexOf(' '));      // And ' '.</span>
+<span class="fc bfc" id="L1038" title="All 2 branches covered.">            if (lastSeparator &gt;= 0) {</span>
+<span class="fc" id="L1039">                final String prefix = trimmed.substring(0, lastSeparator);</span>
+<span class="fc" id="L1040">                final Territory parent = createFromString(prefix, parentTerritory);</span>
+<span class="fc bfc" id="L1041" title="All 2 branches covered.">                if (PARENT_TERRITORIES.contains(parent)) {</span>
+<span class="fc" id="L1042">                    final String postfix = trimmed.substring(lastSeparator + 1);</span>
+<span class="fc" id="L1043">                    final Territory child = createFromString(postfix, parentTerritory);</span>
+<span class="fc bfc" id="L1044" title="All 2 branches covered.">                    if (child.parentTerritory == parent) {</span>
+<span class="fc" id="L1045">                        return child;</span>
+                    }
+                }
+            }
+        }
+<span class="fc" id="L1050">        throw new UnknownTerritoryException(trimmed);</span>
+    }
+
+    /**
+     * Private helper method to add names for a territory.
+     *
+     * @param name      Name to add.
+     * @param territory Territory.
+     */
+    private static void addNameWithParentVariants(@Nonnull final String name,
+                                                  @Nonnull final Territory territory) {
+
+        // Add the name as provided
+<span class="fc" id="L1063">        addNameWithSeperatorVariants(name, territory);</span>
+
+<span class="fc bfc" id="L1065" title="All 2 branches covered.">        if (name.contains(&quot;-&quot;)) {</span>
+<span class="fc" id="L1066">            final String childTerritoryName = name.substring(name.lastIndexOf('-') + 1);</span>
+
+            // Tolerate a child territory specified without the parent.
+            // (e.g. &quot;CA&quot; rather than &quot;US-CA&quot;)
+<span class="fc" id="L1070">            addName(childTerritoryName, territory);</span>
+
+<span class="fc bfc" id="L1072" title="All 2 branches covered.">            if (territory.parentTerritory != null) {</span>
+
+                // Add the variant using the primary parent name.
+<span class="fc" id="L1075">                String nameVariant = (territory.parentTerritory.toString() + '-') + childTerritoryName;</span>
+<span class="pc bpc" id="L1076" title="1 of 2 branches missed.">                if (!nameVariant.contentEquals(name)) {</span>
+<span class="fc" id="L1077">                    addNameWithSeperatorVariants(nameVariant, territory);</span>
+                }
+
+                // Add each variant using the parent alias names.
+<span class="fc bfc" id="L1081" title="All 2 branches covered.">                for (final String alias : territory.parentTerritory.aliases) {</span>
+<span class="fc" id="L1082">                    nameVariant = alias + '-' + childTerritoryName;</span>
+<span class="fc bfc" id="L1083" title="All 2 branches covered.">                    if (!nameVariant.contentEquals(name)) {</span>
+<span class="fc" id="L1084">                        addNameWithSeperatorVariants(nameVariant, territory);</span>
+                    }
+                }
+            }
+        }
+<span class="fc" id="L1089">    }</span>
+
+    private static void addNameWithSeperatorVariants(@Nonnull final String name, @Nonnull final Territory territory) {
+<span class="fc" id="L1092">        addName(name, territory);</span>
+
+        // Tolerate a space character in place of a hyphen.
+        // (e.g. &quot;US CA&quot; in addition to &quot;US-CA&quot;)
+<span class="fc bfc" id="L1096" title="All 2 branches covered.">        if (name.contains(&quot;-&quot;)) {</span>
+<span class="fc" id="L1097">            addName(name.replace('-', ' '), territory);</span>
+        }
+<span class="fc" id="L1099">    }</span>
+
+    private static void addName(@Nonnull final String name, @Nonnull final Territory territory) {
+<span class="fc bfc" id="L1102" title="All 2 branches covered.">        if (NAME_MAP.containsKey(name)) {</span>
+<span class="fc" id="L1103">            final List&lt;Territory&gt; territories = NAME_MAP.get(name);</span>
+
+            // Add child territories in the order the parents are declared.
+            // This results in consistent decoding of ambiguous territory names.
+<span class="fc" id="L1107">            final Territory newTerritoryParent = territory.getParentTerritory();</span>
+<span class="fc bfc" id="L1108" title="All 4 branches covered.">            if ((newTerritoryParent == null) &amp;&amp; name.equals(territory.toString())) {</span>
+
+                // A primary identifier always takes priority.
+<span class="fc" id="L1111">                territories.clear();</span>
+<span class="fc" id="L1112">                territories.add(territory);</span>
+<span class="fc" id="L1113">                return;</span>
+            }
+
+<span class="fc bfc" id="L1116" title="All 2 branches covered.">            if (newTerritoryParent != null) {</span>
+<span class="fc bfc" id="L1117" title="All 2 branches covered.">                for (int i = 0; i &lt; territories.size(); i++) {</span>
+
+<span class="fc" id="L1119">                    final Territory existingTerritoryParent = territories.get(i).getParentTerritory();</span>
+<span class="fc bfc" id="L1120" title="All 4 branches covered.">                    if ((existingTerritoryParent == null) &amp;&amp; territories.get(i).toString().contentEquals(name)) {</span>
+                        // A primary identifier always takes priority.
+<span class="fc" id="L1122">                        return;</span>
+                    }
+<span class="fc bfc" id="L1124" title="All 2 branches covered.">                    if ((existingTerritoryParent == null) ||</span>
+<span class="fc bfc" id="L1125" title="All 2 branches covered.">                            (existingTerritoryParent.ordinal() &gt; newTerritoryParent.ordinal())) {</span>
+<span class="fc" id="L1126">                        territories.add(i, territory);</span>
+<span class="fc" id="L1127">                        return;</span>
+                    }
+                }
+            }
+<span class="fc" id="L1131">            territories.add(territory);</span>
+<span class="fc" id="L1132">        } else {</span>
+<span class="fc" id="L1133">            final ArrayList&lt;Territory&gt; arrayList = new ArrayList&lt;Territory&gt;();</span>
+<span class="fc" id="L1134">            arrayList.add(territory);</span>
+<span class="fc" id="L1135">            NAME_MAP.put(name, arrayList);</span>
+        }
+<span class="fc" id="L1137">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>

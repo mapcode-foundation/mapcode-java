@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapcodeCodec.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Mapcode Java Library</a> &gt; <a href="index.source.html" class="el_package">com.mapcode</a> &gt; <span class="el_source">MapcodeCodec.java</span></div><h1>MapcodeCodec.java</h1><pre class="source lang-java linenums">/*
+ * Copyright (C) 2014-2017, Stichting Mapcode Foundation (http://www.mapcode.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.mapcode;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+
+import static com.mapcode.CheckArgs.checkDefined;
+import static com.mapcode.CheckArgs.checkNonnull;
+import static com.mapcode.Mapcode.getPrecisionFormat;
+
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the mapcode implementation only.
+//----------------------------------------------------------------------------------------------
+
+/**
+ * This class is the external Java interface for encoding and decoding mapcodes.
+ */
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">@SuppressWarnings(&quot;MagicNumber&quot;)</span>
+public final class MapcodeCodec {
+
+    // Get direct access to the data model.
+<span class="fc" id="L40">    private static final DataModel DATA_MODEL = DataModel.getInstance();</span>
+
+    private MapcodeCodec() {
+        // Prevent instantiation.
+    }
+
+    // ------------------------------------------------------------------------------------------
+    // Encoding latitude, longitude to mapcodes.
+    // ------------------------------------------------------------------------------------------
+
+    /**
+     * Encode a lat/lon pair to a mapcode with territory information. This produces a non-empty list of mapcode,
+     * with at the very least 1 mapcodes for the lat/lon, which is the &quot;International&quot; mapcode.
+     *
+     * The returned result list will always contain at least 1 mapcode, because every lat/lon pair can be encoded.
+     *
+     * The list is ordered in such a way that the last result is the international code. However, you cannot assume
+     * that the first result is the shortest mapcode. If you want to use the shortest mapcode, use
+     * {@link #encodeToShortest(double, double, Territory)}.
+     *
+     * The international code can be obtained from the list by using: &quot;results.get(results.size() - 1)&quot;, or
+     * you can use {@link #encodeToInternational(double, double)}, which is faster.
+     *
+     * @param latDeg Latitude, accepted range: -90..90.
+     * @param lonDeg Longitude, accepted range: -180..180.
+     * @return Non-empty, ordered list of mapcode information records, see {@link Mapcode}.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
+     */
+    @Nonnull
+    public static List&lt;Mapcode&gt; encode(final double latDeg, final double lonDeg)
+            throws IllegalArgumentException {
+<span class="fc" id="L71">        return encode(latDeg, lonDeg, null);</span>
+    }
+
+    @Nonnull
+    public static List&lt;Mapcode&gt; encode(@Nonnull final Point point)
+            throws IllegalArgumentException {
+<span class="fc" id="L77">        checkDefined(&quot;point&quot;, point);</span>
+<span class="fc" id="L78">        return encode(point.getLatDeg(), point.getLonDeg());</span>
+    }
+
+    /**
+     * Encode a lat/lon pair to a mapcode with territory information, for a specific territory. This produces a
+     * potentially empty list of mapcodes (empty if the lat/lon does not fall within the territory for mapcodes).
+     *
+     * The returned result list will always contain at least 1 mapcode, because every lat/lon pair can be encoded.
+     *
+     * The list is ordered in such a way that the last result is the international code. However, you cannot assume
+     * that the first result is the shortest mapcode. If you want to use the shortest mapcode, use
+     * {@link #encodeToShortest(double, double, Territory)}.
+     *
+     * @param latDeg              Latitude, accepted range: -90..90 (limited to this range if outside).
+     * @param lonDeg              Longitude, accepted range: -180..180 (wrapped to this range if outside).
+     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. May be null.
+     * @return List of mapcode information records, see {@link Mapcode}. This list is empty if no
+     * Mapcode can be generated for this territory matching the lat/lon.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
+     */
+    @Nonnull
+    public static List&lt;Mapcode&gt; encode(final double latDeg, final double lonDeg,
+                                       @Nullable final Territory restrictToTerritory)
+            throws IllegalArgumentException {
+<span class="fc" id="L102">        final List&lt;Mapcode&gt; results = Encoder.encode(latDeg, lonDeg, restrictToTerritory, false);</span>
+<span class="pc bpc" id="L103" title="2 of 4 branches missed.">        assert results != null;</span>
+<span class="fc" id="L104">        return results;</span>
+    }
+
+    @Nonnull
+    public static List&lt;Mapcode&gt; encode(@Nonnull final Point point,
+                                       @Nullable final Territory restrictToTerritory)
+            throws IllegalArgumentException {
+<span class="fc" id="L111">        checkNonnull(&quot;point&quot;, point);</span>
+<span class="fc" id="L112">        return encode(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);</span>
+    }
+
+    /**
+     * Encode a lat/lon pair to a list of mapcodes, like {@link #encode(double, double)}.
+     * The result list is limited to those mapcodes that belong to the provided ISO 3166 country code, 2 characters.
+     * For example, if you wish to restrict the list to Mexican mapcodes, use &quot;MX&quot;. This would
+     * produce a result list of mapcodes with territories that start with &quot;MX-&quot; (note that a
+     * mapcode that starts with &quot;MEX&quot; is not returned in that case.)
+     *
+     * @param latDeg      Latitude, accepted range: -90..90.
+     * @param lonDeg      Longitude, accepted range: -180..180.
+     * @param countryISO2 ISO 3166 country code, 2 characters.
+     * @return Possibly empty, ordered list of mapcode information records, see {@link Mapcode}.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range, or if the ISO code is invalid.
+     */
+    @Nonnull
+    public static List&lt;Mapcode&gt; encodeRestrictToCountryISO2(final double latDeg, final double lonDeg,
+                                                            @Nonnull final String countryISO2)
+            throws IllegalArgumentException {
+<span class="fc" id="L132">        checkNonnull(&quot;countryISO2&quot;, countryISO2);</span>
+<span class="fc" id="L133">        final String countryISO3 = Territory.fromCountryISO2(countryISO2).toString();</span>
+<span class="fc" id="L134">        final String prefix = countryISO2.toUpperCase() + '-';</span>
+<span class="fc" id="L135">        final List&lt;Mapcode&gt; mapcodes = encode(latDeg, lonDeg);</span>
+<span class="fc" id="L136">        final List&lt;Mapcode&gt; filtered = new ArrayList&lt;Mapcode&gt;();</span>
+<span class="fc bfc" id="L137" title="All 2 branches covered.">        for (final Mapcode mapcode : mapcodes) {</span>
+
+<span class="fc bfc" id="L139" title="All 2 branches covered.">            if (mapcode.getTerritory().toString().startsWith(prefix)) {</span>
+                // If the mapcode starts with the ISO 2 code, it's OK.
+<span class="fc" id="L141">                filtered.add(mapcode);</span>
+
+<span class="fc bfc" id="L143" title="All 2 branches covered.">            } else if (mapcode.getTerritory().toString().equals(countryISO3)) {</span>
+
+                // Otherwise, if it's the correct country ISO 3 code, it's also OK.
+<span class="fc" id="L146">                filtered.add(mapcode);</span>
+            }
+<span class="fc" id="L148">        }</span>
+<span class="fc" id="L149">        return filtered;</span>
+    }
+
+    @Nonnull
+    public static List&lt;Mapcode&gt; encodeRestrictToCountryISO2(@Nonnull final Point point,
+                                                            @Nonnull final String countryISO2)
+            throws IllegalArgumentException {
+<span class="fc" id="L156">        checkNonnull(&quot;point&quot;, point);</span>
+<span class="fc" id="L157">        return encodeRestrictToCountryISO2(point.getLatDeg(), point.getLonDeg(), countryISO2);</span>
+    }
+
+    /**
+     * Encode a lat/lon pair to a list of mapcodes, like {@link #encode(double, double)}.
+     * The result list is limited to those mapcodes that belong to the provided ISO 3166 country code, 3 characters.
+     * For example, if you wish to restrict the list to Mexican mapcodes, use &quot;MEX&quot;. This would
+     * produce a result list of mapcodes with territories that start with &quot;MEX&quot; (note that
+     * mapcode that starts with &quot;MX-&quot; are not returned in that case.)
+     *
+     * @param latDeg      Latitude, accepted range: -90..90.
+     * @param lonDeg      Longitude, accepted range: -180..180.
+     * @param countryISO3 ISO 3166 country code, 3 characters.
+     * @return Possibly empty, ordered list of mapcode information records, see {@link Mapcode}.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range, or if the ISO code is invalid.
+     */
+    @Nonnull
+    public static List&lt;Mapcode&gt; encodeRestrictToCountryISO3(final double latDeg, final double lonDeg,
+                                                            @Nonnull final String countryISO3)
+            throws IllegalArgumentException {
+<span class="fc" id="L177">        checkNonnull(&quot;countryISO3&quot;, countryISO3);</span>
+<span class="fc" id="L178">        return encodeRestrictToCountryISO2(latDeg, lonDeg, Territory.getCountryISO2FromISO3(countryISO3));</span>
+    }
+
+    @Nonnull
+    public static List&lt;Mapcode&gt; encodeRestrictToCountryISO3(@Nonnull final Point point,
+                                                            @Nonnull final String countryISO3)
+            throws IllegalArgumentException {
+<span class="fc" id="L185">        checkNonnull(&quot;point&quot;, point);</span>
+<span class="fc" id="L186">        return encodeRestrictToCountryISO3(point.getLatDeg(), point.getLonDeg(), countryISO3);</span>
+    }
+
+    /**
+     * Encode a lat/lon pair to its shortest mapcode with territory information.
+     *
+     * @param latDeg              Latitude, accepted range: -90..90.
+     * @param lonDeg              Longitude, accepted range: -180..180.
+     * @param restrictToTerritory Try to encode only within this territory, see {@link Territory}. Cannot be null.
+     * @return Shortest mapcode, see {@link Mapcode}.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
+     * @throws UnknownMapcodeException  Thrown if no mapcode was found for the lat/lon matching the territory.
+     */
+    @Nonnull
+    public static Mapcode encodeToShortest(final double latDeg, final double lonDeg,
+                                           @Nonnull final Territory restrictToTerritory)
+            throws IllegalArgumentException, UnknownMapcodeException {
+<span class="fc" id="L203">        checkNonnull(&quot;restrictToTerritory&quot;, restrictToTerritory);</span>
+
+        // Call mapcode encoder.
+<span class="fc" id="L206">        @Nonnull final List&lt;Mapcode&gt; results =</span>
+<span class="fc" id="L207">                Encoder.encode(latDeg, lonDeg, restrictToTerritory, /* Stop with one result: */ true);</span>
+<span class="pc bpc" id="L208" title="2 of 4 branches missed.">        assert results != null;</span>
+<span class="pc bpc" id="L209" title="2 of 4 branches missed.">        assert results.size() &lt;= 1;</span>
+<span class="fc bfc" id="L210" title="All 2 branches covered.">        if (results.isEmpty()) {</span>
+<span class="fc" id="L211">            throw new UnknownMapcodeException(&quot;No Mapcode for lat=&quot; + latDeg + &quot;, lon=&quot; + lonDeg +</span>
+                    &quot;, territory=&quot; + restrictToTerritory);
+        }
+<span class="fc" id="L214">        return results.get(0);</span>
+    }
+
+    @Nonnull
+    public static Mapcode encodeToShortest(@Nonnull final Point point,
+                                           @Nonnull final Territory restrictToTerritory)
+            throws IllegalArgumentException, UnknownMapcodeException {
+<span class="fc" id="L221">        checkDefined(&quot;point&quot;, point);</span>
+<span class="fc" id="L222">        return encodeToShortest(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);</span>
+    }
+
+    /**
+     * Encode a lat/lon pair to its unambiguous, international mapcode.
+     *
+     * @param latDeg Latitude, accepted range: -90..90.
+     * @param lonDeg Longitude, accepted range: -180..180.
+     * @return International unambiguous mapcode (always exists), see {@link Mapcode}.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range.
+     */
+    @Nonnull
+    public static Mapcode encodeToInternational(final double latDeg, final double lonDeg)
+            throws IllegalArgumentException {
+
+        // Call mapcode encoder.
+<span class="fc" id="L238">        @Nonnull final List&lt;Mapcode&gt; results = encode(latDeg, lonDeg, Territory.AAA);</span>
+<span class="pc bpc" id="L239" title="2 of 4 branches missed.">        assert results != null;</span>
+<span class="pc bpc" id="L240" title="2 of 4 branches missed.">        assert results.size() &gt;= 1;</span>
+<span class="fc" id="L241">        return results.get(results.size() - 1);</span>
+    }
+
+    @Nonnull
+    public static Mapcode encodeToInternational(@Nonnull final Point point)
+            throws IllegalArgumentException {
+<span class="fc" id="L247">        checkDefined(&quot;point&quot;, point);</span>
+<span class="fc" id="L248">        return encodeToInternational(point.getLatDeg(), point.getLonDeg());</span>
+    }
+
+    // ------------------------------------------------------------------------------------------
+    // Decoding mapcodes back to latitude, longitude.
+    // ------------------------------------------------------------------------------------------
+    //
+
+    /**
+     * Decode a mapcode to a Point. The decoding process may fail for local mapcodes,
+     * because no territory context is supplied (world-wide).
+     *
+     * The accepted format is:
+     * {mapcode}
+     * {territory-code} {mapcode}
+     *
+     * @param mapcode Mapcode.
+     * @return Point corresponding to mapcode.
+     * @throws UnknownMapcodeException         Thrown if the mapcode has the correct syntax,
+     *                                         but cannot be decoded into a point.
+     * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
+     * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
+     */
+    @Nonnull
+    public static Point decode(@Nonnull final String mapcode)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+<span class="fc" id="L274">        return decode(mapcode, Territory.AAA);</span>
+    }
+
+    /**
+     * Decode a mapcode to a Point. A reference territory is supplied for disambiguation (only used if applicable).
+     *
+     * The accepted format is:
+     * {mapcode}
+     * {territory-code} {mapcode}
+     *
+     * Note that if a territory-code is supplied in the string, it takes preferences over the parameter.
+     *
+     * @param mapcode                 Mapcode.
+     * @param defaultTerritoryContext Default territory context for disambiguation purposes. May be null.
+     * @return Point corresponding to mapcode. Latitude range: -90..90, longitude range: -180..180.
+     * @throws UnknownMapcodeException         Thrown if the mapcode has the right syntax, but cannot be decoded into a point.
+     * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
+     * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
+     */
+    @Nonnull
+    public static Point decode(@Nonnull final String mapcode, @Nullable final Territory defaultTerritoryContext)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+<span class="fc" id="L296">        checkNonnull(&quot;mapcode&quot;, mapcode);</span>
+
+<span class="fc" id="L298">        final MapcodeZone mapcodeZone = decodeToMapcodeZone(mapcode, defaultTerritoryContext);</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">        if (mapcodeZone.isEmpty()) {</span>
+<span class="fc" id="L300">            throw new UnknownMapcodeException(&quot;Unknown mapcode, mapcode=&quot; + mapcode + &quot;, territoryContext=&quot; + defaultTerritoryContext);</span>
+        }
+<span class="fc" id="L302">        return mapcodeZone.getCenter();</span>
+    }
+
+    /**
+     * Decode a mapcode to a Rectangle, which defines the valid zone for a mapcode. The boundaries of the
+     * mapcode zone are inclusive for the South and West borders and exclusive for the North and East borders.
+     * This is essentially the same call as a 'decode', except it returns a rectangle, rather than its center point.
+     *
+     * @param mapcode Mapcode.
+     * @return Rectangle Mapcode zone. South/West borders are inclusive, North/East borders exclusive.
+     * @throws UnknownMapcodeException         Thrown if the mapcode has the correct syntax,
+     *                                         but cannot be decoded into a point.
+     * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
+     * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
+     */
+    @Nonnull
+    public static Rectangle decodeToRectangle(@Nonnull final String mapcode)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+<span class="fc" id="L320">        return decodeToRectangle(mapcode, Territory.AAA);</span>
+    }
+
+    /**
+     * Decode a mapcode to a Rectangle, which defines the valid zone for a mapcode. The boundaries of the
+     * mapcode zone are inclusive for the South and West borders and exclusive for the North and East borders.
+     * This is essentially the same call as a 'decode', except it returns a rectangle, rather than its center point.
+     *
+     * @param mapcode                 Mapcode.
+     * @param defaultTerritoryContext Default territory context for disambiguation purposes. May be null.
+     * @return Rectangle Mapcode zone. South/West borders are inclusive, North/East borders exclusive.
+     * @throws UnknownMapcodeException         Thrown if the mapcode has the correct syntax,
+     *                                         but cannot be decoded into a point.
+     * @throws UnknownPrecisionFormatException Thrown if the precision format is incorrect.
+     * @throws IllegalArgumentException        Thrown if arguments are null, or if the syntax of the mapcode is incorrect.
+     */
+    @Nonnull
+    public static Rectangle decodeToRectangle(@Nonnull final String mapcode, @Nullable final Territory defaultTerritoryContext)
+            throws UnknownMapcodeException, IllegalArgumentException, UnknownPrecisionFormatException {
+<span class="fc" id="L339">        checkNonnull(&quot;mapcode&quot;, mapcode);</span>
+<span class="fc" id="L340">        final MapcodeZone mapcodeZone = decodeToMapcodeZone(mapcode, defaultTerritoryContext);</span>
+<span class="fc" id="L341">        final Point southWest = Point.fromLatLonFractions(mapcodeZone.getLatFractionMin(), mapcodeZone.getLonFractionMin());</span>
+<span class="fc" id="L342">        final Point northEast = Point.fromLatLonFractions(mapcodeZone.getLatFractionMax(), mapcodeZone.getLonFractionMax());</span>
+<span class="fc" id="L343">        final Rectangle rectangle = new Rectangle(southWest, northEast);</span>
+<span class="pc bpc" id="L344" title="2 of 4 branches missed.">        assert rectangle.isDefined();</span>
+<span class="fc" id="L345">        return rectangle;</span>
+    }
+
+    /**
+     * Is coordinate near multiple territory borders?
+     *
+     * @param point     Latitude/Longitude in degrees.
+     * @param territory Territory.
+     * @return true Iff the coordinate is near more than one territory border (and thus encode(decode(M)) may not produce M).
+     */
+    public static boolean isNearMultipleBorders(@Nonnull final Point point, @Nonnull final Territory territory) {
+<span class="fc" id="L356">        checkDefined(&quot;point&quot;, point);</span>
+<span class="pc bpc" id="L357" title="1 of 2 branches missed.">        if (territory != Territory.AAA) {</span>
+<span class="fc" id="L358">            final int territoryNumber = territory.getNumber();</span>
+<span class="pc bpc" id="L359" title="1 of 2 branches missed.">            if (territory.getParentTerritory() != null) {</span>
+                // There is a parent! check its borders as well...
+<span class="nc bnc" id="L361" title="All 2 branches missed.">                if (isNearMultipleBorders(point, territory.getParentTerritory())) {</span>
+<span class="nc" id="L362">                    return true;</span>
+                }
+            }
+<span class="fc" id="L365">            int nrFound = 0;</span>
+<span class="fc" id="L366">            final int fromTerritoryRecord = DATA_MODEL.getDataFirstRecord(territoryNumber);</span>
+<span class="fc" id="L367">            final int uptoTerritoryRecord = DATA_MODEL.getDataLastRecord(territoryNumber);</span>
+<span class="fc bfc" id="L368" title="All 2 branches covered.">            for (int territoryRecord = uptoTerritoryRecord; territoryRecord &gt;= fromTerritoryRecord; territoryRecord--) {</span>
+<span class="fc bfc" id="L369" title="All 2 branches covered.">                if (!Data.isRestricted(territoryRecord)) {</span>
+<span class="fc" id="L370">                    final Boundary boundary = Boundary.createBoundaryForTerritoryRecord(territoryRecord);</span>
+<span class="fc" id="L371">                    final int xdiv8 = Common.xDivider(boundary.getLatMicroDegMin(), boundary.getLatMicroDegMax()) / 4;</span>
+<span class="fc bfc" id="L372" title="All 2 branches covered.">                    if (boundary.extendBoundary(60, xdiv8).containsPoint(point)) {</span>
+<span class="pc bpc" id="L373" title="1 of 2 branches missed.">                        if (!boundary.extendBoundary(-60, -xdiv8).containsPoint(point)) {</span>
+<span class="nc" id="L374">                            nrFound++;</span>
+<span class="nc bnc" id="L375" title="All 2 branches missed.">                            if (nrFound &gt; 1) {</span>
+<span class="nc" id="L376">                                return true;</span>
+                            }
+                        }
+                    }
+                }
+            }
+        }
+<span class="fc" id="L383">        return false;</span>
+    }
+
+    @Nonnull
+    private static MapcodeZone decodeToMapcodeZone(@Nonnull final String mapcode, @Nullable final Territory defaultTerritoryContext)
+            throws UnknownMapcodeException, IllegalArgumentException {
+<span class="fc" id="L389">        checkNonnull(&quot;mapcode&quot;, mapcode);</span>
+<span class="fc" id="L390">        String mapcodeClean = Mapcode.convertStringToPlainAscii(mapcode.trim()).toUpperCase();</span>
+
+        // Determine territory from mapcode.
+        final Territory territory;
+<span class="fc" id="L394">        final Matcher matcherTerritory = Mapcode.PATTERN_TERRITORY.matcher(mapcodeClean);</span>
+<span class="fc bfc" id="L395" title="All 2 branches covered.">        if (matcherTerritory.find()) {</span>
+
+            // Use the territory code from the string.
+<span class="fc" id="L398">            final String territoryName = mapcodeClean.substring(matcherTerritory.start(), matcherTerritory.end()).trim();</span>
+            try {
+<span class="fc" id="L400">                territory = Territory.fromString(territoryName);</span>
+<span class="nc" id="L401">            } catch (final UnknownTerritoryException ignored) {</span>
+<span class="nc" id="L402">                throw new UnknownMapcodeException(&quot;Wrong territory code: &quot; + territoryName);</span>
+<span class="fc" id="L403">            }</span>
+
+            // Cut off the territory part.
+<span class="fc" id="L406">            mapcodeClean = mapcodeClean.substring(matcherTerritory.end()).trim();</span>
+<span class="fc" id="L407">        } else {</span>
+
+            // No territory code was supplied in the string, use specified territory context parameter.
+<span class="fc bfc" id="L410" title="All 2 branches covered.">            territory = (defaultTerritoryContext != null) ? defaultTerritoryContext : Territory.AAA;</span>
+        }
+
+        // Throws an exception if the format is incorrect.
+<span class="fc" id="L414">        getPrecisionFormat(mapcodeClean);</span>
+<span class="fc" id="L415">        return Decoder.decodeToMapcodeZone(mapcodeClean, territory);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.1.201803210924</span></div></body></html>
