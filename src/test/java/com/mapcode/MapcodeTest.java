@@ -86,7 +86,7 @@ public class MapcodeTest {
         assertFalse(Mapcode.isValidMapcodeFormat("NL- XX.XX"));
         assertFalse(Mapcode.isValidMapcodeFormat("US IN XX.XX"));
 
-        // Incorrect (nunber of) characters.
+        // Incorrect (number of) characters.
         assertFalse(Mapcode.isValidMapcodeFormat("P"));
         assertFalse(Mapcode.isValidMapcodeFormat("PQ"));
         assertFalse(Mapcode.isValidMapcodeFormat("PQ."));

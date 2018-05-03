@@ -261,4 +261,40 @@ public class EncoderTest {
         assertEquals(MapcodeCodec.encode(0, -181), MapcodeCodec.encode(0, 179));
         assertEquals(MapcodeCodec.encode(0, 181), MapcodeCodec.encode(0, -179));
     }
+
+    private static final Point CIUDAD_JUAREZ = Point.fromDeg(31.7, -106.5);
+
+    @Test
+    public void testEncodeCiudadJuarez() {
+        LOG.info("testEncodeCiudadJuarez");
+        final List<Mapcode> mapcodes = MapcodeCodec.encode(CIUDAD_JUAREZ);
+        assertEquals(13, mapcodes.size());
+        assertEquals("MX-CHH 5S.0G", mapcodes.get(0).toString());
+    }
+
+    @Test
+    public void testEncodeRestrictToCountryISO2() {
+        LOG.info("testEncodeRestrictToCountryISO2");
+        final Point ciudadJuarez = Point.fromDeg(31.7, -106.5);
+        final List<Mapcode> mapcodesMX = MapcodeCodec.encodeRestrictToCountryISO2(ciudadJuarez, "MX");
+        assertEquals(5, mapcodesMX.size());
+        assertEquals("MX-CHH 5S.0G", mapcodesMX.get(0).toString());
+
+        final List<Mapcode> mapcodesUS = MapcodeCodec.encodeRestrictToCountryISO2(ciudadJuarez, "us");
+        assertEquals(4, mapcodesUS.size());
+        assertEquals("US-NM T1DZ.338", mapcodesUS.get(0).toString());
+    }
+
+    @Test
+    public void testEncodeRestrictToCountryISO3() {
+        LOG.info("testEncodeRestrictToCountryISO3");
+        final Point ciudadJuarez = Point.fromDeg(31.7, -106.5);
+        final List<Mapcode> mapcodesMEX = MapcodeCodec.encodeRestrictToCountryISO3(ciudadJuarez, "MEX");
+        assertEquals(2, mapcodesMEX.size());
+        assertEquals("MEX 4CMT.DLX", mapcodesMEX.get(0).toString());
+
+        final List<Mapcode> mapcodesUSA = MapcodeCodec.encodeRestrictToCountryISO3(ciudadJuarez, "usa");
+        assertEquals(1, mapcodesUSA.size());
+        assertEquals("USA NG4F.K745", mapcodesUSA.get(0).toString());
+    }
 }

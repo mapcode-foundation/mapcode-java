@@ -295,6 +295,22 @@ This resticts encoding to a specific territory and produces a potentially empty 
 Again, if encoding succeeded, the first mapcode is the shortest one and the last mapcode in the list is the
 globally unique international mapcode.
 
+**`List<Mapcode> encodeRestrictToCountryISO2/ISO3(double latitude, double longitude, String countryISO2/ISO3)`** encodes a (latitude,
+longitude) pair, where encoding is restricted to a specific country, provided as an ISO 3166-2 or -3 country code. 
+    
+Example:
+
+    List<Mapcode> results = MapcodeCodec.encodeRestrictToCountryISO2(lat, lon, "BR");
+    // Returns a list of mapcodes retricted to Brazil (not: IN-BR).
+
+    List<Mapcode> results = MapcodeCodec.encodeRestrictToCountryISO3(lat, lon, "MEX");
+    // Returns a list of mapcodes retricted to Mexico.
+
+**Important notice:** The codes used in these methods asume the ISO conversion, 
+not the `fromString` conversion from `Territory`. For example, `Territory.fromString("BR")` 
+produce the territory `IN-BR`, whereas `Territory.fromCountryISO2("BR")` produces 
+the territory `BRA`. 
+
 Both `encode()` methods are also offered as a `encodeToShortest()` method, which essentially
 returns only the first result of the previous methods (if there are any results).
 
@@ -381,6 +397,9 @@ smaller areas, so mapcodes can remain fairly short:
 Rather than using the 3-letter territory code for mapcodes in these territories, you'd probably want
 to use the `TT-XXX` form, where `XXX` defines the subterritory (state, province, etc.) 
 
+Two convenience methods are provided to create a territory code from an ISO 3166-2 or -3 code: 
+`Territory.fromCountryISO2(String)` and `Territory.fromCountryISO3(String)`. 
+
 
 ## Enum `Alphabet` <a name="alphabet"></a>
 
@@ -464,6 +483,8 @@ These are the release notes for the Java library for mapcodes.
 ### 2.4.6
 
 * General cleanup after running stricter IntelliJ inspections profile.
+
+* Added convenience methods to restrict encoded mapcodes to specific ISO 3166-2 or 3 country codes.
 
 ### 2.4.5
 

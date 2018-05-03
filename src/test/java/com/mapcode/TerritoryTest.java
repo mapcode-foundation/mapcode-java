@@ -194,4 +194,56 @@ public class TerritoryTest {
         LOG.info("testFromNumberError2");
         Territory.fromNumber(99999);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringCountryIso2Error1() {
+        LOG.info("testFromStringCountryIso2Error1");
+        Territory.fromCountryISO2("US-IN");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringCountryIso2Error2() {
+        LOG.info("testFromStringCountryIso2Error2");
+        Territory.fromCountryISO2("USA");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringCountryIso2Error3() {
+        LOG.info("testFromStringCountryIso2Error3");
+        Territory.fromCountryISO2("");
+    }
+
+    @Test
+    public void testFromStringCountryIso2OK() {
+        LOG.info("testFromStringCountryIso2OK");
+        assertEquals("NLD", Territory.fromCountryISO2("NL").toString());
+        assertEquals("BRA", Territory.fromCountryISO2("br").toString());
+        assertEquals("USA", Territory.fromCountryISO2("Us").toString());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringCountryIso3Error1() {
+        LOG.info("testFromStringCountryIso3Error1");
+        Territory.fromCountryISO3("US-IN");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringCountryIso3Error2() {
+        LOG.info("testFromStringCountryIso3Error2");
+        Territory.fromCountryISO3("US");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testFromStringCountryIso3Error3() {
+        LOG.info("testFromStringCountryIso3Error3");
+        Territory.fromCountryISO3("");
+    }
+
+    @Test
+    public void testFromStringCountryIso3OK() {
+        LOG.info("testFromStringCountryIso3OK");
+        assertEquals("NLD", Territory.fromCountryISO3("NLD").toString());
+        assertEquals("BRA", Territory.fromCountryISO3("bra").toString());
+        assertEquals("USA", Territory.fromCountryISO3("Usa").toString());
+    }
 }

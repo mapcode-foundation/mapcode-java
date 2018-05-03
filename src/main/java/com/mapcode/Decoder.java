@@ -342,7 +342,7 @@ final class Decoder {
         int relx;
         int rely;
         final int codexlen = result.length() - 1; // length ex dot
-        int prelen = result.indexOf('.'); // dotposition
+        int prelen = result.indexOf('.'); // dot position
 
         if ((prelen == 1) && (codexlen == 5)) {
             prelen++;
@@ -389,7 +389,7 @@ final class Decoder {
 
         String rest = result.substring(prelen + 1);
 
-        // decoderelative (postfix vs rely,relx)
+        // decode relative (postfix vs rely, relx)
         final int difx;
         int dify;
 
@@ -682,7 +682,7 @@ final class Decoder {
                 if (DECODE_CHARS[i] < 0) {
                     return ""; // bad char!
                 } else if (voweled && (DECODE_CHARS[(int) str.charAt(v)] > 9)) {
-                    return ""; // nonodigit!
+                    return ""; // no-nodigit!
                 }
             }
         }
@@ -923,7 +923,7 @@ final class Decoder {
                 return true; // Hebrew
             }
             if ((c >= 0x388) && (c <= 0x3C9)) {
-                return true; // Greek uppercase and lowecase
+                return true; // Greek uppercase and lowercase
             }
             if (((c >= 0x1100) && (c <= 0x1174)) || ((c >= 0xad6c) && (c <= 0xd314))) {
                 return true; // Korean
