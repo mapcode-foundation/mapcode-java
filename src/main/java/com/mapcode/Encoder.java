@@ -27,11 +27,11 @@ import java.util.List;
 import static com.mapcode.Boundary.createBoundaryForTerritoryRecord;
 import static com.mapcode.Common.*;
 
+ // ----------------------------------------------------------------------------------------------
+ // Package private implementation class. For internal use within the Mapcode implementation only.
+ // ----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the Mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * This class contains encoder for mapcodes.
  */
 @SuppressWarnings({"MagicNumber", "StringConcatenationMissingWhitespace"})

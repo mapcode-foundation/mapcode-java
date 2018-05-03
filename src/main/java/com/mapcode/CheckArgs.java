@@ -21,11 +21,11 @@ import javax.annotation.Nullable;
 
 import static com.mapcode.Mapcode.getPrecisionFormat;
 
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the mapcode implementation only.
+// ----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * This class provides a number of helper methods to check (runtime) arguments.
  */
 final class CheckArgs {

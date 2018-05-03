@@ -18,11 +18,11 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 
+// ----------------------------------------------------------------------------------------------
+// Package private implementation class. For internal use within the Mapcode implementation only.
+// ----------------------------------------------------------------------------------------------
+
 /**
- * ----------------------------------------------------------------------------------------------
- * Package private implementation class. For internal use within the Mapcode implementation only.
- * ----------------------------------------------------------------------------------------------
- *
  * This class the data class for Mapcode codex items.
  */
 @SuppressWarnings("MagicNumber")
