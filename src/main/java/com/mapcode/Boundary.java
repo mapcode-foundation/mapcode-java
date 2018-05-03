@@ -82,7 +82,7 @@ final class Boundary {
      * Note: Points at the exact North pole with latitude 90 are never part of a boundary.
      *
      * @param p Point to check.
-     * @return True if the points falls within the boudary.
+     * @return True if the points falls within the boundary.
      */
     boolean containsPoint(@Nonnull final Point p) {
         if (!p.isDefined()) {

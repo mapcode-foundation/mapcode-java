@@ -704,6 +704,51 @@ public enum Territory {
         return createFromString(alphaCode, parentTerritory);
     }
 
+    // Keep a mapping from ISO3 to ISO2 codes. This map is used to make sure valid ISO3 codes are being used.
+    private static final Map<String, String> MAP_ISO3_TO_ISO2;
+
+    static {
+        final String[] countries = Locale.getISOCountries();
+        MAP_ISO3_TO_ISO2 = new HashMap<String, String>(countries.length);
+        for (final String countryISO2 : countries) {
+            final String countryISO3 = new Locale("", countryISO2).getISO3Country();
+            MAP_ISO3_TO_ISO2.put(countryISO3.toUpperCase(), countryISO2.toUpperCase());
+        }
+    }
+
+    /**
+     * Create a Territory object from a valid ISO2 country code.
+     *
+     * @param countryISO2 ISO 3166-2 country code.
+     * @return Territory object for the country.
+     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166-2 code.
+     */
+    @Nonnull
+    public static Territory fromCountryISO2(@Nonnull final String countryISO2) {
+        final Locale locale = new Locale("", countryISO2);
+        try {
+            final String countryISO3 = locale.getISO3Country().toUpperCase();
+            return fromString(countryISO3);
+        } catch (final MissingResourceException ignored) {
+            throw new IllegalArgumentException("Parameter " + countryISO2 + " must be a valid ISO 3166-2 country code");
+        }
+    }
+
+    /**
+     * Create a Territory object from a valid ISO 3166-3 country code.
+     *
+     * @param countryISO3 ISO 3166-3 country code.
+     * @return Territory object for the country.
+     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166-3 code.
+     */
+    @Nonnull
+    public static Territory fromCountryISO3(@Nonnull final String countryISO3) {
+        if (!MAP_ISO3_TO_ISO2.containsKey(countryISO3.toUpperCase())) {
+            throw new IllegalArgumentException("Parameter " + countryISO3 + " must be a valid ISO 3166-3 country code");
+        }
+        return fromString(countryISO3);
+    }
+
     /**
      * Return the international value of the territory name, with dashes rather than underscores.
      * This is the same as {@link #toAlphaCode(AlphaCodeFormat)} for {@link AlphaCodeFormat#INTERNATIONAL}.

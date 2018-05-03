@@ -18,6 +18,7 @@ package com.mapcode;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 
@@ -106,10 +107,78 @@ public final class MapcodeCodec {
     }
 
     @Nonnull
-    public static List<Mapcode> encode(@Nonnull final Point point, @Nullable final Territory restrictToTerritory)
+    public static List<Mapcode> encode(@Nonnull final Point point,
+                                       @Nullable final Territory restrictToTerritory)
             throws IllegalArgumentException {
         checkNonnull("point", point);
         return encode(point.getLatDeg(), point.getLonDeg(), restrictToTerritory);
+    }
+
+    /**
+     * Encode a lat/lon pair to a list of mapcodes, like {@link #encode(double, double)}.
+     * The result list is limited to those mapcodes that belong to the provided ISO 3166-2 country code.
+     * For example, if you wish to restrict the list to Mexican mapcodes, use "MX". This would
+     * produce a result list of mapcodes with territories that start with "MX-" (note that a
+     * mapcode that starts with "MEX" is not returned in that case.)
+     *
+     * @param latDeg      Latitude, accepted range: -90..90.
+     * @param lonDeg      Longitude, accepted range: -180..180.
+     * @param countryISO2 ISO 3166-2 country code.
+     * @return Possibly empty, ordered list of mapcode information records, see {@link Mapcode}.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range, or if the ISO code is invalid.
+     */
+    @Nonnull
+    public static List<Mapcode> encodeRestrictToCountryISO2(final double latDeg, final double lonDeg,
+                                                            @Nonnull final String countryISO2)
+            throws IllegalArgumentException {
+        checkNonnull("countryISO2", countryISO2);
+        final String prefix = countryISO2.toUpperCase() + '-';
+        final List<Mapcode> mapcodes = encode(latDeg, lonDeg);
+        final List<Mapcode> filtered = new ArrayList<Mapcode>();
+        for (final Mapcode mapcode : mapcodes) {
+            if (mapcode.getTerritory().toString().startsWith(prefix)) {
+                filtered.add(mapcode);
+            }
+        }
+        return filtered;
+    }
+
+    @Nonnull
+    public static List<Mapcode> encodeRestrictToCountryISO2(@Nonnull final Point point,
+                                                            @Nonnull final String countryISO2)
+            throws IllegalArgumentException {
+        checkNonnull("point", point);
+        return encodeRestrictToCountryISO2(point.getLatDeg(), point.getLonDeg(), countryISO2);
+    }
+
+    /**
+     * Encode a lat/lon pair to a list of mapcodes, like {@link #encode(double, double)}.
+     * The result list is limited to those mapcodes that belong to the provided ISO 3166-3 country code.
+     * For example, if you wish to restrict the list to Mexican mapcodes, use "MEX". This would
+     * produce a result list of mapcodes with territories that start with "MEX" (note that
+     * mapcode that starts with "MX-" are not returned in that case.)
+     *
+     * @param latDeg      Latitude, accepted range: -90..90.
+     * @param lonDeg      Longitude, accepted range: -180..180.
+     * @param countryISO3 ISO 3166-3 country code.
+     * @return Possibly empty, ordered list of mapcode information records, see {@link Mapcode}.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range, or if the ISO code is invalid.
+     */
+    @Nonnull
+    public static List<Mapcode> encodeRestrictToCountryISO3(final double latDeg, final double lonDeg,
+                                                            @Nonnull final String countryISO3)
+            throws IllegalArgumentException {
+        checkNonnull("countryISO3", countryISO3);
+        final Territory restrictToTerritory = Territory.fromCountryISO3(countryISO3);
+        return encode(latDeg, lonDeg, restrictToTerritory);
+    }
+
+    @Nonnull
+    public static List<Mapcode> encodeRestrictToCountryISO3(@Nonnull final Point point,
+                                                            @Nonnull final String countryISO3)
+            throws IllegalArgumentException {
+        checkNonnull("point", point);
+        return encodeRestrictToCountryISO3(point.getLatDeg(), point.getLonDeg(), countryISO3);
     }
 
     /**
@@ -272,8 +341,6 @@ public final class MapcodeCodec {
         return rectangle;
     }
 
-
-    // TODO: Explain when this method is needed/used.
     /**
      * Is coordinate near multiple territory borders?
      *

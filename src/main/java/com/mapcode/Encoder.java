@@ -487,7 +487,7 @@ final class Encoder {
                     str = str.substring(0, d);
                     rlen = d;
                 } else {
-                    return str; // not alldigit (or multiple dots)
+                    return str; // not all-digit (or multiple dots)
                 }
             }
         }
