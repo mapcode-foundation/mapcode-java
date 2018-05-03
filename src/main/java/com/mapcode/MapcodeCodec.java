@@ -114,14 +114,14 @@ public final class MapcodeCodec {
 
     /**
      * Encode a lat/lon pair to a list of mapcodes, like {@link #encode(double, double)}.
-     * The result list is limited to those mapcodes that belong to the provided ISO 3166-2 country code.
+     * The result list is limited to those mapcodes that belong to the provided ISO 3166 country code, 2 characters.
      * For example, if you wish to restrict the list to Mexican mapcodes, use "MX". This would
      * produce a result list of mapcodes with territories that start with "MX-" (note that a
      * mapcode that starts with "MEX" is not returned in that case.)
      *
      * @param latDeg      Latitude, accepted range: -90..90.
      * @param lonDeg      Longitude, accepted range: -180..180.
-     * @param countryISO2 ISO 3166-2 country code.
+     * @param countryISO2 ISO 3166 country code, 2 characters.
      * @return Possibly empty, ordered list of mapcode information records, see {@link Mapcode}.
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range, or if the ISO code is invalid.
      */
@@ -162,14 +162,14 @@ public final class MapcodeCodec {
 
     /**
      * Encode a lat/lon pair to a list of mapcodes, like {@link #encode(double, double)}.
-     * The result list is limited to those mapcodes that belong to the provided ISO 3166-3 country code.
+     * The result list is limited to those mapcodes that belong to the provided ISO 3166 country code, 3 characters.
      * For example, if you wish to restrict the list to Mexican mapcodes, use "MEX". This would
      * produce a result list of mapcodes with territories that start with "MEX" (note that
      * mapcode that starts with "MX-" are not returned in that case.)
      *
      * @param latDeg      Latitude, accepted range: -90..90.
      * @param lonDeg      Longitude, accepted range: -180..180.
-     * @param countryISO3 ISO 3166-3 country code.
+     * @param countryISO3 ISO 3166 country code, 3 characters.
      * @return Possibly empty, ordered list of mapcode information records, see {@link Mapcode}.
      * @throws IllegalArgumentException Thrown if latitude or longitude are out of range, or if the ISO code is invalid.
      */
@@ -178,8 +178,7 @@ public final class MapcodeCodec {
                                                             @Nonnull final String countryISO3)
             throws IllegalArgumentException {
         checkNonnull("countryISO3", countryISO3);
-        final Territory restrictToTerritory = Territory.fromCountryISO3(countryISO3);
-        return encode(latDeg, lonDeg, restrictToTerritory);
+        return encodeRestrictToCountryISO2(latDeg, lonDeg, Territory.getCountryISO2FromISO3(countryISO3));
     }
 
     @Nonnull

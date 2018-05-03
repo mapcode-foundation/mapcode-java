@@ -296,15 +296,15 @@ Again, if encoding succeeded, the first mapcode is the shortest one and the last
 globally unique international mapcode.
 
 **`List<Mapcode> encodeRestrictToCountryISO2/ISO3(double latitude, double longitude, String countryISO2/ISO3)`** encodes a (latitude,
-longitude) pair, where encoding is restricted to a specific country, provided as an ISO 3166-2 or -3 country code. 
+longitude) pair, where encoding is restricted to a specific country, provided as an ISO 3166 2 or 3 characters country code. 
     
 Example:
 
     List<Mapcode> results = MapcodeCodec.encodeRestrictToCountryISO2(lat, lon, "BR");
-    // Returns a list of mapcodes retricted to Brazil (not: IN-BR).
+    // Returns a list of mapcodes retricted to Brazil, so their territories start with BR- or BRA.
 
     List<Mapcode> results = MapcodeCodec.encodeRestrictToCountryISO3(lat, lon, "MEX");
-    // Returns a list of mapcodes retricted to Mexico.
+    // Returns a list of mapcodes retricted to Mexico, so their therritories start with MX- or MEX.
 
 **Important notice:** The codes used in these methods asume the ISO conversion, 
 not the `fromString` conversion from `Territory`. For example, `Territory.fromString("BR")` 
@@ -397,7 +397,7 @@ smaller areas, so mapcodes can remain fairly short:
 Rather than using the 3-letter territory code for mapcodes in these territories, you'd probably want
 to use the `TT-XXX` form, where `XXX` defines the subterritory (state, province, etc.) 
 
-Two convenience methods are provided to create a territory code from an ISO 3166-2 or -3 code: 
+Two convenience methods are provided to create a territory code from an ISO 3166 2 or 3 character code: 
 `Territory.fromCountryISO2(String)` and `Territory.fromCountryISO3(String)`. 
 
 
@@ -484,7 +484,7 @@ These are the release notes for the Java library for mapcodes.
 
 * General cleanup after running stricter IntelliJ inspections profile.
 
-* Added convenience methods to restrict encoded mapcodes to specific ISO 3166-2 or 3 country codes.
+* Added convenience methods to restrict encoded mapcodes to specific ISO 3166 2 or 3 character country codes.
 
 ### 2.4.5
 

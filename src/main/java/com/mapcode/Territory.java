@@ -655,10 +655,10 @@ public enum Territory {
      */
     @Nonnull
     static Territory fromNumber(final int number) throws UnknownTerritoryException {
-        if ((number < 0) || (number >= codeList.size())) {
+        if ((number < 0) || (number >= CODE_LIST.size())) {
             throw new UnknownTerritoryException(number);
         }
-        return codeList.get(number);
+        return CODE_LIST.get(number);
     }
 
     /**
@@ -704,47 +704,66 @@ public enum Territory {
         return createFromString(alphaCode, parentTerritory);
     }
 
-    // Keep a mapping from ISO3 to ISO2 codes. This map is used to make sure valid ISO3 codes are being used.
-    private static final Map<String, String> MAP_ISO3_TO_ISO2;
-
-    static {
-        final String[] countries = Locale.getISOCountries();
-        MAP_ISO3_TO_ISO2 = new HashMap<String, String>(countries.length);
-        for (final String countryISO2 : countries) {
-            final String countryISO3 = new Locale("", countryISO2).getISO3Country();
-            MAP_ISO3_TO_ISO2.put(countryISO3.toUpperCase(), countryISO2.toUpperCase());
-        }
-    }
-
     /**
      * Create a Territory object from a valid ISO2 country code.
      *
-     * @param countryISO2 ISO 3166-2 country code.
+     * @param countryISO2 ISO 3166 country code, 2 characters.
      * @return Territory object for the country.
-     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166-2 code.
+     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166 code, 2 characters.
      */
     @Nonnull
     public static Territory fromCountryISO2(@Nonnull final String countryISO2) {
+        return fromString(getCountryISO3FromISO2(countryISO2));
+    }
+
+    /**
+     * Return the ISO 3166 2 character country code for a ISO 3166 3 character code.
+     *
+     * @param countryISO3 ISO 3166 country code, 3 characters.
+     * @return ISO 3166 country code, 2 characters.
+     */
+    @Nonnull
+    public static String getCountryISO2FromISO3(@Nonnull final String countryISO3) {
+        final String countryISO2 = MAP_ISO3_TO_ISO2.get(countryISO3.toUpperCase());
+        if (countryISO2 == null) {
+            throw new IllegalArgumentException("Parameter " + countryISO3 + " must be a valid ISO 3166 country code, 3 characters");
+        }
+        return countryISO2;
+    }
+
+    /**
+     * Return the ISO 3166 3 character country code for a ISO 3166 2 character code.
+     *
+     * @param countryISO2 ISO 3166 country code, 2 characters.
+     * @return ISO 3166 country code, characters.
+     */
+    @Nonnull
+    public static String getCountryISO3FromISO2(@Nonnull final String countryISO2) {
+        // Clipperton Island not recognized by Java - treat separately.
+        if ("CP".equalsIgnoreCase(countryISO2)) {
+            return "CPT";
+        }
+
+        // Otherwise, use Java locales.
         final Locale locale = new Locale("", countryISO2);
         try {
-            final String countryISO3 = locale.getISO3Country().toUpperCase();
-            return fromString(countryISO3);
+            return locale.getISO3Country().toUpperCase();
         } catch (final MissingResourceException ignored) {
-            throw new IllegalArgumentException("Parameter " + countryISO2 + " must be a valid ISO 3166-2 country code");
+            throw new IllegalArgumentException("Parameter " + countryISO2 + " must be a valid ISO 3166 country code, 2 characters");
         }
     }
 
     /**
-     * Create a Territory object from a valid ISO 3166-3 country code.
+     * Create a Territory object from a valid ISO 3166 country code, 3 characters.
      *
-     * @param countryISO3 ISO 3166-3 country code.
+     * @param countryISO3 ISO 3166 country code, 3 characters.
      * @return Territory object for the country.
-     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166-3 code.
+     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166 code, 3 characters.
      */
     @Nonnull
     public static Territory fromCountryISO3(@Nonnull final String countryISO3) {
         if (!MAP_ISO3_TO_ISO2.containsKey(countryISO3.toUpperCase())) {
-            throw new IllegalArgumentException("Parameter " + countryISO3 + " must be a valid ISO 3166-3 country code");
+            throw new IllegalArgumentException("Parameter " + countryISO3 + " must be a valid ISO 3166 country code, 3 characters");
         }
         return fromString(countryISO3);
     }
@@ -798,7 +817,7 @@ public enum Territory {
             if (index != -1) {
                 assert name().length() > (index + 1);
                 final String shortName = name().substring(index + 1);
-                if ((format == AlphaCodeFormat.MINIMAL) || (nameMap.get(shortName).size() == 1)) {
+                if ((format == AlphaCodeFormat.MINIMAL) || (NAME_MAP.get(shortName).size() == 1)) {
                     result = shortName;
                 }
             }
@@ -833,7 +852,7 @@ public enum Territory {
      * @return True if this territory contains other territory subdivisions.
      */
     public boolean hasSubdivisions() {
-        return parentList.contains(this);
+        return PARENT_LIST.contains(this);
     }
 
     /**
@@ -880,21 +899,36 @@ public enum Territory {
         this.fullNameAliases = (fullNameAliases == null) ? new String[]{} : fullNameAliases;
     }
 
+    // Keep a mapping from ISO3 to ISO2 codes. This map is used to make sure valid ISO3 codes are being used.
     @Nonnull
-    private static final List<Territory> codeList;
+    private static final Map<String, String> MAP_ISO3_TO_ISO2;
     @Nonnull
-    private static final Map<String, List<Territory>> nameMap;
+    private static final List<Territory> CODE_LIST;
     @Nonnull
-    private static final List<Territory> parentList;
+    private static final Map<String, List<Territory>> NAME_MAP;
+    @Nonnull
+    private static final List<Territory> PARENT_LIST;
+
+    static {
+        final String[] countries = Locale.getISOCountries();
+        MAP_ISO3_TO_ISO2 = new HashMap<String, String>(countries.length);
+        for (final String countryISO2 : countries) {
+            final String countryISO3 = new Locale("", countryISO2).getISO3Country();
+            MAP_ISO3_TO_ISO2.put(countryISO3.toUpperCase(), countryISO2.toUpperCase());
+        }
+
+        // Add Clipperton Island (not recognized by Java).
+        MAP_ISO3_TO_ISO2.put("CPT", "CP");
+    }
 
     /**
      * Static checking of the static data structures.
      */
     static {
         final String errorPrefix = "Initializing error: ";
-        codeList = new ArrayList<Territory>();
-        nameMap = new HashMap<String, List<Territory>>();
-        parentList = new ArrayList<Territory>();
+        CODE_LIST = new ArrayList<Territory>();
+        NAME_MAP = new HashMap<String, List<Territory>>();
+        PARENT_LIST = new ArrayList<Territory>();
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
         final Set<Integer> territoryNumbers = new HashSet<Integer>();
@@ -915,13 +949,13 @@ public enum Territory {
             }
             territoryNumbers.add(territory.getNumber());
 
-            final int initialCodeListSize = codeList.size();
+            final int initialCodeListSize = CODE_LIST.size();
             for (int i = initialCodeListSize; i <= territory.number; i++) {
-                codeList.add(null);
+                CODE_LIST.add(null);
             }
-            codeList.set(territory.number, territory);
-            if ((territory.parentTerritory != null) && !parentList.contains(territory.parentTerritory)) {
-                parentList.add(territory.parentTerritory);
+            CODE_LIST.set(territory.number, territory);
+            if ((territory.parentTerritory != null) && !PARENT_LIST.contains(territory.parentTerritory)) {
+                PARENT_LIST.add(territory.parentTerritory);
             }
 
             // Check if territory name is unique.
@@ -985,7 +1019,7 @@ public enum Territory {
                 alphaCode.trim().replace('_', '-')).toUpperCase();
 
         // Try as alpha code.
-        final List<Territory> territories = nameMap.get(trimmed);
+        final List<Territory> territories = NAME_MAP.get(trimmed);
         if (territories != null) {
             if (parentTerritory == null) {
                 return territories.get(0);
@@ -1065,8 +1099,8 @@ public enum Territory {
     }
 
     private static void addName(@Nonnull final String name, @Nonnull final Territory territory) {
-        if (nameMap.containsKey(name)) {
-            final List<Territory> territories = nameMap.get(name);
+        if (NAME_MAP.containsKey(name)) {
+            final List<Territory> territories = NAME_MAP.get(name);
 
             // Add child territories in the order the parents are declared.
             // This results in consistent decoding of ambiguous territory names.
@@ -1098,7 +1132,7 @@ public enum Territory {
         } else {
             final ArrayList<Territory> arrayList = new ArrayList<Territory>();
             arrayList.add(territory);
-            nameMap.put(name, arrayList);
+            NAME_MAP.put(name, arrayList);
         }
     }
 }
