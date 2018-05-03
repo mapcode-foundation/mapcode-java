@@ -144,9 +144,6 @@ public final class MapcodeCodec {
 
                 // Otherwise, if it's the correct country ISO 3 code, it's also OK.
                 filtered.add(mapcode);
-            } else {
-
-                // Nothing.
             }
         }
         return filtered;
