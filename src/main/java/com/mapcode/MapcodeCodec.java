@@ -130,12 +130,23 @@ public final class MapcodeCodec {
                                                             @Nonnull final String countryISO2)
             throws IllegalArgumentException {
         checkNonnull("countryISO2", countryISO2);
+        final String countryISO3 = Territory.fromCountryISO2(countryISO2).toString();
         final String prefix = countryISO2.toUpperCase() + '-';
         final List<Mapcode> mapcodes = encode(latDeg, lonDeg);
         final List<Mapcode> filtered = new ArrayList<Mapcode>();
         for (final Mapcode mapcode : mapcodes) {
+
             if (mapcode.getTerritory().toString().startsWith(prefix)) {
+                // If the mapcode starts with the ISO 2 code, it's OK.
                 filtered.add(mapcode);
+
+            } else if (mapcode.getTerritory().toString().equals(countryISO3)) {
+
+                // Otherwise, if it's the correct country ISO 3 code, it's also OK.
+                filtered.add(mapcode);
+            } else {
+
+                // Nothing.
             }
         }
         return filtered;
