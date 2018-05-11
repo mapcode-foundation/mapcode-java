@@ -480,6 +480,14 @@ Normally, one of our developers should be able to comment on them and fix.
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.7
+
+* Added `fromCountryISO/2/3` methods to get a `Territory` value from a 2- or 3-character ISO 3166 string.
+
+* Added `allCountryISO2/3Codes` to get a set of all 2- or 3-character ISO 3166 codes.
+
+* Added `encodeRestrictToCountryISO` to restrict mapcodes to a 2- or 3-character ISO 3166 country.
+
 ### 2.4.6
 
 * General cleanup after running stricter IntelliJ inspections profile.
