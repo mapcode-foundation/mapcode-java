@@ -21,6 +21,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Set;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -254,6 +256,17 @@ public class TerritoryTest {
     }
 
     @Test
+    public void testFromStringCountryISOOK() {
+        LOG.info("testFromStringCountryISOOK");
+        assertEquals("NLD", Territory.fromCountryISO2("NL").toString());
+        assertEquals("BRA", Territory.fromCountryISO2("br").toString());
+        assertEquals("USA", Territory.fromCountryISO2("Us").toString());
+        assertEquals("NLD", Territory.fromCountryISO("NLD").toString());
+        assertEquals("BRA", Territory.fromCountryISO("bra").toString());
+        assertEquals("USA", Territory.fromCountryISO("Usa").toString());
+    }
+
+    @Test
     public void testGetCountryISO3FromISO2() {
         LOG.info("testGetCountryISO3FromISO2");
         assertEquals("NLD", Territory.getCountryISO3FromISO2("NL"));
@@ -281,4 +294,21 @@ public class TerritoryTest {
         Territory.getCountryISO2FromISO3("NL");
     }
 
+    @Test
+    public void testGetCountryISO2Codes() {
+        LOG.info("testGetCountryISO2Codes");
+        final Set<String> countryISO2Codes = Territory.allCountryISO2Codes();
+        LOG.info("set={}", countryISO2Codes);
+        assertEquals(251, countryISO2Codes.size());
+        assertEquals(2, countryISO2Codes.iterator().next().length());
+    }
+
+    @Test
+    public void testGetCountryISO3Codes() {
+        LOG.info("testGetCountryISO3Codes");
+        final Set<String> countryISO3Codes = Territory.allCountryISO3Codes();
+        LOG.info("set={}", countryISO3Codes);
+        assertEquals(251, countryISO3Codes.size());
+        assertEquals(3, countryISO3Codes.iterator().next().length());
+    }
 }

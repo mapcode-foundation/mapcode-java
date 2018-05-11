@@ -187,6 +187,39 @@ public final class MapcodeCodec {
     }
 
     /**
+     * Encode a lat/lon pair to a list of mapcodes, like {@link #encode(double, double)}.
+     * The result list is limited to those mapcodes that belong to the provided ISO 3166 country code, 2 or 3
+     * characters.
+     *
+     * @param latDeg     Latitude, accepted range: -90..90.
+     * @param lonDeg     Longitude, accepted range: -180..180.
+     * @param countryISO ISO 3166 country code, 2 or 3 characters.
+     * @return Possibly empty, ordered list of mapcode information records, see {@link Mapcode}.
+     * @throws IllegalArgumentException Thrown if latitude or longitude are out of range, or if the ISO code is invalid.
+     */
+    @Nonnull
+    public static List<Mapcode> encodeRestrictToCountryISO(final double latDeg, final double lonDeg,
+                                                           @Nonnull final String countryISO)
+            throws IllegalArgumentException {
+        checkNonnull("countryISO", countryISO);
+        List<Mapcode> mapcodes;
+        try {
+            mapcodes = encodeRestrictToCountryISO2(latDeg, lonDeg, countryISO);
+        } catch (final IllegalArgumentException ignored) {
+            mapcodes = encodeRestrictToCountryISO3(latDeg, lonDeg, countryISO);
+        }
+        return mapcodes;
+    }
+
+    @Nonnull
+    public static List<Mapcode> encodeRestrictToCountryISO(@Nonnull final Point point,
+                                                           @Nonnull final String countryISO)
+            throws IllegalArgumentException {
+        checkNonnull("point", point);
+        return encodeRestrictToCountryISO(point.getLatDeg(), point.getLonDeg(), countryISO);
+    }
+
+    /**
      * Encode a lat/lon pair to its shortest mapcode with territory information.
      *
      * @param latDeg              Latitude, accepted range: -90..90.

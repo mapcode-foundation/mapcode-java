@@ -717,6 +717,37 @@ public enum Territory {
     }
 
     /**
+     * Create a Territory object from a valid ISO 3166 country code, 3 characters.
+     *
+     * @param countryISO3 ISO 3166 country code, 3 characters.
+     * @return Territory object for the country.
+     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166 code, 3 characters.
+     */
+    @Nonnull
+    public static Territory fromCountryISO3(@Nonnull final String countryISO3) {
+        if (!MAP_ISO3_TO_ISO2.containsKey(countryISO3.toUpperCase())) {
+            throw new IllegalArgumentException("Parameter " + countryISO3 + " must be a valid ISO 3166 country code, 3 characters");
+        }
+        return fromString(countryISO3);
+    }
+
+    /**
+     * Create a Territory object from a valid ISO 3166 country code, 2 or 3 characters.
+     *
+     * @param countryISO ISO 3166 country code, 2 or 3 characters.
+     * @return Territory object for the country.
+     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166 code, 2 or 3 characters.
+     */
+    @Nonnull
+    public static Territory fromCountryISO(@Nonnull final String countryISO) {
+        try {
+            return fromCountryISO2(countryISO);
+        } catch (final IllegalArgumentException ignored) {
+            return fromCountryISO3(countryISO);
+        }
+    }
+
+    /**
      * Return the ISO 3166 2 character country code for a ISO 3166 3 character code.
      *
      * @param countryISO3 ISO 3166 country code, 3 characters.
@@ -754,18 +785,23 @@ public enum Territory {
     }
 
     /**
-     * Create a Territory object from a valid ISO 3166 country code, 3 characters.
+     * Returns all ISO 3166 country codes, 2 characters.
      *
-     * @param countryISO3 ISO 3166 country code, 3 characters.
-     * @return Territory object for the country.
-     * @throws IllegalArgumentException Thrown if the country code is not a valid ISO 3166 code, 3 characters.
+     * @return ISO 3166 country codes, 2 characters.
      */
     @Nonnull
-    public static Territory fromCountryISO3(@Nonnull final String countryISO3) {
-        if (!MAP_ISO3_TO_ISO2.containsKey(countryISO3.toUpperCase())) {
-            throw new IllegalArgumentException("Parameter " + countryISO3 + " must be a valid ISO 3166 country code, 3 characters");
-        }
-        return fromString(countryISO3);
+    public static Set<String> allCountryISO2Codes() {
+        return COUNTRY_ISO2_CODES;
+    }
+
+    /**
+     * Returns all ISO 3166 country codes, 3 characters.
+     *
+     * @return ISO 3166 country codes, 3 characters.
+     */
+    @Nonnull
+    public static Set<String> allCountryISO3Codes() {
+        return COUNTRY_ISO3_CODES;
     }
 
     /**
@@ -903,6 +939,10 @@ public enum Territory {
     @Nonnull
     private static final Map<String, String> MAP_ISO3_TO_ISO2;
     @Nonnull
+    private static final Set<String> COUNTRY_ISO2_CODES;
+    @Nonnull
+    private static final Set<String> COUNTRY_ISO3_CODES;
+    @Nonnull
     private static final List<Territory> CODE_LIST;
     @Nonnull
     private static final Map<String, List<Territory>> NAME_MAP;
@@ -919,6 +959,10 @@ public enum Territory {
 
         // Add Clipperton Island (not recognized by Java).
         MAP_ISO3_TO_ISO2.put("CPT", "CP");
+
+        // Create fixed sets of the keys and values.
+        COUNTRY_ISO2_CODES = new HashSet<String>(MAP_ISO3_TO_ISO2.values());
+        COUNTRY_ISO3_CODES = new HashSet<String>(MAP_ISO3_TO_ISO2.keySet());
     }
 
     /**
