@@ -480,6 +480,10 @@ Normally, one of our developers should be able to comment on them and fix.
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.9
+
+* Updated dependencies for security patches.
+
 ### 2.4.8
 
 * Updated dependencies for security patches.
