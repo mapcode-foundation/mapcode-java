@@ -28,6 +28,9 @@ public class MapcodeTest {
     @Test
     public void checkValidMapcodeFormat() {
         LOG.info("checkValidMapcodeFormat");
+        assertTrue(Mapcode.isValidMapcodeFormat(" A1.B1"));
+        assertTrue(Mapcode.isValidMapcodeFormat("A1.B1 "));
+        assertTrue(Mapcode.isValidMapcodeFormat(" A1.B1 "));
         assertTrue(Mapcode.isValidMapcodeFormat("A1.B1"));
         assertTrue(Mapcode.isValidMapcodeFormat("a1.B1"));
         assertTrue(Mapcode.isValidMapcodeFormat("00.01"));
