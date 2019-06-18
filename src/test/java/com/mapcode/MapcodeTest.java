@@ -86,6 +86,7 @@ public class MapcodeTest {
         LOG.info("checkInvalidPrecisionFormats");
 
         // Territory code must be correct syntax.
+        assertFalse(Mapcode.isValidMapcodeFormat(null));
         assertFalse(Mapcode.isValidMapcodeFormat(""));
         assertFalse(Mapcode.isValidMapcodeFormat("NL- XX.XX"));
         assertFalse(Mapcode.isValidMapcodeFormat("US IN XX.XX"));

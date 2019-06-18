@@ -477,8 +477,13 @@ Normally, one of our developers should be able to comment on them and fix.
 
 
 # Release Notes <a name="releasenotes"></a>
-
+mat
 These are the release notes for the Java library for mapcodes.
+
+### 2.4.10
+
+* Changed `Mapcode.isValidMapcodeFormat()` to return `false` if the string is `null`. Trimming the string is also
+no longer needed.
 
 ### 2.4.9
 

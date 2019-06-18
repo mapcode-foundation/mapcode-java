@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.mapcode.CheckArgs.checkMapcodeCode;
-import static com.mapcode.CheckArgs.checkNonnull;
 
 /**
  * This class defines a single mapcode encoding result, including the alphanumeric code and the
@@ -313,11 +312,13 @@ public final class Mapcode {
      * actually a valid  mapcode representing a location on Earth.
      * @throws IllegalArgumentException If mapcode is null.
      */
-    public static boolean isValidMapcodeFormat(@Nonnull final String mapcode) throws IllegalArgumentException {
-        checkNonnull("mapcode", mapcode);
+    public static boolean isValidMapcodeFormat(@Nullable final String mapcode) throws IllegalArgumentException {
+        if (mapcode == null) {
+            return false;
+        }
         try {
             // Throws an exception if the format is incorrect.
-            getPrecisionFormat(mapcode.toUpperCase());
+            getPrecisionFormat(mapcode.trim().toUpperCase());
             return true;
         } catch (final UnknownPrecisionFormatException ignored) {
             return false;
@@ -333,7 +334,7 @@ public final class Mapcode {
      */
     public static boolean containsTerritory(@Nonnull final String mapcode) throws IllegalArgumentException {
         checkMapcodeCode("mapcode", mapcode);
-        return PATTERN_TERRITORY.matcher(mapcode.toUpperCase().trim()).find();
+        return PATTERN_TERRITORY.matcher(mapcode.trim().toUpperCase()).find();
     }
 
     /**
