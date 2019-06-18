@@ -37,6 +37,14 @@ public class TerritoryTest {
     }
 
     @Test
+    public void checkConvert() {
+        LOG.info("checkConvert");
+        final String s1 = "รฉะ ฑง.ดฯง";
+        final String s2 = Mapcode.convertStringToPlainAscii(s1);
+        assertEquals("THA KF.LZF", s2);
+    }
+
+    @Test
     public void checkFullName() {
         LOG.info("checkFullName");
         assertEquals(Territory.AAA, Territory.fromString("International"));
