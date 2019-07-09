@@ -296,15 +296,15 @@ final class Decoder {
             /* Tibetan  */ new Unicode2Ascii('\u0f40', '\u0f66', "BCD?FGHJ?K?????NMP?QRLS?A?????TVUWXYE?Z"),                                           // Tibetan
             /* Arabic   */ new Unicode2Ascii('\u0627', '\u0648', "IA?BEVCDFGHJKLMNPQRS??????TU?WXYOZ"),                                                // Arabic
 
-            /* Devanag. */ new Unicode2Ascii('\u0966', '\u096f', ""), // Devanagari digits
-            /* Malai    */ new Unicode2Ascii('\u0d66', '\u0d6f', ""), // Malayalam digits
-            /* Thai     */ new Unicode2Ascii('\u0e50', '\u0e59', ""), // Thai digits
-            /* Bengali  */ new Unicode2Ascii('\u09e6', '\u09ef', ""), // Bengali digits
-            /* Gurmukhi */ new Unicode2Ascii('\u0a66', '\u0a6f', ""), // Gurmukhi digits
-            /* Tibetan  */ new Unicode2Ascii('\u0f20', '\u0f29', ""), // Tibetan digits
-            /* Burmese  */ new Unicode2Ascii('\u1040', '\u1049', ""), // Burmese digits
-            /* Khmer    */ new Unicode2Ascii('\u17e0', '\u17e9', ""), // Khmer digits
-            /* Tamil    */ new Unicode2Ascii('\u0be6', '\u0bef', ""), // Tamil digits
+            /* Devanag. */ new Unicode2Ascii('\u0966', '\u096f', "0123456789"), // Devanagari digits
+            /* Malai    */ new Unicode2Ascii('\u0d66', '\u0d6f', "0123456789"), // Malayalam digits
+            /* Thai     */ new Unicode2Ascii('\u0e50', '\u0e59', "0123456789"), // Thai digits
+            /* Bengali  */ new Unicode2Ascii('\u09e6', '\u09ef', "0123456789"), // Bengali digits
+            /* Gurmukhi */ new Unicode2Ascii('\u0a66', '\u0a6f', "0123456789"), // Gurmukhi digits
+            /* Tibetan  */ new Unicode2Ascii('\u0f20', '\u0f29', "0123456789"), // Tibetan digits
+            /* Burmese  */ new Unicode2Ascii('\u1040', '\u1049', "0123456789"), // Burmese digits
+            /* Khmer    */ new Unicode2Ascii('\u17e0', '\u17e9', "0123456789"), // Khmer digits
+            /* Tamil    */ new Unicode2Ascii('\u0be6', '\u0bef', "0123456789"), // Tamil digits
             /* Amharic  */ new Unicode2Ascii('\u1369', '\u1372', "1234567890"), // Amharic digits [1-9][0]
 
             /* Korean   */ new Unicode2Ascii('\u1100', '\u1175', "B?CD?F?G?H?OV?WXJKA??????????????????????????????????????????????????????????????????????????????LMNPQER?S???YZ???T?UI"), // Korean

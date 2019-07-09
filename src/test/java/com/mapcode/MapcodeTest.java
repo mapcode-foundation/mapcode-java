@@ -48,6 +48,13 @@ public class MapcodeTest {
     }
 
     @Test
+    public void checkValidMapcodeFormatUnicode() {
+        LOG.info("checkValidMapcodeFormatUnicode");
+        assertTrue(Mapcode.isValidMapcodeFormat("THA จก.ผถฉ๕")); // THA GB.RMH5
+        assertTrue(Mapcode.isValidMapcodeFormat("รฉะ จก.ผถฉ๕")); // THA GB.RMH5
+    }
+
+    @Test
     public void checkValidPrecisionFormats() {
         LOG.info("checkValidPrecisionFormats");
 
