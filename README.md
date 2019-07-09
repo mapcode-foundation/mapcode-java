@@ -480,6 +480,11 @@ Normally, one of our developers should be able to comment on them and fix.
 mat
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.11
+
+* Fixed a bug in `Mapcode.isValidMapcodeFormat()` which caused an exception when parsing a Unicode mapcode
+which included a numeral, like `THA จก.ผถฉ๕` (which is `THA GB.RMH5` in non-Unicode). 
+
 ### 2.4.10
 
 * Changed `Mapcode.isValidMapcodeFormat()` to return `false` if the string is `null`. Trimming the string is also
