@@ -205,7 +205,7 @@ final class Decoder {
     // Private methods.
     // ----------------------------------------------------------------------
 
-    private final static int[] DECODE_CHARS = {
+    final static int[] DECODE_CHARS = {
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -224,7 +224,7 @@ final class Decoder {
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     };
 
-    private static class Unicode2Ascii {
+    static class Unicode2Ascii {
 
         final char min;
         final char max;
@@ -245,7 +245,7 @@ final class Decoder {
     private static final char MISSCODE = '?';
 
     // @formatter:off
-    @SuppressWarnings("LongLine") private final static char[][] ASCII2LANGUAGE = {
+    @SuppressWarnings("LongLine") final static char[][] ASCII2LANGUAGE = {
             // Character:   A         B         C         D         E         F         G         H         I         J        K          L         M         N         O         P         Q         R         S         T         U         V         W         X         Y         Z         0         1         2         3         4         5         6         7         8         9
             /* Roman    */ {'\u0041', '\u0042', '\u0043', '\u0044', '\u0045', '\u0046', '\u0047', '\u0048', '\u0049', '\u004a', '\u004b', '\u004c', '\u004d', '\u004e', '\u004f', '\u0050', '\u0051', '\u0052', '\u0053', '\u0054', '\u0055', '\u0056', '\u0057', '\u0058', '\u0059', '\u005a', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Roman
             /* Greek    */ {'\u0391', '\u0392', '\u039e', '\u0394', '\u0388', '\u0395', '\u0393', '\u0397', '\u0399', '\u03a0', '\u039a', '\u039b', '\u039c', '\u039d', '\u039f', '\u03a1', '\u0398', '\u03a8', '\u03a3', '\u03a4', '\u0389', '\u03a6', '\u03a9', '\u03a7', '\u03a5', '\u0396', '\u0030', '\u0031', '\u0032', '\u0033', '\u0034', '\u0035', '\u0036', '\u0037', '\u0038', '\u0039'}, // Greek
@@ -279,7 +279,7 @@ final class Decoder {
     // @formatter:on
 
     // @formatter:off
-    @SuppressWarnings("LongLine") private final static Unicode2Ascii[] UNICODE2ASCII = {
+    @SuppressWarnings("LongLine") final static Unicode2Ascii[] UNICODE2ASCII = {
             /* Roman    */ new Unicode2Ascii('\u0041', '\u005a', "ABCDEFGHIJKLMNOPQRSTUVWXYZ"),                                                        // Roman
             /* Greek    */ new Unicode2Ascii('\u0388', '\u03a9', "EU???????ABGDFZHQIKLMNCOJP?STYVXRW"),                                                // Greek
             /* Cyrillic */ new Unicode2Ascii('\u0410', '\u042f', "AZBGDEFNI?KLMHOJPCTYQXSVW????U?R"),                                                  // Cyrillic
@@ -728,7 +728,7 @@ final class Decoder {
         if (mapcode.startsWith(String.valueOf(GREEK_CAPITAL_ALPHA))) {
             final String unpacked = aeuUnpack(result);
             if (unpacked.isEmpty()) {
-                throw new AssertionError("decodeUTF16: cannot decode " + mapcode);
+                throw new UnknownDecodeException("decodeUTF16: cannot decode " + mapcode);
             }
             result = Encoder.aeuPack(unpacked, false);
         }

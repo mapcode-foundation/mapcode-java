@@ -322,6 +322,8 @@ public final class Mapcode {
             return true;
         } catch (final UnknownPrecisionFormatException ignored) {
             return false;
+        } catch (final UnknownDecodeException ignored2) {
+            return false;
         }
     }
 

@@ -16,6 +16,7 @@
 
 package com.mapcode;
 
+import com.mapcode.Decoder.Unicode2Ascii;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,36 @@ import static org.junit.Assert.assertEquals;
 public class DecoderTest {
     private static final Logger LOG = LoggerFactory.getLogger(DecoderTest.class);
 
+    @Test
+    public void tableDecodeChars() {
+        LOG.info("tableDecodeChars");
+        assertEquals("Length: " + Decoder.DECODE_CHARS.length, 256, Decoder.DECODE_CHARS.length);
+    }
+
+    @Test
+    public void tableAscii2Language() {
+        LOG.info("tableAscii2Language");
+        assertEquals(Decoder.ASCII2LANGUAGE.length, Decoder.UNICODE2ASCII.length - 10 /* Digits */ - 3 /* Lowercase */);
+        int i = 1;
+        for (char[] chars : Decoder.ASCII2LANGUAGE) {
+            assertEquals("At row " + i + ", length: " + chars.length, 36, chars.length);
+            ++i;
+        }
+    }
+
+    @Test
+    public void tableUnicodeToAscii() {
+        LOG.info("tableUnicodeToAscii");
+        for (Unicode2Ascii unicode2Ascii : Decoder.UNICODE2ASCII) {
+            assertEquals("Error at: u" + Integer.toHexString(unicode2Ascii.min),
+                    (int) unicode2Ascii.max - (int) unicode2Ascii.min, unicode2Ascii.convert.length() - 1);
+        }
+    }
+
     @SuppressWarnings("JUnitTestMethodWithNoAssertions")
     @Test
     public void getInternationalGrid() {
+        LOG.info("getInternationalGrid");
         final DataModel dataModel = DataModel.getInstance();
         final int world = Territory.AAA.getNumber();
         final int to = dataModel.getDataLastRecord(world);
