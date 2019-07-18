@@ -90,7 +90,6 @@ final class Common {
 
     // This method returns a divider for longitude (multiplied by 4), for a given latitude.
     // TODO: Need better names for minY and maxY.
-    @SuppressWarnings("ConstantConditions")
     static int xDivider(final int latMin, final int latMax) {
         assert latMin < latMax;
         if (latMin >= 0) {

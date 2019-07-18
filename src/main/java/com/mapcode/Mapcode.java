@@ -249,13 +249,13 @@ public final class Mapcode {
      * provided as statics to only compile these patterns once.
      */
     @Nonnull
-    static final String REGEX_TERRITORY = "[\\p{L}\\p{N}]{2,3}+([-_][\\p{L}\\p{N}]{2,3}+)?";
+    private static final String REGEX_TERRITORY = "[\\p{L}\\p{N}]{2,3}+([-_][\\p{L}\\p{N}]{2,3}+)?";
     @Nonnull
-    static final String REGEX_CODE_PREFIX = "[\\p{L}\\p{N}]{2,5}+";
+    private static final String REGEX_CODE_PREFIX = "[\\p{L}\\p{N}]{2,5}+";
     @Nonnull
-    static final String REGEX_CODE_POSTFIX = "[\\p{L}\\p{N}]{2,4}+";
+    private static final String REGEX_CODE_POSTFIX = "[\\p{L}\\p{N}]{2,4}+";
     @Nonnull
-    static final String REGEX_CODE_PRECISION = "[-][\\p{L}\\p{N}&&[^zZ]]{1,8}+";
+    private static final String REGEX_CODE_PRECISION = "[-][\\p{L}\\p{N}&&[^zZ]]{1,8}+";
 
     /**
      * This patterns/regular expressions is used for checking mapcode format strings.

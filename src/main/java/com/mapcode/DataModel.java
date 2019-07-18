@@ -86,7 +86,7 @@ class DataModel {
     private static final Object mutex = new Object();
 
     @SuppressWarnings({"DoubleCheckedLocking", "SynchronizationOnStaticField"})
-    public static DataModel getInstance() {
+    static DataModel getInstance() {
         if (instance == null) {
             synchronized (mutex) {
                 if (instance == null) {

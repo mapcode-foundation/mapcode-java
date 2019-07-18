@@ -338,8 +338,7 @@ final class Encoder {
             if (Data.getTerritoryRecordType(i) == Data.TERRITORY_RECORD_TYPE_PLUS) // plus pipe
             {
                 final int goodRounder = (codexm >= 23) ? (961 * 961 * 31) : (961 * 961);
-                product =
-                        ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
+                product = ((((storageStart + product + goodRounder) - 1) / goodRounder) * goodRounder) - storageStart;
             }
 
             if (i == territoryRecord) {
