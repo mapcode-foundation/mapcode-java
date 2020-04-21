@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2014-2019, Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2016-2020, Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -38,7 +38,7 @@ public class DecoderTest {
         LOG.info("tableAscii2Language");
         assertEquals(Decoder.ASCII2LANGUAGE.length, Decoder.UNICODE2ASCII.length - 10 /* Digits */ - 3 /* Lowercase */);
         int i = 1;
-        for (char[] chars : Decoder.ASCII2LANGUAGE) {
+        for (final char[] chars : Decoder.ASCII2LANGUAGE) {
             assertEquals("At row " + i + ", length: " + chars.length, 36, chars.length);
             ++i;
         }
@@ -47,7 +47,7 @@ public class DecoderTest {
     @Test
     public void tableUnicodeToAscii() {
         LOG.info("tableUnicodeToAscii");
-        for (Unicode2Ascii unicode2Ascii : Decoder.UNICODE2ASCII) {
+        for (final Unicode2Ascii unicode2Ascii : Decoder.UNICODE2ASCII) {
             assertEquals("Error at: u" + Integer.toHexString(unicode2Ascii.min),
                     (int) unicode2Ascii.max - (int) unicode2Ascii.min, unicode2Ascii.convert.length() - 1);
         }

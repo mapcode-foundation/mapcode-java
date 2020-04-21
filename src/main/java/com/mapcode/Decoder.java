@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2014-2019, Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2016-2020, Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -678,6 +678,7 @@ final class Decoder {
 
         for (int v = 0; v <= lastpos; v++) {
             if (v != dotpos) {
+                //noinspection RedundantCast
                 final int i = (int) str.charAt(v);
                 if (DECODE_CHARS[i] < 0) {
                     return ""; // bad char!
@@ -839,7 +840,9 @@ final class Decoder {
             final int extremeLatMicroDeg,
             final int maxLonMicroDeg) {
         final MapcodeZone mapcodeZone = new MapcodeZone();
+        //noinspection RedundantCast
         double dividerx4 = (double) dividerx0;
+        //noinspection RedundantCast
         double dividery = (double) dividery0;
         double processor = 1;
         int lon32 = 0;
@@ -849,6 +852,7 @@ final class Decoder {
         // decode up to 8 characters
         final int len = (extrapostfix.length() > 8) ? 8 : extrapostfix.length();
         while (idx < len) {
+            //noinspection RedundantCast
             int c1 = (int) extrapostfix.charAt(idx);
             idx++;
             c1 = DECODE_CHARS[c1];
@@ -861,6 +865,7 @@ final class Decoder {
             final int y2;
             final int x2;
             if (idx < len) {
+                //noinspection RedundantCast
                 int c2 = (int) extrapostfix.charAt(idx);
                 idx++;
                 c2 = DECODE_CHARS[c2];
@@ -915,6 +920,7 @@ final class Decoder {
 
     private static boolean isAbjadScript(@Nonnull final String argStr) {
         for (final char ch : argStr.toCharArray()) {
+            //noinspection RedundantCast
             final int c = (int) ch;
             if ((c >= 0x0628) && (c <= 0x0649)) {
                 return true; // Arabic

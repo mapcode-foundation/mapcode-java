@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2014-2019, Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2016-2020, Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -36,9 +36,13 @@ import static com.mapcode.CheckArgs.checkNonnull;
 public final class Point {
 
     // Latitude and longitude ranges.
+    @SuppressWarnings("unused")
     public static final double LON_DEG_MIN = -180.0;
+    @SuppressWarnings("unused")
     public static final double LON_DEG_MAX = 180.0;
+    @SuppressWarnings("unused")
     public static final double LAT_DEG_MIN = -90.0;
+    @SuppressWarnings("unused")
     public static final double LAT_DEG_MAX = 90.0;
 
     // Conversion constants.
