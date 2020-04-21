@@ -1,11 +1,11 @@
 /*
- * Copyright (C) 2014-2019, Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2016-2020, Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -978,11 +978,11 @@ public enum Territory {
         final Set<Integer> territoryNumbers = new HashSet<Integer>();
         final Set<String> namesSet = new HashSet<String>();
 
-        for (final Territory territory : Territory.values()) {
+        for (final Territory territory : values()) {
             final int territoryNumber = territory.getNumber();
 
             // Check if territory code is within range.
-            if ((territoryNumber < 0) || (territoryNumber >= Territory.values().length)) {
+            if ((territoryNumber < 0) || (territoryNumber >= values().length)) {
                 throw new ExceptionInInitializerError(errorPrefix + "territory number out of range: " + territoryNumber);
 
             }
@@ -1036,12 +1036,12 @@ public enum Territory {
             max = Math.max(max, territory.number);
             assert territory.alphabets.length > 0;
         }
-        assert territoryNumbers.size() == Territory.values().length;
+        assert territoryNumbers.size() == values().length;
 
         // Check that territory has at least one alphabet.
 
         // Check for missing codes; minimum code must be 0, maximum code must be last code of enum.
-        if (!((min == 0) && (max == (Territory.values().length - 1)))) {
+        if (!((min == 0) && (max == (values().length - 1)))) {
             throw new ExceptionInInitializerError(errorPrefix + "incorrect min/max territory number: " + min + '/' + max);
         }
     }

@@ -1,3 +1,19 @@
+<!--
+  ~ Copyright (C) 2016-2020, Stichting Mapcode Foundation (http://www.mapcode.com)
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
@@ -8,7 +24,7 @@
     <artifactId>mapcode</artifactId>
 
     <packaging>jar</packaging>
-    <version>2.4.14-SNAPSHOT</version>
+    <version>2.4.14</version>
 
     <name>Mapcode Java Library</name>
     <description>
@@ -36,7 +52,7 @@
             <name>Rijn Buve</name>
             <organization>Mapcode Foundation</organization>
             <roles>
-                <role>Managing Director, main contributor</role>
+                <role>Developer</role>
             </roles>
         </developer>
 
@@ -44,7 +60,7 @@
             <id>matthew</id>
             <name>Matthew Lowden</name>
             <roles>
-                <role>Original Java port</role>
+                <role>Developer (original port from C++)</role>
             </roles>
         </developer>
     </developers>
@@ -73,22 +89,22 @@
 
         <!-- Modules. -->
         <coveralls-maven-plugin.version>4.3.0</coveralls-maven-plugin.version>
-        <jacoco-maven-plugin.version>0.8.4</jacoco-maven-plugin.version>
+        <jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
-        <maven-javadoc-plugin.version>3.1.0</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
         <maven-gpg-plugin.version>1.6</maven-gpg-plugin.version>
         <maven-project-info-reports-plugin.version>3.0.0</maven-project-info-reports-plugin.version>
-        <maven-site-plugin.version>3.7.1</maven-site-plugin.version>
-        <maven-source-plugin.version>3.1.0</maven-source-plugin.version>
+        <maven-site-plugin.version>3.9.0</maven-site-plugin.version>
+        <maven-source-plugin.version>3.2.1</maven-source-plugin.version>
         <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
         <nexus-staging-maven-plugin.version>1.6.8</nexus-staging-maven-plugin.version>
 
         <!-- libraries. -->
         <gson.version>2.8.6</gson.version>
         <jsr305.version>3.0.2</jsr305.version>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13</junit.version>
         <log4j.version>1.2.17</log4j.version>
-        <slf4j.version>1.7.26</slf4j.version>
+        <slf4j.version>1.7.30</slf4j.version>
     </properties>
 
     <distributionManagement>
@@ -283,15 +299,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
             <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
 
         <dependency>
