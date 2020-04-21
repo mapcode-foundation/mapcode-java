@@ -480,6 +480,10 @@ Normally, one of our developers should be able to comment on them and fix.
 mat
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.14
+
+* Updated dependencies for security vulnerabilities.
+
 ### 2.4.13
 
 * Minor code cleanup.
