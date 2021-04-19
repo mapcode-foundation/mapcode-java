@@ -7,7 +7,7 @@
 [![Release](https://img.shields.io/github/release/mapcode-foundation/mapcode-java.svg?maxAge=3600)](https://github.com/mapcode-foundation/mapcode-java/releases)
 [![Maven Central](https://img.shields.io/maven-central/v/com.mapcode/mapcode.svg?maxAge=3600)](https://maven-badges.herokuapp.com/maven-central/com.mapcode/mapcode)
 
-**Copyright (C) 2014-2019, Stichting Mapcode Foundation (http://www.mapcode.com)**
+**Copyright (C) 2014-2021, Stichting Mapcode Foundation (http://www.mapcode.com)**
 
 This Java project contains a library to encode latitude/longitude pairs to mapcodes
 and to decode mapcodes back to latitude/longitude pairs.
@@ -477,8 +477,16 @@ Normally, one of our developers should be able to comment on them and fix.
 
 
 # Release Notes <a name="releasenotes"></a>
-mat
+
 These are the release notes for the Java library for mapcodes.
+
+### 2.4.15
+
+* Removed country code ANT (not used for mapcodes) after JDK 1.8. Fixed unit test for that.
+
+* Updated Maven dependencies for security vulnerabilities.
+
+* Updated copyrights.
 
 ### 2.4.14
 

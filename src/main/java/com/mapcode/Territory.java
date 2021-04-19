@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020, Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2016-2021, Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -960,14 +960,15 @@ public enum Territory {
         // Add Clipperton Island (not recognized by Java).
         MAP_ISO3_TO_ISO2.put("CPT", "CP");
 
+        // Remove Antilles (present in Java 1.8, removed later).
+        MAP_ISO3_TO_ISO2.remove("ANT");
+
         // Create fixed sets of the keys and values.
         COUNTRY_ISO2_CODES = new HashSet<String>(MAP_ISO3_TO_ISO2.values());
         COUNTRY_ISO3_CODES = new HashSet<String>(MAP_ISO3_TO_ISO2.keySet());
     }
 
-    /**
-     * Static checking of the static data structures.
-     */
+    // Static checking of the static data structures.
     static {
         final String errorPrefix = "Initializing error: ";
         CODE_LIST = new ArrayList<Territory>();
