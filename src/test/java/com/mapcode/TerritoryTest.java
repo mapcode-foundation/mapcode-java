@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2020, Stichting Mapcode Foundation (http://www.mapcode.com)
+ * Copyright (C) 2016-2021, Stichting Mapcode Foundation (http://www.mapcode.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -307,7 +307,7 @@ public class TerritoryTest {
         LOG.info("testGetCountryISO2Codes");
         final Set<String> countryISO2Codes = Territory.allCountryISO2Codes();
         LOG.info("set={}", countryISO2Codes);
-        assertEquals(251, countryISO2Codes.size());
+        assertEquals(250, countryISO2Codes.size());
         assertEquals(2, countryISO2Codes.iterator().next().length());
     }
 
@@ -316,7 +316,7 @@ public class TerritoryTest {
         LOG.info("testGetCountryISO3Codes");
         final Set<String> countryISO3Codes = Territory.allCountryISO3Codes();
         LOG.info("set={}", countryISO3Codes);
-        assertEquals(251, countryISO3Codes.size());
+        assertEquals(250, countryISO3Codes.size());
         assertEquals(3, countryISO3Codes.iterator().next().length());
     }
 }
