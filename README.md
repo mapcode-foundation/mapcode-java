@@ -480,6 +480,10 @@ Normally, one of our developers should be able to comment on them and fix.
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.16
+
+* Updated `log4j` and `gson` dependencies.
+
 ### 2.4.15
 
 * Removed country code ANT (not used for mapcodes) after JDK 1.8. Fixed unit test for that.
