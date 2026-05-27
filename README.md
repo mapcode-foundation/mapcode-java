@@ -1,13 +1,11 @@
 # Mapcode Library for Java
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/0c9f11645f504b50bd154a80fb95a5c3)](https://www.codacy.com/app/rijnb/mapcode-java?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=mapcode-foundation/mapcode-java&amp;utm_campaign=Badge_Grade)
-[![Build Status](https://img.shields.io/travis/mapcode-foundation/mapcode-java.svg?maxAge=3600&branch=master)](https://travis-ci.org/mapcode-foundation/mapcode-java)
 [![Coverage Status](https://coveralls.io/repos/github/mapcode-foundation/mapcode-java/badge.svg?branch=master&maxAge=3600)](https://coveralls.io/github/mapcode-foundation/mapcode-java?branch=master)
 [![License](http://img.shields.io/badge/license-APACHE2-blue.svg)]()
 [![Release](https://img.shields.io/github/release/mapcode-foundation/mapcode-java.svg?maxAge=3600)](https://github.com/mapcode-foundation/mapcode-java/releases)
 [![Maven Central](https://img.shields.io/maven-central/v/com.mapcode/mapcode.svg?maxAge=3600)](https://maven-badges.herokuapp.com/maven-central/com.mapcode/mapcode)
 
-**Copyright (C) 2014-2021, Stichting Mapcode Foundation (http://www.mapcode.com)**
+**Copyright (C) 2014-2026, Stichting Mapcode Foundation (http://www.mapcode.com)**
 
 This Java project contains a library to encode latitude/longitude pairs to mapcodes
 and to decode mapcodes back to latitude/longitude pairs.
