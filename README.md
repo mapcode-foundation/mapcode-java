@@ -480,6 +480,11 @@ Normally, one of our developers should be able to comment on them and fix.
 
 These are the release notes for the Java library for mapcodes.
 
+### 2.4.19
+
+* Added synonyms for territories Maco CN-MO and Mexico MX-CMX.
+* Updated dependencies.
+
 ### 2.4.16-2.4.18
 
 * Updated `log4j` and `gson` dependencies.
